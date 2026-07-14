@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { club, players } from "@/lib/mock";
 
@@ -97,6 +98,19 @@ function NavIcon({ name }: { name: string }) {
 }
 
 function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
+const router = useRouter();
+
+const routes: Record<string, string> = {
+  Dashboard: "/dashboard",
+  Team: "/team",
+  Players: "/players",
+  League: "/league",
+  Transfers: "/transfers",
+  Finance: "/finance",
+  Training: "/training",
+  "Youth Academy": "/academy",
+  Settings: "/settings",
+};
   return (
     <>
       <div className="flex items-center gap-2.5 border-b border-white/5 px-5 py-5">
@@ -117,7 +131,10 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
           <button
             key={item.label}
             type="button"
-            onClick={onNavigate}
+            onClick={() => {
+              router.push(routes[item.label]);
+              onNavigate?.();
+            }}
             className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition ${
               item.active
                 ? "border border-[#c9a227]/30 bg-[#c9a227]/10 text-[#d4af37]"
