@@ -256,7 +256,7 @@ export default function TeamPage() {
                     Management
                   </span>
                 </h1>
-                <p className="text-xs text-zinc-500 sm:text-sm">Circolo Firenze · Season 2025/26</p>
+                <p className="text-xs text-zinc-500 sm:text-sm">Accademia Biliardo Pontedera · Season 2025/26</p>
               </div>
             </div>
             <div className="rounded-lg border border-[#c9a227]/25 bg-[#c9a227]/5 px-3 py-1.5 sm:px-4 sm:py-2">
@@ -277,7 +277,7 @@ export default function TeamPage() {
                   <div className="relative flex flex-col gap-6 p-5 sm:flex-row sm:items-start sm:p-8">
                     <div className="flex shrink-0 items-center gap-4 sm:flex-col sm:items-center">
                       <div className="flex h-20 w-20 items-center justify-center rounded-2xl border-2 border-[#c9a227]/40 bg-gradient-to-br from-[#c9a227]/20 to-[#c9a227]/5 shadow-lg shadow-[#d4af37]/10 sm:h-28 sm:w-28">
-                        <span className="text-2xl font-bold text-[#d4af37] sm:text-3xl">CF</span>
+                        <span className="text-2xl font-bold text-[#d4af37] sm:text-3xl">ABP</span>
                       </div>
                       <StarRating rating={4} />
                     </div>
@@ -287,18 +287,18 @@ export default function TeamPage() {
                         Serie A Club
                       </p>
                       <h2 className="mt-1 text-2xl font-bold text-white sm:text-3xl">
-                        Circolo{" "}
+                        Accademia Biliardo{" "}
                         <span className="bg-gradient-to-r from-[#d4af37] to-[#f0c14b] bg-clip-text text-transparent">
-                          Firenze
+                          Pontedera
                         </span>
                       </h2>
 
                       <div className="mt-5 grid grid-cols-2 gap-x-6 gap-y-3 sm:grid-cols-3 lg:grid-cols-4">
                         {[
                           { label: "Founded", value: "1984" },
-                          { label: "President", value: "Giuseppe Neri" },
-                          { label: "Coach", value: "Marco Rossi" },
-                          { label: "Home Venue", value: "Sala Oltrarno" },
+                          { label: "President", value: "Andrea Martinelli" },
+                          { label: "Coach", value: "Simone Caciagli" },
+                          { label: "Home Venue", value: "Pontedera" },
                           { label: "Fans", value: "2,840" },
                           { label: "Reputation", value: "4 / 5 stars" },
                         ].map((item) => (
@@ -553,9 +553,9 @@ export default function TeamPage() {
                   <div className="mt-4 flex items-center justify-between gap-2">
                     <div className="text-center">
                       <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-full border border-[#c9a227]/40 bg-[#c9a227]/10 text-xs font-bold text-[#d4af37]">
-                        CF
+                        ABP
                       </div>
-                      <p className="mt-1.5 text-xs font-medium text-white">Firenze</p>
+                      <p className="mt-1.5 text-xs font-medium text-white">Pontedera</p>
                     </div>
                     <div className="text-center">
                       <p className="text-sm font-bold text-zinc-500">VS</p>

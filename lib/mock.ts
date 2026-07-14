@@ -2,13 +2,13 @@ import { Club, Player } from "./types";
 
 export const club: Club = {
   id: "club_001",
-  name: "Sala Firenze",
-  city: "Firenze",
-  hallName: "Sala Firenze",
+  name: "Accademia Biliardo Pontedera",
+  city: "Pontedera",
+  hallName: "Accademia Biliardo Pontedera",
   reputation: 4,
   fans: 2340,
   balance: 248500,
-  president: "Emiliano Rofi",
+  president: "Andrea Martinelli",
   coach: "Massimo Rossi",
   sponsor: "Gold Biliards",
 };
@@ -16,8 +16,8 @@ export const club: Club = {
 export const players: Player[] = [
   {
     id: "1",
-    firstName: "Luca",
-    lastName: "Bianchi",
+    firstName: "Emiliano",
+    lastName: "Rofi",
     age: 33,
     nationality: "Italia",
     category: "A",
@@ -44,8 +44,8 @@ export const players: Player[] = [
   },
   {
     id: "2",
-    firstName: "Andrea",
-    lastName: "Conti",
+    firstName: "Francesco",
+    lastName: "Galli",
     age: 28,
     nationality: "Italia",
     category: "B",
@@ -72,8 +72,8 @@ export const players: Player[] = [
   },
   {
     id: "3",
-    firstName: "Marco",
-    lastName: "Rossi",
+    firstName: "Federico",
+    lastName: "Raduazzo",
     age: 24,
     nationality: "Italia",
     category: "C",
