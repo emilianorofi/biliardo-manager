@@ -1,5 +1,19 @@
 import Link from "next/link";
-import { club, players } from "@/lib/mock";
+import {
+  players as allPlayers,
+  teams,
+  getPlayerOverall,
+} from "@/lib/game-data";
+
+const club = {
+  name: "Accademia Biliardo Pontedera",
+};
+
+const userTeam = teams.find((team) => team.isUserTeam);
+const players = allPlayers.filter(
+  (player) => player.teamId === userTeam?.id
+);
+
 
 export default function PlayersPage() {
   const averageAge =
@@ -13,17 +27,19 @@ export default function PlayersPage() {
   const averageOverall =
     players.length > 0
       ? Math.round(
-          players.reduce((total, player) => total + player.overall, 0) /
-            players.length
-        )
-      : 0;
+          players.reduce(
+          (total, player) => total + getPlayerOverall(player),
+          0
+        ) / players.length
+      )
+    : 0;
 
   const bestPlayer =
     players.length > 0
       ? players.reduce((best, player) =>
-          player.overall > best.overall ? player : best
-        )
-      : null;
+        getPlayerOverall(player) > getPlayerOverall(best) ? player : best
+      )
+    : null;
 
   return (
     <main className="min-h-screen space-y-6 bg-[#0a0a0a] p-4 sm:p-6">
@@ -92,7 +108,7 @@ export default function PlayersPage() {
               <p className="mt-1 text-sm text-zinc-400">
                 Overall{" "}
                 <span className="font-bold text-yellow-400">
-                  {bestPlayer.overall}
+                  {getPlayerOverall(bestPlayer)}
                 </span>
               </p>
             </>
@@ -162,44 +178,44 @@ export default function PlayersPage() {
 
                   <td className="px-3 py-4 text-center">
                     <span className="inline-flex min-w-9 items-center justify-center rounded-lg border border-yellow-400/30 bg-yellow-400/10 px-2 py-1 font-bold text-yellow-400">
-                      {player.overall}
+                      {getPlayerOverall(player)}
                     </span>
                   </td>
 
                   <td className="px-3 py-4 text-center text-zinc-300">
-                    {player.precision}
+                    {player.skills.precision}
                   </td>
 
                   <td className="px-3 py-4 text-center text-zinc-300">
-                    {player.direct}
+                    {player.skills.direct}
                   </td>
 
                   <td className="px-3 py-4 text-center text-zinc-300">
-                    {player.banks}
+                    {player.skills.banks}
                   </td>
 
                   <td className="px-3 py-4 text-center text-zinc-300">
-                    {player.tactics}
+                    {player.skills.tactics}
                   </td>
 
                   <td className="px-3 py-4 text-center text-zinc-300">
-                    {player.mentality}
+                    {player.skills.mentality}
                   </td>
 
                   <td className="px-3 py-4 text-center text-zinc-300">
-                    {player.defense}
+                    {player.skills.defense}
                   </td>
 
                   <td className="px-3 py-4 text-center text-zinc-300">
-                    {player.finishing}
+                    {player.skills.finishing}
                   </td>
 
                   <td className="px-3 py-4 text-center text-zinc-300">
-                    {player.creativity}
+                    {player.skills.creativity}
                   </td>
 
                   <td className="px-3 py-4 text-center text-zinc-300">
-                    {player.touch}
+                    {player.skills.measure}
                   </td>
                 </tr>
               ))}

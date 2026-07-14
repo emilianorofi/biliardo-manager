@@ -1,0 +1,1291 @@
+export type PlayerSkills = {
+  precision: number;
+  direct: number;
+  banks: number;
+  tactics: number;
+  mentality: number;
+  defense: number;
+  finishing: number;
+  creativity: number;
+  measure: number;
+};
+
+export type GamePlayer = {
+  id: string;
+  teamId: string;
+  firstName: string;
+  lastName: string;
+  age: number;
+  nationality: string;
+  experience: number;
+  form: number;
+  morale: number;
+  skills: PlayerSkills;
+};
+
+export type GameTeam = {
+  id: string;
+  name: string;
+  shortName: string;
+  city: string;
+  isUserTeam: boolean;
+  balance: number;
+  reputation: number;
+};
+
+export const teams: GameTeam[] = [
+  {
+    id: "team_abp",
+    name: "Accademia Biliardo Pontedera",
+    shortName: "ABP",
+    city: "Pontedera",
+    isUserTeam: true,
+    balance: 248500,
+    reputation: 4,
+  },
+  {
+    id: "team_ib",
+    name: "Il Biliardo",
+    shortName: "IB",
+    city: "Pisa",
+    isUserTeam: false,
+    balance: 236000,
+    reputation: 4,
+  },
+  {
+    id: "team_blk",
+    name: "Balalaika",
+    shortName: "BLK",
+    city: "Pisa",
+    isUserTeam: false,
+    balance: 221000,
+    reputation: 4,
+  },
+  {
+    id: "team_enj",
+    name: "Enjoy Livorno",
+    shortName: "ENJ",
+    city: "Livorno",
+    isUserTeam: false,
+    balance: 229000,
+    reputation: 4,
+  },
+  {
+    id: "team_lct",
+    name: "La Catena",
+    shortName: "LCT",
+    city: "San Miniato",
+    isUserTeam: false,
+    balance: 215000,
+    reputation: 3,
+  },
+  {
+    id: "team_bm",
+    name: "Bassa Marea",
+    shortName: "BM",
+    city: "Empoli",
+    isUserTeam: false,
+    balance: 218000,
+    reputation: 3,
+  },
+  {
+    id: "team_coi",
+    name: "Coiano",
+    shortName: "COI",
+    city: "Prato",
+    isUserTeam: false,
+    balance: 224000,
+    reputation: 4,
+  },
+  {
+    id: "team_mar",
+    name: "Marameo",
+    shortName: "MAR",
+    city: "Pistoia",
+    isUserTeam: false,
+    balance: 211000,
+    reputation: 3,
+  },
+];
+
+export const players: GamePlayer[] = [
+  // =========================================================
+  // ACCADEMIA BILIARDO PONTEDERA
+  // =========================================================
+
+  {
+    id: "player_abp_01",
+    teamId: "team_abp",
+    firstName: "Emiliano",
+    lastName: "Rofi",
+    age: 38,
+    nationality: "Italia",
+    experience: 78,
+    form: 8,
+    morale: 8,
+    skills: {
+      precision: 87,
+      direct: 88,
+      banks: 84,
+      tactics: 85,
+      mentality: 83,
+      defense: 82,
+      finishing: 86,
+      creativity: 84,
+      measure: 85,
+    },
+  },
+  {
+    id: "player_abp_02",
+    teamId: "team_abp",
+    firstName: "Francesco",
+    lastName: "Galli",
+    age: 36,
+    nationality: "Italia",
+    experience: 72,
+    form: 7,
+    morale: 8,
+    skills: {
+      precision: 84,
+      direct: 80,
+      banks: 86,
+      tactics: 82,
+      mentality: 81,
+      defense: 83,
+      finishing: 80,
+      creativity: 79,
+      measure: 82,
+    },
+  },
+  {
+    id: "player_abp_03",
+    teamId: "team_abp",
+    firstName: "Federico",
+    lastName: "Raduazzo",
+    age: 37,
+    nationality: "Italia",
+    experience: 76,
+    form: 8,
+    morale: 8,
+    skills: {
+      precision: 88,
+      direct: 87,
+      banks: 84,
+      tactics: 83,
+      mentality: 84,
+      defense: 81,
+      finishing: 85,
+      creativity: 86,
+      measure: 84,
+    },
+  },
+  {
+    id: "player_abp_04",
+    teamId: "team_abp",
+    firstName: "Paolo",
+    lastName: "Guidi",
+    age: 39,
+    nationality: "Italia",
+    experience: 80,
+    form: 8,
+    morale: 7,
+    skills: {
+      precision: 86,
+      direct: 84,
+      banks: 88,
+      tactics: 86,
+      mentality: 84,
+      defense: 85,
+      finishing: 82,
+      creativity: 81,
+      measure: 85,
+    },
+  },
+  {
+    id: "player_abp_05",
+    teamId: "team_abp",
+    firstName: "Nico",
+    lastName: "Guerrieri",
+    age: 34,
+    nationality: "Italia",
+    experience: 68,
+    form: 7,
+    morale: 8,
+    skills: {
+      precision: 82,
+      direct: 85,
+      banks: 84,
+      tactics: 79,
+      mentality: 81,
+      defense: 80,
+      finishing: 83,
+      creativity: 84,
+      measure: 80,
+    },
+  },
+  {
+    id: "player_abp_06",
+    teamId: "team_abp",
+    firstName: "Matteo",
+    lastName: "Taccini",
+    age: 32,
+    nationality: "Italia",
+    experience: 61,
+    form: 7,
+    morale: 7,
+    skills: {
+      precision: 82,
+      direct: 83,
+      banks: 79,
+      tactics: 78,
+      mentality: 79,
+      defense: 77,
+      finishing: 81,
+      creativity: 80,
+      measure: 79,
+    },
+  },
+
+  // =========================================================
+  // IL BILIARDO - PISA
+  // =========================================================
+
+  {
+    id: "player_ib_01",
+    teamId: "team_ib",
+    firstName: "Andrea",
+    lastName: "Bellini",
+    age: 41,
+    nationality: "Italia",
+    experience: 84,
+    form: 8,
+    morale: 8,
+    skills: {
+      precision: 88,
+      direct: 84,
+      banks: 87,
+      tactics: 86,
+      mentality: 85,
+      defense: 84,
+      finishing: 85,
+      creativity: 82,
+      measure: 86,
+    },
+  },
+  {
+    id: "player_ib_02",
+    teamId: "team_ib",
+    firstName: "Marco",
+    lastName: "Lombardi",
+    age: 35,
+    nationality: "Italia",
+    experience: 72,
+    form: 7,
+    morale: 8,
+    skills: {
+      precision: 84,
+      direct: 87,
+      banks: 82,
+      tactics: 81,
+      mentality: 83,
+      defense: 79,
+      finishing: 86,
+      creativity: 84,
+      measure: 81,
+    },
+  },
+  {
+    id: "player_ib_03",
+    teamId: "team_ib",
+    firstName: "Stefano",
+    lastName: "Conti",
+    age: 46,
+    nationality: "Italia",
+    experience: 89,
+    form: 7,
+    morale: 7,
+    skills: {
+      precision: 86,
+      direct: 80,
+      banks: 88,
+      tactics: 88,
+      mentality: 86,
+      defense: 87,
+      finishing: 80,
+      creativity: 78,
+      measure: 85,
+    },
+  },
+  {
+    id: "player_ib_04",
+    teamId: "team_ib",
+    firstName: "Luca",
+    lastName: "Ferrari",
+    age: 29,
+    nationality: "Italia",
+    experience: 58,
+    form: 8,
+    morale: 8,
+    skills: {
+      precision: 82,
+      direct: 85,
+      banks: 83,
+      tactics: 78,
+      mentality: 80,
+      defense: 77,
+      finishing: 84,
+      creativity: 85,
+      measure: 79,
+    },
+  },
+  {
+    id: "player_ib_05",
+    teamId: "team_ib",
+    firstName: "Alessio",
+    lastName: "Marini",
+    age: 24,
+    nationality: "Italia",
+    experience: 42,
+    form: 7,
+    morale: 9,
+    skills: {
+      precision: 80,
+      direct: 82,
+      banks: 78,
+      tactics: 74,
+      mentality: 78,
+      defense: 73,
+      finishing: 81,
+      creativity: 84,
+      measure: 77,
+    },
+  },
+  {
+    id: "player_ib_06",
+    teamId: "team_ib",
+    firstName: "Roberto",
+    lastName: "Gori",
+    age: 52,
+    nationality: "Italia",
+    experience: 94,
+    form: 6,
+    morale: 7,
+    skills: {
+      precision: 83,
+      direct: 76,
+      banks: 85,
+      tactics: 89,
+      mentality: 88,
+      defense: 88,
+      finishing: 77,
+      creativity: 75,
+      measure: 86,
+    },
+  },
+
+  // =========================================================
+  // BALALAIKA - PISA
+  // =========================================================
+
+  {
+    id: "player_blk_01",
+    teamId: "team_blk",
+    firstName: "Simone",
+    lastName: "Bertini",
+    age: 33,
+    nationality: "Italia",
+    experience: 69,
+    form: 8,
+    morale: 8,
+    skills: {
+      precision: 86,
+      direct: 86,
+      banks: 82,
+      tactics: 82,
+      mentality: 84,
+      defense: 80,
+      finishing: 85,
+      creativity: 83,
+      measure: 82,
+    },
+  },
+  {
+    id: "player_blk_02",
+    teamId: "team_blk",
+    firstName: "Davide",
+    lastName: "Neri",
+    age: 44,
+    nationality: "Italia",
+    experience: 86,
+    form: 7,
+    morale: 7,
+    skills: {
+      precision: 85,
+      direct: 79,
+      banks: 87,
+      tactics: 87,
+      mentality: 86,
+      defense: 86,
+      finishing: 79,
+      creativity: 77,
+      measure: 85,
+    },
+  },
+  {
+    id: "player_blk_03",
+    teamId: "team_blk",
+    firstName: "Gabriele",
+    lastName: "Rossi",
+    age: 28,
+    nationality: "Italia",
+    experience: 55,
+    form: 8,
+    morale: 8,
+    skills: {
+      precision: 81,
+      direct: 85,
+      banks: 84,
+      tactics: 78,
+      mentality: 80,
+      defense: 77,
+      finishing: 83,
+      creativity: 86,
+      measure: 80,
+    },
+  },
+  {
+    id: "player_blk_04",
+    teamId: "team_blk",
+    firstName: "Massimo",
+    lastName: "Fabbri",
+    age: 49,
+    nationality: "Italia",
+    experience: 91,
+    form: 7,
+    morale: 8,
+    skills: {
+      precision: 84,
+      direct: 78,
+      banks: 86,
+      tactics: 88,
+      mentality: 87,
+      defense: 85,
+      finishing: 78,
+      creativity: 76,
+      measure: 87,
+    },
+  },
+  {
+    id: "player_blk_05",
+    teamId: "team_blk",
+    firstName: "Niccolò",
+    lastName: "Serra",
+    age: 21,
+    nationality: "Italia",
+    experience: 34,
+    form: 8,
+    morale: 9,
+    skills: {
+      precision: 79,
+      direct: 82,
+      banks: 80,
+      tactics: 73,
+      mentality: 77,
+      defense: 72,
+      finishing: 81,
+      creativity: 85,
+      measure: 76,
+    },
+  },
+  {
+    id: "player_blk_06",
+    teamId: "team_blk",
+    firstName: "Claudio",
+    lastName: "Mancini",
+    age: 38,
+    nationality: "Italia",
+    experience: 76,
+    form: 6,
+    morale: 7,
+    skills: {
+      precision: 82,
+      direct: 81,
+      banks: 83,
+      tactics: 84,
+      mentality: 82,
+      defense: 83,
+      finishing: 80,
+      creativity: 79,
+      measure: 84,
+    },
+  },
+
+  // =========================================================
+  // ENJOY LIVORNO
+  // =========================================================
+
+  {
+    id: "player_enj_01",
+    teamId: "team_enj",
+    firstName: "Filippo",
+    lastName: "Bianchi",
+    age: 36,
+    nationality: "Italia",
+    experience: 74,
+    form: 8,
+    morale: 8,
+    skills: {
+      precision: 87,
+      direct: 85,
+      banks: 84,
+      tactics: 84,
+      mentality: 83,
+      defense: 82,
+      finishing: 85,
+      creativity: 83,
+      measure: 84,
+    },
+  },
+  {
+    id: "player_enj_02",
+    teamId: "team_enj",
+    firstName: "Tommaso",
+    lastName: "Leoni",
+    age: 31,
+    nationality: "Italia",
+    experience: 63,
+    form: 7,
+    morale: 8,
+    skills: {
+      precision: 83,
+      direct: 87,
+      banks: 82,
+      tactics: 79,
+      mentality: 81,
+      defense: 78,
+      finishing: 86,
+      creativity: 85,
+      measure: 80,
+    },
+  },
+  {
+    id: "player_enj_03",
+    teamId: "team_enj",
+    firstName: "Enrico",
+    lastName: "Vitali",
+    age: 43,
+    nationality: "Italia",
+    experience: 85,
+    form: 7,
+    morale: 7,
+    skills: {
+      precision: 85,
+      direct: 80,
+      banks: 87,
+      tactics: 87,
+      mentality: 86,
+      defense: 86,
+      finishing: 80,
+      creativity: 78,
+      measure: 86,
+    },
+  },
+  {
+    id: "player_enj_04",
+    teamId: "team_enj",
+    firstName: "Matteo",
+    lastName: "Grassi",
+    age: 27,
+    nationality: "Italia",
+    experience: 51,
+    form: 8,
+    morale: 9,
+    skills: {
+      precision: 81,
+      direct: 84,
+      banks: 83,
+      tactics: 77,
+      mentality: 80,
+      defense: 76,
+      finishing: 83,
+      creativity: 85,
+      measure: 79,
+    },
+  },
+  {
+    id: "player_enj_05",
+    teamId: "team_enj",
+    firstName: "Cristian",
+    lastName: "Pagni",
+    age: 40,
+    nationality: "Italia",
+    experience: 80,
+    form: 7,
+    morale: 8,
+    skills: {
+      precision: 84,
+      direct: 82,
+      banks: 85,
+      tactics: 85,
+      mentality: 84,
+      defense: 83,
+      finishing: 81,
+      creativity: 80,
+      measure: 85,
+    },
+  },
+  {
+    id: "player_enj_06",
+    teamId: "team_enj",
+    firstName: "Samuele",
+    lastName: "Orsini",
+    age: 23,
+    nationality: "Italia",
+    experience: 38,
+    form: 7,
+    morale: 9,
+    skills: {
+      precision: 78,
+      direct: 82,
+      banks: 79,
+      tactics: 73,
+      mentality: 77,
+      defense: 72,
+      finishing: 81,
+      creativity: 84,
+      measure: 76,
+    },
+  },
+
+  // =========================================================
+  // LA CATENA - SAN MINIATO
+  // =========================================================
+
+  {
+    id: "player_lct_01",
+    teamId: "team_lct",
+    firstName: "Riccardo",
+    lastName: "Martini",
+    age: 39,
+    nationality: "Italia",
+    experience: 79,
+    form: 8,
+    morale: 8,
+    skills: {
+      precision: 85,
+      direct: 82,
+      banks: 86,
+      tactics: 85,
+      mentality: 84,
+      defense: 84,
+      finishing: 81,
+      creativity: 80,
+      measure: 85,
+    },
+  },
+  {
+    id: "player_lct_02",
+    teamId: "team_lct",
+    firstName: "Daniele",
+    lastName: "Pellegrini",
+    age: 34,
+    nationality: "Italia",
+    experience: 67,
+    form: 7,
+    morale: 8,
+    skills: {
+      precision: 83,
+      direct: 85,
+      banks: 81,
+      tactics: 80,
+      mentality: 82,
+      defense: 79,
+      finishing: 84,
+      creativity: 83,
+      measure: 81,
+    },
+  },
+  {
+    id: "player_lct_03",
+    teamId: "team_lct",
+    firstName: "Fabio",
+    lastName: "Giannini",
+    age: 47,
+    nationality: "Italia",
+    experience: 89,
+    form: 6,
+    morale: 7,
+    skills: {
+      precision: 84,
+      direct: 77,
+      banks: 86,
+      tactics: 88,
+      mentality: 87,
+      defense: 87,
+      finishing: 77,
+      creativity: 75,
+      measure: 86,
+    },
+  },
+  {
+    id: "player_lct_04",
+    teamId: "team_lct",
+    firstName: "Lorenzo",
+    lastName: "Masi",
+    age: 26,
+    nationality: "Italia",
+    experience: 48,
+    form: 8,
+    morale: 8,
+    skills: {
+      precision: 80,
+      direct: 83,
+      banks: 82,
+      tactics: 76,
+      mentality: 79,
+      defense: 75,
+      finishing: 82,
+      creativity: 84,
+      measure: 78,
+    },
+  },
+  {
+    id: "player_lct_05",
+    teamId: "team_lct",
+    firstName: "Alberto",
+    lastName: "Pucci",
+    age: 42,
+    nationality: "Italia",
+    experience: 83,
+    form: 7,
+    morale: 7,
+    skills: {
+      precision: 82,
+      direct: 80,
+      banks: 84,
+      tactics: 85,
+      mentality: 84,
+      defense: 85,
+      finishing: 79,
+      creativity: 78,
+      measure: 84,
+    },
+  },
+  {
+    id: "player_lct_06",
+    teamId: "team_lct",
+    firstName: "Leonardo",
+    lastName: "Rinaldi",
+    age: 20,
+    nationality: "Italia",
+    experience: 29,
+    form: 8,
+    morale: 9,
+    skills: {
+      precision: 77,
+      direct: 80,
+      banks: 78,
+      tactics: 71,
+      mentality: 75,
+      defense: 70,
+      finishing: 79,
+      creativity: 83,
+      measure: 74,
+    },
+  },
+
+  // =========================================================
+  // BASSA MAREA - EMPOLI
+  // =========================================================
+
+  {
+    id: "player_bm_01",
+    teamId: "team_bm",
+    firstName: "Michele",
+    lastName: "Bartoli",
+    age: 37,
+    nationality: "Italia",
+    experience: 75,
+    form: 8,
+    morale: 8,
+    skills: {
+      precision: 84,
+      direct: 85,
+      banks: 82,
+      tactics: 82,
+      mentality: 83,
+      defense: 80,
+      finishing: 84,
+      creativity: 83,
+      measure: 82,
+    },
+  },
+  {
+    id: "player_bm_02",
+    teamId: "team_bm",
+    firstName: "Emanuele",
+    lastName: "Corsi",
+    age: 45,
+    nationality: "Italia",
+    experience: 87,
+    form: 7,
+    morale: 7,
+    skills: {
+      precision: 84,
+      direct: 78,
+      banks: 86,
+      tactics: 87,
+      mentality: 86,
+      defense: 86,
+      finishing: 78,
+      creativity: 76,
+      measure: 86,
+    },
+  },
+  {
+    id: "player_bm_03",
+    teamId: "team_bm",
+    firstName: "Giacomo",
+    lastName: "Fontani",
+    age: 30,
+    nationality: "Italia",
+    experience: 59,
+    form: 8,
+    morale: 8,
+    skills: {
+      precision: 82,
+      direct: 84,
+      banks: 83,
+      tactics: 78,
+      mentality: 80,
+      defense: 77,
+      finishing: 83,
+      creativity: 84,
+      measure: 80,
+    },
+  },
+  {
+    id: "player_bm_04",
+    teamId: "team_bm",
+    firstName: "Mirko",
+    lastName: "Baldini",
+    age: 35,
+    nationality: "Italia",
+    experience: 68,
+    form: 7,
+    morale: 8,
+    skills: {
+      precision: 82,
+      direct: 81,
+      banks: 84,
+      tactics: 83,
+      mentality: 82,
+      defense: 83,
+      finishing: 80,
+      creativity: 79,
+      measure: 83,
+    },
+  },
+  {
+    id: "player_bm_05",
+    teamId: "team_bm",
+    firstName: "Nicola",
+    lastName: "Taddei",
+    age: 25,
+    nationality: "Italia",
+    experience: 45,
+    form: 8,
+    morale: 9,
+    skills: {
+      precision: 79,
+      direct: 83,
+      banks: 80,
+      tactics: 74,
+      mentality: 78,
+      defense: 73,
+      finishing: 82,
+      creativity: 84,
+      measure: 76,
+    },
+  },
+  {
+    id: "player_bm_06",
+    teamId: "team_bm",
+    firstName: "Sergio",
+    lastName: "Mori",
+    age: 54,
+    nationality: "Italia",
+    experience: 96,
+    form: 6,
+    morale: 7,
+    skills: {
+      precision: 81,
+      direct: 74,
+      banks: 84,
+      tactics: 89,
+      mentality: 89,
+      defense: 88,
+      finishing: 75,
+      creativity: 73,
+      measure: 86,
+    },
+  },
+
+  // =========================================================
+  // COIANO - PRATO
+  // =========================================================
+
+  {
+    id: "player_coi_01",
+    teamId: "team_coi",
+    firstName: "Alessandro",
+    lastName: "Moretti",
+    age: 38,
+    nationality: "Italia",
+    experience: 77,
+    form: 8,
+    morale: 8,
+    skills: {
+      precision: 87,
+      direct: 84,
+      banks: 86,
+      tactics: 85,
+      mentality: 84,
+      defense: 84,
+      finishing: 83,
+      creativity: 82,
+      measure: 85,
+    },
+  },
+  {
+    id: "player_coi_02",
+    teamId: "team_coi",
+    firstName: "Federico",
+    lastName: "Lenzi",
+    age: 32,
+    nationality: "Italia",
+    experience: 64,
+    form: 8,
+    morale: 8,
+    skills: {
+      precision: 83,
+      direct: 86,
+      banks: 83,
+      tactics: 80,
+      mentality: 82,
+      defense: 79,
+      finishing: 85,
+      creativity: 85,
+      measure: 81,
+    },
+  },
+  {
+    id: "player_coi_03",
+    teamId: "team_coi",
+    firstName: "Massimiliano",
+    lastName: "Pini",
+    age: 48,
+    nationality: "Italia",
+    experience: 90,
+    form: 7,
+    morale: 7,
+    skills: {
+      precision: 85,
+      direct: 79,
+      banks: 88,
+      tactics: 88,
+      mentality: 87,
+      defense: 87,
+      finishing: 79,
+      creativity: 77,
+      measure: 87,
+    },
+  },
+  {
+    id: "player_coi_04",
+    teamId: "team_coi",
+    firstName: "Dario",
+    lastName: "Cecchi",
+    age: 29,
+    nationality: "Italia",
+    experience: 55,
+    form: 7,
+    morale: 8,
+    skills: {
+      precision: 81,
+      direct: 84,
+      banks: 82,
+      tactics: 77,
+      mentality: 80,
+      defense: 76,
+      finishing: 83,
+      creativity: 84,
+      measure: 79,
+    },
+  },
+  {
+    id: "player_coi_05",
+    teamId: "team_coi",
+    firstName: "Lapo",
+    lastName: "Biagini",
+    age: 22,
+    nationality: "Italia",
+    experience: 35,
+    form: 8,
+    morale: 9,
+    skills: {
+      precision: 79,
+      direct: 82,
+      banks: 81,
+      tactics: 73,
+      mentality: 77,
+      defense: 72,
+      finishing: 81,
+      creativity: 85,
+      measure: 76,
+    },
+  },
+  {
+    id: "player_coi_06",
+    teamId: "team_coi",
+    firstName: "Renato",
+    lastName: "Fedi",
+    age: 51,
+    nationality: "Italia",
+    experience: 93,
+    form: 6,
+    morale: 7,
+    skills: {
+      precision: 82,
+      direct: 75,
+      banks: 85,
+      tactics: 89,
+      mentality: 88,
+      defense: 88,
+      finishing: 76,
+      creativity: 74,
+      measure: 87,
+    },
+  },
+
+  // =========================================================
+  // MARAMEO - PISTOIA
+  // =========================================================
+
+  {
+    id: "player_mar_01",
+    teamId: "team_mar",
+    firstName: "Matteo",
+    lastName: "Innocenti",
+    age: 35,
+    nationality: "Italia",
+    experience: 71,
+    form: 8,
+    morale: 8,
+    skills: {
+      precision: 85,
+      direct: 84,
+      banks: 83,
+      tactics: 82,
+      mentality: 83,
+      defense: 81,
+      finishing: 84,
+      creativity: 83,
+      measure: 82,
+    },
+  },
+  {
+    id: "player_mar_02",
+    teamId: "team_mar",
+    firstName: "Andrea",
+    lastName: "Cappelli",
+    age: 43,
+    nationality: "Italia",
+    experience: 84,
+    form: 7,
+    morale: 7,
+    skills: {
+      precision: 84,
+      direct: 79,
+      banks: 86,
+      tactics: 86,
+      mentality: 85,
+      defense: 86,
+      finishing: 79,
+      creativity: 77,
+      measure: 85,
+    },
+  },
+  {
+    id: "player_mar_03",
+    teamId: "team_mar",
+    firstName: "Lorenzo",
+    lastName: "Vannini",
+    age: 28,
+    nationality: "Italia",
+    experience: 53,
+    form: 8,
+    morale: 8,
+    skills: {
+      precision: 81,
+      direct: 84,
+      banks: 82,
+      tactics: 77,
+      mentality: 80,
+      defense: 76,
+      finishing: 83,
+      creativity: 84,
+      measure: 79,
+    },
+  },
+  {
+    id: "player_mar_04",
+    teamId: "team_mar",
+    firstName: "Paolo",
+    lastName: "Bruni",
+    age: 40,
+    nationality: "Italia",
+    experience: 80,
+    form: 7,
+    morale: 8,
+    skills: {
+      precision: 83,
+      direct: 81,
+      banks: 84,
+      tactics: 84,
+      mentality: 84,
+      defense: 83,
+      finishing: 80,
+      creativity: 79,
+      measure: 84,
+    },
+  },
+  {
+    id: "player_mar_05",
+    teamId: "team_mar",
+    firstName: "Edoardo",
+    lastName: "Nannini",
+    age: 23,
+    nationality: "Italia",
+    experience: 39,
+    form: 8,
+    morale: 9,
+    skills: {
+      precision: 78,
+      direct: 82,
+      banks: 80,
+      tactics: 73,
+      mentality: 77,
+      defense: 72,
+      finishing: 81,
+      creativity: 84,
+      measure: 76,
+    },
+  },
+  {
+    id: "player_mar_06",
+    teamId: "team_mar",
+    firstName: "Giuliano",
+    lastName: "Sarti",
+    age: 50,
+    nationality: "Italia",
+    experience: 92,
+    form: 6,
+    morale: 7,
+    skills: {
+      precision: 81,
+      direct: 75,
+      banks: 84,
+      tactics: 88,
+      mentality: 88,
+      defense: 87,
+      finishing: 76,
+      creativity: 74,
+      measure: 86,
+    },
+  },
+];
+
+// =========================================================
+// FUNZIONI CONDIVISE
+// =========================================================
+
+export function getPlayerOverall(player: GamePlayer) {
+  const values = Object.values(player.skills);
+
+  return Math.round(
+    values.reduce((total, value) => total + value, 0) / values.length
+  );
+}
+
+export function getTeamById(teamId: string) {
+  return teams.find((team) => team.id === teamId);
+}
+
+export function getPlayersByTeamId(teamId: string) {
+  return players.filter((player) => player.teamId === teamId);
+}
+
+export function getUserTeam() {
+  return teams.find((team) => team.isUserTeam);
+}
+
+export function getUserTeamPlayers() {
+  const userTeam = getUserTeam();
+
+  if (!userTeam) {
+    return [];
+  }
+
+  return getPlayersByTeamId(userTeam.id);
+}
+
+export function calculateOverall(player: GamePlayer) {
+  const values = Object.values(player.skills);
+
+  const total = values.reduce(
+    (sum, value) => sum + value,
+    0
+  );
+
+  return Math.round(total / values.length);
+}
+
+export function getItalianScore(player: GamePlayer) {
+  return Math.round(
+    (player.skills.precision + player.skills.direct) / 2
+  );
+}
+
+export function getGorizianaScore(player: GamePlayer) {
+  return Math.round(
+    (player.skills.precision + player.skills.banks) / 2
+  );
+}
+
+export function getTuttiDoppiScore(player: GamePlayer) {
+  return Math.round(
+    (player.skills.direct + player.skills.banks) / 2
+  );
+}
+
+export function getBestSpecialty(player: GamePlayer) {
+  const specialties = [
+    {
+      name: "Italiana",
+      value: getItalianScore(player),
+    },
+    {
+      name: "Goriziana",
+      value: getGorizianaScore(player),
+    },
+    {
+      name: "Tutti Doppi",
+      value: getTuttiDoppiScore(player),
+    },
+  ];
+
+  return specialties.sort(
+    (a, b) => b.value - a.value
+  )[0];
+}
