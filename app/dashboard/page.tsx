@@ -141,6 +141,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
 }
 
 export default function DashboardPage() {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
     <div className="flex min-h-full bg-[#0a0a0a] text-zinc-100">

@@ -229,7 +229,7 @@ export default function TeamPage() {
             onClick={() => setSidebarOpen(false)}
           />
           <aside className="relative flex h-full w-72 max-w-[85vw] flex-col bg-[#0d0d0d] shadow-2xl">
-          <Sidebar onNavigate={() => setSidebarOpen(false)} />
+          <Sidebar />
           </aside>
         </div>
       )}
