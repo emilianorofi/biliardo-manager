@@ -1,3 +1,5 @@
+import AnimatedBilliardTable from "./components/AnimatedBilliardTable";
+
 export default function Home() {
   return (
     <div className="flex min-h-full flex-col bg-[#0a0a0a] text-zinc-100">
@@ -101,152 +103,9 @@ export default function Home() {
                 </a>
               </div>
             </div>
-
-            {/* Billiard table hero */}
-            <div className="relative mx-auto w-full max-w-lg lg:max-w-none">
-              <div className="absolute -inset-4 rounded-3xl bg-[#d4af37]/10 blur-3xl" />
-              <div className="relative rounded-2xl border border-white/10 bg-gradient-to-b from-[#1c1c1c] to-[#111111] p-4 shadow-2xl shadow-black/60 sm:p-6">
-                <svg
-                  viewBox="0 0 520 300"
-                  className="h-auto w-full drop-shadow-2xl"
-                  aria-label="Italian billiard table"
-                >
-                  <defs>
-                    <linearGradient id="felt" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stopColor="#1a5c38" />
-                      <stop offset="50%" stopColor="#227a4a" />
-                      <stop offset="100%" stopColor="#165a35" />
-                    </linearGradient>
-                    <linearGradient id="rail" x1="0%" y1="0%" x2="0%" y2="100%">
-                      <stop offset="0%" stopColor="#6b4423" />
-                      <stop offset="40%" stopColor="#8b5a2b" />
-                      <stop offset="100%" stopColor="#4a2f18" />
-                    </linearGradient>
-                    <radialGradient id="ballShine" cx="35%" cy="30%" r="60%">
-                      <stop offset="0%" stopColor="#ffffff" stopOpacity="0.9" />
-                      <stop offset="100%" stopColor="#ffffff" stopOpacity="0" />
-                    </radialGradient>
-                    <filter id="tableShadow">
-                      <feDropShadow dx="0" dy="8" stdDeviation="12" floodOpacity="0.5" />
-                    </filter>
-                  </defs>
-
-                  {/* Table shadow */}
-                  <ellipse cx="260" cy="280" rx="220" ry="12" fill="#000" opacity="0.4" />
-
-                  {/* Outer rail */}
-                  <rect
-                    x="20"
-                    y="30"
-                    width="480"
-                    height="240"
-                    rx="18"
-                    fill="url(#rail)"
-                    filter="url(#tableShadow)"
-                  />
-
-                  {/* Inner rail cushion */}
-                  <rect x="36" y="46" width="448" height="208" rx="12" fill="#5c3d1e" />
-
-                  {/* Felt surface */}
-                  <rect x="48" y="58" width="424" height="184" rx="8" fill="url(#felt)" />
-
-                  {/* Felt texture lines */}
-                  <line x1="48" y1="120" x2="472" y2="120" stroke="#ffffff" strokeOpacity="0.03" />
-                  <line x1="48" y1="180" x2="472" y2="180" stroke="#ffffff" strokeOpacity="0.03" />
-                  <line x1="260" y1="58" x2="260" y2="242" stroke="#ffffff" strokeOpacity="0.04" />
-
-                  {/* Diamond markers */}
-                  {[120, 200, 320, 400].map((x) => (
-                    <circle key={x} cx={x} cy="150" r="3" fill="#ffffff" opacity="0.15" />
-                  ))}
-
-                  {/* 5-pin diamond (Italian billiards) */}
-                  {[
-                    { cx: 260, cy: 130, fill: "#e8c547" },
-                    { cx: 240, cy: 155, fill: "#e74c3c" },
-                    { cx: 280, cy: 155, fill: "#e74c3c" },
-                    { cx: 220, cy: 180, fill: "#e74c3c" },
-                    { cx: 300, cy: 180, fill: "#e74c3c" },
-                  ].map((pin, i) => (
-                    <g key={i}>
-                      <ellipse cx={pin.cx} cy={pin.cy + 2} rx="5" ry="2" fill="#000" opacity="0.3" />
-                      <rect
-                        x={pin.cx - 4}
-                        y={pin.cy - 14}
-                        width="8"
-                        height="16"
-                        rx="2"
-                        fill={pin.fill}
-                      />
-                      <rect
-                        x={pin.cx - 3}
-                        y={pin.cy - 13}
-                        width="2"
-                        height="14"
-                        rx="1"
-                        fill="#ffffff"
-                        opacity="0.25"
-                      />
-                    </g>
-                  ))}
-
-                  {/* Cue ball */}
-                  <circle cx="130" cy="190" r="14" fill="#f5f5f0" />
-                  <circle cx="130" cy="190" r="14" fill="url(#ballShine)" />
-                  <circle cx="124" cy="184" r="3" fill="#ffffff" opacity="0.6" />
-
-                  {/* Red ball */}
-                  <circle cx="380" cy="100" r="13" fill="#c0392b" />
-                  <circle cx="380" cy="100" r="13" fill="url(#ballShine)" />
-
-                  {/* Yellow ball */}
-                  <circle cx="410" cy="200" r="13" fill="#f1c40f" />
-                  <circle cx="410" cy="200" r="13" fill="url(#ballShine)" />
-
-                  {/* Cue stick */}
-                  <line
-                    x1="60"
-                    y1="250"
-                    x2="115"
-                    y2="198"
-                    stroke="#d4a574"
-                    strokeWidth="5"
-                    strokeLinecap="round"
-                  />
-                  <line
-                    x1="60"
-                    y1="250"
-                    x2="115"
-                    y2="198"
-                    stroke="#8b6914"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                  />
-
-                  {/* Corner pockets */}
-                  {[
-                    [48, 58],
-                    [472, 58],
-                    [48, 242],
-                    [472, 242],
-                  ].map(([cx, cy], i) => (
-                    <circle key={i} cx={cx} cy={cy} r="10" fill="#0a0a0a" />
-                  ))}
-
-                  {/* Side pockets */}
-                  <circle cx="48" cy="150" r="9" fill="#0a0a0a" />
-                  <circle cx="472" cy="150" r="9" fill="#0a0a0a" />
-                </svg>
-
-                <div className="mt-4 flex items-center justify-between border-t border-white/5 pt-4 text-xs text-zinc-500">
-                  <span>5-Pin · Serie A</span>
-                  <span className="text-[#d4af37]">Season 2026</span>
-                </div>
-              </div>
-            </div>
           </div>
         </section>
+        <AnimatedBilliardTable />
 
         {/* Features */}
         <section id="features" className="relative py-20 sm:py-28">

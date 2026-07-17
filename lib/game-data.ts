@@ -1240,17 +1240,6 @@ export function getUserTeamPlayers() {
   return getPlayersByTeamId(userTeam.id);
 }
 
-export function calculateOverall(player: GamePlayer) {
-  const values = Object.values(player.skills);
-
-  const total = values.reduce(
-    (sum, value) => sum + value,
-    0
-  );
-
-  return Math.round(total / values.length);
-}
-
 export function getItalianScore(player: GamePlayer) {
   return Math.round(
     (player.skills.precision + player.skills.direct) / 2
