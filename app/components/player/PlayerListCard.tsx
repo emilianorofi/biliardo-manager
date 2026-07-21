@@ -1,122 +1,96 @@
 import Link from "next/link";
+
 import {
   GamePlayer,
   getPlayerOverall,
-  getItalianScore,
+  getItalianaScore,
   getGorizianaScore,
   getTuttiDoppiScore,
 } from "@/lib/game-data";
+
+import PlayerInfo from "./PlayerInfo";
+import AttributeBar from "./AttributeBar";
+import OverallBadge from "./OverallBadge";
+import SpecialityScores from "./SpecialityScores";
 
 type Props = {
   player: GamePlayer;
 };
 
+const skills = [
+  { key: "direct", label: "Diretto" },
+  { key: "banks", label: "Sponde" },
+  { key: "defense", label: "Difesa" },
+  { key: "finishing", label: "Realizzazione" },
+  { key: "precision", label: "Precisione" },
+  { key: "measure", label: "Misura" },
+  { key: "creativity", label: "Creatività" },
+  { key: "tactics", label: "Tattica" },
+  { key: "mentality", label: "Mentalità" },
+] as const;
+
 export default function PlayerListCard({ player }: Props) {
   const overall = getPlayerOverall(player);
 
-  const italiana = getItalianScore(player);
+  const italiana = getItalianaScore(player);
   const goriziana = getGorizianaScore(player);
   const tuttiDoppi = getTuttiDoppiScore(player);
 
   return (
     <Link
       href={`/players/${player.id}`}
-      className="group block overflow-hidden rounded-2xl border border-white/10 bg-[#171717] transition-all duration-300 hover:-translate-y-1 hover:border-yellow-400/40 hover:shadow-2xl hover:shadow-yellow-400/5"
+      className="group block"
     >
-      {/* Header */}
-      <div className="flex items-start justify-between border-b border-white/5 p-5">
+      <div className="rounded-xl border border-zinc-800 bg-[#171717] transition-all duration-200 hover:border-green-500 hover:bg-[#1b1b1b]">
 
-        <div className="flex gap-4">
+        <div className="flex items-stretch">
 
-          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-yellow-500 to-yellow-700 text-xl font-bold text-black">
-            {player.firstName[0]}
-            {player.lastName[0]}
+          {/* FOTO + INFO + STATO */}
+
+          <div className="w-[340px] border-r border-zinc-800 p-4">
+
+  <PlayerInfo player={player} />
+
+</div>
+
+          {/* CARATTERISTICHE */}
+
+          <div className="flex-1 border-r border-zinc-800 p-4">
+
+            <div className="space-y-1">
+
+              {skills.map((skill) => (
+
+                <AttributeBar
+                  key={skill.key}
+                  label={skill.label}
+                  value={player.skills[skill.key]}
+                />
+
+              ))}
+
+            </div>
+
           </div>
 
-          <div>
+          {/* OVERALL */}
+                    <div className="flex w-56 flex-col items-center justify-between p-4">
 
-            <h3 className="text-lg font-bold text-white">
-              {player.firstName} {player.lastName}
-            </h3>
+            <OverallBadge value={overall} />
 
-            <p className="mt-1 text-sm text-zinc-400">
-              🇮🇹 {player.nationality} • {player.age} anni
-            </p>
+            <SpecialityScores
+              italiana={italiana}
+              goriziana={goriziana}
+              tuttiDoppi={tuttiDoppi}
+            />
 
           </div>
 
         </div>
-
-        <div className="rounded-xl border border-yellow-400/30 bg-yellow-400/10 px-3 py-2 text-center">
-
-          <div className="text-xs uppercase tracking-wider text-yellow-300">
-            OVR
-          </div>
-
-          <div className="text-2xl font-black text-yellow-400">
-            {overall}
-          </div>
-
-        </div>
-
-      </div>
-
-      {/* Specialità */}
-
-      <div className="space-y-3 p-5">
-
-        <div className="flex items-center justify-between">
-
-          <span className="text-sm text-zinc-400">
-            🎱 Italiana
-          </span>
-
-          <span className="font-bold text-white">
-            {italiana}
-          </span>
-
-        </div>
-
-        <div className="flex items-center justify-between">
-
-          <span className="text-sm text-zinc-400">
-            🎱 Goriziana
-          </span>
-
-          <span className="font-bold text-white">
-            {goriziana}
-          </span>
-
-        </div>
-
-        <div className="flex items-center justify-between">
-
-          <span className="text-sm text-zinc-400">
-            🎱 Tutti Doppi
-          </span>
-
-          <span className="font-bold text-white">
-            {tuttiDoppi}
-          </span>
-
-        </div>
-
-      </div>
-
-      {/* Footer */}
-
-      <div className="flex items-center justify-between border-t border-white/5 bg-black/20 px-5 py-3">
-
-        <span className="text-xs uppercase tracking-widest text-zinc-500">
-          Apri scheda
-        </span>
-
-        <span className="translate-x-0 text-xl text-yellow-400 transition-transform duration-300 group-hover:translate-x-1">
-          →
-        </span>
 
       </div>
 
     </Link>
+
   );
 }

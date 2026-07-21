@@ -1240,7 +1240,7 @@ export function getUserTeamPlayers() {
   return getPlayersByTeamId(userTeam.id);
 }
 
-export function getItalianScore(player: GamePlayer) {
+export function getItalianaScore(player: GamePlayer) {
   return Math.round(
     (player.skills.precision + player.skills.direct) / 2
   );
@@ -1262,7 +1262,7 @@ export function getBestSpecialty(player: GamePlayer) {
   const specialties = [
     {
       name: "Italiana",
-      value: getItalianScore(player),
+      value: getItalianaScore(player),
     },
     {
       name: "Goriziana",
