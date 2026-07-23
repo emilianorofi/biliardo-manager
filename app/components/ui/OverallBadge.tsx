@@ -1,49 +1,48 @@
+"use client";
+
 interface OverallBadgeProps {
-  overall: number;
+  value: number;
+  size?: "sm" | "md" | "lg";
 }
 
 export default function OverallBadge({
-  overall,
+  value,
+  size = "md",
 }: OverallBadgeProps) {
-  let borderColor = "border-gray-500";
-  let textColor = "text-gray-300";
+  const color =
+    value >= 90
+      ? "bg-purple-600"
+      : value >= 80
+      ? "bg-green-600"
+      : value >= 70
+      ? "bg-yellow-500"
+      : value >= 60
+      ? "bg-orange-500"
+      : "bg-red-600";
 
-  if (overall >= 90) {
-    borderColor = "border-yellow-400";
-    textColor = "text-yellow-400";
-  } else if (overall >= 80) {
-    borderColor = "border-emerald-500";
-    textColor = "text-emerald-400";
-  } else if (overall >= 70) {
-    borderColor = "border-sky-500";
-    textColor = "text-sky-400";
-  } else if (overall >= 60) {
-    borderColor = "border-orange-500";
-    textColor = "text-orange-400";
-  }
+  const dimensions = {
+    sm: "w-10 h-10 text-lg",
+    md: "w-14 h-14 text-2xl",
+    lg: "w-20 h-20 text-4xl",
+  };
 
   return (
     <div
       className={`
-        w-20 h-20
-        rounded-2xl
-        border-2
-        ${borderColor}
-        bg-zinc-900
+        ${color}
+        ${dimensions[size]}
+        rounded-full
         flex
-        flex-col
         items-center
         justify-center
+        font-extrabold
+        text-white
         shadow-lg
+        border-4
+        border-white/10
       `}
     >
-      <span className="text-xs uppercase text-zinc-500">
-        OVR
-      </span>
-
-      <span className={`text-3xl font-bold ${textColor}`}>
-        {overall}
-      </span>
+      {value}
     </div>
   );
 }

@@ -11,6 +11,7 @@ import {
   Euro,
   Dumbbell,
   GraduationCap,
+  Target,
   Settings,
 } from "lucide-react";
 
@@ -18,6 +19,7 @@ const menu = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { label: "Squadra", href: "/team", icon: Users },
   { label: "Giocatori", href: "/players", icon: User },
+  { label: "Formazione", href: "/formation", icon: Target },
   { label: "Lega", href: "/league", icon: Trophy },
   { label: "Trasferimenti", href: "/transfers", icon: ArrowRightLeft },
   { label: "Finanze", href: "/finance", icon: Euro },
