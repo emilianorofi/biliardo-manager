@@ -2,108 +2,42 @@
 
 import { useState } from "react";
 
-type YouthPlayer = {
-  id: number;
-  firstName: string;
-  lastName: string;
-  age: number;
-  nationality: string;
-  revealed: number;
-  total: number;
-  precision: number | null;
-  direct: number | null;
-  banks: number | null;
-  tactics: number | null;
-  mentality: number | null;
-  defense: number | null;
-  finishing: number | null;
-  creativity: number | null;
-  measure: number | null;
-};
+import { academyPlayers } from "@/app/data/academyPlayers";
+import type {
+  AcademyAttributes,
+  AcademyPlayer,
+} from "@/app/types/academyPlayer";
 
-const youthPlayers: YouthPlayer[] = [
-  {
-    id: 1,
-    firstName: "Lorenzo",
-    lastName: "Benedetti",
-    age: 16,
-    nationality: "Italia",
-    revealed: 6,
-    total: 9,
-    precision: 78,
-    direct: 74,
-    banks: 81,
-    tactics: 72,
-    mentality: 76,
-    defense: 70,
-    finishing: null,
-    creativity: null,
-    measure: null,
-  },
-  {
-    id: 2,
-    firstName: "Matteo",
-    lastName: "Morelli",
-    age: 15,
-    nationality: "Italia",
-    revealed: 4,
-    total: 9,
-    precision: 71,
-    direct: null,
-    banks: 76,
-    tactics: 69,
-    mentality: null,
-    defense: null,
-    finishing: null,
-    creativity: 75,
-    measure: null,
-  },
-  {
-    id: 3,
-    firstName: "Tommaso",
-    lastName: "Ferri",
-    age: 14,
-    nationality: "Italia",
-    revealed: 2,
-    total: 9,
-    precision: null,
-    direct: 68,
-    banks: null,
-    tactics: null,
-    mentality: null,
-    defense: null,
-    finishing: null,
-    creativity: null,
-    measure: 73,
-  },
+const characteristics: {
+  key: keyof AcademyAttributes;
+  label: string;
+}[] = [
+  { key: "precisione", label: "Precisione" },
+  { key: "diretto", label: "Diretto" },
+  { key: "sponde", label: "Sponde" },
+  { key: "tattica", label: "Tattica" },
+  { key: "mentalita", label: "Mentalità" },
+  { key: "difesa", label: "Difesa" },
+  { key: "realizzazione", label: "Realizzazione" },
+  { key: "creativita", label: "Creatività" },
+  { key: "misura", label: "Misura" },
 ];
 
-const characteristics = [
-  { key: "precision", label: "Precisione" },
-  { key: "direct", label: "Diretto" },
-  { key: "banks", label: "Sponde" },
-  { key: "tactics", label: "Tattica" },
-  { key: "mentality", label: "Mentalità" },
-  { key: "defense", label: "Difesa" },
-  { key: "finishing", label: "Realizzazione" },
-  { key: "creativity", label: "Creatività" },
-  { key: "measure", label: "Misura" },
-] as const;
-
 export default function AcademyPage() {
-  const [players, setPlayers] = useState(youthPlayers);
+  const [players, setPlayers] =
+  useState<AcademyPlayer[]>(academyPlayers);
 
   const promotablePlayers = players.filter(
     (player) => player.age >= 16
   ).length;
 
   const totalRevealed = players.reduce(
-    (total, player) => total + player.revealed,
+    (total, player) => total + player.revealedAttributes,
     0
   );
 
   const totalCharacteristics = players.reduce(
-    (total, player) => total + player.total,
+    (total, player) => total + player.totalAttributes,
     0
   );
 
@@ -289,7 +223,7 @@ export default function AcademyPage() {
                       </td>
 
                       {characteristics.map((characteristic) => {
-                        const value = player[characteristic.key];
+                        const value = player.attributes[characteristic.key];
 
                         return (
                           <td
@@ -313,12 +247,12 @@ export default function AcademyPage() {
                         <div className="min-w-[110px]">
                           <div className="flex items-center justify-between text-xs">
                             <span className="text-zinc-400">
-                              {player.revealed}/{player.total}
+                              {player.revealedAttributes}/{player.totalAttributes}
                             </span>
 
                             <span className="font-semibold text-yellow-400">
                               {Math.round(
-                                (player.revealed / player.total) * 100
+                                (player.revealedAttributes / player.totalAttributes) * 100
                               )}
                               %
                             </span>
@@ -329,7 +263,7 @@ export default function AcademyPage() {
                               className="h-full rounded-full bg-yellow-400"
                               style={{
                                 width: `${
-                                  (player.revealed / player.total) * 100
+                                  (player.revealedAttributes / player.totalAttributes) * 100
                                 }%`,
                               }}
                             />

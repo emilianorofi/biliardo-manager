@@ -1,0 +1,137 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Club {
+  id Int @id @default(autoincrement())
+
+  name      String
+  shortName String
+  logo      String @default("")
+
+  city    String
+  country String
+
+  reputation Int @default(1)
+  fans       Int @default(0)
+
+  balance        Int @default(0)
+  weeklyExpenses Int @default(0)
+  weeklyIncome   Int @default(0)
+
+  trainerLevel    Int @default(1)
+  youthCoachLevel Int @default(1)
+
+  players        Player[]
+  academyPlayers AcademyPlayer[]
+  formation      Formation?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Player {
+  id Int @id @default(autoincrement())
+
+  clubId Int
+  club   Club @relation(fields: [clubId], references: [id], onDelete: Cascade)
+
+  firstName   String
+  lastName    String
+  nationality String
+  age         Int
+
+  form       Int   @default(5)
+  morale     Int   @default(5)
+  experience Float @default(0)
+
+  talent    Float
+  potential Float
+
+  value  Int @default(0)
+  salary Int @default(0)
+
+  image String   @default("")
+  style String[] @default([])
+
+  precisione    Float
+  diretto       Float
+  sponde        Float
+  tattica       Float
+  mentalita     Float
+  difesa        Float
+  realizzazione Float
+  creativita    Float
+  misura        Float
+
+  formationAsA Formation[] @relation("FormationSlotA")
+  formationAsB Formation[] @relation("FormationSlotB")
+  formationAsC Formation[] @relation("FormationSlotC")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([clubId])
+}
+
+model AcademyPlayer {
+  id Int @id @default(autoincrement())
+
+  clubId Int
+  club   Club @relation(fields: [clubId], references: [id], onDelete: Cascade)
+
+  firstName   String
+  lastName    String
+  nationality String
+  age         Int
+
+  talent    Float
+  potential Float
+
+  revealedAttributes Int @default(0)
+  totalAttributes    Int @default(9)
+
+  precisione    Float?
+  diretto       Float?
+  sponde        Float?
+  tattica       Float?
+  mentalita     Float?
+  difesa        Float?
+  realizzazione Float?
+  creativita    Float?
+  misura        Float?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([clubId])
+}
+
+model Formation {
+  id Int @id @default(autoincrement())
+
+  clubId Int  @unique
+  club   Club @relation(fields: [clubId], references: [id], onDelete: Cascade)
+
+  slotAPlayerId Int?
+  slotAPlayer   Player? @relation("FormationSlotA", fields: [slotAPlayerId], references: [id], onDelete: SetNull)
+
+  slotBPlayerId Int?
+  slotBPlayer   Player? @relation("FormationSlotB", fields: [slotBPlayerId], references: [id], onDelete: SetNull)
+
+  slotCPlayerId Int?
+  slotCPlayer   Player? @relation("FormationSlotC", fields: [slotCPlayerId], references: [id], onDelete: SetNull)
+
+  savedAt   DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([slotAPlayerId])
+  @@index([slotBPlayerId])
+  @@index([slotCPlayerId])
+}
