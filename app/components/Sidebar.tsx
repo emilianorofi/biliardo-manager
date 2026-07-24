@@ -16,23 +16,63 @@ import {
 } from "lucide-react";
 
 const menu = [
-  { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { label: "Squadra", href: "/team", icon: Users },
-  { label: "Giocatori", href: "/players", icon: User },
-  { label: "Formazione", href: "/formation", icon: Target },
-  { label: "Lega", href: "/league", icon: Trophy },
-  { label: "Trasferimenti", href: "/transfers", icon: ArrowRightLeft },
-  { label: "Finanze", href: "/finance", icon: Euro },
-  { label: "Allenamento", href: "/training", icon: Dumbbell },
-  { label: "Accademia", href: "/academy", icon: GraduationCap },
-  { label: "Impostazioni", href: "/settings", icon: Settings },
+  {
+    label: "Dashboard",
+    href: "/dashboard",
+    icon: LayoutDashboard,
+  },
+  {
+    label: "Squadra",
+    href: "/team",
+    icon: Users,
+  },
+  {
+    label: "Giocatori",
+    href: "/players",
+    icon: User,
+  },
+  {
+    label: "Formazione",
+    href: "/formation",
+    icon: Target,
+  },
+  {
+    label: "Lega",
+    href: "/league",
+    icon: Trophy,
+  },
+  {
+    label: "Mercato",
+    href: "/market",
+    icon: ArrowRightLeft,
+  },
+  {
+    label: "Finanze",
+    href: "/finance",
+    icon: Euro,
+  },
+  {
+    label: "Allenamento",
+    href: "/training",
+    icon: Dumbbell,
+  },
+  {
+    label: "Accademia",
+    href: "/academy",
+    icon: GraduationCap,
+  },
+  {
+    label: "Impostazioni",
+    href: "/settings",
+    icon: Settings,
+  },
 ];
 
 export default function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="w-64 min-h-screen bg-[#121212] border-r border-yellow-700 flex flex-col">
+    <aside className="flex min-h-screen w-64 shrink-0 flex-col border-r border-yellow-700 bg-[#121212]">
       <div className="p-6 text-2xl font-bold text-yellow-400">
         🎱 Biliardo Manager
       </div>
@@ -41,19 +81,22 @@ export default function Sidebar() {
         {menu.map((item) => {
           const Icon = item.icon;
 
+          const isActive =
+            pathname === item.href ||
+            pathname.startsWith(`${item.href}/`);
+
           return (
             <Link
               key={item.href}
               href={item.href}
-              className={`flex items-center gap-3 rounded-xl px-4 py-3 transition-all
-              ${
-                pathname === item.href
-                  ? "bg-yellow-500 text-black font-semibold"
+              className={`flex items-center gap-3 rounded-xl px-4 py-3 transition-all ${
+                isActive
+                  ? "bg-yellow-500 font-semibold text-black"
                   : "text-gray-300 hover:bg-zinc-800 hover:text-yellow-400"
               }`}
             >
               <Icon size={20} />
-              {item.label}
+              <span>{item.label}</span>
             </Link>
           );
         })}
