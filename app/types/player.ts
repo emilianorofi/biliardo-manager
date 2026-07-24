@@ -17,8 +17,6 @@ export interface Player {
   value: number;
   salary: number;
 
-  slot: "A" | "B" | "C" | "-";
-
   image: string;
 
   style: string[];

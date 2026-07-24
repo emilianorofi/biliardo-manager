@@ -16,8 +16,6 @@ export const players: Player[] = [
     value: 425000,
     salary: 2300,
 
-    slot: "A",
-
     image: "/players/galli.png",
 
     style: ["Leader", "Freddo", "Carismatico"],
@@ -56,8 +54,6 @@ export const players: Player[] = [
     value: 330000,
     salary: 1900,
 
-    slot: "B",
-
     image: "/players/martin.png",
 
     style: ["Tecnico"],
@@ -95,8 +91,6 @@ export const players: Player[] = [
 
     value: 250000,
     salary: 1500,
-
-    slot: "A",
 
     image: "/players/lopez.png",
 

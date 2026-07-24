@@ -68,15 +68,9 @@ export default async function PlayerPage({
             </div>
 
             <div>
-              <div className="flex flex-wrap items-center gap-3">
-                <h1 className="text-3xl font-black text-white">
-                  {player.firstName} {player.lastName}
-                </h1>
-
-                <span className="rounded-lg bg-amber-400 px-3 py-1 text-sm font-black text-[#122018]">
-                  Slot {player.slot}
-                </span>
-              </div>
+              <h1 className="text-3xl font-black text-white">
+                {player.firstName} {player.lastName}
+              </h1>
 
               <p className="mt-2 text-sm text-slate-400">
                 {player.nationality} · {player.age} anni
