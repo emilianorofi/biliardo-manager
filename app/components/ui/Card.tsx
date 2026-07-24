@@ -1,28 +1,59 @@
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 
 interface CardProps {
   children: ReactNode;
   className?: string;
+  title?: string;
+  subtitle?: string;
+  icon?: ReactNode;
+  actions?: ReactNode;
 }
 
 export default function Card({
   children,
   className = "",
+  title,
+  subtitle,
+  icon,
+  actions,
 }: CardProps) {
+  const hasHeader = title || subtitle || icon || actions;
+
   return (
-    <div
-      className={`
-        rounded-2xl
-        border
-        border-zinc-800
-        bg-zinc-900
-        shadow-lg
-        transition-all
-        duration-200
-        ${className}
-      `}
+    <section
+      className={`overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900 shadow-lg transition-all duration-200 ${className}`}
     >
-      {children}
-    </div>
+      {hasHeader && (
+        <header className="flex items-center justify-between gap-4 border-b border-zinc-800 px-6 py-4">
+          <div className="flex min-w-0 items-center gap-3">
+            {icon && (
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-emerald-600/15 text-emerald-400">
+                {icon}
+              </div>
+            )}
+
+            <div className="min-w-0">
+              {title && (
+                <h2 className="truncate text-lg font-bold text-white">
+                  {title}
+                </h2>
+              )}
+
+              {subtitle && (
+                <p className="mt-0.5 text-sm text-zinc-400">
+                  {subtitle}
+                </p>
+              )}
+            </div>
+          </div>
+
+          {actions && <div className="shrink-0">{actions}</div>}
+        </header>
+      )}
+
+      <div className={hasHeader ? "p-6" : ""}>
+        {children}
+      </div>
+    </section>
   );
 }

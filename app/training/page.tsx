@@ -1,4 +1,4 @@
-import { players } from "@/lib/mock";
+import { players } from "@/app/data/players";
 
 const SKILLS = [
   "Precisione",
