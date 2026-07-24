@@ -1,44 +1,381 @@
-import { club } from "@/lib/mock";
+import {
+  ArrowDownRight,
+  ArrowUpRight,
+  Landmark,
+  ReceiptText,
+  WalletCards,
+} from "lucide-react";
 
-const TRANSACTIONS = [
-  {
-    id: 1,
-    date: "14 Lug",
-    description: "Entrate sponsor",
-    category: "Sponsor",
-    amount: 5200,
-  },
-  {
-    id: 2,
-    date: "13 Lug",
-    description: "Incasso giornata di campionato",
-    category: "Partita",
-    amount: 8400,
-  },
-  {
-    id: 3,
-    date: "10 Lug",
-    description: "Costi gestione club",
-    category: "Gestione",
-    amount: -2750,
-  },
-  {
-    id: 4,
-    date: "9 Lug",
-    description: "Staff tecnico",
-    category: "Staff",
-    amount: -3500,
-  },
-  {
-    id: 5,
-    date: "7 Lug",
-    description: "Entrate sponsor",
-    category: "Sponsor",
-    amount: 5200,
-  },
-];
+import { clubs } from "@/app/data/clubs";
 
-function formatMoney(value: number) {
+export default function FinancePage() {
+  const club = clubs[0];
+
+  if (!club) {
+    throw new Error("Club principale non disponibile.");
+  }
+
+  const weeklyBalance =
+    club.weeklyIncome - club.weeklyExpenses;
+
+  const projectedBalance =
+    club.balance + weeklyBalance;
+
+  const transactions = [
+    {
+      id: 1,
+      date: "Settimana corrente",
+      description: "Entrate complessive del club",
+      category: "Entrate",
+      amount: club.weeklyIncome,
+    },
+    {
+      id: 2,
+      date: "Settimana corrente",
+      description: "Uscite complessive del club",
+      category: "Uscite",
+      amount: -club.weeklyExpenses,
+    },
+  ];
+
+  return (
+    <main className="space-y-6">
+      <header>
+        <p className="text-sm font-bold text-amber-400">
+          Gestione economica
+        </p>
+
+        <h1 className="mt-1 text-3xl font-black text-white">
+          Finanze
+        </h1>
+
+        <p className="mt-2 text-sm text-slate-400">
+          Situazione economica di {club.name}
+        </p>
+      </header>
+
+      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <SummaryCard
+          label="Saldo disponibile"
+          value={formatCurrency(club.balance)}
+          description="Disponibilità attuale"
+          icon={<WalletCards size={22} />}
+          tone="amber"
+        />
+
+        <SummaryCard
+          label="Entrate settimanali"
+          value={formatSignedCurrency(club.weeklyIncome)}
+          description="Totale delle entrate"
+          icon={<ArrowUpRight size={22} />}
+          tone="emerald"
+        />
+
+        <SummaryCard
+          label="Uscite settimanali"
+          value={formatSignedCurrency(
+            -club.weeklyExpenses
+          )}
+          description="Totale delle spese"
+          icon={<ArrowDownRight size={22} />}
+          tone="red"
+        />
+
+        <SummaryCard
+          label="Risultato settimanale"
+          value={formatSignedCurrency(weeklyBalance)}
+          description="Entrate meno uscite"
+          icon={
+            weeklyBalance >= 0 ? (
+              <ArrowUpRight size={22} />
+            ) : (
+              <ArrowDownRight size={22} />
+            )
+          }
+          tone={
+            weeklyBalance >= 0
+              ? "emerald"
+              : "red"
+          }
+        />
+      </section>
+
+      <div className="grid gap-6 xl:grid-cols-[1fr_360px]">
+        <section className="overflow-hidden rounded-2xl border border-emerald-900/60 bg-[#15261f]">
+          <div className="border-b border-emerald-900/60 p-5 sm:p-6">
+            <div className="flex items-center gap-3">
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-300">
+                <ReceiptText size={22} />
+              </div>
+
+              <div>
+                <h2 className="text-xl font-black text-white">
+                  Movimenti settimanali
+                </h2>
+
+                <p className="mt-1 text-sm text-slate-400">
+                  Riepilogo delle entrate e delle uscite
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[620px] text-left">
+              <thead className="border-b border-emerald-900/50 bg-emerald-950/30">
+                <tr className="text-xs font-black uppercase tracking-wider text-slate-500">
+                  <th className="px-5 py-4 sm:px-6">
+                    Periodo
+                  </th>
+
+                  <th className="px-4 py-4">
+                    Descrizione
+                  </th>
+
+                  <th className="px-4 py-4">
+                    Categoria
+                  </th>
+
+                  <th className="px-5 py-4 text-right sm:px-6">
+                    Importo
+                  </th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {transactions.map((transaction) => (
+                  <tr
+                    key={transaction.id}
+                    className="border-b border-emerald-900/40 last:border-0"
+                  >
+                    <td className="px-5 py-5 text-sm text-slate-400 sm:px-6">
+                      {transaction.date}
+                    </td>
+
+                    <td className="px-4 py-5">
+                      <p className="font-bold text-white">
+                        {transaction.description}
+                      </p>
+                    </td>
+
+                    <td className="px-4 py-5">
+                      <span
+                        className={`rounded-lg border px-3 py-1 text-xs font-bold ${
+                          transaction.amount >= 0
+                            ? "border-emerald-500/25 bg-emerald-500/10 text-emerald-300"
+                            : "border-red-500/25 bg-red-500/10 text-red-300"
+                        }`}
+                      >
+                        {transaction.category}
+                      </span>
+                    </td>
+
+                    <td
+                      className={`px-5 py-5 text-right font-black sm:px-6 ${
+                        transaction.amount >= 0
+                          ? "text-emerald-300"
+                          : "text-red-300"
+                      }`}
+                    >
+                      {formatSignedCurrency(
+                        transaction.amount
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <aside className="space-y-6">
+          <section className="rounded-2xl border border-emerald-900/60 bg-[#15261f] p-5 sm:p-6">
+            <div className="flex items-center gap-3">
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-amber-400/10 text-amber-300">
+                <Landmark size={22} />
+              </div>
+
+              <div>
+                <p className="text-xs font-black uppercase tracking-wider text-slate-500">
+                  Riepilogo
+                </p>
+
+                <h2 className="text-xl font-black text-white">
+                  Settimana corrente
+                </h2>
+              </div>
+            </div>
+
+            <div className="mt-6 space-y-4">
+              <FinancialRow
+                label="Entrate"
+                value={formatSignedCurrency(
+                  club.weeklyIncome
+                )}
+                tone="positive"
+              />
+
+              <FinancialRow
+                label="Uscite"
+                value={formatSignedCurrency(
+                  -club.weeklyExpenses
+                )}
+                tone="negative"
+              />
+
+              <FinancialRow
+                label="Risultato"
+                value={formatSignedCurrency(
+                  weeklyBalance
+                )}
+                tone={
+                  weeklyBalance >= 0
+                    ? "positive"
+                    : "negative"
+                }
+                last
+              />
+            </div>
+          </section>
+
+          <section
+            className={`rounded-2xl border p-5 sm:p-6 ${
+              weeklyBalance >= 0
+                ? "border-emerald-500/25 bg-emerald-500/5"
+                : "border-red-500/25 bg-red-500/5"
+            }`}
+          >
+            <p
+              className={`text-xs font-black uppercase tracking-[0.18em] ${
+                weeklyBalance >= 0
+                  ? "text-emerald-300"
+                  : "text-red-300"
+              }`}
+            >
+              Previsione
+            </p>
+
+            <h2 className="mt-2 text-xl font-black text-white">
+              {weeklyBalance >= 0
+                ? "Situazione economica positiva"
+                : "Situazione economica negativa"}
+            </h2>
+
+            <p className="mt-3 text-sm leading-6 text-slate-400">
+              Mantenendo l’attuale andamento, il saldo
+              previsto al termine della prossima settimana
+              sarà:
+            </p>
+
+            <p
+              className={`mt-4 text-3xl font-black ${
+                projectedBalance >= 0
+                  ? "text-amber-300"
+                  : "text-red-300"
+              }`}
+            >
+              {formatCurrency(projectedBalance)}
+            </p>
+          </section>
+        </aside>
+      </div>
+    </main>
+  );
+}
+
+function SummaryCard({
+  label,
+  value,
+  description,
+  icon,
+  tone,
+}: {
+  label: string;
+  value: string;
+  description: string;
+  icon: React.ReactNode;
+  tone: "amber" | "emerald" | "red";
+}) {
+  const tones = {
+    amber: {
+      border: "border-amber-400/25",
+      background: "bg-amber-400/5",
+      text: "text-amber-300",
+    },
+    emerald: {
+      border: "border-emerald-500/25",
+      background: "bg-emerald-500/5",
+      text: "text-emerald-300",
+    },
+    red: {
+      border: "border-red-500/25",
+      background: "bg-red-500/5",
+      text: "text-red-300",
+    },
+  };
+
+  const style = tones[tone];
+
+  return (
+    <article
+      className={`rounded-2xl border p-5 ${style.border} ${style.background}`}
+    >
+      <div className={`flex items-center gap-2 ${style.text}`}>
+        {icon}
+
+        <p className="text-xs font-black uppercase tracking-wider">
+          {label}
+        </p>
+      </div>
+
+      <p className={`mt-3 text-2xl font-black ${style.text}`}>
+        {value}
+      </p>
+
+      <p className="mt-1 text-sm text-slate-500">
+        {description}
+      </p>
+    </article>
+  );
+}
+
+function FinancialRow({
+  label,
+  value,
+  tone,
+  last = false,
+}: {
+  label: string;
+  value: string;
+  tone: "positive" | "negative";
+  last?: boolean;
+}) {
+  return (
+    <div
+      className={`flex items-center justify-between gap-4 ${
+        last
+          ? ""
+          : "border-b border-emerald-900/50 pb-4"
+      }`}
+    >
+      <span className="text-sm text-slate-400">
+        {label}
+      </span>
+
+      <span
+        className={`font-black ${
+          tone === "positive"
+            ? "text-emerald-300"
+            : "text-red-300"
+        }`}
+      >
+        {value}
+      </span>
+    </div>
+  );
+}
+
+function formatCurrency(value: number) {
   return new Intl.NumberFormat("it-IT", {
     style: "currency",
     currency: "EUR",
@@ -46,269 +383,11 @@ function formatMoney(value: number) {
   }).format(value);
 }
 
-export default function FinancePage() {
-  const weeklyIncome = 13600;
-  const weeklyExpenses = 8750;
-  const weeklyBalance = weeklyIncome - weeklyExpenses;
+function formatSignedCurrency(value: number) {
+  const formatted = formatCurrency(Math.abs(value));
 
-  return (
-    <main className="min-h-screen bg-[#0a0a0a] p-4 text-white sm:p-6">
-      <div className="mx-auto max-w-7xl space-y-6">
+  if (value > 0) return `+ ${formatted}`;
+  if (value < 0) return `- ${formatted}`;
 
-        {/* Titolo */}
-        <div>
-          <p className="text-sm font-medium text-yellow-400">
-            Gestione economica
-          </p>
-
-          <h1 className="mt-1 text-3xl font-bold">
-            Finanze
-          </h1>
-
-          <p className="mt-1 text-sm text-zinc-400">
-            Situazione economica di {club.name}
-          </p>
-        </div>
-
-        {/* Riepilogo */}
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-
-          <div className="rounded-2xl border border-yellow-400/20 bg-yellow-400/[0.05] p-5">
-            <p className="text-xs font-semibold uppercase tracking-wider text-yellow-400">
-              Saldo
-            </p>
-            <p className="mt-2 text-3xl font-bold text-yellow-400">
-              {formatMoney(club.balance)}
-            </p>
-            <p className="mt-1 text-sm text-zinc-400">
-              Disponibilità attuale
-            </p>
-          </div>
-
-          <div className="rounded-2xl border border-white/10 bg-[#141414] p-5">
-            <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
-              Entrate settimanali
-            </p>
-            <p className="mt-2 text-3xl font-bold text-emerald-400">
-              + {formatMoney(weeklyIncome)}
-            </p>
-            <p className="mt-1 text-sm text-zinc-400">
-              Totale entrate
-            </p>
-          </div>
-
-          <div className="rounded-2xl border border-white/10 bg-[#141414] p-5">
-            <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
-              Uscite settimanali
-            </p>
-            <p className="mt-2 text-3xl font-bold text-red-400">
-              - {formatMoney(weeklyExpenses)}
-            </p>
-            <p className="mt-1 text-sm text-zinc-400">
-              Totale spese
-            </p>
-          </div>
-
-          <div className="rounded-2xl border border-white/10 bg-[#141414] p-5">
-            <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
-              Bilancio settimanale
-            </p>
-            <p className="mt-2 text-3xl font-bold text-emerald-400">
-              + {formatMoney(weeklyBalance)}
-            </p>
-            <p className="mt-1 text-sm text-zinc-400">
-              Entrate meno uscite
-            </p>
-          </div>
-
-        </div>
-
-        {/* Sezione centrale */}
-        <div className="grid gap-6 xl:grid-cols-[1fr_360px]">
-
-          {/* Movimenti */}
-          <section className="overflow-hidden rounded-2xl border border-white/10 bg-[#141414]">
-
-            <div className="border-b border-white/10 p-5">
-              <h2 className="text-lg font-bold">
-                Ultimi movimenti
-              </h2>
-              <p className="mt-1 text-sm text-zinc-400">
-                Entrate e uscite recenti del club
-              </p>
-            </div>
-
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[650px] text-left">
-
-                <thead className="border-b border-white/10 bg-white/[0.02]">
-                  <tr className="text-xs uppercase tracking-wider text-zinc-500">
-                    <th className="px-5 py-4">Data</th>
-                    <th className="px-4 py-4">Descrizione</th>
-                    <th className="px-4 py-4">Categoria</th>
-                    <th className="px-5 py-4 text-right">Importo</th>
-                  </tr>
-                </thead>
-
-                <tbody>
-                  {TRANSACTIONS.map((transaction) => (
-                    <tr
-                      key={transaction.id}
-                      className="border-b border-white/5 last:border-0"
-                    >
-                      <td className="px-5 py-4 text-sm text-zinc-400">
-                        {transaction.date}
-                      </td>
-
-                      <td className="px-4 py-4">
-                        <p className="font-medium text-white">
-                          {transaction.description}
-                        </p>
-                      </td>
-
-                      <td className="px-4 py-4">
-                        <span className="rounded-lg border border-white/10 bg-white/[0.03] px-2.5 py-1 text-xs text-zinc-300">
-                          {transaction.category}
-                        </span>
-                      </td>
-
-                      <td
-                        className={`px-5 py-4 text-right font-bold ${
-                          transaction.amount >= 0
-                            ? "text-emerald-400"
-                            : "text-red-400"
-                        }`}
-                      >
-                        {transaction.amount >= 0 ? "+" : ""}
-                        {formatMoney(transaction.amount)}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-
-              </table>
-            </div>
-          </section>
-
-          {/* Riepilogo settimanale */}
-          <aside className="space-y-4">
-
-            <section className="rounded-2xl border border-white/10 bg-[#141414] p-5">
-              <h2 className="text-lg font-bold">
-                Entrate settimanali
-              </h2>
-
-              <div className="mt-5 space-y-4">
-
-                <div className="flex items-center justify-between border-b border-white/5 pb-3">
-                  <span className="text-sm text-zinc-400">
-                    Sponsor
-                  </span>
-                  <span className="font-semibold text-emerald-400">
-                    + {formatMoney(5200)}
-                  </span>
-                </div>
-
-                <div className="flex items-center justify-between border-b border-white/5 pb-3">
-                  <span className="text-sm text-zinc-400">
-                    Partite
-                  </span>
-                  <span className="font-semibold text-emerald-400">
-                    + {formatMoney(8400)}
-                  </span>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <span className="font-semibold text-white">
-                    Totale
-                  </span>
-                  <span className="font-bold text-emerald-400">
-                    + {formatMoney(weeklyIncome)}
-                  </span>
-                </div>
-
-              </div>
-            </section>
-
-            <section className="rounded-2xl border border-white/10 bg-[#141414] p-5">
-              <h2 className="text-lg font-bold">
-                Uscite settimanali
-              </h2>
-
-              <div className="mt-5 space-y-4">
-
-                <div className="flex items-center justify-between border-b border-white/5 pb-3">
-                  <span className="text-sm text-zinc-400">
-                    Gestione club
-                  </span>
-                  <span className="font-semibold text-red-400">
-                    - {formatMoney(2750)}
-                  </span>
-                </div>
-
-                <div className="flex items-center justify-between border-b border-white/5 pb-3">
-                  <span className="text-sm text-zinc-400">
-                    Staff
-                  </span>
-                  <span className="font-semibold text-red-400">
-                    - {formatMoney(3500)}
-                  </span>
-                </div>
-
-                <div className="flex items-center justify-between border-b border-white/5 pb-3">
-                  <span className="text-sm text-zinc-400">
-                    Accademia
-                  </span>
-                  <span className="font-semibold text-red-400">
-                    - {formatMoney(2500)}
-                  </span>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <span className="font-semibold text-white">
-                    Totale
-                  </span>
-                  <span className="font-bold text-red-400">
-                    - {formatMoney(weeklyExpenses)}
-                  </span>
-                </div>
-
-              </div>
-            </section>
-
-          </aside>
-        </div>
-
-        {/* Previsione */}
-        <section className="rounded-2xl border border-yellow-400/20 bg-yellow-400/[0.05] p-5">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-wider text-yellow-400">
-                Previsione
-              </p>
-              <h2 className="mt-1 text-xl font-bold">
-                Situazione economica positiva
-              </h2>
-              <p className="mt-1 text-sm text-zinc-400">
-                Mantenendo l'attuale andamento, il club chiuderà la prossima
-                settimana con un saldo positivo.
-              </p>
-            </div>
-
-            <div className="rounded-xl border border-yellow-400/20 bg-black/20 px-5 py-3 text-right">
-              <p className="text-xs uppercase tracking-wider text-zinc-500">
-                Saldo previsto
-              </p>
-              <p className="mt-1 text-2xl font-bold text-yellow-400">
-                {formatMoney(club.balance + weeklyBalance)}
-              </p>
-            </div>
-
-          </div>
-        </section>
-
-      </div>
-    </main>
-  );
+  return formatted;
 }
