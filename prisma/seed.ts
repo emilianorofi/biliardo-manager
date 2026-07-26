@@ -224,6 +224,72 @@ const initialPlayers = [
   },
 ];
 
+const initialAcademyPlayers = [
+  {
+    id: 1,
+    clubId: 1,
+    firstName: "Lorenzo",
+    lastName: "Benedetti",
+    nationality: "🇮🇹",
+    age: 16,
+    talent: 82,
+    potential: 90,
+    revealedAttributes: 6,
+    totalAttributes: 9,
+    precisione: 78,
+    diretto: 74,
+    sponde: 81,
+    tattica: 72,
+    mentalita: 76,
+    difesa: 70,
+    realizzazione: null,
+    creativita: null,
+    misura: null,
+  },
+  {
+    id: 2,
+    clubId: 1,
+    firstName: "Matteo",
+    lastName: "Morelli",
+    nationality: "🇮🇹",
+    age: 15,
+    talent: 76,
+    potential: 88,
+    revealedAttributes: 4,
+    totalAttributes: 9,
+    precisione: 71,
+    diretto: null,
+    sponde: 76,
+    tattica: 69,
+    mentalita: null,
+    difesa: null,
+    realizzazione: null,
+    creativita: 75,
+    misura: null,
+  },
+  {
+    id: 3,
+    clubId: 1,
+    firstName: "Tommaso",
+    lastName: "Ferri",
+    nationality: "🇮🇹",
+    age: 14,
+    talent: 72,
+    potential: 86,
+    revealedAttributes: 2,
+    totalAttributes: 9,
+    precisione: null,
+    diretto: 68,
+    sponde: null,
+    tattica: null,
+    mentalita: null,
+    difesa: null,
+    realizzazione: null,
+    creativita: null,
+    misura: 73,
+  },
+];
+
 async function main() {
   console.log("🌱 Inserimento dei dati iniziali...");
 
@@ -231,7 +297,9 @@ async function main() {
     const { id, ...clubData } = club;
 
     await prisma.club.upsert({
-      where: { id },
+      where: {
+        id,
+      },
       update: clubData,
       create: {
         id,
@@ -244,7 +312,9 @@ async function main() {
     const { id, ...playerData } = player;
 
     await prisma.player.upsert({
-      where: { id },
+      where: {
+        id,
+      },
       update: playerData,
       create: {
         id,
@@ -253,11 +323,30 @@ async function main() {
     });
   }
 
+  for (const academyPlayer of initialAcademyPlayers) {
+    const { id, ...academyPlayerData } =
+      academyPlayer;
+
+    await prisma.academyPlayer.upsert({
+      where: {
+        id,
+      },
+      update: academyPlayerData,
+      create: {
+        id,
+        ...academyPlayerData,
+      },
+    });
+  }
+
   await prisma.$queryRaw`
     SELECT setval(
       pg_get_serial_sequence('"Club"', 'id'),
       GREATEST(
-        (SELECT COALESCE(MAX(id), 1) FROM "Club"),
+        (
+          SELECT COALESCE(MAX(id), 1)
+          FROM "Club"
+        ),
         1
       ),
       true
@@ -268,7 +357,27 @@ async function main() {
     SELECT setval(
       pg_get_serial_sequence('"Player"', 'id'),
       GREATEST(
-        (SELECT COALESCE(MAX(id), 1) FROM "Player"),
+        (
+          SELECT COALESCE(MAX(id), 1)
+          FROM "Player"
+        ),
+        1
+      ),
+      true
+    )
+  `;
+
+  await prisma.$queryRaw`
+    SELECT setval(
+      pg_get_serial_sequence(
+        '"AcademyPlayer"',
+        'id'
+      ),
+      GREATEST(
+        (
+          SELECT COALESCE(MAX(id), 1)
+          FROM "AcademyPlayer"
+        ),
         1
       ),
       true
@@ -277,9 +386,20 @@ async function main() {
 
   const clubCount = await prisma.club.count();
   const playerCount = await prisma.player.count();
+  const academyPlayerCount =
+    await prisma.academyPlayer.count();
 
-  console.log(`✅ ${clubCount} club presenti nel database`);
-  console.log(`✅ ${playerCount} giocatori presenti nel database`);
+  console.log(
+    `✅ ${clubCount} club presenti nel database`
+  );
+
+  console.log(
+    `✅ ${playerCount} giocatori presenti nel database`
+  );
+
+  console.log(
+    `✅ ${academyPlayerCount} giovani presenti nell'Accademia`
+  );
 }
 
 main()
@@ -287,7 +407,11 @@ main()
     await prisma.$disconnect();
   })
   .catch(async (error: unknown) => {
-    console.error("❌ Errore durante il seed:", error);
+    console.error(
+      "❌ Errore durante il seed:",
+      error
+    );
+
     await prisma.$disconnect();
     process.exit(1);
   });

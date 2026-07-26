@@ -1,8 +1,6 @@
 "use client";
 
-import { useState } from "react";
-
-import { academyPlayers } from "@/app/data/academyPlayers";
+import { useEffect, useState } from "react";
 import type {
   AcademyAttributes,
   AcademyPlayer,
@@ -25,7 +23,60 @@ const characteristics: {
 
 export default function AcademyPage() {
   const [players, setPlayers] =
-  useState<AcademyPlayer[]>(academyPlayers);
+    useState<AcademyPlayer[]>([]);
+
+  const [isLoading, setIsLoading] =
+    useState(true);
+
+  const [error, setError] =
+    useState<string | null>(null);
+
+  useEffect(() => {
+    let isCancelled = false;
+
+    async function loadAcademyPlayers() {
+      try {
+        setIsLoading(true);
+        setError(null);
+
+        const response = await fetch("/api/academy", {
+          cache: "no-store",
+        });
+
+        if (!response.ok) {
+          throw new Error(
+            "Impossibile caricare i giovani dell'Accademia."
+          );
+        }
+
+        const data: {
+          players: AcademyPlayer[];
+        } = await response.json();
+
+        if (!isCancelled) {
+          setPlayers(data.players);
+        }
+      } catch (loadError: unknown) {
+        if (isCancelled) return;
+
+        setError(
+          loadError instanceof Error
+            ? loadError.message
+            : "Errore durante il caricamento dell'Accademia."
+        );
+      } finally {
+        if (!isCancelled) {
+          setIsLoading(false);
+        }
+      }
+    }
+
+    loadAcademyPlayers();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, []);
 
   const promotablePlayers = players.filter(
     (player) => player.age >= 16
@@ -63,6 +114,30 @@ export default function AcademyPage() {
 
     alert(
       `${player.firstName} ${player.lastName} è stato promosso in prima squadra.`
+    );
+  }
+
+    if (isLoading) {
+    return (
+      <main className="min-h-screen bg-[#0a0a0a] p-6 text-white">
+        <div className="mx-auto max-w-[1500px] rounded-2xl border border-white/10 bg-[#141414] p-10 text-center">
+          <p className="text-lg font-semibold">
+            Caricamento Accademia...
+          </p>
+        </div>
+      </main>
+    );
+  }
+
+  if (error) {
+    return (
+      <main className="min-h-screen bg-[#0a0a0a] p-6 text-white">
+        <div className="mx-auto max-w-[1500px] rounded-2xl border border-red-500/30 bg-red-500/10 p-10 text-center">
+          <p className="font-semibold text-red-300">
+            {error}
+          </p>
+        </div>
+      </main>
     );
   }
 
