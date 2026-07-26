@@ -93,8 +93,9 @@ model AcademyPlayer {
   talent    Float
   potential Float
 
-  revealedAttributes Int @default(0)
-  totalAttributes    Int @default(9)
+  revealedAttributes    Int      @default(0)
+  totalAttributes       Int      @default(9)
+  revealedAttributeKeys String[] @default([])
 
   precisione    Float?
   diretto       Float?

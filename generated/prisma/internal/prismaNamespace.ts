@@ -819,6 +819,7 @@ export const AcademyPlayerScalarFieldEnum = {
   potential: 'potential',
   revealedAttributes: 'revealedAttributes',
   totalAttributes: 'totalAttributes',
+  revealedAttributeKeys: 'revealedAttributeKeys',
   precisione: 'precisione',
   diretto: 'diretto',
   sponde: 'sponde',

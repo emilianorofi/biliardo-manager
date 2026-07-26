@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+
 import type {
   AcademyAttributes,
   AcademyPlayer,
@@ -21,6 +22,16 @@ const characteristics: {
   { key: "misura", label: "Misura" },
 ];
 
+type PromotionResponse = {
+  message?: string;
+  error?: string;
+  player?: {
+    id: number;
+    firstName: string;
+    lastName: string;
+  };
+};
+
 export default function AcademyPage() {
   const [players, setPlayers] =
     useState<AcademyPlayer[]>([]);
@@ -30,6 +41,12 @@ export default function AcademyPage() {
 
   const [error, setError] =
     useState<string | null>(null);
+
+  const [actionError, setActionError] =
+    useState<string | null>(null);
+
+  const [promotingPlayerId, setPromotingPlayerId] =
+    useState<number | null>(null);
 
   useEffect(() => {
     let isCancelled = false;
@@ -57,7 +74,9 @@ export default function AcademyPage() {
           setPlayers(data.players);
         }
       } catch (loadError: unknown) {
-        if (isCancelled) return;
+        if (isCancelled) {
+          return;
+        }
 
         setError(
           loadError instanceof Error
@@ -83,41 +102,89 @@ export default function AcademyPage() {
   ).length;
 
   const totalRevealed = players.reduce(
-    (total, player) => total + player.revealedAttributes,
+    (total, player) =>
+      total + player.revealedAttributes,
     0
   );
 
   const totalCharacteristics = players.reduce(
-    (total, player) => total + player.totalAttributes,
+    (total, player) =>
+      total + player.totalAttributes,
     0
   );
 
   const scoutingProgress =
     totalCharacteristics > 0
-      ? Math.round((totalRevealed / totalCharacteristics) * 100)
+      ? Math.round(
+          (totalRevealed /
+            totalCharacteristics) *
+            100
+        )
       : 0;
 
-  function promotePlayer(playerId: number) {
-    const player = players.find((item) => item.id === playerId);
+  async function promotePlayer(playerId: number) {
+    const player = players.find(
+      (item) => item.id === playerId
+    );
 
-    if (!player || player.age < 16) return;
+    if (!player || player.age < 16) {
+      return;
+    }
 
     const confirmed = window.confirm(
       `Vuoi promuovere ${player.firstName} ${player.lastName} in prima squadra?`
     );
 
-    if (!confirmed) return;
+    if (!confirmed) {
+      return;
+    }
 
-    setPlayers((currentPlayers) =>
-      currentPlayers.filter((item) => item.id !== playerId)
-    );
+    try {
+      setPromotingPlayerId(playerId);
+      setActionError(null);
 
-    alert(
-      `${player.firstName} ${player.lastName} è stato promosso in prima squadra.`
-    );
+      const response = await fetch("/api/academy", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          playerId,
+        }),
+      });
+
+      const data: PromotionResponse =
+        await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.error ??
+            "Impossibile completare la promozione."
+        );
+      }
+
+      setPlayers((currentPlayers) =>
+        currentPlayers.filter(
+          (item) => item.id !== playerId
+        )
+      );
+
+      window.alert(
+        data.message ??
+          `${player.firstName} ${player.lastName} è stato promosso in prima squadra.`
+      );
+    } catch (promotionError: unknown) {
+      setActionError(
+        promotionError instanceof Error
+          ? promotionError.message
+          : "Errore durante la promozione."
+      );
+    } finally {
+      setPromotingPlayerId(null);
+    }
   }
 
-    if (isLoading) {
+  if (isLoading) {
     return (
       <main className="min-h-screen bg-[#0a0a0a] p-6 text-white">
         <div className="mx-auto max-w-[1500px] rounded-2xl border border-white/10 bg-[#141414] p-10 text-center">
@@ -144,7 +211,6 @@ export default function AcademyPage() {
   return (
     <main className="min-h-screen bg-[#0a0a0a] p-4 text-white sm:p-6">
       <div className="mx-auto max-w-[1500px] space-y-6">
-        {/* Page heading */}
         <div>
           <p className="text-sm font-medium text-yellow-400">
             Settore giovanile
@@ -155,11 +221,28 @@ export default function AcademyPage() {
           </h1>
 
           <p className="mt-1 text-sm text-zinc-400">
-            Sviluppa e scopri i giovani talenti di Accademia Biliardo Pontedera
+            Sviluppa e scopri i giovani talenti di
+            Accademia Biliardo Pontedera
           </p>
         </div>
 
-        {/* Summary cards */}
+        {actionError && (
+          <div className="flex items-start justify-between gap-4 rounded-2xl border border-red-500/30 bg-red-500/10 p-4">
+            <p className="text-sm font-semibold text-red-300">
+              {actionError}
+            </p>
+
+            <button
+              type="button"
+              onClick={() => setActionError(null)}
+              className="text-sm font-bold text-red-300 transition hover:text-white"
+              aria-label="Chiudi messaggio di errore"
+            >
+              ×
+            </button>
+          </div>
+        )}
+
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           <div className="rounded-2xl border border-white/10 bg-[#141414] p-5">
             <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
@@ -218,9 +301,7 @@ export default function AcademyPage() {
           </div>
         </div>
 
-        {/* Main content */}
         <div className="grid gap-6 xl:grid-cols-[1fr_330px]">
-          {/* Players */}
           <section className="overflow-hidden rounded-2xl border border-white/10 bg-[#141414]">
             <div className="flex items-center justify-between border-b border-white/10 p-5">
               <div>
@@ -229,7 +310,8 @@ export default function AcademyPage() {
                 </h2>
 
                 <p className="mt-1 text-sm text-zinc-400">
-                  Ogni settimana viene rivelata una nuova caratteristica reale
+                  Ogni settimana viene rivelata una
+                  nuova caratteristica reale
                 </p>
               </div>
 
@@ -254,14 +336,16 @@ export default function AcademyPage() {
                       Naz.
                     </th>
 
-                    {characteristics.map((characteristic) => (
-                      <th
-                        key={characteristic.key}
-                        className="px-4 py-4 text-xs font-semibold uppercase text-zinc-500"
-                      >
-                        {characteristic.label}
-                      </th>
-                    ))}
+                    {characteristics.map(
+                      (characteristic) => (
+                        <th
+                          key={characteristic.key}
+                          className="px-4 py-4 text-xs font-semibold uppercase text-zinc-500"
+                        >
+                          {characteristic.label}
+                        </th>
+                      )
+                    )}
 
                     <th className="px-4 py-4 text-xs font-semibold uppercase text-zinc-500">
                       Scoperto
@@ -274,95 +358,120 @@ export default function AcademyPage() {
                 </thead>
 
                 <tbody>
-                  {players.map((player) => (
-                    <tr
-                      key={player.id}
-                      className="border-b border-white/5 transition hover:bg-white/[0.03]"
-                    >
-                      <td className="px-5 py-4">
-                        <p className="font-semibold text-white">
-                          {player.firstName} {player.lastName}
-                        </p>
+                  {players.map((player) => {
+                    const isPromoting =
+                      promotingPlayerId === player.id;
 
-                        <p className="mt-1 text-xs text-zinc-500">
-                          Giovane dell&apos;Accademia
-                        </p>
-                      </td>
+                    return (
+                      <tr
+                        key={player.id}
+                        className="border-b border-white/5 transition hover:bg-white/[0.03]"
+                      >
+                        <td className="px-5 py-4">
+                          <p className="font-semibold text-white">
+                            {player.firstName}{" "}
+                            {player.lastName}
+                          </p>
 
-                      <td className="px-4 py-4 font-medium">
-                        {player.age}
-                      </td>
+                          <p className="mt-1 text-xs text-zinc-500">
+                            Giovane dell&apos;Accademia
+                          </p>
+                        </td>
 
-                      <td className="px-4 py-4 text-zinc-300">
-                        {player.nationality}
-                      </td>
+                        <td className="px-4 py-4 font-medium">
+                          {player.age}
+                        </td>
 
-                      {characteristics.map((characteristic) => {
-                        const value = player.attributes[characteristic.key];
+                        <td className="px-4 py-4 text-zinc-300">
+                          {player.nationality}
+                        </td>
 
-                        return (
-                          <td
-                            key={characteristic.key}
-                            className="px-4 py-4"
-                          >
-                            {value !== null ? (
-                              <span className="font-semibold text-white">
-                                {value}
-                              </span>
-                            ) : (
-                              <span className="inline-flex h-7 w-7 items-center justify-center rounded-lg border border-white/10 bg-white/5 font-bold text-zinc-500">
-                                ?
-                              </span>
-                            )}
-                          </td>
-                        );
-                      })}
+                        {characteristics.map(
+                          (characteristic) => {
+                            const value =
+                              player.attributes[
+                                characteristic.key
+                              ];
 
-                      <td className="px-4 py-4">
-                        <div className="min-w-[110px]">
-                          <div className="flex items-center justify-between text-xs">
-                            <span className="text-zinc-400">
-                              {player.revealedAttributes}/{player.totalAttributes}
-                            </span>
-
-                            <span className="font-semibold text-yellow-400">
-                              {Math.round(
-                                (player.revealedAttributes / player.totalAttributes) * 100
-                              )}
-                              %
-                            </span>
-                          </div>
-
-                          <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-white/10">
-                            <div
-                              className="h-full rounded-full bg-yellow-400"
-                              style={{
-                                width: `${
-                                  (player.revealedAttributes / player.totalAttributes) * 100
-                                }%`,
-                              }}
-                            />
-                          </div>
-                        </div>
-                      </td>
-
-                      <td className="px-5 py-4">
-                        {player.age >= 16 ? (
-                          <button
-                            type="button"
-                            onClick={() => promotePlayer(player.id)}
-                            className="whitespace-nowrap rounded-lg bg-yellow-400 px-4 py-2 text-sm font-semibold text-black transition hover:bg-yellow-300"
-                          >
-                            Promuovi
-                          </button>
-                        ) : (
-                          <span className="whitespace-nowrap text-xs text-zinc-500">
-                            Non disponibile
-                          </span>
+                            return (
+                              <td
+                                key={characteristic.key}
+                                className="px-4 py-4"
+                              >
+                                {value !== null ? (
+                                  <span className="font-semibold text-white">
+                                    {value}
+                                  </span>
+                                ) : (
+                                  <span className="inline-flex h-7 w-7 items-center justify-center rounded-lg border border-white/10 bg-white/5 font-bold text-zinc-500">
+                                    ?
+                                  </span>
+                                )}
+                              </td>
+                            );
+                          }
                         )}
-                      </td>
-                    </tr>
-                  ))}
+
+                        <td className="px-4 py-4">
+                          <div className="min-w-[110px]">
+                            <div className="flex items-center justify-between text-xs">
+                              <span className="text-zinc-400">
+                                {
+                                  player.revealedAttributes
+                                }
+                                /{player.totalAttributes}
+                              </span>
+
+                              <span className="font-semibold text-yellow-400">
+                                {Math.round(
+                                  (player.revealedAttributes /
+                                    player.totalAttributes) *
+                                    100
+                                )}
+                                %
+                              </span>
+                            </div>
+
+                            <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-white/10">
+                              <div
+                                className="h-full rounded-full bg-yellow-400"
+                                style={{
+                                  width: `${
+                                    (player.revealedAttributes /
+                                      player.totalAttributes) *
+                                    100
+                                  }%`,
+                                }}
+                              />
+                            </div>
+                          </div>
+                        </td>
+
+                        <td className="px-5 py-4">
+                          {player.age >= 16 ? (
+                            <button
+                              type="button"
+                              onClick={() =>
+                                promotePlayer(player.id)
+                              }
+                              disabled={
+                                promotingPlayerId !== null
+                              }
+                              className="whitespace-nowrap rounded-lg bg-yellow-400 px-4 py-2 text-sm font-semibold text-black transition hover:bg-yellow-300 disabled:cursor-not-allowed disabled:opacity-50"
+                            >
+                              {isPromoting
+                                ? "Promozione..."
+                                : "Promuovi"}
+                            </button>
+                          ) : (
+                            <span className="whitespace-nowrap text-xs text-zinc-500">
+                              Non disponibile
+                            </span>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
 
@@ -380,9 +489,7 @@ export default function AcademyPage() {
             </div>
           </section>
 
-          {/* Right sidebar */}
           <aside className="space-y-4">
-            {/* Scouting */}
             <article className="rounded-2xl border border-white/10 bg-[#141414] p-5">
               <p className="text-xs font-semibold uppercase tracking-wider text-yellow-400">
                 Scouting
@@ -398,25 +505,28 @@ export default function AcademyPage() {
                 </p>
 
                 <p className="text-sm text-zinc-500">
-                  {totalRevealed}/{totalCharacteristics}
+                  {totalRevealed}/
+                  {totalCharacteristics}
                 </p>
               </div>
 
               <div className="mt-4 h-2 overflow-hidden rounded-full bg-white/10">
                 <div
                   className="h-full rounded-full bg-yellow-400"
-                  style={{ width: `${scoutingProgress}%` }}
+                  style={{
+                    width: `${scoutingProgress}%`,
+                  }}
                 />
               </div>
 
               <p className="mt-4 text-sm leading-6 text-zinc-400">
-                Le caratteristiche dei giovani non sono completamente
-                conosciute. Ogni settimana una nuova caratteristica reale viene
+                Le caratteristiche dei giovani non sono
+                completamente conosciute. Ogni settimana
+                una nuova caratteristica reale viene
                 rivelata.
               </p>
             </article>
 
-            {/* Academy news */}
             <article className="rounded-2xl border border-white/10 bg-[#141414] p-5">
               <p className="text-xs font-semibold uppercase tracking-wider text-yellow-400">
                 Cronaca Accademia
@@ -429,8 +539,8 @@ export default function AcademyPage() {
                   </p>
 
                   <p className="mt-1 text-xs leading-5 text-zinc-400">
-                    Lorenzo Benedetti ha mostrato buone qualità nelle Sponde:
-                    valore reale 81.
+                    Lorenzo Benedetti ha mostrato buone
+                    qualità nelle Sponde: valore reale 81.
                   </p>
                 </div>
 
@@ -440,7 +550,8 @@ export default function AcademyPage() {
                   </p>
 
                   <p className="mt-1 text-xs leading-5 text-zinc-400">
-                    Matteo Morelli continua il proprio percorso di crescita
+                    Matteo Morelli continua il proprio
+                    percorso di crescita
                     nell&apos;Accademia.
                   </p>
                 </div>
@@ -451,14 +562,13 @@ export default function AcademyPage() {
                   </p>
 
                   <p className="mt-1 text-xs leading-5 text-zinc-400">
-                    Lorenzo Benedetti ha compiuto 16 anni e può essere promosso
-                    in prima squadra.
+                    Lorenzo Benedetti ha compiuto 16 anni e
+                    può essere promosso in prima squadra.
                   </p>
                 </div>
               </div>
             </article>
 
-            {/* Rules */}
             <article className="rounded-2xl border border-yellow-400/20 bg-yellow-400/[0.05] p-5">
               <p className="text-xs font-semibold uppercase tracking-wider text-yellow-400">
                 Regole Accademia
@@ -466,15 +576,18 @@ export default function AcademyPage() {
 
               <div className="mt-4 space-y-3 text-sm text-zinc-300">
                 <p>
-                  • Età dei giovani: <strong>14–16 anni</strong>
+                  • Età dei giovani:{" "}
+                  <strong>14–16 anni</strong>
                 </p>
 
                 <p>
-                  • Promozione disponibile dai <strong>16 anni</strong>
+                  • Promozione disponibile dai{" "}
+                  <strong>16 anni</strong>
                 </p>
 
                 <p>
-                  • Una caratteristica reale viene rivelata progressivamente
+                  • Una caratteristica reale viene rivelata
+                  progressivamente
                 </p>
 
                 <p>

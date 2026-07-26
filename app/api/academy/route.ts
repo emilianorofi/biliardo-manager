@@ -21,63 +21,86 @@ export async function GET() {
         ],
       });
 
-    const players = databasePlayers.map((player) => ({
-      id: player.id,
-      firstName: player.firstName,
-      lastName: player.lastName,
-      nationality: player.nationality,
-      age: player.age,
+    const players = databasePlayers.map((player) => {
+      const usesExplicitRevealKeys =
+        player.revealedAttributeKeys.length > 0;
 
-      revealedAttributes: player.revealedAttributes,
-      totalAttributes: player.totalAttributes,
+      function getVisibleValue(
+        key: string,
+        value: number | null
+      ) {
+        const isRevealed = usesExplicitRevealKeys
+          ? player.revealedAttributeKeys.includes(key)
+          : value !== null;
 
-      attributes: {
-        precisione:
-          player.precisione === null
-            ? null
-            : Math.round(player.precisione),
+        if (!isRevealed || value === null) {
+          return null;
+        }
 
-        diretto:
-          player.diretto === null
-            ? null
-            : Math.round(player.diretto),
+        return Math.round(value);
+      }
 
-        sponde:
-          player.sponde === null
-            ? null
-            : Math.round(player.sponde),
+      return {
+        id: player.id,
+        firstName: player.firstName,
+        lastName: player.lastName,
+        nationality: player.nationality,
+        age: player.age,
 
-        tattica:
-          player.tattica === null
-            ? null
-            : Math.round(player.tattica),
+        revealedAttributes: usesExplicitRevealKeys
+          ? player.revealedAttributeKeys.length
+          : player.revealedAttributes,
 
-        mentalita:
-          player.mentalita === null
-            ? null
-            : Math.round(player.mentalita),
+        totalAttributes: player.totalAttributes,
 
-        difesa:
-          player.difesa === null
-            ? null
-            : Math.round(player.difesa),
+        attributes: {
+          precisione: getVisibleValue(
+            "precisione",
+            player.precisione
+          ),
 
-        realizzazione:
-          player.realizzazione === null
-            ? null
-            : Math.round(player.realizzazione),
+          diretto: getVisibleValue(
+            "diretto",
+            player.diretto
+          ),
 
-        creativita:
-          player.creativita === null
-            ? null
-            : Math.round(player.creativita),
+          sponde: getVisibleValue(
+            "sponde",
+            player.sponde
+          ),
 
-        misura:
-          player.misura === null
-            ? null
-            : Math.round(player.misura),
-      },
-    }));
+          tattica: getVisibleValue(
+            "tattica",
+            player.tattica
+          ),
+
+          mentalita: getVisibleValue(
+            "mentalita",
+            player.mentalita
+          ),
+
+          difesa: getVisibleValue(
+            "difesa",
+            player.difesa
+          ),
+
+          realizzazione: getVisibleValue(
+            "realizzazione",
+            player.realizzazione
+          ),
+
+          creativita: getVisibleValue(
+            "creativita",
+            player.creativita
+          ),
+
+          misura: getVisibleValue(
+            "misura",
+            player.misura
+          ),
+        },
+      };
+    });
 
     return NextResponse.json({
       players,
@@ -92,6 +115,187 @@ export async function GET() {
       {
         error:
           "Impossibile caricare i giocatori dell'Accademia.",
+      },
+      {
+        status: 500,
+      }
+    );
+  }
+}
+
+export async function POST(request: Request) {
+  try {
+    const body: unknown = await request.json();
+
+    const playerId =
+      typeof body === "object" &&
+      body !== null &&
+      "playerId" in body
+        ? Number(
+            (body as { playerId: unknown }).playerId
+          )
+        : Number.NaN;
+
+    if (
+      !Number.isInteger(playerId) ||
+      playerId <= 0
+    ) {
+      return NextResponse.json(
+        {
+          error: "Identificativo del giovane non valido.",
+        },
+        {
+          status: 400,
+        }
+      );
+    }
+
+    const academyPlayer =
+      await prisma.academyPlayer.findFirst({
+        where: {
+          id: playerId,
+          clubId: 1,
+        },
+      });
+
+    if (!academyPlayer) {
+      return NextResponse.json(
+        {
+          error:
+            "Il giovane selezionato non è stato trovato.",
+        },
+        {
+          status: 404,
+        }
+      );
+    }
+
+    if (academyPlayer.age < 16) {
+      return NextResponse.json(
+        {
+          error:
+            "Il giovane deve avere almeno 16 anni per essere promosso.",
+        },
+        {
+          status: 400,
+        }
+      );
+    }
+
+    const attributes = [
+      academyPlayer.precisione,
+      academyPlayer.diretto,
+      academyPlayer.sponde,
+      academyPlayer.tattica,
+      academyPlayer.mentalita,
+      academyPlayer.difesa,
+      academyPlayer.realizzazione,
+      academyPlayer.creativita,
+      academyPlayer.misura,
+    ];
+
+    const hasMissingAttributes =
+      attributes.some(
+        (attribute) => attribute === null
+      );
+
+    if (hasMissingAttributes) {
+      return NextResponse.json(
+        {
+          error:
+            "Il giovane non possiede ancora tutti i valori interni necessari.",
+        },
+        {
+          status: 400,
+        }
+      );
+    }
+
+    const promotedPlayer =
+      await prisma.$transaction(async (transaction) => {
+        const player = await transaction.player.create({
+          data: {
+            clubId: academyPlayer.clubId,
+            firstName: academyPlayer.firstName,
+            lastName: academyPlayer.lastName,
+            nationality:
+              academyPlayer.nationality,
+            age: academyPlayer.age,
+
+            form: 5,
+            morale: 5,
+            experience: 0,
+
+            talent: academyPlayer.talent,
+            potential: academyPlayer.potential,
+
+            value: 0,
+            salary: 0,
+            image: "",
+            style: [],
+
+            precisione:
+              academyPlayer.precisione as number,
+
+            diretto:
+              academyPlayer.diretto as number,
+
+            sponde:
+              academyPlayer.sponde as number,
+
+            tattica:
+              academyPlayer.tattica as number,
+
+            mentalita:
+              academyPlayer.mentalita as number,
+
+            difesa:
+              academyPlayer.difesa as number,
+
+            realizzazione:
+              academyPlayer.realizzazione as number,
+
+            creativita:
+              academyPlayer.creativita as number,
+
+            misura:
+              academyPlayer.misura as number,
+          },
+        });
+
+        await transaction.academyPlayer.delete({
+          where: {
+            id: academyPlayer.id,
+          },
+        });
+
+        return player;
+      });
+
+    return NextResponse.json(
+      {
+        message: `${promotedPlayer.firstName} ${promotedPlayer.lastName} è stato promosso in prima squadra.`,
+
+        player: {
+          id: promotedPlayer.id,
+          firstName: promotedPlayer.firstName,
+          lastName: promotedPlayer.lastName,
+        },
+      },
+      {
+        status: 201,
+      }
+    );
+  } catch (error) {
+    console.error(
+      "Errore durante la promozione del giovane:",
+      error
+    );
+
+    return NextResponse.json(
+      {
+        error:
+          "Impossibile completare la promozione in prima squadra.",
       },
       {
         status: 500,

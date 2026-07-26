@@ -123,6 +123,7 @@ export type AcademyPlayerCountAggregateOutputType = {
   potential: number
   revealedAttributes: number
   totalAttributes: number
+  revealedAttributeKeys: number
   precisione: number
   diretto: number
   sponde: number
@@ -235,6 +236,7 @@ export type AcademyPlayerCountAggregateInputType = {
   potential?: true
   revealedAttributes?: true
   totalAttributes?: true
+  revealedAttributeKeys?: true
   precisione?: true
   diretto?: true
   sponde?: true
@@ -346,6 +348,7 @@ export type AcademyPlayerGroupByOutputType = {
   potential: number
   revealedAttributes: number
   totalAttributes: number
+  revealedAttributeKeys: string[]
   precisione: number | null
   diretto: number | null
   sponde: number | null
@@ -393,6 +396,7 @@ export type AcademyPlayerWhereInput = {
   potential?: Prisma.FloatFilter<"AcademyPlayer"> | number
   revealedAttributes?: Prisma.IntFilter<"AcademyPlayer"> | number
   totalAttributes?: Prisma.IntFilter<"AcademyPlayer"> | number
+  revealedAttributeKeys?: Prisma.StringNullableListFilter<"AcademyPlayer">
   precisione?: Prisma.FloatNullableFilter<"AcademyPlayer"> | number | null
   diretto?: Prisma.FloatNullableFilter<"AcademyPlayer"> | number | null
   sponde?: Prisma.FloatNullableFilter<"AcademyPlayer"> | number | null
@@ -418,6 +422,7 @@ export type AcademyPlayerOrderByWithRelationInput = {
   potential?: Prisma.SortOrder
   revealedAttributes?: Prisma.SortOrder
   totalAttributes?: Prisma.SortOrder
+  revealedAttributeKeys?: Prisma.SortOrder
   precisione?: Prisma.SortOrderInput | Prisma.SortOrder
   diretto?: Prisma.SortOrderInput | Prisma.SortOrder
   sponde?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -446,6 +451,7 @@ export type AcademyPlayerWhereUniqueInput = Prisma.AtLeast<{
   potential?: Prisma.FloatFilter<"AcademyPlayer"> | number
   revealedAttributes?: Prisma.IntFilter<"AcademyPlayer"> | number
   totalAttributes?: Prisma.IntFilter<"AcademyPlayer"> | number
+  revealedAttributeKeys?: Prisma.StringNullableListFilter<"AcademyPlayer">
   precisione?: Prisma.FloatNullableFilter<"AcademyPlayer"> | number | null
   diretto?: Prisma.FloatNullableFilter<"AcademyPlayer"> | number | null
   sponde?: Prisma.FloatNullableFilter<"AcademyPlayer"> | number | null
@@ -471,6 +477,7 @@ export type AcademyPlayerOrderByWithAggregationInput = {
   potential?: Prisma.SortOrder
   revealedAttributes?: Prisma.SortOrder
   totalAttributes?: Prisma.SortOrder
+  revealedAttributeKeys?: Prisma.SortOrder
   precisione?: Prisma.SortOrderInput | Prisma.SortOrder
   diretto?: Prisma.SortOrderInput | Prisma.SortOrder
   sponde?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -503,6 +510,7 @@ export type AcademyPlayerScalarWhereWithAggregatesInput = {
   potential?: Prisma.FloatWithAggregatesFilter<"AcademyPlayer"> | number
   revealedAttributes?: Prisma.IntWithAggregatesFilter<"AcademyPlayer"> | number
   totalAttributes?: Prisma.IntWithAggregatesFilter<"AcademyPlayer"> | number
+  revealedAttributeKeys?: Prisma.StringNullableListFilter<"AcademyPlayer">
   precisione?: Prisma.FloatNullableWithAggregatesFilter<"AcademyPlayer"> | number | null
   diretto?: Prisma.FloatNullableWithAggregatesFilter<"AcademyPlayer"> | number | null
   sponde?: Prisma.FloatNullableWithAggregatesFilter<"AcademyPlayer"> | number | null
@@ -525,6 +533,7 @@ export type AcademyPlayerCreateInput = {
   potential: number
   revealedAttributes?: number
   totalAttributes?: number
+  revealedAttributeKeys?: Prisma.AcademyPlayerCreaterevealedAttributeKeysInput | string[]
   precisione?: number | null
   diretto?: number | null
   sponde?: number | null
@@ -550,6 +559,7 @@ export type AcademyPlayerUncheckedCreateInput = {
   potential: number
   revealedAttributes?: number
   totalAttributes?: number
+  revealedAttributeKeys?: Prisma.AcademyPlayerCreaterevealedAttributeKeysInput | string[]
   precisione?: number | null
   diretto?: number | null
   sponde?: number | null
@@ -572,6 +582,7 @@ export type AcademyPlayerUpdateInput = {
   potential?: Prisma.FloatFieldUpdateOperationsInput | number
   revealedAttributes?: Prisma.IntFieldUpdateOperationsInput | number
   totalAttributes?: Prisma.IntFieldUpdateOperationsInput | number
+  revealedAttributeKeys?: Prisma.AcademyPlayerUpdaterevealedAttributeKeysInput | string[]
   precisione?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   diretto?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   sponde?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -597,6 +608,7 @@ export type AcademyPlayerUncheckedUpdateInput = {
   potential?: Prisma.FloatFieldUpdateOperationsInput | number
   revealedAttributes?: Prisma.IntFieldUpdateOperationsInput | number
   totalAttributes?: Prisma.IntFieldUpdateOperationsInput | number
+  revealedAttributeKeys?: Prisma.AcademyPlayerUpdaterevealedAttributeKeysInput | string[]
   precisione?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   diretto?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   sponde?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -621,6 +633,7 @@ export type AcademyPlayerCreateManyInput = {
   potential: number
   revealedAttributes?: number
   totalAttributes?: number
+  revealedAttributeKeys?: Prisma.AcademyPlayerCreaterevealedAttributeKeysInput | string[]
   precisione?: number | null
   diretto?: number | null
   sponde?: number | null
@@ -643,6 +656,7 @@ export type AcademyPlayerUpdateManyMutationInput = {
   potential?: Prisma.FloatFieldUpdateOperationsInput | number
   revealedAttributes?: Prisma.IntFieldUpdateOperationsInput | number
   totalAttributes?: Prisma.IntFieldUpdateOperationsInput | number
+  revealedAttributeKeys?: Prisma.AcademyPlayerUpdaterevealedAttributeKeysInput | string[]
   precisione?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   diretto?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   sponde?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -667,6 +681,7 @@ export type AcademyPlayerUncheckedUpdateManyInput = {
   potential?: Prisma.FloatFieldUpdateOperationsInput | number
   revealedAttributes?: Prisma.IntFieldUpdateOperationsInput | number
   totalAttributes?: Prisma.IntFieldUpdateOperationsInput | number
+  revealedAttributeKeys?: Prisma.AcademyPlayerUpdaterevealedAttributeKeysInput | string[]
   precisione?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   diretto?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   sponde?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -701,6 +716,7 @@ export type AcademyPlayerCountOrderByAggregateInput = {
   potential?: Prisma.SortOrder
   revealedAttributes?: Prisma.SortOrder
   totalAttributes?: Prisma.SortOrder
+  revealedAttributeKeys?: Prisma.SortOrder
   precisione?: Prisma.SortOrder
   diretto?: Prisma.SortOrder
   sponde?: Prisma.SortOrder
@@ -842,6 +858,15 @@ export type AcademyPlayerUncheckedUpdateManyWithoutClubNestedInput = {
   deleteMany?: Prisma.AcademyPlayerScalarWhereInput | Prisma.AcademyPlayerScalarWhereInput[]
 }
 
+export type AcademyPlayerCreaterevealedAttributeKeysInput = {
+  set: string[]
+}
+
+export type AcademyPlayerUpdaterevealedAttributeKeysInput = {
+  set?: string[]
+  push?: string | string[]
+}
+
 export type NullableFloatFieldUpdateOperationsInput = {
   set?: number | null
   increment?: number
@@ -859,6 +884,7 @@ export type AcademyPlayerCreateWithoutClubInput = {
   potential: number
   revealedAttributes?: number
   totalAttributes?: number
+  revealedAttributeKeys?: Prisma.AcademyPlayerCreaterevealedAttributeKeysInput | string[]
   precisione?: number | null
   diretto?: number | null
   sponde?: number | null
@@ -882,6 +908,7 @@ export type AcademyPlayerUncheckedCreateWithoutClubInput = {
   potential: number
   revealedAttributes?: number
   totalAttributes?: number
+  revealedAttributeKeys?: Prisma.AcademyPlayerCreaterevealedAttributeKeysInput | string[]
   precisione?: number | null
   diretto?: number | null
   sponde?: number | null
@@ -935,6 +962,7 @@ export type AcademyPlayerScalarWhereInput = {
   potential?: Prisma.FloatFilter<"AcademyPlayer"> | number
   revealedAttributes?: Prisma.IntFilter<"AcademyPlayer"> | number
   totalAttributes?: Prisma.IntFilter<"AcademyPlayer"> | number
+  revealedAttributeKeys?: Prisma.StringNullableListFilter<"AcademyPlayer">
   precisione?: Prisma.FloatNullableFilter<"AcademyPlayer"> | number | null
   diretto?: Prisma.FloatNullableFilter<"AcademyPlayer"> | number | null
   sponde?: Prisma.FloatNullableFilter<"AcademyPlayer"> | number | null
@@ -958,6 +986,7 @@ export type AcademyPlayerCreateManyClubInput = {
   potential: number
   revealedAttributes?: number
   totalAttributes?: number
+  revealedAttributeKeys?: Prisma.AcademyPlayerCreaterevealedAttributeKeysInput | string[]
   precisione?: number | null
   diretto?: number | null
   sponde?: number | null
@@ -980,6 +1009,7 @@ export type AcademyPlayerUpdateWithoutClubInput = {
   potential?: Prisma.FloatFieldUpdateOperationsInput | number
   revealedAttributes?: Prisma.IntFieldUpdateOperationsInput | number
   totalAttributes?: Prisma.IntFieldUpdateOperationsInput | number
+  revealedAttributeKeys?: Prisma.AcademyPlayerUpdaterevealedAttributeKeysInput | string[]
   precisione?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   diretto?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   sponde?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -1003,6 +1033,7 @@ export type AcademyPlayerUncheckedUpdateWithoutClubInput = {
   potential?: Prisma.FloatFieldUpdateOperationsInput | number
   revealedAttributes?: Prisma.IntFieldUpdateOperationsInput | number
   totalAttributes?: Prisma.IntFieldUpdateOperationsInput | number
+  revealedAttributeKeys?: Prisma.AcademyPlayerUpdaterevealedAttributeKeysInput | string[]
   precisione?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   diretto?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   sponde?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -1026,6 +1057,7 @@ export type AcademyPlayerUncheckedUpdateManyWithoutClubInput = {
   potential?: Prisma.FloatFieldUpdateOperationsInput | number
   revealedAttributes?: Prisma.IntFieldUpdateOperationsInput | number
   totalAttributes?: Prisma.IntFieldUpdateOperationsInput | number
+  revealedAttributeKeys?: Prisma.AcademyPlayerUpdaterevealedAttributeKeysInput | string[]
   precisione?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   diretto?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   sponde?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -1052,6 +1084,7 @@ export type AcademyPlayerSelect<ExtArgs extends runtime.Types.Extensions.Interna
   potential?: boolean
   revealedAttributes?: boolean
   totalAttributes?: boolean
+  revealedAttributeKeys?: boolean
   precisione?: boolean
   diretto?: boolean
   sponde?: boolean
@@ -1077,6 +1110,7 @@ export type AcademyPlayerSelectCreateManyAndReturn<ExtArgs extends runtime.Types
   potential?: boolean
   revealedAttributes?: boolean
   totalAttributes?: boolean
+  revealedAttributeKeys?: boolean
   precisione?: boolean
   diretto?: boolean
   sponde?: boolean
@@ -1102,6 +1136,7 @@ export type AcademyPlayerSelectUpdateManyAndReturn<ExtArgs extends runtime.Types
   potential?: boolean
   revealedAttributes?: boolean
   totalAttributes?: boolean
+  revealedAttributeKeys?: boolean
   precisione?: boolean
   diretto?: boolean
   sponde?: boolean
@@ -1127,6 +1162,7 @@ export type AcademyPlayerSelectScalar = {
   potential?: boolean
   revealedAttributes?: boolean
   totalAttributes?: boolean
+  revealedAttributeKeys?: boolean
   precisione?: boolean
   diretto?: boolean
   sponde?: boolean
@@ -1140,7 +1176,7 @@ export type AcademyPlayerSelectScalar = {
   updatedAt?: boolean
 }
 
-export type AcademyPlayerOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "clubId" | "firstName" | "lastName" | "nationality" | "age" | "talent" | "potential" | "revealedAttributes" | "totalAttributes" | "precisione" | "diretto" | "sponde" | "tattica" | "mentalita" | "difesa" | "realizzazione" | "creativita" | "misura" | "createdAt" | "updatedAt", ExtArgs["result"]["academyPlayer"]>
+export type AcademyPlayerOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "clubId" | "firstName" | "lastName" | "nationality" | "age" | "talent" | "potential" | "revealedAttributes" | "totalAttributes" | "revealedAttributeKeys" | "precisione" | "diretto" | "sponde" | "tattica" | "mentalita" | "difesa" | "realizzazione" | "creativita" | "misura" | "createdAt" | "updatedAt", ExtArgs["result"]["academyPlayer"]>
 export type AcademyPlayerInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   club?: boolean | Prisma.ClubDefaultArgs<ExtArgs>
 }
@@ -1167,6 +1203,7 @@ export type $AcademyPlayerPayload<ExtArgs extends runtime.Types.Extensions.Inter
     potential: number
     revealedAttributes: number
     totalAttributes: number
+    revealedAttributeKeys: string[]
     precisione: number | null
     diretto: number | null
     sponde: number | null
@@ -1612,6 +1649,7 @@ export interface AcademyPlayerFieldRefs {
   readonly potential: Prisma.FieldRef<"AcademyPlayer", 'Float'>
   readonly revealedAttributes: Prisma.FieldRef<"AcademyPlayer", 'Int'>
   readonly totalAttributes: Prisma.FieldRef<"AcademyPlayer", 'Int'>
+  readonly revealedAttributeKeys: Prisma.FieldRef<"AcademyPlayer", 'String[]'>
   readonly precisione: Prisma.FieldRef<"AcademyPlayer", 'Float'>
   readonly diretto: Prisma.FieldRef<"AcademyPlayer", 'Float'>
   readonly sponde: Prisma.FieldRef<"AcademyPlayer", 'Float'>
