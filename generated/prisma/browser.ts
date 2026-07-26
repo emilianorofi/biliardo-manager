@@ -37,3 +37,8 @@ export type AcademyPlayer = Prisma.AcademyPlayerModel
  * 
  */
 export type Formation = Prisma.FormationModel
+/**
+ * Model TrainingPlan
+ * 
+ */
+export type TrainingPlan = Prisma.TrainingPlanModel

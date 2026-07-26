@@ -54,7 +54,8 @@ export const ModelName = {
   Club: 'Club',
   Player: 'Player',
   AcademyPlayer: 'AcademyPlayer',
-  Formation: 'Formation'
+  Formation: 'Formation',
+  TrainingPlan: 'TrainingPlan'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -166,6 +167,20 @@ export const FormationScalarFieldEnum = {
 } as const
 
 export type FormationScalarFieldEnum = (typeof FormationScalarFieldEnum)[keyof typeof FormationScalarFieldEnum]
+
+
+export const TrainingPlanScalarFieldEnum = {
+  id: 'id',
+  clubId: 'clubId',
+  primaryFocus: 'primaryFocus',
+  secondaryFocus: 'secondaryFocus',
+  savedAt: 'savedAt',
+  lastProcessedAt: 'lastProcessedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type TrainingPlanScalarFieldEnum = (typeof TrainingPlanScalarFieldEnum)[keyof typeof TrainingPlanScalarFieldEnum]
 
 
 export const SortOrder = {

@@ -30,6 +30,7 @@ model Club {
   players        Player[]
   academyPlayers AcademyPlayer[]
   formation      Formation?
+  trainingPlan   TrainingPlan?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -135,4 +136,20 @@ model Formation {
   @@index([slotAPlayerId])
   @@index([slotBPlayerId])
   @@index([slotCPlayerId])
+}
+
+model TrainingPlan {
+  id Int @id @default(autoincrement())
+
+  clubId Int  @unique
+  club   Club @relation(fields: [clubId], references: [id], onDelete: Cascade)
+
+  primaryFocus   String @default("precisione")
+  secondaryFocus String @default("tattica")
+
+  savedAt         DateTime?
+  lastProcessedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
