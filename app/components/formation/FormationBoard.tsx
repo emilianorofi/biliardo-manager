@@ -1,6 +1,11 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import {
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+
 import {
   BarChart3,
   CheckCircle2,
@@ -12,14 +17,18 @@ import {
   Users,
 } from "lucide-react";
 
-import { players } from "../../data/players";
 import type { Player } from "../../types/player";
 import FormationSlot from "./FormationSlot";
 
 type SlotKey = "A" | "B" | "C";
-type SpecialtyKey = keyof Player["specialties"];
 
-type Formation = Record<SlotKey, number | null>;
+type SpecialtyKey =
+  keyof Player["specialties"];
+
+type Formation = Record<
+  SlotKey,
+  number | null
+>;
 
 type FormationStats = {
   overall: number;
@@ -31,6 +40,20 @@ type FormationStats = {
   chemistry: number;
 };
 
+type FormationApiResponse = {
+  players?: Player[];
+
+  formation?: {
+    slotAPlayerId: number | null;
+    slotBPlayerId: number | null;
+    slotCPlayerId: number | null;
+    savedAt: string | null;
+  };
+
+  message?: string;
+  error?: string;
+};
+
 const emptyFormation: Formation = {
   A: null,
   B: null,
@@ -38,22 +61,132 @@ const emptyFormation: Formation = {
 };
 
 export default function FormationBoard() {
+  const [players, setPlayers] =
+    useState<Player[]>([]);
+
   const [formation, setFormation] =
     useState<Formation>(emptyFormation);
 
   const [lastSavedAt, setLastSavedAt] =
     useState<Date | null>(null);
 
-  const [isDirty, setIsDirty] = useState(false);
+  const [isDirty, setIsDirty] =
+    useState(false);
 
-  const playerA = findPlayer(formation.A);
-  const playerB = findPlayer(formation.B);
-  const playerC = findPlayer(formation.C);
+  const [isLoading, setIsLoading] =
+    useState(true);
+
+  const [isSaving, setIsSaving] =
+    useState(false);
+
+  const [error, setError] =
+    useState<string | null>(null);
+
+  const [actionError, setActionError] =
+    useState<string | null>(null);
+
+  useEffect(() => {
+    let isCancelled = false;
+
+    async function loadFormation() {
+      try {
+        setIsLoading(true);
+        setError(null);
+
+        const response = await fetch(
+          "/api/formation",
+          {
+            cache: "no-store",
+          }
+        );
+
+        const data =
+          (await response.json()) as FormationApiResponse;
+
+        if (!response.ok) {
+          throw new Error(
+            data.error ??
+              "Impossibile caricare la formazione."
+          );
+        }
+
+        if (isCancelled) {
+          return;
+        }
+
+        setPlayers(data.players ?? []);
+
+        setFormation({
+          A:
+            data.formation
+              ?.slotAPlayerId ?? null,
+
+          B:
+            data.formation
+              ?.slotBPlayerId ?? null,
+
+          C:
+            data.formation
+              ?.slotCPlayerId ?? null,
+        });
+
+        setLastSavedAt(
+          data.formation?.savedAt
+            ? new Date(
+                data.formation.savedAt
+              )
+            : null
+        );
+
+        setIsDirty(false);
+      } catch (loadError: unknown) {
+        if (isCancelled) {
+          return;
+        }
+
+        setError(
+          loadError instanceof Error
+            ? loadError.message
+            : "Errore durante il caricamento della formazione."
+        );
+      } finally {
+        if (!isCancelled) {
+          setIsLoading(false);
+        }
+      }
+    }
+
+    loadFormation();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, []);
+
+  const playerA = players.find(
+    (player) =>
+      player.id === formation.A
+  );
+
+  const playerB = players.find(
+    (player) =>
+      player.id === formation.B
+  );
+
+  const playerC = players.find(
+    (player) =>
+      player.id === formation.C
+  );
 
   const selectedPlayers = useMemo(
     () =>
-      [playerA, playerB, playerC].filter(
-        (player): player is Player => Boolean(player)
+      [
+        playerA,
+        playerB,
+        playerC,
+      ].filter(
+        (player): player is Player =>
+          Boolean(player)
       ),
     [playerA, playerB, playerC]
   );
@@ -61,7 +194,9 @@ export default function FormationBoard() {
   const selectedIds = useMemo(
     () =>
       Object.values(formation).filter(
-        (playerId): playerId is number =>
+        (
+          playerId
+        ): playerId is number =>
           playerId !== null
       ),
     [formation]
@@ -71,12 +206,18 @@ export default function FormationBoard() {
     selectedPlayers.length === 3;
 
   const formationStats = useMemo(
-    () => calculateFormationStats(selectedPlayers),
+    () =>
+      calculateFormationStats(
+        selectedPlayers
+      ),
     [selectedPlayers]
   );
 
   const warnings = useMemo(
-    () => getFormationWarnings(selectedPlayers),
+    () =>
+      getFormationWarnings(
+        selectedPlayers
+      ),
     [selectedPlayers]
   );
 
@@ -84,13 +225,17 @@ export default function FormationBoard() {
     slot: SlotKey,
     value: string
   ) {
-    const playerId = value ? Number(value) : null;
+    const playerId =
+      value.length > 0
+        ? Number(value)
+        : null;
 
     setFormation((current) => ({
       ...current,
       [slot]: playerId,
     }));
 
+    setActionError(null);
     setIsDirty(true);
   }
 
@@ -101,8 +246,8 @@ export default function FormationBoard() {
       C: null,
     });
 
-    setLastSavedAt(null);
-    setIsDirty(false);
+    setActionError(null);
+    setIsDirty(true);
   }
 
   function createRecommendedFormation() {
@@ -110,14 +255,126 @@ export default function FormationBoard() {
       getRecommendedFormation(players);
 
     setFormation(recommended);
+    setActionError(null);
     setIsDirty(true);
   }
 
-  function saveFormation() {
-    if (!formationComplete) return;
+  async function saveFormation() {
+    if (
+      formation.A === null ||
+      formation.B === null ||
+      formation.C === null
+    ) {
+      return;
+    }
 
-    setLastSavedAt(new Date());
-    setIsDirty(false);
+    try {
+      setIsSaving(true);
+      setActionError(null);
+
+      const response = await fetch(
+        "/api/formation",
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type":
+              "application/json",
+          },
+
+          body: JSON.stringify({
+            slotAPlayerId:
+              formation.A,
+
+            slotBPlayerId:
+              formation.B,
+
+            slotCPlayerId:
+              formation.C,
+          }),
+        }
+      );
+
+      const data =
+        (await response.json()) as FormationApiResponse;
+
+      if (!response.ok) {
+        throw new Error(
+          data.error ??
+            "Impossibile salvare la formazione."
+        );
+      }
+
+      setFormation({
+        A:
+          data.formation
+            ?.slotAPlayerId ??
+          formation.A,
+
+        B:
+          data.formation
+            ?.slotBPlayerId ??
+          formation.B,
+
+        C:
+          data.formation
+            ?.slotCPlayerId ??
+          formation.C,
+      });
+
+      setLastSavedAt(
+        data.formation?.savedAt
+          ? new Date(
+              data.formation.savedAt
+            )
+          : new Date()
+      );
+
+      setIsDirty(false);
+    } catch (saveError: unknown) {
+      setActionError(
+        saveError instanceof Error
+          ? saveError.message
+          : "Errore durante il salvataggio della formazione."
+      );
+    } finally {
+      setIsSaving(false);
+    }
+  }
+
+  if (isLoading) {
+    return (
+      <div className="rounded-2xl border border-emerald-900/60 bg-[#15261f] p-10 text-center">
+        <p className="font-bold text-white">
+          Caricamento formazione...
+        </p>
+
+        <p className="mt-2 text-sm text-slate-400">
+          Recupero della rosa e degli
+          slot salvati.
+        </p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="rounded-2xl border border-red-500/30 bg-red-500/10 p-8 text-center">
+        <p className="font-bold text-red-300">
+          {error}
+        </p>
+
+        <button
+          type="button"
+          onClick={() =>
+            window.location.reload()
+          }
+          className="mt-5 rounded-xl bg-red-400 px-4 py-2 text-sm font-black text-black transition hover:bg-red-300"
+        >
+          Riprova
+        </button>
+      </div>
+    );
   }
 
   return (
@@ -134,44 +391,60 @@ export default function FormationBoard() {
             </h2>
 
             <p className="mt-1 max-w-2xl text-sm leading-6 text-slate-400">
-              Scegli tre giocatori diversi. Le sei
-              partite della giornata verranno generate
-              automaticamente.
+              Scegli tre giocatori
+              diversi. Le sei partite
+              della giornata verranno
+              generate automaticamente.
             </p>
           </div>
 
           <div className="flex flex-col gap-3 sm:flex-row">
             <button
               type="button"
-              onClick={createRecommendedFormation}
-              disabled={players.length < 3}
+              onClick={
+                createRecommendedFormation
+              }
+              disabled={
+                players.length < 3 ||
+                isSaving
+              }
               className="flex items-center justify-center gap-2 rounded-xl border border-amber-400/40 bg-amber-400/10 px-4 py-2.5 text-sm font-black text-amber-300 transition hover:bg-amber-400/20 disabled:cursor-not-allowed disabled:opacity-40"
             >
               <Sparkles size={17} />
+
               Formazione consigliata
             </button>
 
             <button
               type="button"
               onClick={resetFormation}
-              className="flex items-center justify-center gap-2 rounded-xl border border-emerald-800 px-4 py-2.5 text-sm font-bold text-slate-300 transition hover:bg-white/5 hover:text-white"
+              disabled={isSaving}
+              className="flex items-center justify-center gap-2 rounded-xl border border-emerald-800 px-4 py-2.5 text-sm font-bold text-slate-300 transition hover:bg-white/5 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
             >
               <RotateCcw size={17} />
+
               Azzera
             </button>
 
             <button
               type="button"
               onClick={saveFormation}
-              disabled={!formationComplete}
+              disabled={
+                !formationComplete ||
+                isSaving
+              }
               className="flex items-center justify-center gap-2 rounded-xl bg-amber-400 px-4 py-2.5 text-sm font-black text-[#122018] transition hover:bg-amber-300 disabled:cursor-not-allowed disabled:opacity-40"
             >
               <Save size={17} />
-              Salva
+
+              {isSaving
+                ? "Salvataggio..."
+                : "Salva"}
             </button>
           </div>
         </div>
-                <div className="grid grid-cols-1 gap-5 p-5 lg:grid-cols-3 lg:p-6">
+
+        <div className="grid grid-cols-1 gap-5 p-5 lg:grid-cols-3 lg:p-6">
           <FormationSlot
             slot="A"
             player={playerA}
@@ -179,7 +452,10 @@ export default function FormationBoard() {
             selectedIds={selectedIds}
             currentValue={formation.A}
             onChange={(value) =>
-              assignPlayer("A", value)
+              assignPlayer(
+                "A",
+                value
+              )
             }
           />
 
@@ -190,7 +466,10 @@ export default function FormationBoard() {
             selectedIds={selectedIds}
             currentValue={formation.B}
             onChange={(value) =>
-              assignPlayer("B", value)
+              assignPlayer(
+                "B",
+                value
+              )
             }
           />
 
@@ -201,16 +480,51 @@ export default function FormationBoard() {
             selectedIds={selectedIds}
             currentValue={formation.C}
             onChange={(value) =>
-              assignPlayer("C", value)
+              assignPlayer(
+                "C",
+                value
+              )
             }
           />
         </div>
 
         <div className="px-5 pb-5 lg:px-6 lg:pb-6">
+          {actionError && (
+            <div className="mb-3 flex items-start justify-between gap-4 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3">
+              <div className="flex gap-3">
+                <CircleAlert
+                  size={18}
+                  className="mt-0.5 shrink-0 text-red-300"
+                />
+
+                <p className="text-sm font-bold text-red-200">
+                  {actionError}
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={() =>
+                  setActionError(
+                    null
+                  )
+                }
+                className="font-black text-red-300 transition hover:text-white"
+                aria-label="Chiudi errore"
+              >
+                ×
+              </button>
+            </div>
+          )}
+
           <FormationStatus
-            complete={formationComplete}
+            complete={
+              formationComplete
+            }
             dirty={isDirty}
-            lastSavedAt={lastSavedAt}
+            lastSavedAt={
+              lastSavedAt
+            }
           />
 
           {warnings.length > 0 && (
@@ -223,18 +537,23 @@ export default function FormationBoard() {
 
                 <div>
                   <p className="text-sm font-black text-orange-200">
-                    Attenzione alla condizione
+                    Attenzione alla
+                    condizione
                   </p>
 
                   <div className="mt-2 space-y-1">
-                    {warnings.map((warning) => (
-                      <p
-                        key={warning}
-                        className="text-sm text-orange-100/70"
-                      >
-                        {warning}
-                      </p>
-                    ))}
+                    {warnings.map(
+                      (warning) => (
+                        <p
+                          key={
+                            warning
+                          }
+                          className="text-sm text-orange-100/70"
+                        >
+                          {warning}
+                        </p>
+                      )
+                    )}
                   </div>
                 </div>
               </div>
@@ -267,7 +586,9 @@ export default function FormationBoard() {
               specialty="Italiana 80"
               specialtyKey="italiana"
               position="A"
-              matchPlayers={[playerA]}
+              matchPlayers={[
+                playerA,
+              ]}
             />
 
             <MatchCard
@@ -275,7 +596,10 @@ export default function FormationBoard() {
               specialty="Italiana 80"
               specialtyKey="italiana"
               position="B–C"
-              matchPlayers={[playerB, playerC]}
+              matchPlayers={[
+                playerB,
+                playerC,
+              ]}
             />
 
             <MatchCard
@@ -283,7 +607,9 @@ export default function FormationBoard() {
               specialty="Goriziana 400"
               specialtyKey="goriziana"
               position="B"
-              matchPlayers={[playerB]}
+              matchPlayers={[
+                playerB,
+              ]}
             />
 
             <MatchCard
@@ -291,7 +617,10 @@ export default function FormationBoard() {
               specialty="Goriziana 400"
               specialtyKey="goriziana"
               position="A–C"
-              matchPlayers={[playerA, playerC]}
+              matchPlayers={[
+                playerA,
+                playerC,
+              ]}
             />
 
             <MatchCard
@@ -299,7 +628,9 @@ export default function FormationBoard() {
               specialty="Tutti Doppi 600"
               specialtyKey="tuttiDoppi"
               position="C"
-              matchPlayers={[playerC]}
+              matchPlayers={[
+                playerC,
+              ]}
             />
 
             <MatchCard
@@ -307,13 +638,18 @@ export default function FormationBoard() {
               specialty="Tutti Doppi 600"
               specialtyKey="tuttiDoppi"
               position="A–B"
-              matchPlayers={[playerA, playerB]}
+              matchPlayers={[
+                playerA,
+                playerB,
+              ]}
             />
           </div>
         </section>
 
         <FormationSummary
-          complete={formationComplete}
+          complete={
+            formationComplete
+          }
           stats={formationStats}
         />
       </div>
@@ -332,22 +668,33 @@ function MatchCard({
   specialty: string;
   specialtyKey: SpecialtyKey;
   position: string;
-  matchPlayers: Array<Player | undefined>;
-}) {
-  const complete = matchPlayers.every(Boolean);
 
-  const validPlayers = matchPlayers.filter(
-    (player): player is Player => Boolean(player)
-  );
+  matchPlayers: Array<
+    Player | undefined
+  >;
+}) {
+  const complete =
+    matchPlayers.every(Boolean);
+
+  const validPlayers =
+    matchPlayers.filter(
+      (
+        player
+      ): player is Player =>
+        Boolean(player)
+    );
 
   const matchRating = complete
     ? Math.round(
         validPlayers.reduce(
           (total, player) =>
             total +
-            player.specialties[specialtyKey],
+            player.specialties[
+              specialtyKey
+            ],
           0
-        ) / validPlayers.length
+        ) /
+          validPlayers.length
       )
     : null;
 
@@ -387,7 +734,8 @@ function MatchCard({
           />
         )}
       </div>
-            <div className="mt-4 rounded-xl border border-emerald-900/60 bg-[#10231c] px-4 py-3">
+
+      <div className="mt-4 rounded-xl border border-emerald-900/60 bg-[#10231c] px-4 py-3">
         {complete ? (
           <div>
             <p className="font-bold text-white">
@@ -400,20 +748,32 @@ function MatchCard({
             </p>
 
             <div className="mt-2 flex flex-wrap gap-2">
-              {validPlayers.map((player) => (
-                <span
-                  key={player.id}
-                  className="rounded-lg bg-emerald-900/50 px-2 py-1 text-[11px] font-bold text-emerald-200"
-                >
-                  {player.specialties[specialtyKey]}{" "}
-                  {specialty.split(" ")[0]}
-                </span>
-              ))}
+              {validPlayers.map(
+                (player) => (
+                  <span
+                    key={player.id}
+                    className="rounded-lg bg-emerald-900/50 px-2 py-1 text-[11px] font-bold text-emerald-200"
+                  >
+                    {
+                      player
+                        .specialties[
+                        specialtyKey
+                      ]
+                    }{" "}
+                    {
+                      specialty.split(
+                        " "
+                      )[0]
+                    }
+                  </span>
+                )
+              )}
             </div>
           </div>
         ) : (
           <p className="text-sm text-slate-500">
-            Completa gli slot richiesti
+            Completa gli slot
+            richiesti
           </p>
         )}
       </div>
@@ -519,8 +879,10 @@ function FormationSummary({
 
         {!complete && (
           <div className="mt-5 rounded-xl border border-slate-700 bg-black/10 p-4 text-sm leading-6 text-slate-400">
-            Completa gli slot A, B e C per visualizzare
-            l’analisi della formazione.
+            Completa gli slot A, B
+            e C per visualizzare
+            l’analisi della
+            formazione.
           </div>
         )}
       </div>
@@ -563,7 +925,9 @@ function SummaryProgress({
         </p>
 
         <p className="text-sm font-black text-white">
-          {value !== null ? `${value}%` : "--"}
+          {value !== null
+            ? `${value}%`
+            : "--"}
         </p>
       </div>
 
@@ -572,13 +936,16 @@ function SummaryProgress({
           className="h-full rounded-full bg-gradient-to-r from-emerald-400 to-amber-300 transition-all duration-500"
           style={{
             width:
-              value !== null ? `${value}%` : "0%",
+              value !== null
+                ? `${value}%`
+                : "0%",
           }}
         />
       </div>
     </div>
   );
 }
+
 function FormationStatus({
   complete,
   dirty,
@@ -588,28 +955,45 @@ function FormationStatus({
   dirty: boolean;
   lastSavedAt: Date | null;
 }) {
-  if (lastSavedAt && !dirty) {
+  if (
+    lastSavedAt &&
+    !dirty
+  ) {
     return (
       <div className="flex flex-col gap-2 rounded-xl border border-emerald-500/40 bg-emerald-400/10 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3 text-sm font-bold text-emerald-300">
-          <CheckCircle2 size={18} />
-          Formazione salvata correttamente.
+          <CheckCircle2
+            size={18}
+          />
+
+          Formazione salvata
+          correttamente.
         </div>
 
         <div className="flex items-center gap-2 text-xs font-semibold text-emerald-200/60">
           <Clock3 size={14} />
+
           Ultimo salvataggio:{" "}
-          {formatSavedDate(lastSavedAt)}
+          {formatSavedDate(
+            lastSavedAt
+          )}
         </div>
       </div>
     );
   }
 
-  if (complete && dirty) {
+  if (
+    complete &&
+    dirty
+  ) {
     return (
       <div className="flex items-center gap-3 rounded-xl border border-amber-400/30 bg-amber-400/10 px-4 py-3 text-sm font-bold text-amber-300">
-        <CircleAlert size={18} />
-        Formazione completa ma non ancora salvata.
+        <CircleAlert
+          size={18}
+        />
+
+        Formazione completa ma
+        non ancora salvata.
       </div>
     );
   }
@@ -617,8 +1001,10 @@ function FormationStatus({
   return (
     <div className="flex items-center gap-3 rounded-xl border border-slate-700 bg-black/10 px-4 py-3 text-sm text-slate-400">
       <CircleAlert size={18} />
-      Assegna un giocatore diverso a ciascuno dei
-      tre slot.
+
+      Assegna un giocatore
+      diverso a ciascuno dei tre
+      slot.
     </div>
   );
 }
@@ -626,47 +1012,61 @@ function FormationStatus({
 function calculateFormationStats(
   selectedPlayers: Player[]
 ): FormationStats | null {
-  if (selectedPlayers.length !== 3) {
+  if (
+    selectedPlayers.length !== 3
+  ) {
     return null;
   }
 
   const overall = average(
-    selectedPlayers.map((player) => player.overall)
+    selectedPlayers.map(
+      (player) =>
+        player.overall
+    )
   );
 
   const italiana = average(
     selectedPlayers.map(
-      (player) => player.specialties.italiana
+      (player) =>
+        player.specialties
+          .italiana
     )
   );
 
   const goriziana = average(
     selectedPlayers.map(
-      (player) => player.specialties.goriziana
+      (player) =>
+        player.specialties
+          .goriziana
     )
   );
 
   const tuttiDoppi = average(
     selectedPlayers.map(
-      (player) => player.specialties.tuttiDoppi
+      (player) =>
+        player.specialties
+          .tuttiDoppi
     )
   );
 
   const form = average(
     selectedPlayers.map(
-      (player) => player.form * 10
+      (player) =>
+        player.form * 10
     )
   );
 
   const morale = average(
     selectedPlayers.map(
-      (player) => player.morale * 10
+      (player) =>
+        player.morale * 10
     )
   );
 
   const experience = average(
     selectedPlayers.map(
-      (player) => player.experience
+      (player) =>
+        player.experience
     )
   );
 
@@ -695,22 +1095,24 @@ function getFormationWarnings(
 ) {
   const warnings: string[] = [];
 
-  selectedPlayers.forEach((player) => {
-    const fullName =
-      `${player.firstName} ${player.lastName}`;
+  selectedPlayers.forEach(
+    (player) => {
+      const fullName =
+        `${player.firstName} ${player.lastName}`;
 
-    if (player.form <= 4) {
-      warnings.push(
-        `${fullName} ha una forma bassa (${player.form}/10).`
-      );
-    }
+      if (player.form <= 4) {
+        warnings.push(
+          `${fullName} ha una forma bassa (${player.form}/10).`
+        );
+      }
 
-    if (player.morale <= 4) {
-      warnings.push(
-        `${fullName} ha un morale basso (${player.morale}/10).`
-      );
+      if (player.morale <= 4) {
+        warnings.push(
+          `${fullName} ha un morale basso (${player.morale}/10).`
+        );
+      }
     }
-  });
+  );
 
   return warnings;
 }
@@ -732,26 +1134,46 @@ function getRecommendedFormation(
     C: roster[2].id,
   };
 
-  let bestScore = Number.NEGATIVE_INFINITY;
+  let bestScore =
+    Number.NEGATIVE_INFINITY;
 
   for (const playerA of roster) {
     for (const playerB of roster) {
-      if (playerB.id === playerA.id) continue;
+      if (
+        playerB.id === playerA.id
+      ) {
+        continue;
+      }
 
-      for (const playerC of roster) {
+      for (
+        const playerC of roster
+      ) {
         if (
-          playerC.id === playerA.id ||
-          playerC.id === playerB.id
+          playerC.id ===
+            playerA.id ||
+          playerC.id ===
+            playerB.id
         ) {
           continue;
         }
 
         const score =
-          calculateSlotScore(playerA, "A") +
-          calculateSlotScore(playerB, "B") +
-          calculateSlotScore(playerC, "C");
+          calculateSlotScore(
+            playerA,
+            "A"
+          ) +
+          calculateSlotScore(
+            playerB,
+            "B"
+          ) +
+          calculateSlotScore(
+            playerC,
+            "C"
+          );
 
-        if (score > bestScore) {
+        if (
+          score > bestScore
+        ) {
           bestScore = score;
 
           bestFormation = {
@@ -778,9 +1200,13 @@ function calculateSlotScore(
 
   if (slot === "A") {
     return (
-      player.specialties.italiana * 2 +
-      player.specialties.goriziana +
-      player.specialties.tuttiDoppi +
+      player.specialties
+        .italiana *
+        2 +
+      player.specialties
+        .goriziana +
+      player.specialties
+        .tuttiDoppi +
       player.overall +
       conditionBonus
     );
@@ -788,45 +1214,57 @@ function calculateSlotScore(
 
   if (slot === "B") {
     return (
-      player.specialties.goriziana * 2 +
-      player.specialties.italiana +
-      player.specialties.tuttiDoppi +
+      player.specialties
+        .goriziana *
+        2 +
+      player.specialties
+        .italiana +
+      player.specialties
+        .tuttiDoppi +
       player.overall +
       conditionBonus
     );
   }
 
   return (
-    player.specialties.tuttiDoppi * 2 +
-    player.specialties.italiana +
-    player.specialties.goriziana +
+    player.specialties
+      .tuttiDoppi *
+      2 +
+    player.specialties
+      .italiana +
+    player.specialties
+      .goriziana +
     player.overall +
     conditionBonus
   );
 }
 
-function average(values: number[]) {
-  if (values.length === 0) return 0;
+function average(
+  values: number[]
+) {
+  if (values.length === 0) {
+    return 0;
+  }
 
   return Math.round(
     values.reduce(
-      (total, value) => total + value,
+      (total, value) =>
+        total + value,
       0
     ) / values.length
   );
 }
 
-function findPlayer(playerId: number | null) {
-  return players.find(
-    (player) => player.id === playerId
-  );
-}
-
-function formatSavedDate(date: Date) {
-  return new Intl.DateTimeFormat("it-IT", {
-    day: "2-digit",
-    month: "short",
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(date);
+function formatSavedDate(
+  date: Date
+) {
+  return new Intl.DateTimeFormat(
+    "it-IT",
+    {
+      day: "2-digit",
+      month: "short",
+      hour: "2-digit",
+      minute: "2-digit",
+    }
+  ).format(date);
 }
