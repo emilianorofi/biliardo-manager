@@ -1,7 +1,9 @@
 import { notFound } from "next/navigation";
 
-import { players } from "@/app/data/players";
 import type { Player } from "@/app/types/player";
+import { prisma } from "@/lib/prisma";
+
+export const dynamic = "force-dynamic";
 
 const attributes: {
   key: keyof Player["attributes"];
@@ -30,13 +32,70 @@ export default async function PlayerPage({
     notFound();
   }
 
-  const player = players.find(
-    (currentPlayer) => currentPlayer.id === playerId
-  );
+  const databasePlayer = await prisma.player.findFirst({
+  where: {
+    id: playerId,
+    clubId: 1,
+  },
+});
 
-  if (!player) {
-    notFound();
-  }
+if (!databasePlayer) {
+  notFound();
+}
+
+const playerAttributes: Player["attributes"] = {
+  precisione: Math.round(databasePlayer.precisione),
+  diretto: Math.round(databasePlayer.diretto),
+  sponde: Math.round(databasePlayer.sponde),
+  tattica: Math.round(databasePlayer.tattica),
+  mentalita: Math.round(databasePlayer.mentalita),
+  difesa: Math.round(databasePlayer.difesa),
+  realizzazione: Math.round(
+    databasePlayer.realizzazione
+  ),
+  creativita: Math.round(databasePlayer.creativita),
+  misura: Math.round(databasePlayer.misura),
+};
+
+const player: Player = {
+  id: databasePlayer.id,
+  firstName: databasePlayer.firstName,
+  lastName: databasePlayer.lastName,
+  nationality: databasePlayer.nationality,
+  age: databasePlayer.age,
+
+  overall: calculateOverall(playerAttributes),
+
+  form: databasePlayer.form,
+  morale: databasePlayer.morale,
+  experience: Math.round(databasePlayer.experience),
+
+  value: databasePlayer.value,
+  salary: databasePlayer.salary,
+
+  image: databasePlayer.image,
+  style: databasePlayer.style,
+
+  specialties: {
+    italiana: Math.round(
+      (playerAttributes.precisione +
+        playerAttributes.diretto) /
+        2
+    ),
+    goriziana: Math.round(
+      (playerAttributes.precisione +
+        playerAttributes.sponde) /
+        2
+    ),
+    tuttiDoppi: Math.round(
+      (playerAttributes.diretto +
+        playerAttributes.sponde) /
+        2
+    ),
+  },
+
+  attributes: playerAttributes,
+};
 
   const specialties = [
     {
@@ -321,4 +380,16 @@ function getValueClass(value: number) {
   if (value >= 60) return "text-lime-300";
 
   return "text-slate-300";
+}
+function calculateOverall(
+  playerAttributes: Player["attributes"]
+) {
+  const values = Object.values(playerAttributes);
+
+  return Math.round(
+    values.reduce(
+      (total, value) => total + value,
+      0
+    ) / values.length
+  );
 }

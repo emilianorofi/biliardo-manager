@@ -11,15 +11,28 @@ import {
   WalletCards,
 } from "lucide-react";
 
-import { clubs } from "@/app/data/clubs";
-import { players } from "@/app/data/players";
+import { prisma } from "@/lib/prisma";
 
-export default function TeamPage() {
-  const club = clubs[0];
+export const dynamic = "force-dynamic";
+
+export default async function TeamPage() {
+  const club = await prisma.club.findUnique({
+    where: {
+      id: 1,
+    },
+    include: {
+      players: true,
+    },
+  });
 
   if (!club) {
     throw new Error("Club principale non disponibile.");
   }
+
+  const players = club.players.map((player) => ({
+    ...player,
+    overall: calculateOverall(player),
+  }));
 
   const weeklyResult =
     club.weeklyIncome - club.weeklyExpenses;
@@ -45,7 +58,10 @@ export default function TeamPage() {
       : "0";
 
   const topPlayers = [...players]
-    .sort((first, second) => second.overall - first.overall)
+    .sort(
+      (first, second) =>
+        second.overall - first.overall
+    )
     .slice(0, 5);
 
   return (
@@ -424,4 +440,34 @@ function formatSignedCurrency(value: number) {
 
 function formatNumber(value: number) {
   return new Intl.NumberFormat("it-IT").format(value);
+}
+function calculateOverall(player: {
+  precisione: number;
+  diretto: number;
+  sponde: number;
+  tattica: number;
+  mentalita: number;
+  difesa: number;
+  realizzazione: number;
+  creativita: number;
+  misura: number;
+}) {
+  const attributes = [
+    player.precisione,
+    player.diretto,
+    player.sponde,
+    player.tattica,
+    player.mentalita,
+    player.difesa,
+    player.realizzazione,
+    player.creativita,
+    player.misura,
+  ];
+
+  return Math.round(
+    attributes.reduce(
+      (total, attribute) => total + attribute,
+      0
+    ) / attributes.length
+  );
 }
