@@ -27,10 +27,11 @@ model Club {
   trainerLevel    Int @default(1)
   youthCoachLevel Int @default(1)
 
-  players        Player[]
-  academyPlayers AcademyPlayer[]
-  formation      Formation?
-  trainingPlan   TrainingPlan?
+  players          Player[]
+  academyPlayers   AcademyPlayer[]
+  formation        Formation?
+  trainingPlan     TrainingPlan?
+  trainingSessions TrainingSession[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -73,6 +74,8 @@ model Player {
   formationAsA Formation[] @relation("FormationSlotA")
   formationAsB Formation[] @relation("FormationSlotB")
   formationAsC Formation[] @relation("FormationSlotC")
+
+  trainingResults TrainingResult[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -152,4 +155,62 @@ model TrainingPlan {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model TrainingSession {
+  id Int @id @default(autoincrement())
+
+  clubId Int
+  club   Club @relation(fields: [clubId], references: [id], onDelete: Cascade)
+
+  weekKey String
+
+  primaryFocus   String
+  secondaryFocus String
+
+  trainerLevel      Int
+  trainerEfficiency Int
+
+  processedAt DateTime @default(now())
+
+  results TrainingResult[]
+
+  createdAt DateTime @default(now())
+
+  @@unique([clubId, weekKey])
+  @@index([clubId])
+  @@index([processedAt])
+}
+
+model TrainingResult {
+  id Int @id @default(autoincrement())
+
+  sessionId Int
+  session   TrainingSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  playerId Int?
+  player   Player? @relation(fields: [playerId], references: [id], onDelete: SetNull)
+
+  playerFirstName String
+  playerLastName  String
+  playerAge       Int
+
+  usage     String
+  intensity Int
+
+  primaryBefore Float
+  primaryGain   Float
+  primaryAfter  Float
+
+  secondaryBefore Float
+  secondaryGain   Float
+  secondaryAfter  Float
+
+  overallBefore Float
+  overallAfter  Float
+
+  createdAt DateTime @default(now())
+
+  @@index([sessionId])
+  @@index([playerId])
 }

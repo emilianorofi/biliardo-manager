@@ -456,6 +456,7 @@ export type PlayerWhereInput = {
   formationAsA?: Prisma.FormationListRelationFilter
   formationAsB?: Prisma.FormationListRelationFilter
   formationAsC?: Prisma.FormationListRelationFilter
+  trainingResults?: Prisma.TrainingResultListRelationFilter
 }
 
 export type PlayerOrderByWithRelationInput = {
@@ -489,6 +490,7 @@ export type PlayerOrderByWithRelationInput = {
   formationAsA?: Prisma.FormationOrderByRelationAggregateInput
   formationAsB?: Prisma.FormationOrderByRelationAggregateInput
   formationAsC?: Prisma.FormationOrderByRelationAggregateInput
+  trainingResults?: Prisma.TrainingResultOrderByRelationAggregateInput
 }
 
 export type PlayerWhereUniqueInput = Prisma.AtLeast<{
@@ -525,6 +527,7 @@ export type PlayerWhereUniqueInput = Prisma.AtLeast<{
   formationAsA?: Prisma.FormationListRelationFilter
   formationAsB?: Prisma.FormationListRelationFilter
   formationAsC?: Prisma.FormationListRelationFilter
+  trainingResults?: Prisma.TrainingResultListRelationFilter
 }, "id">
 
 export type PlayerOrderByWithAggregationInput = {
@@ -622,6 +625,7 @@ export type PlayerCreateInput = {
   formationAsA?: Prisma.FormationCreateNestedManyWithoutSlotAPlayerInput
   formationAsB?: Prisma.FormationCreateNestedManyWithoutSlotBPlayerInput
   formationAsC?: Prisma.FormationCreateNestedManyWithoutSlotCPlayerInput
+  trainingResults?: Prisma.TrainingResultCreateNestedManyWithoutPlayerInput
 }
 
 export type PlayerUncheckedCreateInput = {
@@ -654,6 +658,7 @@ export type PlayerUncheckedCreateInput = {
   formationAsA?: Prisma.FormationUncheckedCreateNestedManyWithoutSlotAPlayerInput
   formationAsB?: Prisma.FormationUncheckedCreateNestedManyWithoutSlotBPlayerInput
   formationAsC?: Prisma.FormationUncheckedCreateNestedManyWithoutSlotCPlayerInput
+  trainingResults?: Prisma.TrainingResultUncheckedCreateNestedManyWithoutPlayerInput
 }
 
 export type PlayerUpdateInput = {
@@ -685,6 +690,7 @@ export type PlayerUpdateInput = {
   formationAsA?: Prisma.FormationUpdateManyWithoutSlotAPlayerNestedInput
   formationAsB?: Prisma.FormationUpdateManyWithoutSlotBPlayerNestedInput
   formationAsC?: Prisma.FormationUpdateManyWithoutSlotCPlayerNestedInput
+  trainingResults?: Prisma.TrainingResultUpdateManyWithoutPlayerNestedInput
 }
 
 export type PlayerUncheckedUpdateInput = {
@@ -717,6 +723,7 @@ export type PlayerUncheckedUpdateInput = {
   formationAsA?: Prisma.FormationUncheckedUpdateManyWithoutSlotAPlayerNestedInput
   formationAsB?: Prisma.FormationUncheckedUpdateManyWithoutSlotBPlayerNestedInput
   formationAsC?: Prisma.FormationUncheckedUpdateManyWithoutSlotCPlayerNestedInput
+  trainingResults?: Prisma.TrainingResultUncheckedUpdateManyWithoutPlayerNestedInput
 }
 
 export type PlayerCreateManyInput = {
@@ -1063,6 +1070,22 @@ export type PlayerUpdateOneWithoutFormationAsCNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.PlayerUpdateToOneWithWhereWithoutFormationAsCInput, Prisma.PlayerUpdateWithoutFormationAsCInput>, Prisma.PlayerUncheckedUpdateWithoutFormationAsCInput>
 }
 
+export type PlayerCreateNestedOneWithoutTrainingResultsInput = {
+  create?: Prisma.XOR<Prisma.PlayerCreateWithoutTrainingResultsInput, Prisma.PlayerUncheckedCreateWithoutTrainingResultsInput>
+  connectOrCreate?: Prisma.PlayerCreateOrConnectWithoutTrainingResultsInput
+  connect?: Prisma.PlayerWhereUniqueInput
+}
+
+export type PlayerUpdateOneWithoutTrainingResultsNestedInput = {
+  create?: Prisma.XOR<Prisma.PlayerCreateWithoutTrainingResultsInput, Prisma.PlayerUncheckedCreateWithoutTrainingResultsInput>
+  connectOrCreate?: Prisma.PlayerCreateOrConnectWithoutTrainingResultsInput
+  upsert?: Prisma.PlayerUpsertWithoutTrainingResultsInput
+  disconnect?: Prisma.PlayerWhereInput | boolean
+  delete?: Prisma.PlayerWhereInput | boolean
+  connect?: Prisma.PlayerWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PlayerUpdateToOneWithWhereWithoutTrainingResultsInput, Prisma.PlayerUpdateWithoutTrainingResultsInput>, Prisma.PlayerUncheckedUpdateWithoutTrainingResultsInput>
+}
+
 export type PlayerCreateWithoutClubInput = {
   firstName: string
   lastName: string
@@ -1091,6 +1114,7 @@ export type PlayerCreateWithoutClubInput = {
   formationAsA?: Prisma.FormationCreateNestedManyWithoutSlotAPlayerInput
   formationAsB?: Prisma.FormationCreateNestedManyWithoutSlotBPlayerInput
   formationAsC?: Prisma.FormationCreateNestedManyWithoutSlotCPlayerInput
+  trainingResults?: Prisma.TrainingResultCreateNestedManyWithoutPlayerInput
 }
 
 export type PlayerUncheckedCreateWithoutClubInput = {
@@ -1122,6 +1146,7 @@ export type PlayerUncheckedCreateWithoutClubInput = {
   formationAsA?: Prisma.FormationUncheckedCreateNestedManyWithoutSlotAPlayerInput
   formationAsB?: Prisma.FormationUncheckedCreateNestedManyWithoutSlotBPlayerInput
   formationAsC?: Prisma.FormationUncheckedCreateNestedManyWithoutSlotCPlayerInput
+  trainingResults?: Prisma.TrainingResultUncheckedCreateNestedManyWithoutPlayerInput
 }
 
 export type PlayerCreateOrConnectWithoutClubInput = {
@@ -1210,6 +1235,7 @@ export type PlayerCreateWithoutFormationAsAInput = {
   club: Prisma.ClubCreateNestedOneWithoutPlayersInput
   formationAsB?: Prisma.FormationCreateNestedManyWithoutSlotBPlayerInput
   formationAsC?: Prisma.FormationCreateNestedManyWithoutSlotCPlayerInput
+  trainingResults?: Prisma.TrainingResultCreateNestedManyWithoutPlayerInput
 }
 
 export type PlayerUncheckedCreateWithoutFormationAsAInput = {
@@ -1241,6 +1267,7 @@ export type PlayerUncheckedCreateWithoutFormationAsAInput = {
   updatedAt?: Date | string
   formationAsB?: Prisma.FormationUncheckedCreateNestedManyWithoutSlotBPlayerInput
   formationAsC?: Prisma.FormationUncheckedCreateNestedManyWithoutSlotCPlayerInput
+  trainingResults?: Prisma.TrainingResultUncheckedCreateNestedManyWithoutPlayerInput
 }
 
 export type PlayerCreateOrConnectWithoutFormationAsAInput = {
@@ -1276,6 +1303,7 @@ export type PlayerCreateWithoutFormationAsBInput = {
   club: Prisma.ClubCreateNestedOneWithoutPlayersInput
   formationAsA?: Prisma.FormationCreateNestedManyWithoutSlotAPlayerInput
   formationAsC?: Prisma.FormationCreateNestedManyWithoutSlotCPlayerInput
+  trainingResults?: Prisma.TrainingResultCreateNestedManyWithoutPlayerInput
 }
 
 export type PlayerUncheckedCreateWithoutFormationAsBInput = {
@@ -1307,6 +1335,7 @@ export type PlayerUncheckedCreateWithoutFormationAsBInput = {
   updatedAt?: Date | string
   formationAsA?: Prisma.FormationUncheckedCreateNestedManyWithoutSlotAPlayerInput
   formationAsC?: Prisma.FormationUncheckedCreateNestedManyWithoutSlotCPlayerInput
+  trainingResults?: Prisma.TrainingResultUncheckedCreateNestedManyWithoutPlayerInput
 }
 
 export type PlayerCreateOrConnectWithoutFormationAsBInput = {
@@ -1342,6 +1371,7 @@ export type PlayerCreateWithoutFormationAsCInput = {
   club: Prisma.ClubCreateNestedOneWithoutPlayersInput
   formationAsA?: Prisma.FormationCreateNestedManyWithoutSlotAPlayerInput
   formationAsB?: Prisma.FormationCreateNestedManyWithoutSlotBPlayerInput
+  trainingResults?: Prisma.TrainingResultCreateNestedManyWithoutPlayerInput
 }
 
 export type PlayerUncheckedCreateWithoutFormationAsCInput = {
@@ -1373,6 +1403,7 @@ export type PlayerUncheckedCreateWithoutFormationAsCInput = {
   updatedAt?: Date | string
   formationAsA?: Prisma.FormationUncheckedCreateNestedManyWithoutSlotAPlayerInput
   formationAsB?: Prisma.FormationUncheckedCreateNestedManyWithoutSlotBPlayerInput
+  trainingResults?: Prisma.TrainingResultUncheckedCreateNestedManyWithoutPlayerInput
 }
 
 export type PlayerCreateOrConnectWithoutFormationAsCInput = {
@@ -1419,6 +1450,7 @@ export type PlayerUpdateWithoutFormationAsAInput = {
   club?: Prisma.ClubUpdateOneRequiredWithoutPlayersNestedInput
   formationAsB?: Prisma.FormationUpdateManyWithoutSlotBPlayerNestedInput
   formationAsC?: Prisma.FormationUpdateManyWithoutSlotCPlayerNestedInput
+  trainingResults?: Prisma.TrainingResultUpdateManyWithoutPlayerNestedInput
 }
 
 export type PlayerUncheckedUpdateWithoutFormationAsAInput = {
@@ -1450,6 +1482,7 @@ export type PlayerUncheckedUpdateWithoutFormationAsAInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   formationAsB?: Prisma.FormationUncheckedUpdateManyWithoutSlotBPlayerNestedInput
   formationAsC?: Prisma.FormationUncheckedUpdateManyWithoutSlotCPlayerNestedInput
+  trainingResults?: Prisma.TrainingResultUncheckedUpdateManyWithoutPlayerNestedInput
 }
 
 export type PlayerUpsertWithoutFormationAsBInput = {
@@ -1491,6 +1524,7 @@ export type PlayerUpdateWithoutFormationAsBInput = {
   club?: Prisma.ClubUpdateOneRequiredWithoutPlayersNestedInput
   formationAsA?: Prisma.FormationUpdateManyWithoutSlotAPlayerNestedInput
   formationAsC?: Prisma.FormationUpdateManyWithoutSlotCPlayerNestedInput
+  trainingResults?: Prisma.TrainingResultUpdateManyWithoutPlayerNestedInput
 }
 
 export type PlayerUncheckedUpdateWithoutFormationAsBInput = {
@@ -1522,6 +1556,7 @@ export type PlayerUncheckedUpdateWithoutFormationAsBInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   formationAsA?: Prisma.FormationUncheckedUpdateManyWithoutSlotAPlayerNestedInput
   formationAsC?: Prisma.FormationUncheckedUpdateManyWithoutSlotCPlayerNestedInput
+  trainingResults?: Prisma.TrainingResultUncheckedUpdateManyWithoutPlayerNestedInput
 }
 
 export type PlayerUpsertWithoutFormationAsCInput = {
@@ -1563,6 +1598,7 @@ export type PlayerUpdateWithoutFormationAsCInput = {
   club?: Prisma.ClubUpdateOneRequiredWithoutPlayersNestedInput
   formationAsA?: Prisma.FormationUpdateManyWithoutSlotAPlayerNestedInput
   formationAsB?: Prisma.FormationUpdateManyWithoutSlotBPlayerNestedInput
+  trainingResults?: Prisma.TrainingResultUpdateManyWithoutPlayerNestedInput
 }
 
 export type PlayerUncheckedUpdateWithoutFormationAsCInput = {
@@ -1594,6 +1630,149 @@ export type PlayerUncheckedUpdateWithoutFormationAsCInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   formationAsA?: Prisma.FormationUncheckedUpdateManyWithoutSlotAPlayerNestedInput
   formationAsB?: Prisma.FormationUncheckedUpdateManyWithoutSlotBPlayerNestedInput
+  trainingResults?: Prisma.TrainingResultUncheckedUpdateManyWithoutPlayerNestedInput
+}
+
+export type PlayerCreateWithoutTrainingResultsInput = {
+  firstName: string
+  lastName: string
+  nationality: string
+  age: number
+  form?: number
+  morale?: number
+  experience?: number
+  talent: number
+  potential: number
+  value?: number
+  salary?: number
+  image?: string
+  style?: Prisma.PlayerCreatestyleInput | string[]
+  precisione: number
+  diretto: number
+  sponde: number
+  tattica: number
+  mentalita: number
+  difesa: number
+  realizzazione: number
+  creativita: number
+  misura: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  club: Prisma.ClubCreateNestedOneWithoutPlayersInput
+  formationAsA?: Prisma.FormationCreateNestedManyWithoutSlotAPlayerInput
+  formationAsB?: Prisma.FormationCreateNestedManyWithoutSlotBPlayerInput
+  formationAsC?: Prisma.FormationCreateNestedManyWithoutSlotCPlayerInput
+}
+
+export type PlayerUncheckedCreateWithoutTrainingResultsInput = {
+  id?: number
+  clubId: number
+  firstName: string
+  lastName: string
+  nationality: string
+  age: number
+  form?: number
+  morale?: number
+  experience?: number
+  talent: number
+  potential: number
+  value?: number
+  salary?: number
+  image?: string
+  style?: Prisma.PlayerCreatestyleInput | string[]
+  precisione: number
+  diretto: number
+  sponde: number
+  tattica: number
+  mentalita: number
+  difesa: number
+  realizzazione: number
+  creativita: number
+  misura: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  formationAsA?: Prisma.FormationUncheckedCreateNestedManyWithoutSlotAPlayerInput
+  formationAsB?: Prisma.FormationUncheckedCreateNestedManyWithoutSlotBPlayerInput
+  formationAsC?: Prisma.FormationUncheckedCreateNestedManyWithoutSlotCPlayerInput
+}
+
+export type PlayerCreateOrConnectWithoutTrainingResultsInput = {
+  where: Prisma.PlayerWhereUniqueInput
+  create: Prisma.XOR<Prisma.PlayerCreateWithoutTrainingResultsInput, Prisma.PlayerUncheckedCreateWithoutTrainingResultsInput>
+}
+
+export type PlayerUpsertWithoutTrainingResultsInput = {
+  update: Prisma.XOR<Prisma.PlayerUpdateWithoutTrainingResultsInput, Prisma.PlayerUncheckedUpdateWithoutTrainingResultsInput>
+  create: Prisma.XOR<Prisma.PlayerCreateWithoutTrainingResultsInput, Prisma.PlayerUncheckedCreateWithoutTrainingResultsInput>
+  where?: Prisma.PlayerWhereInput
+}
+
+export type PlayerUpdateToOneWithWhereWithoutTrainingResultsInput = {
+  where?: Prisma.PlayerWhereInput
+  data: Prisma.XOR<Prisma.PlayerUpdateWithoutTrainingResultsInput, Prisma.PlayerUncheckedUpdateWithoutTrainingResultsInput>
+}
+
+export type PlayerUpdateWithoutTrainingResultsInput = {
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  nationality?: Prisma.StringFieldUpdateOperationsInput | string
+  age?: Prisma.IntFieldUpdateOperationsInput | number
+  form?: Prisma.IntFieldUpdateOperationsInput | number
+  morale?: Prisma.IntFieldUpdateOperationsInput | number
+  experience?: Prisma.FloatFieldUpdateOperationsInput | number
+  talent?: Prisma.FloatFieldUpdateOperationsInput | number
+  potential?: Prisma.FloatFieldUpdateOperationsInput | number
+  value?: Prisma.IntFieldUpdateOperationsInput | number
+  salary?: Prisma.IntFieldUpdateOperationsInput | number
+  image?: Prisma.StringFieldUpdateOperationsInput | string
+  style?: Prisma.PlayerUpdatestyleInput | string[]
+  precisione?: Prisma.FloatFieldUpdateOperationsInput | number
+  diretto?: Prisma.FloatFieldUpdateOperationsInput | number
+  sponde?: Prisma.FloatFieldUpdateOperationsInput | number
+  tattica?: Prisma.FloatFieldUpdateOperationsInput | number
+  mentalita?: Prisma.FloatFieldUpdateOperationsInput | number
+  difesa?: Prisma.FloatFieldUpdateOperationsInput | number
+  realizzazione?: Prisma.FloatFieldUpdateOperationsInput | number
+  creativita?: Prisma.FloatFieldUpdateOperationsInput | number
+  misura?: Prisma.FloatFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  club?: Prisma.ClubUpdateOneRequiredWithoutPlayersNestedInput
+  formationAsA?: Prisma.FormationUpdateManyWithoutSlotAPlayerNestedInput
+  formationAsB?: Prisma.FormationUpdateManyWithoutSlotBPlayerNestedInput
+  formationAsC?: Prisma.FormationUpdateManyWithoutSlotCPlayerNestedInput
+}
+
+export type PlayerUncheckedUpdateWithoutTrainingResultsInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  clubId?: Prisma.IntFieldUpdateOperationsInput | number
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  nationality?: Prisma.StringFieldUpdateOperationsInput | string
+  age?: Prisma.IntFieldUpdateOperationsInput | number
+  form?: Prisma.IntFieldUpdateOperationsInput | number
+  morale?: Prisma.IntFieldUpdateOperationsInput | number
+  experience?: Prisma.FloatFieldUpdateOperationsInput | number
+  talent?: Prisma.FloatFieldUpdateOperationsInput | number
+  potential?: Prisma.FloatFieldUpdateOperationsInput | number
+  value?: Prisma.IntFieldUpdateOperationsInput | number
+  salary?: Prisma.IntFieldUpdateOperationsInput | number
+  image?: Prisma.StringFieldUpdateOperationsInput | string
+  style?: Prisma.PlayerUpdatestyleInput | string[]
+  precisione?: Prisma.FloatFieldUpdateOperationsInput | number
+  diretto?: Prisma.FloatFieldUpdateOperationsInput | number
+  sponde?: Prisma.FloatFieldUpdateOperationsInput | number
+  tattica?: Prisma.FloatFieldUpdateOperationsInput | number
+  mentalita?: Prisma.FloatFieldUpdateOperationsInput | number
+  difesa?: Prisma.FloatFieldUpdateOperationsInput | number
+  realizzazione?: Prisma.FloatFieldUpdateOperationsInput | number
+  creativita?: Prisma.FloatFieldUpdateOperationsInput | number
+  misura?: Prisma.FloatFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  formationAsA?: Prisma.FormationUncheckedUpdateManyWithoutSlotAPlayerNestedInput
+  formationAsB?: Prisma.FormationUncheckedUpdateManyWithoutSlotBPlayerNestedInput
+  formationAsC?: Prisma.FormationUncheckedUpdateManyWithoutSlotCPlayerNestedInput
 }
 
 export type PlayerCreateManyClubInput = {
@@ -1652,6 +1831,7 @@ export type PlayerUpdateWithoutClubInput = {
   formationAsA?: Prisma.FormationUpdateManyWithoutSlotAPlayerNestedInput
   formationAsB?: Prisma.FormationUpdateManyWithoutSlotBPlayerNestedInput
   formationAsC?: Prisma.FormationUpdateManyWithoutSlotCPlayerNestedInput
+  trainingResults?: Prisma.TrainingResultUpdateManyWithoutPlayerNestedInput
 }
 
 export type PlayerUncheckedUpdateWithoutClubInput = {
@@ -1683,6 +1863,7 @@ export type PlayerUncheckedUpdateWithoutClubInput = {
   formationAsA?: Prisma.FormationUncheckedUpdateManyWithoutSlotAPlayerNestedInput
   formationAsB?: Prisma.FormationUncheckedUpdateManyWithoutSlotBPlayerNestedInput
   formationAsC?: Prisma.FormationUncheckedUpdateManyWithoutSlotCPlayerNestedInput
+  trainingResults?: Prisma.TrainingResultUncheckedUpdateManyWithoutPlayerNestedInput
 }
 
 export type PlayerUncheckedUpdateManyWithoutClubInput = {
@@ -1722,12 +1903,14 @@ export type PlayerCountOutputType = {
   formationAsA: number
   formationAsB: number
   formationAsC: number
+  trainingResults: number
 }
 
 export type PlayerCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   formationAsA?: boolean | PlayerCountOutputTypeCountFormationAsAArgs
   formationAsB?: boolean | PlayerCountOutputTypeCountFormationAsBArgs
   formationAsC?: boolean | PlayerCountOutputTypeCountFormationAsCArgs
+  trainingResults?: boolean | PlayerCountOutputTypeCountTrainingResultsArgs
 }
 
 /**
@@ -1759,6 +1942,13 @@ export type PlayerCountOutputTypeCountFormationAsBArgs<ExtArgs extends runtime.T
  */
 export type PlayerCountOutputTypeCountFormationAsCArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.FormationWhereInput
+}
+
+/**
+ * PlayerCountOutputType without action
+ */
+export type PlayerCountOutputTypeCountTrainingResultsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.TrainingResultWhereInput
 }
 
 
@@ -1793,6 +1983,7 @@ export type PlayerSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   formationAsA?: boolean | Prisma.Player$formationAsAArgs<ExtArgs>
   formationAsB?: boolean | Prisma.Player$formationAsBArgs<ExtArgs>
   formationAsC?: boolean | Prisma.Player$formationAsCArgs<ExtArgs>
+  trainingResults?: boolean | Prisma.Player$trainingResultsArgs<ExtArgs>
   _count?: boolean | Prisma.PlayerCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["player"]>
 
@@ -1891,6 +2082,7 @@ export type PlayerInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   formationAsA?: boolean | Prisma.Player$formationAsAArgs<ExtArgs>
   formationAsB?: boolean | Prisma.Player$formationAsBArgs<ExtArgs>
   formationAsC?: boolean | Prisma.Player$formationAsCArgs<ExtArgs>
+  trainingResults?: boolean | Prisma.Player$trainingResultsArgs<ExtArgs>
   _count?: boolean | Prisma.PlayerCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type PlayerIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1907,6 +2099,7 @@ export type $PlayerPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     formationAsA: Prisma.$FormationPayload<ExtArgs>[]
     formationAsB: Prisma.$FormationPayload<ExtArgs>[]
     formationAsC: Prisma.$FormationPayload<ExtArgs>[]
+    trainingResults: Prisma.$TrainingResultPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -2333,6 +2526,7 @@ export interface Prisma__PlayerClient<T, Null = never, ExtArgs extends runtime.T
   formationAsA<T extends Prisma.Player$formationAsAArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Player$formationAsAArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FormationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   formationAsB<T extends Prisma.Player$formationAsBArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Player$formationAsBArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FormationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   formationAsC<T extends Prisma.Player$formationAsCArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Player$formationAsCArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FormationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  trainingResults<T extends Prisma.Player$trainingResultsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Player$trainingResultsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TrainingResultPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2858,6 +3052,30 @@ export type Player$formationAsCArgs<ExtArgs extends runtime.Types.Extensions.Int
   take?: number
   skip?: number
   distinct?: Prisma.FormationScalarFieldEnum | Prisma.FormationScalarFieldEnum[]
+}
+
+/**
+ * Player.trainingResults
+ */
+export type Player$trainingResultsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the TrainingResult
+   */
+  select?: Prisma.TrainingResultSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the TrainingResult
+   */
+  omit?: Prisma.TrainingResultOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TrainingResultInclude<ExtArgs> | null
+  where?: Prisma.TrainingResultWhereInput
+  orderBy?: Prisma.TrainingResultOrderByWithRelationInput | Prisma.TrainingResultOrderByWithRelationInput[]
+  cursor?: Prisma.TrainingResultWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.TrainingResultScalarFieldEnum | Prisma.TrainingResultScalarFieldEnum[]
 }
 
 /**

@@ -66,3 +66,13 @@ export type Formation = Prisma.FormationModel
  * 
  */
 export type TrainingPlan = Prisma.TrainingPlanModel
+/**
+ * Model TrainingSession
+ * 
+ */
+export type TrainingSession = Prisma.TrainingSessionModel
+/**
+ * Model TrainingResult
+ * 
+ */
+export type TrainingResult = Prisma.TrainingResultModel

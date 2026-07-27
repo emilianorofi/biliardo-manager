@@ -55,7 +55,9 @@ export const ModelName = {
   Player: 'Player',
   AcademyPlayer: 'AcademyPlayer',
   Formation: 'Formation',
-  TrainingPlan: 'TrainingPlan'
+  TrainingPlan: 'TrainingPlan',
+  TrainingSession: 'TrainingSession',
+  TrainingResult: 'TrainingResult'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -181,6 +183,44 @@ export const TrainingPlanScalarFieldEnum = {
 } as const
 
 export type TrainingPlanScalarFieldEnum = (typeof TrainingPlanScalarFieldEnum)[keyof typeof TrainingPlanScalarFieldEnum]
+
+
+export const TrainingSessionScalarFieldEnum = {
+  id: 'id',
+  clubId: 'clubId',
+  weekKey: 'weekKey',
+  primaryFocus: 'primaryFocus',
+  secondaryFocus: 'secondaryFocus',
+  trainerLevel: 'trainerLevel',
+  trainerEfficiency: 'trainerEfficiency',
+  processedAt: 'processedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type TrainingSessionScalarFieldEnum = (typeof TrainingSessionScalarFieldEnum)[keyof typeof TrainingSessionScalarFieldEnum]
+
+
+export const TrainingResultScalarFieldEnum = {
+  id: 'id',
+  sessionId: 'sessionId',
+  playerId: 'playerId',
+  playerFirstName: 'playerFirstName',
+  playerLastName: 'playerLastName',
+  playerAge: 'playerAge',
+  usage: 'usage',
+  intensity: 'intensity',
+  primaryBefore: 'primaryBefore',
+  primaryGain: 'primaryGain',
+  primaryAfter: 'primaryAfter',
+  secondaryBefore: 'secondaryBefore',
+  secondaryGain: 'secondaryGain',
+  secondaryAfter: 'secondaryAfter',
+  overallBefore: 'overallBefore',
+  overallAfter: 'overallAfter',
+  createdAt: 'createdAt'
+} as const
+
+export type TrainingResultScalarFieldEnum = (typeof TrainingResultScalarFieldEnum)[keyof typeof TrainingResultScalarFieldEnum]
 
 
 export const SortOrder = {
