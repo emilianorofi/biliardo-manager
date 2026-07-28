@@ -57,7 +57,11 @@ export const ModelName = {
   Formation: 'Formation',
   TrainingPlan: 'TrainingPlan',
   TrainingSession: 'TrainingSession',
-  TrainingResult: 'TrainingResult'
+  TrainingResult: 'TrainingResult',
+  Season: 'Season',
+  League: 'League',
+  LeagueEntry: 'LeagueEntry',
+  LeagueFixture: 'LeagueFixture'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -221,6 +225,71 @@ export const TrainingResultScalarFieldEnum = {
 } as const
 
 export type TrainingResultScalarFieldEnum = (typeof TrainingResultScalarFieldEnum)[keyof typeof TrainingResultScalarFieldEnum]
+
+
+export const SeasonScalarFieldEnum = {
+  id: 'id',
+  number: 'number',
+  name: 'name',
+  status: 'status',
+  startsAt: 'startsAt',
+  endsAt: 'endsAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SeasonScalarFieldEnum = (typeof SeasonScalarFieldEnum)[keyof typeof SeasonScalarFieldEnum]
+
+
+export const LeagueScalarFieldEnum = {
+  id: 'id',
+  seasonId: 'seasonId',
+  name: 'name',
+  level: 'level',
+  groupCode: 'groupCode',
+  status: 'status',
+  currentRound: 'currentRound',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type LeagueScalarFieldEnum = (typeof LeagueScalarFieldEnum)[keyof typeof LeagueScalarFieldEnum]
+
+
+export const LeagueEntryScalarFieldEnum = {
+  id: 'id',
+  leagueId: 'leagueId',
+  clubId: 'clubId',
+  played: 'played',
+  won: 'won',
+  drawn: 'drawn',
+  lost: 'lost',
+  pointsFor: 'pointsFor',
+  pointsAgainst: 'pointsAgainst',
+  points: 'points',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type LeagueEntryScalarFieldEnum = (typeof LeagueEntryScalarFieldEnum)[keyof typeof LeagueEntryScalarFieldEnum]
+
+
+export const LeagueFixtureScalarFieldEnum = {
+  id: 'id',
+  leagueId: 'leagueId',
+  round: 'round',
+  homeClubId: 'homeClubId',
+  awayClubId: 'awayClubId',
+  scheduledAt: 'scheduledAt',
+  status: 'status',
+  homeScore: 'homeScore',
+  awayScore: 'awayScore',
+  playedAt: 'playedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type LeagueFixtureScalarFieldEnum = (typeof LeagueFixtureScalarFieldEnum)[keyof typeof LeagueFixtureScalarFieldEnum]
 
 
 export const SortOrder = {

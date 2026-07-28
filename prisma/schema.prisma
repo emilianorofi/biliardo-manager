@@ -33,6 +33,11 @@ model Club {
   trainingPlan     TrainingPlan?
   trainingSessions TrainingSession[]
 
+  leagueEntries LeagueEntry[]
+
+  homeFixtures LeagueFixture[] @relation("HomeClubFixtures")
+  awayFixtures LeagueFixture[] @relation("AwayClubFixtures")
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -213,4 +218,105 @@ model TrainingResult {
 
   @@index([sessionId])
   @@index([playerId])
+}
+
+model Season {
+  id Int @id @default(autoincrement())
+
+  number Int    @unique
+  name   String
+
+  status String @default("PREPARATION")
+
+  startsAt DateTime?
+  endsAt   DateTime?
+
+  leagues League[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model League {
+  id Int @id @default(autoincrement())
+
+  seasonId Int
+  season   Season @relation(fields: [seasonId], references: [id], onDelete: Cascade)
+
+  name      String
+  level     Int    @default(1)
+  groupCode String @default("A")
+
+  status       String @default("PREPARATION")
+  currentRound Int    @default(0)
+
+  entries  LeagueEntry[]
+  fixtures LeagueFixture[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([seasonId, level, groupCode])
+  @@index([seasonId])
+}
+
+model LeagueEntry {
+  id Int @id @default(autoincrement())
+
+  leagueId Int
+  league   League @relation(fields: [leagueId], references: [id], onDelete: Cascade)
+
+  clubId Int
+  club   Club @relation(fields: [clubId], references: [id], onDelete: Cascade)
+
+  played Int @default(0)
+
+  won   Int @default(0)
+  drawn Int @default(0)
+  lost  Int @default(0)
+
+  pointsFor     Int @default(0)
+  pointsAgainst Int @default(0)
+  points        Int @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([leagueId, clubId])
+  @@index([leagueId])
+  @@index([clubId])
+}
+
+model LeagueFixture {
+  id Int @id @default(autoincrement())
+
+  leagueId Int
+  league   League @relation(fields: [leagueId], references: [id], onDelete: Cascade)
+
+  round Int
+
+  homeClubId Int
+  homeClub   Club @relation("HomeClubFixtures", fields: [homeClubId], references: [id], onDelete: Cascade)
+
+  awayClubId Int
+  awayClub   Club @relation("AwayClubFixtures", fields: [awayClubId], references: [id], onDelete: Cascade)
+
+  scheduledAt DateTime
+
+  status String @default("SCHEDULED")
+
+  homeScore Int?
+  awayScore Int?
+
+  playedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([leagueId, round, homeClubId, awayClubId])
+  @@index([leagueId])
+  @@index([round])
+  @@index([homeClubId])
+  @@index([awayClubId])
+  @@index([scheduledAt])
 }

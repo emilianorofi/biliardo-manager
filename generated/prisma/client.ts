@@ -76,3 +76,23 @@ export type TrainingSession = Prisma.TrainingSessionModel
  * 
  */
 export type TrainingResult = Prisma.TrainingResultModel
+/**
+ * Model Season
+ * 
+ */
+export type Season = Prisma.SeasonModel
+/**
+ * Model League
+ * 
+ */
+export type League = Prisma.LeagueModel
+/**
+ * Model LeagueEntry
+ * 
+ */
+export type LeagueEntry = Prisma.LeagueEntryModel
+/**
+ * Model LeagueFixture
+ * 
+ */
+export type LeagueFixture = Prisma.LeagueFixtureModel
