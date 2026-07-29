@@ -14,6 +14,23 @@ export type MatchPlayerValues = {
   sponde: number;
 };
 
+export type MatchPerformancePlayerValues =
+  MatchPlayerValues & {
+    form: number;
+    morale: number;
+    experience: number;
+  };
+
+export type PlayerPerformanceBreakdown = {
+  specialtyRating: number;
+
+  formModifier: number;
+  moraleModifier: number;
+  experienceModifier: number;
+
+  performanceRating: number;
+};
+
 export type LeagueMatchDefinition = {
   order: number;
 
@@ -220,6 +237,136 @@ export function calculateTeamSpecialtyRating(
   return roundRating(
     totalRating /
       players.length
+  );
+}
+
+export function calculatePlayerPerformance(
+  player:
+    MatchPerformancePlayerValues,
+
+  specialty:
+    MatchSpecialty
+): PlayerPerformanceBreakdown {
+  const specialtyRating =
+    calculateSpecialtyRating(
+      player,
+      specialty
+    );
+
+  const normalizedForm =
+    clamp(
+      player.form,
+      1,
+      10
+    );
+
+  const normalizedMorale =
+    clamp(
+      player.morale,
+      1,
+      10
+    );
+
+  const normalizedExperience =
+    clamp(
+      player.experience,
+      0,
+      100
+    );
+
+  const formModifier =
+    roundRating(
+      (
+        normalizedForm - 5
+      ) * 0.75
+    );
+
+  const moraleModifier =
+    roundRating(
+      (
+        normalizedMorale - 5
+      ) * 0.5
+    );
+
+  const experienceModifier =
+    roundRating(
+      normalizedExperience *
+        0.025
+    );
+
+  const performanceRating =
+    roundRating(
+      clamp(
+        specialtyRating +
+          formModifier +
+          moraleModifier +
+          experienceModifier,
+        1,
+        100
+      )
+    );
+
+  return {
+    specialtyRating,
+
+    formModifier,
+    moraleModifier,
+    experienceModifier,
+
+    performanceRating,
+  };
+}
+
+export function calculateTeamPerformanceRating(
+  players:
+    MatchPerformancePlayerValues[],
+
+  specialty:
+    MatchSpecialty
+) {
+  if (players.length === 0) {
+    throw new Error(
+      "Serve almeno un giocatore per calcolare la prestazione della squadra."
+    );
+  }
+
+  const performances =
+    players.map(
+      (player) =>
+        calculatePlayerPerformance(
+          player,
+          specialty
+        )
+    );
+
+  const totalPerformance =
+    performances.reduce(
+      (
+        total,
+        performance
+      ) =>
+        total +
+        performance.performanceRating,
+      0
+    );
+
+  return roundRating(
+    totalPerformance /
+      performances.length
+  );
+}
+
+function clamp(
+  value: number,
+  minimum: number,
+  maximum: number
+) {
+  return Math.min(
+    Math.max(
+      value,
+      minimum
+    ),
+    maximum
   );
 }
 

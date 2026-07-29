@@ -3,7 +3,9 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
 import {
+  calculatePlayerPerformance,
   calculateSpecialtyRating,
+  calculateTeamPerformanceRating,
   calculateTeamSpecialtyRating,
   getLeagueMatchDefinitions,
   type FormationSlot,
@@ -21,6 +23,10 @@ type FormationPlayer = {
   precisione: number;
   diretto: number;
   sponde: number;
+
+  form: number;
+  morale: number;
+  experience: number;
 };
 
 export async function GET() {
@@ -50,6 +56,10 @@ export async function GET() {
               precisione: true,
               diretto: true,
               sponde: true,
+
+              form: true,
+              morale: true,
+              experience: true,
             },
           },
 
@@ -62,6 +72,10 @@ export async function GET() {
               precisione: true,
               diretto: true,
               sponde: true,
+
+              form: true,
+              morale: true,
+              experience: true,
             },
           },
 
@@ -74,6 +88,10 @@ export async function GET() {
               precisione: true,
               diretto: true,
               sponde: true,
+
+              form: true,
+              morale: true,
+              experience: true,
             },
           },
         },
@@ -134,6 +152,12 @@ export async function GET() {
                 const player =
                   playersBySlot[slot];
 
+                const performance =
+                  calculatePlayerPerformance(
+                    player,
+                    match.specialty
+                  );
+
                 return {
                   slot,
 
@@ -145,11 +169,22 @@ export async function GET() {
                   lastName:
                     player.lastName,
 
+                  form:
+                    player.form,
+
+                  morale:
+                    player.morale,
+
+                  experience:
+                    player.experience,
+
                   specialtyRating:
                     calculateSpecialtyRating(
                       player,
                       match.specialty
                     ),
+
+                  performance,
                 };
               }
             );
@@ -172,6 +207,12 @@ export async function GET() {
 
             teamRating:
               calculateTeamSpecialtyRating(
+                selectedPlayers,
+                match.specialty
+              ),
+
+            teamPerformanceRating:
+              calculateTeamPerformanceRating(
                 selectedPlayers,
                 match.specialty
               ),
