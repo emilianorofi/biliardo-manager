@@ -8,6 +8,12 @@ export type MatchSpecialty =
   | "GORIZIANA"
   | "TUTTI_DOPPI";
 
+export type MatchPlayerValues = {
+  precisione: number;
+  diretto: number;
+  sponde: number;
+};
+
 export type LeagueMatchDefinition = {
   order: number;
 
@@ -148,4 +154,79 @@ export function getLeagueMatchDefinitions() {
       ],
     })
   );
+}
+
+export function calculateSpecialtyRating(
+  player:
+    MatchPlayerValues,
+
+  specialty:
+    MatchSpecialty
+) {
+  switch (specialty) {
+    case "ITALIANA":
+      return roundRating(
+        (
+          player.precisione +
+          player.diretto
+        ) / 2
+      );
+
+    case "GORIZIANA":
+      return roundRating(
+        (
+          player.precisione +
+          player.sponde
+        ) / 2
+      );
+
+    case "TUTTI_DOPPI":
+      return roundRating(
+        (
+          player.diretto +
+          player.sponde
+        ) / 2
+      );
+  }
+}
+
+export function calculateTeamSpecialtyRating(
+  players:
+    MatchPlayerValues[],
+
+  specialty:
+    MatchSpecialty
+) {
+  if (players.length === 0) {
+    throw new Error(
+      "Serve almeno un giocatore per calcolare la forza della squadra."
+    );
+  }
+
+  const totalRating =
+    players.reduce(
+      (
+        total,
+        player
+      ) =>
+        total +
+        calculateSpecialtyRating(
+          player,
+          specialty
+        ),
+      0
+    );
+
+  return roundRating(
+    totalRating /
+      players.length
+  );
+}
+
+function roundRating(
+  rating: number
+) {
+  return Math.round(
+    rating * 100
+  ) / 100;
 }
