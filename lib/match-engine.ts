@@ -31,6 +31,16 @@ export type PlayerPerformanceBreakdown = {
   performanceRating: number;
 };
 
+export type MatchWinProbabilities = {
+  homePerformanceRating: number;
+  awayPerformanceRating: number;
+
+  performanceDifference: number;
+
+  homeWinProbability: number;
+  awayWinProbability: number;
+};
+
 export type LeagueMatchDefinition = {
   order: number;
 
@@ -354,6 +364,65 @@ export function calculateTeamPerformanceRating(
     totalPerformance /
       performances.length
   );
+}
+
+export function calculateMatchWinProbabilities(
+  homePerformanceRating: number,
+  awayPerformanceRating: number
+): MatchWinProbabilities {
+  const normalizedHomePerformance =
+    roundRating(
+      clamp(
+        homePerformanceRating,
+        1,
+        100
+      )
+    );
+
+  const normalizedAwayPerformance =
+    roundRating(
+      clamp(
+        awayPerformanceRating,
+        1,
+        100
+      )
+    );
+
+  const performanceDifference =
+    roundRating(
+      normalizedHomePerformance -
+        normalizedAwayPerformance
+    );
+
+  const homeWinProbability =
+    roundRating(
+      clamp(
+        50 +
+          performanceDifference *
+            1.5,
+        8,
+        92
+      )
+    );
+
+  const awayWinProbability =
+    roundRating(
+      100 -
+        homeWinProbability
+    );
+
+  return {
+    homePerformanceRating:
+      normalizedHomePerformance,
+
+    awayPerformanceRating:
+      normalizedAwayPerformance,
+
+    performanceDifference,
+
+    homeWinProbability,
+    awayWinProbability,
+  };
 }
 
 function clamp(
