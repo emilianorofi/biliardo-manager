@@ -8,6 +8,10 @@ import {
 } from "@/lib/league-progress";
 
 import {
+  validateFixtureRound,
+} from "@/lib/league-round";
+
+import {
   calculateFixtureStandingsDeltas,
 } from "@/lib/league-standings";
 
@@ -96,6 +100,7 @@ export async function POST(
               id: true,
               name: true,
               status: true,
+              currentRound: true,
             },
           },
 
@@ -137,6 +142,31 @@ export async function POST(
         {
           error:
             "Il campionato non è attivo.",
+        },
+        {
+          status: 400,
+        }
+      );
+    }
+
+    try {
+      validateFixtureRound(
+        fixture.league.currentRound,
+        fixture.round
+      );
+    } catch (error) {
+      return NextResponse.json(
+        {
+          error:
+            error instanceof Error
+              ? error.message
+              : "La giornata dell'incontro non è valida.",
+
+          currentRound:
+            fixture.league.currentRound,
+
+          fixtureRound:
+            fixture.round,
         },
         {
           status: 400,
