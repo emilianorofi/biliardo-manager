@@ -1,195 +1,409 @@
-import { Match } from "../../types/match";
-import { nextMatch } from "../../data/dashboard";
-export default function NextMatchCard() {
-  const match: Match = nextMatch;
-  return (
-    <div className="flex h-full flex-col rounded-2xl border border-zinc-700 bg-zinc-900 p-6 shadow-lg">
+import Link from "next/link";
 
-      {/* Header */}
-      <div className="mb-6 flex items-center justify-between">
+import {
+  getNextPlayableRound,
+} from "@/lib/league-round";
+
+import { prisma } from "@/lib/prisma";
+
+const CLUB_ID = 1;
+
+export default async function NextMatchCard() {
+  const [league, formation] =
+    await Promise.all([
+      prisma.league.findFirst({
+        where: {
+          status: "ACTIVE",
+        },
+
+        orderBy: {
+          id: "desc",
+        },
+
+        include: {
+          fixtures: {
+            where: {
+              OR: [
+                {
+                  homeClubId:
+                    CLUB_ID,
+                },
+                {
+                  awayClubId:
+                    CLUB_ID,
+                },
+              ],
+            },
+
+            orderBy: {
+              round: "asc",
+            },
+
+            include: {
+              homeClub: {
+                select: {
+                  id: true,
+                  name: true,
+                  shortName: true,
+                  city: true,
+                },
+              },
+
+              awayClub: {
+                select: {
+                  id: true,
+                  name: true,
+                  shortName: true,
+                  city: true,
+                },
+              },
+            },
+          },
+        },
+      }),
+
+      prisma.formation.findUnique({
+        where: {
+          clubId: CLUB_ID,
+        },
+      }),
+    ]);
+
+  if (!league) {
+    return (
+      <section className="flex h-full flex-col rounded-2xl border border-emerald-900/60 bg-[#15261f] p-6">
+        <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-400">
+          Campionato
+        </p>
+
+        <h2 className="mt-2 text-2xl font-black text-white">
+          Nessuna partita disponibile
+        </h2>
+
+        <p className="mt-3 text-sm text-slate-400">
+          Non esiste ancora un campionato attivo.
+        </p>
+      </section>
+    );
+  }
+
+  const totalRounds =
+    league.fixtures.reduce(
+      (
+        highestRound,
+        fixture
+      ) =>
+        Math.max(
+          highestRound,
+          fixture.round
+        ),
+      0
+    );
+
+  const playableRound =
+    totalRounds > 0
+      ? getNextPlayableRound(
+          league.currentRound,
+          totalRounds
+        )
+      : null;
+
+  const fixture =
+    playableRound === null
+      ? null
+      : league.fixtures.find(
+          (currentFixture) =>
+            currentFixture.round ===
+            playableRound
+        ) ?? null;
+
+  const formationComplete =
+    formation?.slotAPlayerId !== null &&
+    formation?.slotAPlayerId !== undefined &&
+    formation?.slotBPlayerId !== null &&
+    formation?.slotBPlayerId !== undefined &&
+    formation?.slotCPlayerId !== null &&
+    formation?.slotCPlayerId !== undefined;
+
+  if (!fixture) {
+    return (
+      <section className="flex h-full flex-col rounded-2xl border border-emerald-900/60 bg-[#15261f] p-6">
+        <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-400">
+          {league.name}
+        </p>
+
+        <h2 className="mt-2 text-2xl font-black text-white">
+          Campionato concluso
+        </h2>
+
+        <p className="mt-3 text-sm text-slate-400">
+          Tutte le giornate del campionato sono state completate.
+        </p>
+
+        <Link
+          href="/campionato"
+          className="mt-6 inline-flex w-fit rounded-xl border border-amber-400/30 bg-amber-400/10 px-4 py-2.5 text-sm font-black text-amber-300 transition hover:bg-amber-400/20"
+        >
+          Vedi la classifica finale
+        </Link>
+      </section>
+    );
+  }
+
+  const isHome =
+    fixture.homeClubId ===
+    CLUB_ID;
+
+  const userClub =
+    isHome
+      ? fixture.homeClub
+      : fixture.awayClub;
+
+  const opponent =
+    isHome
+      ? fixture.awayClub
+      : fixture.homeClub;
+
+  const matchPlayed =
+    fixture.status ===
+    "PLAYED";
+
+  return (
+    <section className="flex h-full flex-col overflow-hidden rounded-2xl border border-emerald-900/60 bg-[#15261f]">
+      <div className="flex flex-col justify-between gap-4 border-b border-emerald-900/60 p-5 sm:flex-row sm:items-center sm:p-6">
         <div>
-          <p className="text-xs uppercase tracking-widest text-emerald-400">
-            {match.competition}
+          <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-400">
+            {league.name}
           </p>
 
-          <h2 className="mt-1 text-2xl font-bold text-white">
-            Prossima Partita
+          <h2 className="mt-2 text-2xl font-black text-white">
+            Partita della giornata
           </h2>
         </div>
 
-        <div className="rounded-xl bg-emerald-700/20 px-4 py-2 text-sm font-semibold text-emerald-400">
-          {match.date} • {match.time}
+        <div className="rounded-xl border border-amber-400/30 bg-amber-400/10 px-4 py-2 text-center">
+          <p className="text-xs font-black uppercase tracking-wider text-amber-300">
+            Giornata {fixture.round}
+          </p>
+
+          <p className="mt-1 text-xs text-slate-400">
+            {formatFixtureDate(
+              fixture.scheduledAt
+            )}
+          </p>
         </div>
       </div>
 
-      {/* Squadre */}
+      <div className="flex flex-1 flex-col p-5 sm:p-6">
+        <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
+          <ClubSide
+            name={
+              fixture.homeClub.name
+            }
+            shortName={
+              fixture.homeClub.shortName
+            }
+            city={
+              fixture.homeClub.city
+            }
+            isUser={
+              fixture.homeClubId ===
+              CLUB_ID
+            }
+          />
 
-      <div className="mb-8 grid grid-cols-3 items-center">
+          <div className="min-w-24 text-center">
+            {matchPlayed ? (
+              <>
+                <p className="text-3xl font-black text-amber-300">
+                  {fixture.homeScore}
+                  {" – "}
+                  {fixture.awayScore}
+                </p>
 
-        {/* Casa */}
+                <p className="mt-1 text-xs font-bold uppercase tracking-wider text-slate-500">
+                  Risultato finale
+                </p>
+              </>
+            ) : (
+              <>
+                <p className="text-3xl font-black text-slate-500">
+                  VS
+                </p>
 
-        <div className="flex flex-col items-center">
-
-          <div className="mb-3 flex h-24 w-24 items-center justify-center rounded-full border-4 border-emerald-500 bg-zinc-800 text-3xl">
-            🟢
+                <p className="mt-1 text-xs font-bold uppercase tracking-wider text-slate-500">
+                  {isHome
+                    ? "In casa"
+                    : "In trasferta"}
+                </p>
+              </>
+            )}
           </div>
 
-          <h3 className="text-lg font-semibold text-white">
-            {match.homeClub.name}
-          </h3>
-
-          <p className="text-sm text-zinc-400">
-            Casa
-          </p>
-
+          <ClubSide
+            name={
+              fixture.awayClub.name
+            }
+            shortName={
+              fixture.awayClub.shortName
+            }
+            city={
+              fixture.awayClub.city
+            }
+            isUser={
+              fixture.awayClubId ===
+              CLUB_ID
+            }
+            align="right"
+          />
         </div>
 
-        {/* VS */}
+        <div className="mt-6 grid gap-3 sm:grid-cols-3">
+          <StatusBox
+            label="La tua squadra"
+            value={userClub.name}
+          />
 
-        <div className="text-center">
+          <StatusBox
+            label="Avversario"
+            value={opponent.name}
+          />
 
-          <div className="text-5xl font-black text-zinc-600">
-            VS
-          </div>
-
-          <p className="mt-2 text-sm text-zinc-500">
-            {match.venue}
-          </p>
-
+          <StatusBox
+            label="Formazione"
+            value={
+              formationComplete
+                ? "Completa"
+                : "Da preparare"
+            }
+            highlight={
+              formationComplete
+            }
+          />
         </div>
 
-        {/* Ospite */}
+        <div className="mt-auto flex flex-col gap-3 pt-6 sm:flex-row">
+          {matchPlayed ? (
+            <Link
+              href="/campionato"
+              className="flex-1 rounded-xl bg-amber-400 px-4 py-3 text-center text-sm font-black text-[#122018] transition hover:bg-amber-300"
+            >
+              Vedi risultato e classifica
+            </Link>
+          ) : (
+            <Link
+              href="/formation"
+              className="flex-1 rounded-xl bg-amber-400 px-4 py-3 text-center text-sm font-black text-[#122018] transition hover:bg-amber-300"
+            >
+              Prepara la formazione
+            </Link>
+          )}
 
-        <div className="flex flex-col items-center">
-
-          <div className="mb-3 flex h-24 w-24 items-center justify-center rounded-full border-4 border-red-500 bg-zinc-800 text-3xl">
-            🔴
-          </div>
-
-          <h3 className="text-lg font-semibold text-white">
-            {match.awayClub.name}
-          </h3>
-
-          <p className="text-sm text-zinc-400">
-            Trasferta
-          </p>
-
+          <Link
+            href="/campionato"
+            className="flex-1 rounded-xl border border-emerald-800 px-4 py-3 text-center text-sm font-bold text-slate-300 transition hover:bg-white/5 hover:text-white"
+          >
+            Vai al campionato
+          </Link>
         </div>
+      </div>
+    </section>
+  );
+}
 
+function ClubSide({
+  name,
+  shortName,
+  city,
+  isUser,
+  align = "left",
+}: {
+  name: string;
+  shortName: string;
+  city: string;
+  isUser: boolean;
+  align?: "left" | "right";
+}) {
+  const alignment =
+    align === "right"
+      ? "items-end text-right"
+      : "items-start text-left";
+
+  return (
+    <div
+      className={`flex min-w-0 flex-col ${alignment}`}
+    >
+      <div
+        className={`flex h-14 w-14 items-center justify-center rounded-xl border text-sm font-black ${
+          isUser
+            ? "border-amber-400/40 bg-amber-400/10 text-amber-300"
+            : "border-emerald-900/60 bg-emerald-950/50 text-emerald-300"
+        }`}
+      >
+        {shortName}
       </div>
 
-      {/* Countdown */}
+      <p
+        className={`mt-3 font-black ${
+          isUser
+            ? "text-amber-300"
+            : "text-white"
+        }`}
+      >
+        {name}
+      </p>
 
-      <div className="mb-6 rounded-xl border border-zinc-700 bg-zinc-800 p-4">
-
-        <div className="flex items-center justify-between">
-
-          <span className="text-sm text-zinc-400">
-            Mancano
-          </span>
-
-          <span className="text-2xl font-bold text-amber-400">
-            1g 03h 18m
-          </span>
-
-        </div>
-
-      </div>
-
-      {/* Preparazione */}
-
-      <div>
-
-        <div className="mb-2 flex justify-between text-sm">
-
-          <span className="text-zinc-400">
-            Preparazione squadra
-          </span>
-
-          <span className="font-semibold text-white">
-            {match.preparation}%
-          </span>
-
-        </div>
-
-        <div className="h-3 overflow-hidden rounded-full bg-zinc-700">
-
-          <div className="h-full rounded-full bg-emerald-500 transition-all"
-               style={{ width: `${match.preparation}%` }}
-/>
-
-        </div>
-
-      </div>
-
-      {/* Stato */}
-
-      <div className="mt-6 grid grid-cols-4 gap-4">
-
-        <div className="rounded-xl bg-zinc-800 p-3 text-center">
-
-          <p className="text-xs text-zinc-500">
-            Morale
-          </p>
-
-          <p className="mt-1 font-bold text-emerald-400">
-            {match.morale}
-          </p>
-
-        </div>
-
-        <div className="rounded-xl bg-zinc-800 p-3 text-center">
-
-          <p className="text-xs text-zinc-500">
-            Forma
-          </p>
-
-          <p className="mt-1 font-bold text-emerald-400">
-            {match.form}
-          </p>
-
-        </div>
-
-        <div className="rounded-xl bg-zinc-800 p-3 text-center">
-
-          <p className="text-xs text-zinc-500">
-            Condizione
-          </p>
-
-          <p className="mt-1 font-bold text-emerald-400">
-            {match.fitness}%
-          </p>
-
-        </div>
-
-        <div className="rounded-xl bg-zinc-800 p-3 text-center">
-
-          <p className="text-xs text-zinc-500">
-            Assenze
-          </p>
-
-          <p className="mt-1 font-bold text-red-400">
-            {match.absences}
-          </p>
-
-        </div>
-
-      </div>
-
-      {/* Pulsanti */}
-
-      <div className="mt-auto flex gap-4 pt-8">
-
-        <button className="flex-1 rounded-xl bg-emerald-600 py-3 font-semibold text-white transition hover:bg-emerald-500">
-          Prepara Formazione
-        </button>
-
-        <button className="flex-1 rounded-xl border border-zinc-600 py-3 font-semibold text-zinc-200 transition hover:border-emerald-500 hover:text-white">
-          Analizza Avversario
-        </button>
-
-      </div>
-
+      <p className="mt-1 text-xs text-slate-500">
+        {city}
+        {isUser
+          ? " · La tua squadra"
+          : ""}
+      </p>
     </div>
   );
+}
+
+function StatusBox({
+  label,
+  value,
+  highlight = false,
+}: {
+  label: string;
+  value: string;
+  highlight?: boolean;
+}) {
+  return (
+    <div className="rounded-xl border border-emerald-900/50 bg-emerald-950/30 p-4">
+      <p className="text-xs font-bold uppercase tracking-wider text-slate-500">
+        {label}
+      </p>
+
+      <p
+        className={`mt-2 font-black ${
+          highlight
+            ? "text-emerald-300"
+            : "text-white"
+        }`}
+      >
+        {value}
+      </p>
+    </div>
+  );
+}
+
+function formatFixtureDate(
+  date: Date
+): string {
+  return new Intl.DateTimeFormat(
+    "it-IT",
+    {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      timeZone:
+        "Europe/Rome",
+    }
+  ).format(date);
 }
