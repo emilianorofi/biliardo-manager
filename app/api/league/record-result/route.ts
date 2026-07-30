@@ -4,6 +4,10 @@ import {
 } from "next/server";
 
 import {
+  calculateLeagueCompletion,
+} from "@/lib/league-completion";
+
+import {
   calculateCompletedRound,
 } from "@/lib/league-progress";
 
@@ -142,31 +146,9 @@ export async function POST(
         {
           error:
             "Il campionato non è attivo.",
-        },
-        {
-          status: 400,
-        }
-      );
-    }
 
-    try {
-      validateFixtureRound(
-        fixture.league.currentRound,
-        fixture.round
-      );
-    } catch (error) {
-      return NextResponse.json(
-        {
-          error:
-            error instanceof Error
-              ? error.message
-              : "La giornata dell'incontro non è valida.",
-
-          currentRound:
-            fixture.league.currentRound,
-
-          fixtureRound:
-            fixture.round,
+          leagueStatus:
+            fixture.league.status,
         },
         {
           status: 400,
@@ -197,6 +179,31 @@ export async function POST(
         },
         {
           status: 409,
+        }
+      );
+    }
+
+    try {
+      validateFixtureRound(
+        fixture.league.currentRound,
+        fixture.round
+      );
+    } catch (error) {
+      return NextResponse.json(
+        {
+          error:
+            error instanceof Error
+              ? error.message
+              : "La giornata dell'incontro non è valida.",
+
+          currentRound:
+            fixture.league.currentRound,
+
+          fixtureRound:
+            fixture.round,
+        },
+        {
+          status: 400,
         }
       );
     }
@@ -405,6 +412,25 @@ export async function POST(
               leagueFixtures
             );
 
+          const totalRounds =
+            leagueFixtures.reduce(
+              (
+                highestRound,
+                leagueFixture
+              ) =>
+                Math.max(
+                  highestRound,
+                  leagueFixture.round
+                ),
+              0
+            );
+
+          const completion =
+            calculateLeagueCompletion(
+              completedRound,
+              totalRounds
+            );
+
           const updatedLeague =
             await transaction
               .league
@@ -416,7 +442,10 @@ export async function POST(
 
                 data: {
                   currentRound:
-                    completedRound,
+                    completion.completedRound,
+
+                  status:
+                    completion.status,
                 },
               });
 
@@ -424,13 +453,16 @@ export async function POST(
             homeEntry,
             awayEntry,
             updatedLeague,
+            completion,
           };
         }
       );
 
     return NextResponse.json({
       message:
-        "Risultato registrato correttamente.",
+        result.completion.isCompleted
+          ? "Risultato registrato e campionato concluso correttamente."
+          : "Risultato registrato correttamente.",
 
       fixture: {
         id:
@@ -459,9 +491,18 @@ export async function POST(
         id:
           result.updatedLeague.id,
 
+        status:
+          result.updatedLeague.status,
+
         currentRound:
           result.updatedLeague
             .currentRound,
+
+        totalRounds:
+          result.completion.totalRounds,
+
+        isCompleted:
+          result.completion.isCompleted,
       },
 
       standings: {
