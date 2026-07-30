@@ -4,6 +4,10 @@ import {
 } from "next/server";
 
 import {
+  calculateCompletedRound,
+} from "@/lib/league-progress";
+
+import {
   calculateFixtureStandingsDeltas,
 } from "@/lib/league-standings";
 
@@ -342,9 +346,54 @@ export async function POST(
                 },
               });
 
+          const leagueFixtures =
+            await transaction
+              .leagueFixture
+              .findMany({
+                where: {
+                  leagueId:
+                    fixture.leagueId,
+                },
+
+                select: {
+                  round: true,
+                  status: true,
+                },
+
+                orderBy: [
+                  {
+                    round: "asc",
+                  },
+                  {
+                    id: "asc",
+                  },
+                ],
+              });
+
+          const completedRound =
+            calculateCompletedRound(
+              leagueFixtures
+            );
+
+          const updatedLeague =
+            await transaction
+              .league
+              .update({
+                where: {
+                  id:
+                    fixture.leagueId,
+                },
+
+                data: {
+                  currentRound:
+                    completedRound,
+                },
+              });
+
           return {
             homeEntry,
             awayEntry,
+            updatedLeague,
           };
         }
       );
@@ -374,6 +423,15 @@ export async function POST(
 
         homeScore,
         awayScore,
+      },
+
+      league: {
+        id:
+          result.updatedLeague.id,
+
+        currentRound:
+          result.updatedLeague
+            .currentRound,
       },
 
       standings: {
