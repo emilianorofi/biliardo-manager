@@ -1,0 +1,1 @@
+export const USER_CLUB_ID = 1;

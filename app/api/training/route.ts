@@ -1,10 +1,13 @@
 import { NextResponse } from "next/server";
 
+import {
+  USER_CLUB_ID,
+} from "@/lib/game-config";
+
 import { prisma } from "@/lib/prisma";
 
-export const dynamic = "force-dynamic";
-
-const CLUB_ID = 1;
+export const dynamic =
+  "force-dynamic";
 
 const VALID_FOCUSES = [
   "precisione",
@@ -35,7 +38,10 @@ function isTrainingFocus(
 function getTrainerEfficiency(
   trainerLevel: number
 ) {
-  const efficiencies: Record<number, number> = {
+  const efficiencies: Record<
+    number,
+    number
+  > = {
     1: 60,
     2: 70,
     3: 80,
@@ -43,7 +49,11 @@ function getTrainerEfficiency(
     5: 100,
   };
 
-  return efficiencies[trainerLevel] ?? 60;
+  return (
+    efficiencies[
+      trainerLevel
+    ] ?? 60
+  );
 }
 
 function calculateOverall(player: {
@@ -68,37 +78,47 @@ function calculateOverall(player: {
     player.creativita +
     player.misura;
 
-  return Math.round(total / 9);
+  return Math.round(
+    total / 9
+  );
 }
 
 export async function GET() {
   try {
-    const club = await prisma.club.findUnique({
-      where: {
-        id: CLUB_ID,
-      },
-
-      include: {
-        players: {
-          orderBy: [
-            {
-              lastName: "asc",
-            },
-            {
-              firstName: "asc",
-            },
-          ],
+    const club =
+      await prisma.club.findUnique({
+        where: {
+          id:
+            USER_CLUB_ID,
         },
 
-        trainingPlan: true,
-        formation: true,
-      },
-    });
+        include: {
+          players: {
+            orderBy: [
+              {
+                lastName:
+                  "asc",
+              },
+              {
+                firstName:
+                  "asc",
+              },
+            ],
+          },
+
+          trainingPlan:
+            true,
+
+          formation:
+            true,
+        },
+      });
 
     if (!club) {
       return NextResponse.json(
         {
-          error: "Club non trovato.",
+          error:
+            "Club non trovato.",
         },
         {
           status: 404,
@@ -106,66 +126,110 @@ export async function GET() {
       );
     }
 
-    const selectedPlayerIds = new Set(
-      [
-        club.formation?.slotAPlayerId,
-        club.formation?.slotBPlayerId,
-        club.formation?.slotCPlayerId,
-      ].filter(
-        (playerId): playerId is number =>
-          playerId !== null &&
-          playerId !== undefined
-      )
-    );
+    const selectedPlayerIds =
+      new Set(
+        [
+          club.formation
+            ?.slotAPlayerId,
 
-    const players = club.players.map((player) => {
-      const isSelected =
-        selectedPlayerIds.has(player.id);
+          club.formation
+            ?.slotBPlayerId,
 
-      return {
-        id: player.id,
-        firstName: player.firstName,
-        lastName: player.lastName,
-        nationality: player.nationality,
-        age: player.age,
+          club.formation
+            ?.slotCPlayerId,
+        ].filter(
+          (
+            playerId
+          ): playerId is number =>
+            playerId !== null &&
+            playerId !== undefined
+        )
+      );
 
-        overall: calculateOverall(player),
+    const players =
+      club.players.map(
+        (player) => {
+          const isSelected =
+            selectedPlayerIds.has(
+              player.id
+            );
 
-        form: player.form,
-        morale: player.morale,
+          return {
+            id:
+              player.id,
 
-        usage: isSelected
-          ? "Singolo + 2 coppie"
-          : "Panchina",
+            firstName:
+              player.firstName,
 
-        intensity: isSelected ? 100 : 15,
+            lastName:
+              player.lastName,
 
-        formationSlot:
-          club.formation?.slotAPlayerId === player.id
-            ? "A"
-            : club.formation?.slotBPlayerId === player.id
-              ? "B"
-              : club.formation?.slotCPlayerId === player.id
-                ? "C"
-                : null,
-      };
-    });
+            nationality:
+              player.nationality,
+
+            age:
+              player.age,
+
+            overall:
+              calculateOverall(
+                player
+              ),
+
+            form:
+              player.form,
+
+            morale:
+              player.morale,
+
+            usage:
+              isSelected
+                ? "Singolo + 2 coppie"
+                : "Panchina",
+
+            intensity:
+              isSelected
+                ? 100
+                : 15,
+
+            formationSlot:
+              club.formation
+                ?.slotAPlayerId ===
+              player.id
+                ? "A"
+                : club.formation
+                      ?.slotBPlayerId ===
+                    player.id
+                  ? "B"
+                  : club.formation
+                        ?.slotCPlayerId ===
+                      player.id
+                    ? "C"
+                    : null,
+          };
+        }
+      );
 
     const trainingPlan = {
       primaryFocus:
-        club.trainingPlan?.primaryFocus ??
+        club.trainingPlan
+          ?.primaryFocus ??
         "precisione",
 
       secondaryFocus:
-        club.trainingPlan?.secondaryFocus ??
+        club.trainingPlan
+          ?.secondaryFocus ??
         "tattica",
 
       savedAt:
-        club.trainingPlan?.savedAt?.toISOString() ??
+        club.trainingPlan
+          ?.savedAt
+          ?.toISOString() ??
         null,
 
       lastProcessedAt:
-        club.trainingPlan?.lastProcessedAt?.toISOString() ??
+        club.trainingPlan
+          ?.lastProcessedAt
+          ?.toISOString() ??
         null,
     };
 
@@ -173,24 +237,32 @@ export async function GET() {
       players,
 
       trainer: {
-        level: club.trainerLevel,
+        level:
+          club.trainerLevel,
 
-        efficiency: getTrainerEfficiency(
-          club.trainerLevel
-        ),
+        efficiency:
+          getTrainerEfficiency(
+            club.trainerLevel
+          ),
       },
 
       trainingPlan,
 
       formation: {
         slotAPlayerId:
-          club.formation?.slotAPlayerId ?? null,
+          club.formation
+            ?.slotAPlayerId ??
+          null,
 
         slotBPlayerId:
-          club.formation?.slotBPlayerId ?? null,
+          club.formation
+            ?.slotBPlayerId ??
+          null,
 
         slotCPlayerId:
-          club.formation?.slotCPlayerId ?? null,
+          club.formation
+            ?.slotCPlayerId ??
+          null,
       },
     });
   } catch (error) {
@@ -211,12 +283,16 @@ export async function GET() {
   }
 }
 
-export async function POST(request: Request) {
+export async function POST(
+  request: Request
+) {
   try {
-    const body: unknown = await request.json();
+    const body: unknown =
+      await request.json();
 
     if (
-      typeof body !== "object" ||
+      typeof body !==
+        "object" ||
       body === null
     ) {
       return NextResponse.json(
@@ -230,10 +306,11 @@ export async function POST(request: Request) {
       );
     }
 
-    const trainingData = body as {
-      primaryFocus?: unknown;
-      secondaryFocus?: unknown;
-    };
+    const trainingData =
+      body as {
+        primaryFocus?: unknown;
+        secondaryFocus?: unknown;
+      };
 
     const primaryFocus =
       trainingData.primaryFocus;
@@ -242,8 +319,12 @@ export async function POST(request: Request) {
       trainingData.secondaryFocus;
 
     if (
-      !isTrainingFocus(primaryFocus) ||
-      !isTrainingFocus(secondaryFocus)
+      !isTrainingFocus(
+        primaryFocus
+      ) ||
+      !isTrainingFocus(
+        secondaryFocus
+      )
     ) {
       return NextResponse.json(
         {
@@ -256,7 +337,10 @@ export async function POST(request: Request) {
       );
     }
 
-    if (primaryFocus === secondaryFocus) {
+    if (
+      primaryFocus ===
+      secondaryFocus
+    ) {
       return NextResponse.json(
         {
           error:
@@ -271,18 +355,21 @@ export async function POST(request: Request) {
     const clubExists =
       await prisma.club.findUnique({
         where: {
-          id: CLUB_ID,
+          id:
+            USER_CLUB_ID,
         },
 
         select: {
-          id: true,
+          id:
+            true,
         },
       });
 
     if (!clubExists) {
       return NextResponse.json(
         {
-          error: "Club non trovato.",
+          error:
+            "Club non trovato.",
         },
         {
           status: 404,
@@ -290,12 +377,14 @@ export async function POST(request: Request) {
       );
     }
 
-    const savedAt = new Date();
+    const savedAt =
+      new Date();
 
     const trainingPlan =
       await prisma.trainingPlan.upsert({
         where: {
-          clubId: CLUB_ID,
+          clubId:
+            USER_CLUB_ID,
         },
 
         update: {
@@ -305,7 +394,9 @@ export async function POST(request: Request) {
         },
 
         create: {
-          clubId: CLUB_ID,
+          clubId:
+            USER_CLUB_ID,
+
           primaryFocus,
           secondaryFocus,
           savedAt,
@@ -318,17 +409,23 @@ export async function POST(request: Request) {
 
       trainingPlan: {
         primaryFocus:
-          trainingPlan.primaryFocus,
+          trainingPlan
+            .primaryFocus,
 
         secondaryFocus:
-          trainingPlan.secondaryFocus,
+          trainingPlan
+            .secondaryFocus,
 
         savedAt:
-          trainingPlan.savedAt?.toISOString() ??
+          trainingPlan
+            .savedAt
+            ?.toISOString() ??
           null,
 
         lastProcessedAt:
-          trainingPlan.lastProcessedAt?.toISOString() ??
+          trainingPlan
+            .lastProcessedAt
+            ?.toISOString() ??
           null,
       },
     });

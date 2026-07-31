@@ -1,5 +1,9 @@
 import { NextResponse } from "next/server";
 
+import {
+  USER_CLUB_ID,
+} from "@/lib/game-config";
+
 import { prisma } from "@/lib/prisma";
 
 import {
@@ -11,9 +15,8 @@ import {
   type FormationSlot,
 } from "@/lib/match-engine";
 
-export const dynamic = "force-dynamic";
-
-const CLUB_ID = 1;
+export const dynamic =
+  "force-dynamic";
 
 type FormationPlayer = {
   id: number;
@@ -34,7 +37,8 @@ export async function GET() {
     const formation =
       await prisma.formation.findUnique({
         where: {
-          clubId: CLUB_ID,
+          clubId:
+            USER_CLUB_ID,
         },
 
         include: {
@@ -129,9 +133,14 @@ export async function GET() {
       FormationSlot,
       FormationPlayer
     > = {
-      A: formation.slotAPlayer,
-      B: formation.slotBPlayer,
-      C: formation.slotCPlayer,
+      A:
+        formation.slotAPlayer,
+
+      B:
+        formation.slotBPlayer,
+
+      C:
+        formation.slotCPlayer,
     };
 
     const matchDefinitions =
@@ -161,7 +170,8 @@ export async function GET() {
                 return {
                   slot,
 
-                  id: player.id,
+                  id:
+                    player.id,
 
                   firstName:
                     player.firstName,

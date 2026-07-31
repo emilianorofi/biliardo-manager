@@ -1,10 +1,13 @@
 import { NextResponse } from "next/server";
 
+import {
+  USER_CLUB_ID,
+} from "@/lib/game-config";
+
 import { prisma } from "@/lib/prisma";
 
-export const dynamic = "force-dynamic";
-
-const CLUB_ID = 1;
+export const dynamic =
+  "force-dynamic";
 
 function calculateOverall(player: {
   precisione: number;
@@ -28,96 +31,182 @@ function calculateOverall(player: {
     player.creativita +
     player.misura;
 
-  return Math.round(total / 9);
+  return Math.round(
+    total / 9
+  );
 }
 
 export async function GET() {
   try {
-    const [databasePlayers, databaseFormation] =
-      await Promise.all([
-        prisma.player.findMany({
-          where: {
-            clubId: CLUB_ID,
+    const [
+      databasePlayers,
+      databaseFormation,
+    ] = await Promise.all([
+      prisma.player.findMany({
+        where: {
+          clubId:
+            USER_CLUB_ID,
+        },
+
+        orderBy: [
+          {
+            lastName:
+              "asc",
           },
-          orderBy: [
-            {
-              lastName: "asc",
-            },
-            {
-              firstName: "asc",
-            },
-          ],
-        }),
-
-        prisma.formation.findUnique({
-          where: {
-            clubId: CLUB_ID,
+          {
+            firstName:
+              "asc",
           },
-        }),
-      ]);
+        ],
+      }),
 
-    const players = databasePlayers.map((player) => ({
-      id: player.id,
-      firstName: player.firstName,
-      lastName: player.lastName,
-      nationality: player.nationality,
-      age: player.age,
+      prisma.formation.findUnique({
+        where: {
+          clubId:
+            USER_CLUB_ID,
+        },
+      }),
+    ]);
 
-      overall: calculateOverall(player),
+    const players =
+      databasePlayers.map(
+        (player) => ({
+          id:
+            player.id,
 
-      form: player.form,
-      morale: player.morale,
-      experience: player.experience,
+          firstName:
+            player.firstName,
 
-      value: player.value,
-      salary: player.salary,
+          lastName:
+            player.lastName,
 
-      image: player.image,
-      style: player.style,
+          nationality:
+            player.nationality,
 
-      specialties: {
-        italiana: Math.round(
-          (player.precisione + player.diretto) / 2
-        ),
+          age:
+            player.age,
 
-        goriziana: Math.round(
-          (player.precisione + player.sponde) / 2
-        ),
+          overall:
+            calculateOverall(
+              player
+            ),
 
-        tuttiDoppi: Math.round(
-          (player.diretto + player.sponde) / 2
-        ),
-      },
+          form:
+            player.form,
 
-      attributes: {
-        precisione: Math.round(player.precisione),
-        diretto: Math.round(player.diretto),
-        sponde: Math.round(player.sponde),
-        tattica: Math.round(player.tattica),
-        mentalita: Math.round(player.mentalita),
-        difesa: Math.round(player.difesa),
+          morale:
+            player.morale,
 
-        realizzazione: Math.round(
-          player.realizzazione
-        ),
+          experience:
+            player.experience,
 
-        creativita: Math.round(player.creativita),
-        misura: Math.round(player.misura),
-      },
-    }));
+          value:
+            player.value,
+
+          salary:
+            player.salary,
+
+          image:
+            player.image,
+
+          style:
+            player.style,
+
+          specialties: {
+            italiana:
+              Math.round(
+                (
+                  player.precisione +
+                  player.diretto
+                ) / 2
+              ),
+
+            goriziana:
+              Math.round(
+                (
+                  player.precisione +
+                  player.sponde
+                ) / 2
+              ),
+
+            tuttiDoppi:
+              Math.round(
+                (
+                  player.diretto +
+                  player.sponde
+                ) / 2
+              ),
+          },
+
+          attributes: {
+            precisione:
+              Math.round(
+                player.precisione
+              ),
+
+            diretto:
+              Math.round(
+                player.diretto
+              ),
+
+            sponde:
+              Math.round(
+                player.sponde
+              ),
+
+            tattica:
+              Math.round(
+                player.tattica
+              ),
+
+            mentalita:
+              Math.round(
+                player.mentalita
+              ),
+
+            difesa:
+              Math.round(
+                player.difesa
+              ),
+
+            realizzazione:
+              Math.round(
+                player.realizzazione
+              ),
+
+            creativita:
+              Math.round(
+                player.creativita
+              ),
+
+            misura:
+              Math.round(
+                player.misura
+              ),
+          },
+        })
+      );
 
     const formation = {
       slotAPlayerId:
-        databaseFormation?.slotAPlayerId ?? null,
+        databaseFormation
+          ?.slotAPlayerId ??
+        null,
 
       slotBPlayerId:
-        databaseFormation?.slotBPlayerId ?? null,
+        databaseFormation
+          ?.slotBPlayerId ??
+        null,
 
       slotCPlayerId:
-        databaseFormation?.slotCPlayerId ?? null,
+        databaseFormation
+          ?.slotCPlayerId ??
+        null,
 
       savedAt:
-        databaseFormation?.savedAt?.toISOString() ??
+        databaseFormation
+          ?.savedAt
+          ?.toISOString() ??
         null,
     };
 
@@ -143,17 +232,22 @@ export async function GET() {
   }
 }
 
-export async function POST(request: Request) {
+export async function POST(
+  request: Request
+) {
   try {
-    const body: unknown = await request.json();
+    const body: unknown =
+      await request.json();
 
     if (
-      typeof body !== "object" ||
+      typeof body !==
+        "object" ||
       body === null
     ) {
       return NextResponse.json(
         {
-          error: "Dati della formazione non validi.",
+          error:
+            "Dati della formazione non validi.",
         },
         {
           status: 400,
@@ -161,38 +255,47 @@ export async function POST(request: Request) {
       );
     }
 
-    const formationData = body as {
-      slotAPlayerId?: unknown;
-      slotBPlayerId?: unknown;
-      slotCPlayerId?: unknown;
-    };
+    const formationData =
+      body as {
+        slotAPlayerId?: unknown;
+        slotBPlayerId?: unknown;
+        slotCPlayerId?: unknown;
+      };
 
-    const slotAPlayerId = Number(
-      formationData.slotAPlayerId
-    );
+    const slotAPlayerId =
+      Number(
+        formationData.slotAPlayerId
+      );
 
-    const slotBPlayerId = Number(
-      formationData.slotBPlayerId
-    );
+    const slotBPlayerId =
+      Number(
+        formationData.slotBPlayerId
+      );
 
-    const slotCPlayerId = Number(
-      formationData.slotCPlayerId
-    );
+    const slotCPlayerId =
+      Number(
+        formationData.slotCPlayerId
+      );
 
-    const selectedPlayerIds = [
-      slotAPlayerId,
-      slotBPlayerId,
-      slotCPlayerId,
-    ];
+    const selectedPlayerIds =
+      [
+        slotAPlayerId,
+        slotBPlayerId,
+        slotCPlayerId,
+      ];
 
     const hasInvalidPlayerId =
       selectedPlayerIds.some(
         (playerId) =>
-          !Number.isInteger(playerId) ||
+          !Number.isInteger(
+            playerId
+          ) ||
           playerId <= 0
       );
 
-    if (hasInvalidPlayerId) {
+    if (
+      hasInvalidPlayerId
+    ) {
       return NextResponse.json(
         {
           error:
@@ -204,11 +307,15 @@ export async function POST(request: Request) {
       );
     }
 
-    const uniquePlayerIds = new Set(
-      selectedPlayerIds
-    );
+    const uniquePlayerIds =
+      new Set(
+        selectedPlayerIds
+      );
 
-    if (uniquePlayerIds.size !== 3) {
+    if (
+      uniquePlayerIds.size !==
+      3
+    ) {
       return NextResponse.json(
         {
           error:
@@ -223,14 +330,20 @@ export async function POST(request: Request) {
     const validPlayersCount =
       await prisma.player.count({
         where: {
-          clubId: CLUB_ID,
+          clubId:
+            USER_CLUB_ID,
+
           id: {
-            in: selectedPlayerIds,
+            in:
+              selectedPlayerIds,
           },
         },
       });
 
-    if (validPlayersCount !== 3) {
+    if (
+      validPlayersCount !==
+      3
+    ) {
       return NextResponse.json(
         {
           error:
@@ -242,12 +355,14 @@ export async function POST(request: Request) {
       );
     }
 
-    const savedAt = new Date();
+    const savedAt =
+      new Date();
 
     const savedFormation =
       await prisma.formation.upsert({
         where: {
-          clubId: CLUB_ID,
+          clubId:
+            USER_CLUB_ID,
         },
 
         update: {
@@ -258,7 +373,9 @@ export async function POST(request: Request) {
         },
 
         create: {
-          clubId: CLUB_ID,
+          clubId:
+            USER_CLUB_ID,
+
           slotAPlayerId,
           slotBPlayerId,
           slotCPlayerId,
@@ -267,20 +384,26 @@ export async function POST(request: Request) {
       });
 
     return NextResponse.json({
-      message: "Formazione salvata correttamente.",
+      message:
+        "Formazione salvata correttamente.",
 
       formation: {
         slotAPlayerId:
-          savedFormation.slotAPlayerId,
+          savedFormation
+            .slotAPlayerId,
 
         slotBPlayerId:
-          savedFormation.slotBPlayerId,
+          savedFormation
+            .slotBPlayerId,
 
         slotCPlayerId:
-          savedFormation.slotCPlayerId,
+          savedFormation
+            .slotCPlayerId,
 
         savedAt:
-          savedFormation.savedAt?.toISOString() ??
+          savedFormation
+            .savedAt
+            ?.toISOString() ??
           null,
       },
     });

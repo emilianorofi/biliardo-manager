@@ -1,5 +1,9 @@
 import { NextResponse } from "next/server";
 
+import {
+  USER_CLUB_ID,
+} from "@/lib/game-config";
+
 import { prisma } from "@/lib/prisma";
 
 import {
@@ -12,38 +16,45 @@ import {
   type TrainingPlayerValues,
 } from "@/lib/training-engine";
 
-export const dynamic = "force-dynamic";
-
-const CLUB_ID = 1;
+export const dynamic =
+  "force-dynamic";
 
 export async function POST() {
   try {
-    const club = await prisma.club.findUnique({
-      where: {
-        id: CLUB_ID,
-      },
-
-      include: {
-        players: {
-          orderBy: [
-            {
-              lastName: "asc",
-            },
-            {
-              firstName: "asc",
-            },
-          ],
+    const club =
+      await prisma.club.findUnique({
+        where: {
+          id:
+            USER_CLUB_ID,
         },
 
-        formation: true,
-        trainingPlan: true,
-      },
-    });
+        include: {
+          players: {
+            orderBy: [
+              {
+                lastName:
+                  "asc",
+              },
+              {
+                firstName:
+                  "asc",
+              },
+            ],
+          },
+
+          formation:
+            true,
+
+          trainingPlan:
+            true,
+        },
+      });
 
     if (!club) {
       return NextResponse.json(
         {
-          error: "Club non trovato.",
+          error:
+            "Club non trovato.",
         },
         {
           status: 404,
@@ -70,8 +81,12 @@ export async function POST() {
       club.trainingPlan.secondaryFocus;
 
     if (
-      !isTrainingFocus(primaryFocus) ||
-      !isTrainingFocus(secondaryFocus)
+      !isTrainingFocus(
+        primaryFocus
+      ) ||
+      !isTrainingFocus(
+        secondaryFocus
+      )
     ) {
       return NextResponse.json(
         {
@@ -84,7 +99,10 @@ export async function POST() {
       );
     }
 
-    if (primaryFocus === secondaryFocus) {
+    if (
+      primaryFocus ===
+      secondaryFocus
+    ) {
       return NextResponse.json(
         {
           error:
@@ -96,16 +114,21 @@ export async function POST() {
       );
     }
 
-    const processedAt = new Date();
+    const processedAt =
+      new Date();
 
     const weekKey =
-      getTrainingWeekKey(processedAt);
+      getTrainingWeekKey(
+        processedAt
+      );
 
     const existingSession =
       await prisma.trainingSession.findUnique({
         where: {
           clubId_weekKey: {
-            clubId: CLUB_ID,
+            clubId:
+              USER_CLUB_ID,
+
             weekKey,
           },
         },
@@ -116,9 +139,13 @@ export async function POST() {
         {
           error:
             "L'allenamento di questa settimana è già stato elaborato.",
+
           weekKey,
+
           processedAt:
-            existingSession.processedAt.toISOString(),
+            existingSession
+              .processedAt
+              .toISOString(),
         },
         {
           status: 409,
@@ -129,9 +156,14 @@ export async function POST() {
     const selectedPlayerIds =
       new Set<number>(
         [
-          club.formation?.slotAPlayerId,
-          club.formation?.slotBPlayerId,
-          club.formation?.slotCPlayerId,
+          club.formation
+            ?.slotAPlayerId,
+
+          club.formation
+            ?.slotBPlayerId,
+
+          club.formation
+            ?.slotCPlayerId,
         ].filter(
           (
             playerId
@@ -148,11 +180,15 @@ export async function POST() {
 
     const sessionResult =
       await prisma.$transaction(
-        async (transaction) => {
+        async (
+          transaction
+        ) => {
           const session =
             await transaction.trainingSession.create({
               data: {
-                clubId: CLUB_ID,
+                clubId:
+                  USER_CLUB_ID,
+
                 weekKey,
 
                 primaryFocus,
@@ -168,35 +204,53 @@ export async function POST() {
 
           const results = [];
 
-          for (const player of club.players) {
+          for (
+            const player of
+              club.players
+          ) {
             const isSelected =
               selectedPlayerIds.has(
                 player.id
               );
 
-            const usage = isSelected
-              ? "Singolo + 2 coppie"
-              : "Panchina";
+            const usage =
+              isSelected
+                ? "Singolo + 2 coppie"
+                : "Panchina";
 
-            const intensity = isSelected
-              ? 100
-              : 15;
+            const intensity =
+              isSelected
+                ? 100
+                : 15;
 
             const currentValues: TrainingPlayerValues =
               {
                 precisione:
                   player.precisione,
-                diretto: player.diretto,
-                sponde: player.sponde,
-                tattica: player.tattica,
+
+                diretto:
+                  player.diretto,
+
+                sponde:
+                  player.sponde,
+
+                tattica:
+                  player.tattica,
+
                 mentalita:
                   player.mentalita,
-                difesa: player.difesa,
+
+                difesa:
+                  player.difesa,
+
                 realizzazione:
                   player.realizzazione,
+
                 creativita:
                   player.creativita,
-                misura: player.misura,
+
+                misura:
+                  player.misura,
               };
 
             const overallBefore =
@@ -216,8 +270,12 @@ export async function POST() {
 
             const primaryGain =
               calculateTrainingGain({
-                age: player.age,
-                talent: player.talent,
+                age:
+                  player.age,
+
+                talent:
+                  player.talent,
+
                 potential:
                   player.potential,
 
@@ -227,13 +285,18 @@ export async function POST() {
                 intensity,
                 trainerEfficiency,
 
-                focusWeight: 1,
+                focusWeight:
+                  1,
               });
 
             const secondaryGain =
               calculateTrainingGain({
-                age: player.age,
-                talent: player.talent,
+                age:
+                  player.age,
+
+                talent:
+                  player.talent,
+
                 potential:
                   player.potential,
 
@@ -243,7 +306,8 @@ export async function POST() {
                 intensity,
                 trainerEfficiency,
 
-                focusWeight: 0.5,
+                focusWeight:
+                  0.5,
               });
 
             const primaryAfter =
@@ -289,50 +353,51 @@ export async function POST() {
 
             await transaction.player.update({
               where: {
-                id: player.id,
+                id:
+                  player.id,
               },
 
-              data: playerUpdate,
+              data:
+                playerUpdate,
             });
 
             const savedResult =
-              await transaction.trainingResult.create(
-                {
-                  data: {
-                    sessionId:
-                      session.id,
+              await transaction.trainingResult.create({
+                data: {
+                  sessionId:
+                    session.id,
 
-                    playerId:
-                      player.id,
+                  playerId:
+                    player.id,
 
-                    playerFirstName:
-                      player.firstName,
+                  playerFirstName:
+                    player.firstName,
 
-                    playerLastName:
-                      player.lastName,
+                  playerLastName:
+                    player.lastName,
 
-                    playerAge:
-                      player.age,
+                  playerAge:
+                    player.age,
 
-                    usage,
-                    intensity,
+                  usage,
+                  intensity,
 
-                    primaryBefore,
-                    primaryGain,
-                    primaryAfter,
+                  primaryBefore,
+                  primaryGain,
+                  primaryAfter,
 
-                    secondaryBefore,
-                    secondaryGain,
-                    secondaryAfter,
+                  secondaryBefore,
+                  secondaryGain,
+                  secondaryAfter,
 
-                    overallBefore,
-                    overallAfter,
-                  },
-                }
-              );
+                  overallBefore,
+                  overallAfter,
+                },
+              });
 
             results.push({
-              id: savedResult.id,
+              id:
+                savedResult.id,
 
               playerId:
                 player.id,
@@ -361,7 +426,8 @@ export async function POST() {
 
           await transaction.trainingPlan.update({
             where: {
-              clubId: CLUB_ID,
+              clubId:
+                USER_CLUB_ID,
             },
 
             data: {
@@ -382,7 +448,10 @@ export async function POST() {
         "Allenamento elaborato correttamente.",
 
       session: {
-        id: sessionResult.session.id,
+        id:
+          sessionResult
+            .session.id,
+
         weekKey,
 
         primaryFocus,
@@ -394,7 +463,8 @@ export async function POST() {
         trainerEfficiency,
 
         processedAt:
-          processedAt.toISOString(),
+          processedAt
+            .toISOString(),
       },
 
       results:

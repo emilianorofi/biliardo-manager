@@ -1,6 +1,10 @@
 import FormationBoard from "../components/formation/FormationBoard";
 
 import {
+  USER_CLUB_ID,
+} from "@/lib/game-config";
+
+import {
   getNextPlayableRound,
 } from "@/lib/league-round";
 
@@ -8,8 +12,6 @@ import { prisma } from "@/lib/prisma";
 
 export const dynamic =
   "force-dynamic";
-
-const CLUB_ID = 1;
 
 export default async function FormationPage() {
   const league =
@@ -28,11 +30,11 @@ export default async function FormationPage() {
             OR: [
               {
                 homeClubId:
-                  CLUB_ID,
+                  USER_CLUB_ID,
               },
               {
                 awayClubId:
-                  CLUB_ID,
+                  USER_CLUB_ID,
               },
             ],
           },
@@ -93,7 +95,7 @@ export default async function FormationPage() {
   const opponent =
     currentFixture
       ? currentFixture.homeClubId ===
-        CLUB_ID
+        USER_CLUB_ID
         ? currentFixture.awayClub
         : currentFixture.homeClub
       : null;

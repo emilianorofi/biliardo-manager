@@ -1,10 +1,14 @@
 import { NextResponse } from "next/server";
 
+import {
+  USER_CLUB_ID,
+} from "@/lib/game-config";
+
 import { prisma } from "@/lib/prisma";
 
-export const dynamic = "force-dynamic";
+export const dynamic =
+  "force-dynamic";
 
-const CLUB_ID = 1;
 const MAX_SESSIONS = 10;
 
 export async function GET() {
@@ -12,18 +16,21 @@ export async function GET() {
     const clubExists =
       await prisma.club.findUnique({
         where: {
-          id: CLUB_ID,
+          id:
+            USER_CLUB_ID,
         },
 
         select: {
-          id: true,
+          id:
+            true,
         },
       });
 
     if (!clubExists) {
       return NextResponse.json(
         {
-          error: "Club non trovato.",
+          error:
+            "Club non trovato.",
         },
         {
           status: 404,
@@ -34,23 +41,28 @@ export async function GET() {
     const sessions =
       await prisma.trainingSession.findMany({
         where: {
-          clubId: CLUB_ID,
+          clubId:
+            USER_CLUB_ID,
         },
 
         orderBy: {
-          processedAt: "desc",
+          processedAt:
+            "desc",
         },
 
-        take: MAX_SESSIONS,
+        take:
+          MAX_SESSIONS,
 
         include: {
           results: {
             orderBy: [
               {
-                playerLastName: "asc",
+                playerLastName:
+                  "asc",
               },
               {
-                playerFirstName: "asc",
+                playerFirstName:
+                  "asc",
               },
             ],
           },
@@ -58,73 +70,82 @@ export async function GET() {
       });
 
     return NextResponse.json({
-      sessions: sessions.map((session) => ({
-        id: session.id,
-        weekKey: session.weekKey,
+      sessions:
+        sessions.map(
+          (session) => ({
+            id:
+              session.id,
 
-        primaryFocus:
-          session.primaryFocus,
+            weekKey:
+              session.weekKey,
 
-        secondaryFocus:
-          session.secondaryFocus,
+            primaryFocus:
+              session.primaryFocus,
 
-        trainerLevel:
-          session.trainerLevel,
+            secondaryFocus:
+              session.secondaryFocus,
 
-        trainerEfficiency:
-          session.trainerEfficiency,
+            trainerLevel:
+              session.trainerLevel,
 
-        processedAt:
-          session.processedAt.toISOString(),
+            trainerEfficiency:
+              session.trainerEfficiency,
 
-        results: session.results.map(
-          (result) => ({
-            id: result.id,
+            processedAt:
+              session.processedAt
+                .toISOString(),
 
-            playerId:
-              result.playerId,
+            results:
+              session.results.map(
+                (result) => ({
+                  id:
+                    result.id,
 
-            firstName:
-              result.playerFirstName,
+                  playerId:
+                    result.playerId,
 
-            lastName:
-              result.playerLastName,
+                  firstName:
+                    result.playerFirstName,
 
-            age:
-              result.playerAge,
+                  lastName:
+                    result.playerLastName,
 
-            usage:
-              result.usage,
+                  age:
+                    result.playerAge,
 
-            intensity:
-              result.intensity,
+                  usage:
+                    result.usage,
 
-            primaryBefore:
-              result.primaryBefore,
+                  intensity:
+                    result.intensity,
 
-            primaryGain:
-              result.primaryGain,
+                  primaryBefore:
+                    result.primaryBefore,
 
-            primaryAfter:
-              result.primaryAfter,
+                  primaryGain:
+                    result.primaryGain,
 
-            secondaryBefore:
-              result.secondaryBefore,
+                  primaryAfter:
+                    result.primaryAfter,
 
-            secondaryGain:
-              result.secondaryGain,
+                  secondaryBefore:
+                    result.secondaryBefore,
 
-            secondaryAfter:
-              result.secondaryAfter,
+                  secondaryGain:
+                    result.secondaryGain,
 
-            overallBefore:
-              result.overallBefore,
+                  secondaryAfter:
+                    result.secondaryAfter,
 
-            overallAfter:
-              result.overallAfter,
+                  overallBefore:
+                    result.overallBefore,
+
+                  overallAfter:
+                    result.overallAfter,
+                })
+              ),
           })
         ),
-      })),
     });
   } catch (error) {
     console.error(
