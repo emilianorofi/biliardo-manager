@@ -1,3 +1,7 @@
+import type {
+  ReactNode,
+} from "react";
+
 import {
   ArrowDownRight,
   ArrowUpRight,
@@ -6,35 +10,84 @@ import {
   WalletCards,
 } from "lucide-react";
 
-import { clubs } from "@/app/data/clubs";
+import {
+  USER_CLUB_ID,
+} from "@/lib/game-config";
 
-export default function FinancePage() {
-  const club = clubs[0];
+import { prisma } from "@/lib/prisma";
+
+export default async function FinancePage() {
+  const club =
+    await prisma.club.findUnique({
+      where: {
+        id:
+          USER_CLUB_ID,
+      },
+
+      select: {
+        name:
+          true,
+
+        balance:
+          true,
+
+        weeklyIncome:
+          true,
+
+        weeklyExpenses:
+          true,
+      },
+    });
 
   if (!club) {
-    throw new Error("Club principale non disponibile.");
+    return (
+      <main className="rounded-2xl border border-red-500/20 bg-red-500/5 p-6">
+        <h1 className="text-2xl font-black text-white">
+          Finanze non disponibili
+        </h1>
+
+        <p className="mt-2 text-sm text-slate-400">
+          Il club principale non è stato trovato.
+        </p>
+      </main>
+    );
   }
 
   const weeklyBalance =
-    club.weeklyIncome - club.weeklyExpenses;
+    club.weeklyIncome -
+    club.weeklyExpenses;
 
   const projectedBalance =
-    club.balance + weeklyBalance;
+    club.balance +
+    weeklyBalance;
 
   const transactions = [
     {
-      id: 1,
-      date: "Settimana corrente",
-      description: "Entrate complessive del club",
-      category: "Entrate",
-      amount: club.weeklyIncome,
+      id:
+        "weekly-income",
+
+      description:
+        "Entrate complessive del club",
+
+      category:
+        "Entrate",
+
+      amount:
+        club.weeklyIncome,
     },
+
     {
-      id: 2,
-      date: "Settimana corrente",
-      description: "Uscite complessive del club",
-      category: "Uscite",
-      amount: -club.weeklyExpenses,
+      id:
+        "weekly-expenses",
+
+      description:
+        "Uscite complessive del club",
+
+      category:
+        "Uscite",
+
+      amount:
+        -club.weeklyExpenses,
     },
   ];
 
@@ -50,24 +103,37 @@ export default function FinancePage() {
         </h1>
 
         <p className="mt-2 text-sm text-slate-400">
-          Situazione economica di {club.name}
+          Situazione economica di{" "}
+          {club.name}
         </p>
       </header>
 
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <SummaryCard
           label="Saldo disponibile"
-          value={formatCurrency(club.balance)}
+          value={formatCurrency(
+            club.balance
+          )}
           description="Disponibilità attuale"
-          icon={<WalletCards size={22} />}
+          icon={
+            <WalletCards
+              size={22}
+            />
+          }
           tone="amber"
         />
 
         <SummaryCard
           label="Entrate settimanali"
-          value={formatSignedCurrency(club.weeklyIncome)}
+          value={formatSignedCurrency(
+            club.weeklyIncome
+          )}
           description="Totale delle entrate"
-          icon={<ArrowUpRight size={22} />}
+          icon={
+            <ArrowUpRight
+              size={22}
+            />
+          }
           tone="emerald"
         />
 
@@ -77,19 +143,29 @@ export default function FinancePage() {
             -club.weeklyExpenses
           )}
           description="Totale delle spese"
-          icon={<ArrowDownRight size={22} />}
+          icon={
+            <ArrowDownRight
+              size={22}
+            />
+          }
           tone="red"
         />
 
         <SummaryCard
           label="Risultato settimanale"
-          value={formatSignedCurrency(weeklyBalance)}
+          value={formatSignedCurrency(
+            weeklyBalance
+          )}
           description="Entrate meno uscite"
           icon={
             weeklyBalance >= 0 ? (
-              <ArrowUpRight size={22} />
+              <ArrowUpRight
+                size={22}
+              />
             ) : (
-              <ArrowDownRight size={22} />
+              <ArrowDownRight
+                size={22}
+              />
             )
           }
           tone={
@@ -105,7 +181,9 @@ export default function FinancePage() {
           <div className="border-b border-emerald-900/60 p-5 sm:p-6">
             <div className="flex items-center gap-3">
               <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-300">
-                <ReceiptText size={22} />
+                <ReceiptText
+                  size={22}
+                />
               </div>
 
               <div>
@@ -143,46 +221,58 @@ export default function FinancePage() {
               </thead>
 
               <tbody>
-                {transactions.map((transaction) => (
-                  <tr
-                    key={transaction.id}
-                    className="border-b border-emerald-900/40 last:border-0"
-                  >
-                    <td className="px-5 py-5 text-sm text-slate-400 sm:px-6">
-                      {transaction.date}
-                    </td>
+                {transactions.map(
+                  (
+                    transaction
+                  ) => (
+                    <tr
+                      key={
+                        transaction.id
+                      }
+                      className="border-b border-emerald-900/40 last:border-0"
+                    >
+                      <td className="px-5 py-5 text-sm text-slate-400 sm:px-6">
+                        Settimana corrente
+                      </td>
 
-                    <td className="px-4 py-5">
-                      <p className="font-bold text-white">
-                        {transaction.description}
-                      </p>
-                    </td>
+                      <td className="px-4 py-5">
+                        <p className="font-bold text-white">
+                          {
+                            transaction.description
+                          }
+                        </p>
+                      </td>
 
-                    <td className="px-4 py-5">
-                      <span
-                        className={`rounded-lg border px-3 py-1 text-xs font-bold ${
-                          transaction.amount >= 0
-                            ? "border-emerald-500/25 bg-emerald-500/10 text-emerald-300"
-                            : "border-red-500/25 bg-red-500/10 text-red-300"
+                      <td className="px-4 py-5">
+                        <span
+                          className={`rounded-lg border px-3 py-1 text-xs font-bold ${
+                            transaction.amount >=
+                            0
+                              ? "border-emerald-500/25 bg-emerald-500/10 text-emerald-300"
+                              : "border-red-500/25 bg-red-500/10 text-red-300"
+                          }`}
+                        >
+                          {
+                            transaction.category
+                          }
+                        </span>
+                      </td>
+
+                      <td
+                        className={`px-5 py-5 text-right font-black sm:px-6 ${
+                          transaction.amount >=
+                          0
+                            ? "text-emerald-300"
+                            : "text-red-300"
                         }`}
                       >
-                        {transaction.category}
-                      </span>
-                    </td>
-
-                    <td
-                      className={`px-5 py-5 text-right font-black sm:px-6 ${
-                        transaction.amount >= 0
-                          ? "text-emerald-300"
-                          : "text-red-300"
-                      }`}
-                    >
-                      {formatSignedCurrency(
-                        transaction.amount
-                      )}
-                    </td>
-                  </tr>
-                ))}
+                        {formatSignedCurrency(
+                          transaction.amount
+                        )}
+                      </td>
+                    </tr>
+                  )
+                )}
               </tbody>
             </table>
           </div>
@@ -192,7 +282,9 @@ export default function FinancePage() {
           <section className="rounded-2xl border border-emerald-900/60 bg-[#15261f] p-5 sm:p-6">
             <div className="flex items-center gap-3">
               <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-amber-400/10 text-amber-300">
-                <Landmark size={22} />
+                <Landmark
+                  size={22}
+                />
               </div>
 
               <div>
@@ -262,9 +354,7 @@ export default function FinancePage() {
             </h2>
 
             <p className="mt-3 text-sm leading-6 text-slate-400">
-              Mantenendo l’attuale andamento, il saldo
-              previsto al termine della prossima settimana
-              sarà:
+              Mantenendo l’attuale andamento, il saldo previsto al termine della prossima settimana sarà:
             </p>
 
             <p
@@ -274,7 +364,9 @@ export default function FinancePage() {
                   : "text-red-300"
               }`}
             >
-              {formatCurrency(projectedBalance)}
+              {formatCurrency(
+                projectedBalance
+              )}
             </p>
           </section>
         </aside>
@@ -293,34 +385,57 @@ function SummaryCard({
   label: string;
   value: string;
   description: string;
-  icon: React.ReactNode;
-  tone: "amber" | "emerald" | "red";
+  icon: ReactNode;
+  tone:
+    | "amber"
+    | "emerald"
+    | "red";
 }) {
   const tones = {
     amber: {
-      border: "border-amber-400/25",
-      background: "bg-amber-400/5",
-      text: "text-amber-300",
+      border:
+        "border-amber-400/25",
+
+      background:
+        "bg-amber-400/5",
+
+      text:
+        "text-amber-300",
     },
+
     emerald: {
-      border: "border-emerald-500/25",
-      background: "bg-emerald-500/5",
-      text: "text-emerald-300",
+      border:
+        "border-emerald-500/25",
+
+      background:
+        "bg-emerald-500/5",
+
+      text:
+        "text-emerald-300",
     },
+
     red: {
-      border: "border-red-500/25",
-      background: "bg-red-500/5",
-      text: "text-red-300",
+      border:
+        "border-red-500/25",
+
+      background:
+        "bg-red-500/5",
+
+      text:
+        "text-red-300",
     },
   };
 
-  const style = tones[tone];
+  const style =
+    tones[tone];
 
   return (
     <article
       className={`rounded-2xl border p-5 ${style.border} ${style.background}`}
     >
-      <div className={`flex items-center gap-2 ${style.text}`}>
+      <div
+        className={`flex items-center gap-2 ${style.text}`}
+      >
         {icon}
 
         <p className="text-xs font-black uppercase tracking-wider">
@@ -328,7 +443,9 @@ function SummaryCard({
         </p>
       </div>
 
-      <p className={`mt-3 text-2xl font-black ${style.text}`}>
+      <p
+        className={`mt-3 text-2xl font-black ${style.text}`}
+      >
         {value}
       </p>
 
@@ -347,7 +464,9 @@ function FinancialRow({
 }: {
   label: string;
   value: string;
-  tone: "positive" | "negative";
+  tone:
+    | "positive"
+    | "negative";
   last?: boolean;
 }) {
   return (
@@ -375,19 +494,39 @@ function FinancialRow({
   );
 }
 
-function formatCurrency(value: number) {
-  return new Intl.NumberFormat("it-IT", {
-    style: "currency",
-    currency: "EUR",
-    maximumFractionDigits: 0,
-  }).format(value);
+function formatCurrency(
+  value: number
+): string {
+  return new Intl.NumberFormat(
+    "it-IT",
+    {
+      style:
+        "currency",
+
+      currency:
+        "EUR",
+
+      maximumFractionDigits:
+        0,
+    }
+  ).format(value);
 }
 
-function formatSignedCurrency(value: number) {
-  const formatted = formatCurrency(Math.abs(value));
+function formatSignedCurrency(
+  value: number
+): string {
+  const formatted =
+    formatCurrency(
+      Math.abs(value)
+    );
 
-  if (value > 0) return `+ ${formatted}`;
-  if (value < 0) return `- ${formatted}`;
+  if (value > 0) {
+    return `+ ${formatted}`;
+  }
+
+  if (value < 0) {
+    return `- ${formatted}`;
+  }
 
   return formatted;
 }
