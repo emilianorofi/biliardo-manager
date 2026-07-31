@@ -1,3 +1,326 @@
-export default function UpcomingEventsCard() {
-  return <div></div>;
+import Link from "next/link";
+
+import {
+  CalendarDays,
+  Clock3,
+  Dumbbell,
+  Trophy,
+} from "lucide-react";
+
+import Card from "@/app/components/ui/Card";
+
+import {
+  USER_CLUB_ID,
+} from "@/lib/game-config";
+
+import {
+  getNextPlayableRound,
+} from "@/lib/league-round";
+
+import { prisma } from "@/lib/prisma";
+
+export default async function UpcomingEventsCard() {
+  const [trainingPlan, league] =
+    await Promise.all([
+      prisma.trainingPlan.findUnique({
+        where: {
+          clubId:
+            USER_CLUB_ID,
+        },
+
+        select: {
+          primaryFocus:
+            true,
+
+          secondaryFocus:
+            true,
+        },
+      }),
+
+      prisma.league.findFirst({
+        where: {
+          status:
+            "ACTIVE",
+        },
+
+        orderBy: {
+          id:
+            "desc",
+        },
+
+        include: {
+          fixtures: {
+            where: {
+              OR: [
+                {
+                  homeClubId:
+                    USER_CLUB_ID,
+                },
+                {
+                  awayClubId:
+                    USER_CLUB_ID,
+                },
+              ],
+            },
+
+            orderBy: {
+              round:
+                "asc",
+            },
+
+            include: {
+              homeClub: {
+                select: {
+                  name:
+                    true,
+                },
+              },
+
+              awayClub: {
+                select: {
+                  name:
+                    true,
+                },
+              },
+            },
+          },
+        },
+      }),
+    ]);
+
+  const totalRounds =
+    league?.fixtures.reduce(
+      (
+        highestRound,
+        fixture
+      ) =>
+        Math.max(
+          highestRound,
+          fixture.round
+        ),
+      0
+    ) ?? 0;
+
+  const playableRound =
+    league &&
+    totalRounds > 0
+      ? getNextPlayableRound(
+          league.currentRound,
+          totalRounds
+        )
+      : null;
+
+  const fixture =
+    playableRound === null
+      ? null
+      : league?.fixtures.find(
+          (currentFixture) =>
+            currentFixture.round ===
+            playableRound
+        ) ?? null;
+
+  return (
+    <Card
+      title="Agenda"
+      subtitle="Prossimi impegni"
+      className="h-full"
+      icon={
+        <CalendarDays
+          size={18}
+        />
+      }
+    >
+      <div className="space-y-4">
+        <AgendaItem
+          icon={
+            <Dumbbell
+              size={18}
+            />
+          }
+          type="Allenamento"
+          title="Allenamento settimanale"
+          description={
+            trainingPlan
+              ? `Focus: ${formatFocus(
+                  trainingPlan.primaryFocus
+                )} + ${formatFocus(
+                  trainingPlan.secondaryFocus
+                )}`
+              : "Programma di allenamento da impostare"
+          }
+          date="Mercoledì"
+          time="21:00"
+          href="/training"
+          tone="training"
+        />
+
+        {fixture ? (
+          <AgendaItem
+            icon={
+              <Trophy
+                size={18}
+              />
+            }
+            type="Campionato"
+            title={`${fixture.homeClub.name} vs ${fixture.awayClub.name}`}
+            description={`Giornata ${fixture.round} di ${league?.name ?? "campionato"}`}
+            date={formatFixtureDate(
+              fixture.scheduledAt
+            )}
+            time={formatFixtureTime(
+              fixture.scheduledAt
+            )}
+            href="/campionato"
+            tone="league"
+          />
+        ) : (
+          <div className="rounded-xl border border-dashed border-zinc-700 bg-zinc-800/30 p-4">
+            <p className="text-sm font-semibold text-zinc-300">
+              Nessuna partita programmata
+            </p>
+
+            <p className="mt-1 text-sm text-zinc-500">
+              Non risultano altri incontri da disputare.
+            </p>
+          </div>
+        )}
+      </div>
+    </Card>
+  );
+}
+
+function AgendaItem({
+  icon,
+  type,
+  title,
+  description,
+  date,
+  time,
+  href,
+  tone,
+}: {
+  icon: React.ReactNode;
+  type: string;
+  title: string;
+  description: string;
+  date: string;
+  time: string;
+  href: string;
+  tone:
+    | "training"
+    | "league";
+}) {
+  const style =
+    tone === "training"
+      ? {
+          icon:
+            "border-emerald-500/20 bg-emerald-500/10 text-emerald-400",
+
+          type:
+            "text-emerald-400",
+        }
+      : {
+          icon:
+            "border-amber-400/20 bg-amber-400/10 text-amber-300",
+
+          type:
+            "text-amber-300",
+        };
+
+  return (
+    <Link
+      href={href}
+      className="block rounded-xl border border-zinc-800 bg-zinc-800/40 p-4 transition hover:border-zinc-700 hover:bg-zinc-800"
+    >
+      <div className="flex items-start gap-4">
+        <div
+          className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border ${style.icon}`}
+        >
+          {icon}
+        </div>
+
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-start justify-between gap-2">
+            <div>
+              <p
+                className={`text-xs font-black uppercase tracking-wider ${style.type}`}
+              >
+                {type}
+              </p>
+
+              <p className="mt-1 font-bold text-white">
+                {title}
+              </p>
+            </div>
+
+            <div className="text-right">
+              <p className="text-xs font-bold text-zinc-300">
+                {date}
+              </p>
+
+              <div className="mt-1 flex items-center justify-end gap-1 text-xs text-zinc-500">
+                <Clock3
+                  size={13}
+                />
+
+                {time}
+              </div>
+            </div>
+          </div>
+
+          <p className="mt-2 text-sm leading-6 text-zinc-400">
+            {description}
+          </p>
+        </div>
+      </div>
+    </Link>
+  );
+}
+
+function formatFocus(
+  focus: string
+): string {
+  return (
+    focus.charAt(0).toUpperCase() +
+    focus.slice(1)
+  );
+}
+
+function formatFixtureDate(
+  date: Date
+): string {
+  return new Intl.DateTimeFormat(
+    "it-IT",
+    {
+      weekday:
+        "short",
+
+      day:
+        "2-digit",
+
+      month:
+        "2-digit",
+
+      timeZone:
+        "Europe/Rome",
+    }
+  ).format(date);
+}
+
+function formatFixtureTime(
+  date: Date
+): string {
+  return new Intl.DateTimeFormat(
+    "it-IT",
+    {
+      hour:
+        "2-digit",
+
+      minute:
+        "2-digit",
+
+      timeZone:
+        "Europe/Rome",
+    }
+  ).format(date);
 }
