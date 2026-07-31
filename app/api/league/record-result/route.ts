@@ -95,32 +95,50 @@ export async function POST(
     const fixture =
       await prisma.leagueFixture.findUnique({
         where: {
-          id: fixtureId,
+          id:
+            fixtureId,
         },
 
         include: {
           league: {
             select: {
-              id: true,
-              name: true,
-              status: true,
-              currentRound: true,
+              id:
+                true,
+
+              name:
+                true,
+
+              status:
+                true,
+
+              currentRound:
+                true,
             },
           },
 
           homeClub: {
             select: {
-              id: true,
-              name: true,
-              shortName: true,
+              id:
+                true,
+
+              name:
+                true,
+
+              shortName:
+                true,
             },
           },
 
           awayClub: {
             select: {
-              id: true,
-              name: true,
-              shortName: true,
+              id:
+                true,
+
+              name:
+                true,
+
+              shortName:
+                true,
             },
           },
         },
@@ -223,8 +241,11 @@ export async function POST(
         },
 
         select: {
-          id: true,
-          clubId: true,
+          id:
+            true,
+
+          clubId:
+            true,
         },
       });
 
@@ -247,7 +268,9 @@ export async function POST(
 
     const result =
       await prisma.$transaction(
-        async (transaction) => {
+        async (
+          transaction
+        ) => {
           const fixtureUpdate =
             await transaction
               .leagueFixture
@@ -393,16 +416,21 @@ export async function POST(
                 },
 
                 select: {
-                  round: true,
-                  status: true,
+                  round:
+                    true,
+
+                  status:
+                    true,
                 },
 
                 orderBy: [
                   {
-                    round: "asc",
+                    round:
+                      "asc",
                   },
                   {
-                    id: "asc",
+                    id:
+                      "asc",
                   },
                 ],
               });
@@ -448,6 +476,25 @@ export async function POST(
                     completion.status,
                 },
               });
+
+          await transaction.gameEvent.create({
+            data: {
+              clubId:
+                null,
+
+              type:
+                "Campionato",
+
+              title:
+                `${fixture.homeClub.name} ${homeScore}-${awayScore} ${fixture.awayClub.name}`,
+
+              description:
+                `Giornata ${fixture.round} di ${fixture.league.name}.`,
+
+              createdAt:
+                playedAt,
+            },
+          });
 
           return {
             homeEntry,
