@@ -58,6 +58,7 @@ export const ModelName = {
   TrainingPlan: 'TrainingPlan',
   TrainingSession: 'TrainingSession',
   TrainingResult: 'TrainingResult',
+  GameEvent: 'GameEvent',
   Season: 'Season',
   League: 'League',
   LeagueEntry: 'LeagueEntry',
@@ -225,6 +226,18 @@ export const TrainingResultScalarFieldEnum = {
 } as const
 
 export type TrainingResultScalarFieldEnum = (typeof TrainingResultScalarFieldEnum)[keyof typeof TrainingResultScalarFieldEnum]
+
+
+export const GameEventScalarFieldEnum = {
+  id: 'id',
+  clubId: 'clubId',
+  type: 'type',
+  title: 'title',
+  description: 'description',
+  createdAt: 'createdAt'
+} as const
+
+export type GameEventScalarFieldEnum = (typeof GameEventScalarFieldEnum)[keyof typeof GameEventScalarFieldEnum]
 
 
 export const SeasonScalarFieldEnum = {

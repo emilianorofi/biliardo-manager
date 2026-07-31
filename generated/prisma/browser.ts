@@ -53,6 +53,11 @@ export type TrainingSession = Prisma.TrainingSessionModel
  */
 export type TrainingResult = Prisma.TrainingResultModel
 /**
+ * Model GameEvent
+ * 
+ */
+export type GameEvent = Prisma.GameEventModel
+/**
  * Model Season
  * 
  */

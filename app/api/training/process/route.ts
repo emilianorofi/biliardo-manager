@@ -436,6 +436,27 @@ export async function POST() {
             },
           });
 
+          await transaction.gameEvent.create({
+            data: {
+              clubId:
+                USER_CLUB_ID,
+
+              type:
+                "Allenamento",
+
+              title:
+                "Allenamento settimanale completato",
+
+              description:
+                `Focus primario: ${primaryFocus}. ` +
+                `Focus secondario: ${secondaryFocus}. ` +
+                `${results.length} giocatori allenati.`,
+
+              createdAt:
+                processedAt,
+            },
+          });
+
           return {
             session,
             results,

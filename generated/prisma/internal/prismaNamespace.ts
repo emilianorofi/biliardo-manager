@@ -404,6 +404,7 @@ export const ModelName = {
   TrainingPlan: 'TrainingPlan',
   TrainingSession: 'TrainingSession',
   TrainingResult: 'TrainingResult',
+  GameEvent: 'GameEvent',
   Season: 'Season',
   League: 'League',
   LeagueEntry: 'LeagueEntry',
@@ -423,7 +424,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "club" | "player" | "academyPlayer" | "formation" | "trainingPlan" | "trainingSession" | "trainingResult" | "season" | "league" | "leagueEntry" | "leagueFixture"
+    modelProps: "club" | "player" | "academyPlayer" | "formation" | "trainingPlan" | "trainingSession" | "trainingResult" | "gameEvent" | "season" | "league" | "leagueEntry" | "leagueFixture"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -945,6 +946,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    GameEvent: {
+      payload: Prisma.$GameEventPayload<ExtArgs>
+      fields: Prisma.GameEventFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.GameEventFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GameEventPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.GameEventFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GameEventPayload>
+        }
+        findFirst: {
+          args: Prisma.GameEventFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GameEventPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.GameEventFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GameEventPayload>
+        }
+        findMany: {
+          args: Prisma.GameEventFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GameEventPayload>[]
+        }
+        create: {
+          args: Prisma.GameEventCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GameEventPayload>
+        }
+        createMany: {
+          args: Prisma.GameEventCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.GameEventCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GameEventPayload>[]
+        }
+        delete: {
+          args: Prisma.GameEventDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GameEventPayload>
+        }
+        update: {
+          args: Prisma.GameEventUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GameEventPayload>
+        }
+        deleteMany: {
+          args: Prisma.GameEventDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.GameEventUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.GameEventUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GameEventPayload>[]
+        }
+        upsert: {
+          args: Prisma.GameEventUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GameEventPayload>
+        }
+        aggregate: {
+          args: Prisma.GameEventAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateGameEvent>
+        }
+        groupBy: {
+          args: Prisma.GameEventGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.GameEventGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.GameEventCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.GameEventCountAggregateOutputType> | number
+        }
+      }
+    }
     Season: {
       payload: Prisma.$SeasonPayload<ExtArgs>
       fields: Prisma.SeasonFieldRefs
@@ -1427,6 +1502,18 @@ export const TrainingResultScalarFieldEnum = {
 export type TrainingResultScalarFieldEnum = (typeof TrainingResultScalarFieldEnum)[keyof typeof TrainingResultScalarFieldEnum]
 
 
+export const GameEventScalarFieldEnum = {
+  id: 'id',
+  clubId: 'clubId',
+  type: 'type',
+  title: 'title',
+  description: 'description',
+  createdAt: 'createdAt'
+} as const
+
+export type GameEventScalarFieldEnum = (typeof GameEventScalarFieldEnum)[keyof typeof GameEventScalarFieldEnum]
+
+
 export const SeasonScalarFieldEnum = {
   id: 'id',
   number: 'number',
@@ -1735,6 +1822,7 @@ export type GlobalOmitConfig = {
   trainingPlan?: Prisma.TrainingPlanOmit
   trainingSession?: Prisma.TrainingSessionOmit
   trainingResult?: Prisma.TrainingResultOmit
+  gameEvent?: Prisma.GameEventOmit
   season?: Prisma.SeasonOmit
   league?: Prisma.LeagueOmit
   leagueEntry?: Prisma.LeagueEntryOmit

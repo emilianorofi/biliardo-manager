@@ -32,6 +32,7 @@ model Club {
   formation        Formation?
   trainingPlan     TrainingPlan?
   trainingSessions TrainingSession[]
+  gameEvents       GameEvent[]
 
   leagueEntries LeagueEntry[]
 
@@ -218,6 +219,23 @@ model TrainingResult {
 
   @@index([sessionId])
   @@index([playerId])
+}
+
+model GameEvent {
+  id Int @id @default(autoincrement())
+
+  clubId Int?
+  club   Club? @relation(fields: [clubId], references: [id], onDelete: Cascade)
+
+  type        String
+  title       String
+  description String?
+
+  createdAt DateTime @default(now())
+
+  @@index([clubId])
+  @@index([type])
+  @@index([createdAt])
 }
 
 model Season {
