@@ -617,18 +617,6 @@ export type FormationUncheckedUpdateManyWithoutSlotCPlayerNestedInput = {
   deleteMany?: Prisma.FormationScalarWhereInput | Prisma.FormationScalarWhereInput[]
 }
 
-export type NullableDateTimeFieldUpdateOperationsInput = {
-  set?: Date | string | null
-}
-
-export type NullableIntFieldUpdateOperationsInput = {
-  set?: number | null
-  increment?: number
-  decrement?: number
-  multiply?: number
-  divide?: number
-}
-
 export type FormationCreateWithoutClubInput = {
   savedAt?: Date | string | null
   createdAt?: Date | string

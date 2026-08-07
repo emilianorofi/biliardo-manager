@@ -375,7 +375,7 @@ export type PlayerGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalA
 
 export type PlayerGroupByOutputType = {
   id: number
-  clubId: number
+  clubId: number | null
   firstName: string
   lastName: string
   nationality: string
@@ -427,7 +427,7 @@ export type PlayerWhereInput = {
   OR?: Prisma.PlayerWhereInput[]
   NOT?: Prisma.PlayerWhereInput | Prisma.PlayerWhereInput[]
   id?: Prisma.IntFilter<"Player"> | number
-  clubId?: Prisma.IntFilter<"Player"> | number
+  clubId?: Prisma.IntNullableFilter<"Player"> | number | null
   firstName?: Prisma.StringFilter<"Player"> | string
   lastName?: Prisma.StringFilter<"Player"> | string
   nationality?: Prisma.StringFilter<"Player"> | string
@@ -452,16 +452,17 @@ export type PlayerWhereInput = {
   misura?: Prisma.FloatFilter<"Player"> | number
   createdAt?: Prisma.DateTimeFilter<"Player"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Player"> | Date | string
-  club?: Prisma.XOR<Prisma.ClubScalarRelationFilter, Prisma.ClubWhereInput>
+  club?: Prisma.XOR<Prisma.ClubNullableScalarRelationFilter, Prisma.ClubWhereInput> | null
   formationAsA?: Prisma.FormationListRelationFilter
   formationAsB?: Prisma.FormationListRelationFilter
   formationAsC?: Prisma.FormationListRelationFilter
   trainingResults?: Prisma.TrainingResultListRelationFilter
+  transferListing?: Prisma.XOR<Prisma.TransferListingNullableScalarRelationFilter, Prisma.TransferListingWhereInput> | null
 }
 
 export type PlayerOrderByWithRelationInput = {
   id?: Prisma.SortOrder
-  clubId?: Prisma.SortOrder
+  clubId?: Prisma.SortOrderInput | Prisma.SortOrder
   firstName?: Prisma.SortOrder
   lastName?: Prisma.SortOrder
   nationality?: Prisma.SortOrder
@@ -491,6 +492,7 @@ export type PlayerOrderByWithRelationInput = {
   formationAsB?: Prisma.FormationOrderByRelationAggregateInput
   formationAsC?: Prisma.FormationOrderByRelationAggregateInput
   trainingResults?: Prisma.TrainingResultOrderByRelationAggregateInput
+  transferListing?: Prisma.TransferListingOrderByWithRelationInput
 }
 
 export type PlayerWhereUniqueInput = Prisma.AtLeast<{
@@ -498,7 +500,7 @@ export type PlayerWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.PlayerWhereInput | Prisma.PlayerWhereInput[]
   OR?: Prisma.PlayerWhereInput[]
   NOT?: Prisma.PlayerWhereInput | Prisma.PlayerWhereInput[]
-  clubId?: Prisma.IntFilter<"Player"> | number
+  clubId?: Prisma.IntNullableFilter<"Player"> | number | null
   firstName?: Prisma.StringFilter<"Player"> | string
   lastName?: Prisma.StringFilter<"Player"> | string
   nationality?: Prisma.StringFilter<"Player"> | string
@@ -523,16 +525,17 @@ export type PlayerWhereUniqueInput = Prisma.AtLeast<{
   misura?: Prisma.FloatFilter<"Player"> | number
   createdAt?: Prisma.DateTimeFilter<"Player"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Player"> | Date | string
-  club?: Prisma.XOR<Prisma.ClubScalarRelationFilter, Prisma.ClubWhereInput>
+  club?: Prisma.XOR<Prisma.ClubNullableScalarRelationFilter, Prisma.ClubWhereInput> | null
   formationAsA?: Prisma.FormationListRelationFilter
   formationAsB?: Prisma.FormationListRelationFilter
   formationAsC?: Prisma.FormationListRelationFilter
   trainingResults?: Prisma.TrainingResultListRelationFilter
+  transferListing?: Prisma.XOR<Prisma.TransferListingNullableScalarRelationFilter, Prisma.TransferListingWhereInput> | null
 }, "id">
 
 export type PlayerOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
-  clubId?: Prisma.SortOrder
+  clubId?: Prisma.SortOrderInput | Prisma.SortOrder
   firstName?: Prisma.SortOrder
   lastName?: Prisma.SortOrder
   nationality?: Prisma.SortOrder
@@ -569,7 +572,7 @@ export type PlayerScalarWhereWithAggregatesInput = {
   OR?: Prisma.PlayerScalarWhereWithAggregatesInput[]
   NOT?: Prisma.PlayerScalarWhereWithAggregatesInput | Prisma.PlayerScalarWhereWithAggregatesInput[]
   id?: Prisma.IntWithAggregatesFilter<"Player"> | number
-  clubId?: Prisma.IntWithAggregatesFilter<"Player"> | number
+  clubId?: Prisma.IntNullableWithAggregatesFilter<"Player"> | number | null
   firstName?: Prisma.StringWithAggregatesFilter<"Player"> | string
   lastName?: Prisma.StringWithAggregatesFilter<"Player"> | string
   nationality?: Prisma.StringWithAggregatesFilter<"Player"> | string
@@ -621,16 +624,17 @@ export type PlayerCreateInput = {
   misura: number
   createdAt?: Date | string
   updatedAt?: Date | string
-  club: Prisma.ClubCreateNestedOneWithoutPlayersInput
+  club?: Prisma.ClubCreateNestedOneWithoutPlayersInput
   formationAsA?: Prisma.FormationCreateNestedManyWithoutSlotAPlayerInput
   formationAsB?: Prisma.FormationCreateNestedManyWithoutSlotBPlayerInput
   formationAsC?: Prisma.FormationCreateNestedManyWithoutSlotCPlayerInput
   trainingResults?: Prisma.TrainingResultCreateNestedManyWithoutPlayerInput
+  transferListing?: Prisma.TransferListingCreateNestedOneWithoutPlayerInput
 }
 
 export type PlayerUncheckedCreateInput = {
   id?: number
-  clubId: number
+  clubId?: number | null
   firstName: string
   lastName: string
   nationality: string
@@ -659,6 +663,7 @@ export type PlayerUncheckedCreateInput = {
   formationAsB?: Prisma.FormationUncheckedCreateNestedManyWithoutSlotBPlayerInput
   formationAsC?: Prisma.FormationUncheckedCreateNestedManyWithoutSlotCPlayerInput
   trainingResults?: Prisma.TrainingResultUncheckedCreateNestedManyWithoutPlayerInput
+  transferListing?: Prisma.TransferListingUncheckedCreateNestedOneWithoutPlayerInput
 }
 
 export type PlayerUpdateInput = {
@@ -686,16 +691,17 @@ export type PlayerUpdateInput = {
   misura?: Prisma.FloatFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  club?: Prisma.ClubUpdateOneRequiredWithoutPlayersNestedInput
+  club?: Prisma.ClubUpdateOneWithoutPlayersNestedInput
   formationAsA?: Prisma.FormationUpdateManyWithoutSlotAPlayerNestedInput
   formationAsB?: Prisma.FormationUpdateManyWithoutSlotBPlayerNestedInput
   formationAsC?: Prisma.FormationUpdateManyWithoutSlotCPlayerNestedInput
   trainingResults?: Prisma.TrainingResultUpdateManyWithoutPlayerNestedInput
+  transferListing?: Prisma.TransferListingUpdateOneWithoutPlayerNestedInput
 }
 
 export type PlayerUncheckedUpdateInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  clubId?: Prisma.IntFieldUpdateOperationsInput | number
+  clubId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   firstName?: Prisma.StringFieldUpdateOperationsInput | string
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   nationality?: Prisma.StringFieldUpdateOperationsInput | string
@@ -724,11 +730,12 @@ export type PlayerUncheckedUpdateInput = {
   formationAsB?: Prisma.FormationUncheckedUpdateManyWithoutSlotBPlayerNestedInput
   formationAsC?: Prisma.FormationUncheckedUpdateManyWithoutSlotCPlayerNestedInput
   trainingResults?: Prisma.TrainingResultUncheckedUpdateManyWithoutPlayerNestedInput
+  transferListing?: Prisma.TransferListingUncheckedUpdateOneWithoutPlayerNestedInput
 }
 
 export type PlayerCreateManyInput = {
   id?: number
-  clubId: number
+  clubId?: number | null
   firstName: string
   lastName: string
   nationality: string
@@ -784,7 +791,7 @@ export type PlayerUpdateManyMutationInput = {
 
 export type PlayerUncheckedUpdateManyInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  clubId?: Prisma.IntFieldUpdateOperationsInput | number
+  clubId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   firstName?: Prisma.StringFieldUpdateOperationsInput | string
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   nationality?: Prisma.StringFieldUpdateOperationsInput | string
@@ -958,6 +965,11 @@ export type PlayerSumOrderByAggregateInput = {
   misura?: Prisma.SortOrder
 }
 
+export type PlayerScalarRelationFilter = {
+  is?: Prisma.PlayerWhereInput
+  isNot?: Prisma.PlayerWhereInput
+}
+
 export type PlayerNullableScalarRelationFilter = {
   is?: Prisma.PlayerWhereInput | null
   isNot?: Prisma.PlayerWhereInput | null
@@ -1020,6 +1032,28 @@ export type FloatFieldUpdateOperationsInput = {
 export type PlayerUpdatestyleInput = {
   set?: string[]
   push?: string | string[]
+}
+
+export type NullableIntFieldUpdateOperationsInput = {
+  set?: number | null
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
+}
+
+export type PlayerCreateNestedOneWithoutTransferListingInput = {
+  create?: Prisma.XOR<Prisma.PlayerCreateWithoutTransferListingInput, Prisma.PlayerUncheckedCreateWithoutTransferListingInput>
+  connectOrCreate?: Prisma.PlayerCreateOrConnectWithoutTransferListingInput
+  connect?: Prisma.PlayerWhereUniqueInput
+}
+
+export type PlayerUpdateOneRequiredWithoutTransferListingNestedInput = {
+  create?: Prisma.XOR<Prisma.PlayerCreateWithoutTransferListingInput, Prisma.PlayerUncheckedCreateWithoutTransferListingInput>
+  connectOrCreate?: Prisma.PlayerCreateOrConnectWithoutTransferListingInput
+  upsert?: Prisma.PlayerUpsertWithoutTransferListingInput
+  connect?: Prisma.PlayerWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PlayerUpdateToOneWithWhereWithoutTransferListingInput, Prisma.PlayerUpdateWithoutTransferListingInput>, Prisma.PlayerUncheckedUpdateWithoutTransferListingInput>
 }
 
 export type PlayerCreateNestedOneWithoutFormationAsAInput = {
@@ -1115,6 +1149,7 @@ export type PlayerCreateWithoutClubInput = {
   formationAsB?: Prisma.FormationCreateNestedManyWithoutSlotBPlayerInput
   formationAsC?: Prisma.FormationCreateNestedManyWithoutSlotCPlayerInput
   trainingResults?: Prisma.TrainingResultCreateNestedManyWithoutPlayerInput
+  transferListing?: Prisma.TransferListingCreateNestedOneWithoutPlayerInput
 }
 
 export type PlayerUncheckedCreateWithoutClubInput = {
@@ -1147,6 +1182,7 @@ export type PlayerUncheckedCreateWithoutClubInput = {
   formationAsB?: Prisma.FormationUncheckedCreateNestedManyWithoutSlotBPlayerInput
   formationAsC?: Prisma.FormationUncheckedCreateNestedManyWithoutSlotCPlayerInput
   trainingResults?: Prisma.TrainingResultUncheckedCreateNestedManyWithoutPlayerInput
+  transferListing?: Prisma.TransferListingUncheckedCreateNestedOneWithoutPlayerInput
 }
 
 export type PlayerCreateOrConnectWithoutClubInput = {
@@ -1180,7 +1216,7 @@ export type PlayerScalarWhereInput = {
   OR?: Prisma.PlayerScalarWhereInput[]
   NOT?: Prisma.PlayerScalarWhereInput | Prisma.PlayerScalarWhereInput[]
   id?: Prisma.IntFilter<"Player"> | number
-  clubId?: Prisma.IntFilter<"Player"> | number
+  clubId?: Prisma.IntNullableFilter<"Player"> | number | null
   firstName?: Prisma.StringFilter<"Player"> | string
   lastName?: Prisma.StringFilter<"Player"> | string
   nationality?: Prisma.StringFilter<"Player"> | string
@@ -1205,6 +1241,152 @@ export type PlayerScalarWhereInput = {
   misura?: Prisma.FloatFilter<"Player"> | number
   createdAt?: Prisma.DateTimeFilter<"Player"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Player"> | Date | string
+}
+
+export type PlayerCreateWithoutTransferListingInput = {
+  firstName: string
+  lastName: string
+  nationality: string
+  age: number
+  form?: number
+  morale?: number
+  experience?: number
+  talent: number
+  potential: number
+  value?: number
+  salary?: number
+  image?: string
+  style?: Prisma.PlayerCreatestyleInput | string[]
+  precisione: number
+  diretto: number
+  sponde: number
+  tattica: number
+  mentalita: number
+  difesa: number
+  realizzazione: number
+  creativita: number
+  misura: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  club?: Prisma.ClubCreateNestedOneWithoutPlayersInput
+  formationAsA?: Prisma.FormationCreateNestedManyWithoutSlotAPlayerInput
+  formationAsB?: Prisma.FormationCreateNestedManyWithoutSlotBPlayerInput
+  formationAsC?: Prisma.FormationCreateNestedManyWithoutSlotCPlayerInput
+  trainingResults?: Prisma.TrainingResultCreateNestedManyWithoutPlayerInput
+}
+
+export type PlayerUncheckedCreateWithoutTransferListingInput = {
+  id?: number
+  clubId?: number | null
+  firstName: string
+  lastName: string
+  nationality: string
+  age: number
+  form?: number
+  morale?: number
+  experience?: number
+  talent: number
+  potential: number
+  value?: number
+  salary?: number
+  image?: string
+  style?: Prisma.PlayerCreatestyleInput | string[]
+  precisione: number
+  diretto: number
+  sponde: number
+  tattica: number
+  mentalita: number
+  difesa: number
+  realizzazione: number
+  creativita: number
+  misura: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  formationAsA?: Prisma.FormationUncheckedCreateNestedManyWithoutSlotAPlayerInput
+  formationAsB?: Prisma.FormationUncheckedCreateNestedManyWithoutSlotBPlayerInput
+  formationAsC?: Prisma.FormationUncheckedCreateNestedManyWithoutSlotCPlayerInput
+  trainingResults?: Prisma.TrainingResultUncheckedCreateNestedManyWithoutPlayerInput
+}
+
+export type PlayerCreateOrConnectWithoutTransferListingInput = {
+  where: Prisma.PlayerWhereUniqueInput
+  create: Prisma.XOR<Prisma.PlayerCreateWithoutTransferListingInput, Prisma.PlayerUncheckedCreateWithoutTransferListingInput>
+}
+
+export type PlayerUpsertWithoutTransferListingInput = {
+  update: Prisma.XOR<Prisma.PlayerUpdateWithoutTransferListingInput, Prisma.PlayerUncheckedUpdateWithoutTransferListingInput>
+  create: Prisma.XOR<Prisma.PlayerCreateWithoutTransferListingInput, Prisma.PlayerUncheckedCreateWithoutTransferListingInput>
+  where?: Prisma.PlayerWhereInput
+}
+
+export type PlayerUpdateToOneWithWhereWithoutTransferListingInput = {
+  where?: Prisma.PlayerWhereInput
+  data: Prisma.XOR<Prisma.PlayerUpdateWithoutTransferListingInput, Prisma.PlayerUncheckedUpdateWithoutTransferListingInput>
+}
+
+export type PlayerUpdateWithoutTransferListingInput = {
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  nationality?: Prisma.StringFieldUpdateOperationsInput | string
+  age?: Prisma.IntFieldUpdateOperationsInput | number
+  form?: Prisma.IntFieldUpdateOperationsInput | number
+  morale?: Prisma.IntFieldUpdateOperationsInput | number
+  experience?: Prisma.FloatFieldUpdateOperationsInput | number
+  talent?: Prisma.FloatFieldUpdateOperationsInput | number
+  potential?: Prisma.FloatFieldUpdateOperationsInput | number
+  value?: Prisma.IntFieldUpdateOperationsInput | number
+  salary?: Prisma.IntFieldUpdateOperationsInput | number
+  image?: Prisma.StringFieldUpdateOperationsInput | string
+  style?: Prisma.PlayerUpdatestyleInput | string[]
+  precisione?: Prisma.FloatFieldUpdateOperationsInput | number
+  diretto?: Prisma.FloatFieldUpdateOperationsInput | number
+  sponde?: Prisma.FloatFieldUpdateOperationsInput | number
+  tattica?: Prisma.FloatFieldUpdateOperationsInput | number
+  mentalita?: Prisma.FloatFieldUpdateOperationsInput | number
+  difesa?: Prisma.FloatFieldUpdateOperationsInput | number
+  realizzazione?: Prisma.FloatFieldUpdateOperationsInput | number
+  creativita?: Prisma.FloatFieldUpdateOperationsInput | number
+  misura?: Prisma.FloatFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  club?: Prisma.ClubUpdateOneWithoutPlayersNestedInput
+  formationAsA?: Prisma.FormationUpdateManyWithoutSlotAPlayerNestedInput
+  formationAsB?: Prisma.FormationUpdateManyWithoutSlotBPlayerNestedInput
+  formationAsC?: Prisma.FormationUpdateManyWithoutSlotCPlayerNestedInput
+  trainingResults?: Prisma.TrainingResultUpdateManyWithoutPlayerNestedInput
+}
+
+export type PlayerUncheckedUpdateWithoutTransferListingInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  clubId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  nationality?: Prisma.StringFieldUpdateOperationsInput | string
+  age?: Prisma.IntFieldUpdateOperationsInput | number
+  form?: Prisma.IntFieldUpdateOperationsInput | number
+  morale?: Prisma.IntFieldUpdateOperationsInput | number
+  experience?: Prisma.FloatFieldUpdateOperationsInput | number
+  talent?: Prisma.FloatFieldUpdateOperationsInput | number
+  potential?: Prisma.FloatFieldUpdateOperationsInput | number
+  value?: Prisma.IntFieldUpdateOperationsInput | number
+  salary?: Prisma.IntFieldUpdateOperationsInput | number
+  image?: Prisma.StringFieldUpdateOperationsInput | string
+  style?: Prisma.PlayerUpdatestyleInput | string[]
+  precisione?: Prisma.FloatFieldUpdateOperationsInput | number
+  diretto?: Prisma.FloatFieldUpdateOperationsInput | number
+  sponde?: Prisma.FloatFieldUpdateOperationsInput | number
+  tattica?: Prisma.FloatFieldUpdateOperationsInput | number
+  mentalita?: Prisma.FloatFieldUpdateOperationsInput | number
+  difesa?: Prisma.FloatFieldUpdateOperationsInput | number
+  realizzazione?: Prisma.FloatFieldUpdateOperationsInput | number
+  creativita?: Prisma.FloatFieldUpdateOperationsInput | number
+  misura?: Prisma.FloatFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  formationAsA?: Prisma.FormationUncheckedUpdateManyWithoutSlotAPlayerNestedInput
+  formationAsB?: Prisma.FormationUncheckedUpdateManyWithoutSlotBPlayerNestedInput
+  formationAsC?: Prisma.FormationUncheckedUpdateManyWithoutSlotCPlayerNestedInput
+  trainingResults?: Prisma.TrainingResultUncheckedUpdateManyWithoutPlayerNestedInput
 }
 
 export type PlayerCreateWithoutFormationAsAInput = {
@@ -1232,15 +1414,16 @@ export type PlayerCreateWithoutFormationAsAInput = {
   misura: number
   createdAt?: Date | string
   updatedAt?: Date | string
-  club: Prisma.ClubCreateNestedOneWithoutPlayersInput
+  club?: Prisma.ClubCreateNestedOneWithoutPlayersInput
   formationAsB?: Prisma.FormationCreateNestedManyWithoutSlotBPlayerInput
   formationAsC?: Prisma.FormationCreateNestedManyWithoutSlotCPlayerInput
   trainingResults?: Prisma.TrainingResultCreateNestedManyWithoutPlayerInput
+  transferListing?: Prisma.TransferListingCreateNestedOneWithoutPlayerInput
 }
 
 export type PlayerUncheckedCreateWithoutFormationAsAInput = {
   id?: number
-  clubId: number
+  clubId?: number | null
   firstName: string
   lastName: string
   nationality: string
@@ -1268,6 +1451,7 @@ export type PlayerUncheckedCreateWithoutFormationAsAInput = {
   formationAsB?: Prisma.FormationUncheckedCreateNestedManyWithoutSlotBPlayerInput
   formationAsC?: Prisma.FormationUncheckedCreateNestedManyWithoutSlotCPlayerInput
   trainingResults?: Prisma.TrainingResultUncheckedCreateNestedManyWithoutPlayerInput
+  transferListing?: Prisma.TransferListingUncheckedCreateNestedOneWithoutPlayerInput
 }
 
 export type PlayerCreateOrConnectWithoutFormationAsAInput = {
@@ -1300,15 +1484,16 @@ export type PlayerCreateWithoutFormationAsBInput = {
   misura: number
   createdAt?: Date | string
   updatedAt?: Date | string
-  club: Prisma.ClubCreateNestedOneWithoutPlayersInput
+  club?: Prisma.ClubCreateNestedOneWithoutPlayersInput
   formationAsA?: Prisma.FormationCreateNestedManyWithoutSlotAPlayerInput
   formationAsC?: Prisma.FormationCreateNestedManyWithoutSlotCPlayerInput
   trainingResults?: Prisma.TrainingResultCreateNestedManyWithoutPlayerInput
+  transferListing?: Prisma.TransferListingCreateNestedOneWithoutPlayerInput
 }
 
 export type PlayerUncheckedCreateWithoutFormationAsBInput = {
   id?: number
-  clubId: number
+  clubId?: number | null
   firstName: string
   lastName: string
   nationality: string
@@ -1336,6 +1521,7 @@ export type PlayerUncheckedCreateWithoutFormationAsBInput = {
   formationAsA?: Prisma.FormationUncheckedCreateNestedManyWithoutSlotAPlayerInput
   formationAsC?: Prisma.FormationUncheckedCreateNestedManyWithoutSlotCPlayerInput
   trainingResults?: Prisma.TrainingResultUncheckedCreateNestedManyWithoutPlayerInput
+  transferListing?: Prisma.TransferListingUncheckedCreateNestedOneWithoutPlayerInput
 }
 
 export type PlayerCreateOrConnectWithoutFormationAsBInput = {
@@ -1368,15 +1554,16 @@ export type PlayerCreateWithoutFormationAsCInput = {
   misura: number
   createdAt?: Date | string
   updatedAt?: Date | string
-  club: Prisma.ClubCreateNestedOneWithoutPlayersInput
+  club?: Prisma.ClubCreateNestedOneWithoutPlayersInput
   formationAsA?: Prisma.FormationCreateNestedManyWithoutSlotAPlayerInput
   formationAsB?: Prisma.FormationCreateNestedManyWithoutSlotBPlayerInput
   trainingResults?: Prisma.TrainingResultCreateNestedManyWithoutPlayerInput
+  transferListing?: Prisma.TransferListingCreateNestedOneWithoutPlayerInput
 }
 
 export type PlayerUncheckedCreateWithoutFormationAsCInput = {
   id?: number
-  clubId: number
+  clubId?: number | null
   firstName: string
   lastName: string
   nationality: string
@@ -1404,6 +1591,7 @@ export type PlayerUncheckedCreateWithoutFormationAsCInput = {
   formationAsA?: Prisma.FormationUncheckedCreateNestedManyWithoutSlotAPlayerInput
   formationAsB?: Prisma.FormationUncheckedCreateNestedManyWithoutSlotBPlayerInput
   trainingResults?: Prisma.TrainingResultUncheckedCreateNestedManyWithoutPlayerInput
+  transferListing?: Prisma.TransferListingUncheckedCreateNestedOneWithoutPlayerInput
 }
 
 export type PlayerCreateOrConnectWithoutFormationAsCInput = {
@@ -1447,15 +1635,16 @@ export type PlayerUpdateWithoutFormationAsAInput = {
   misura?: Prisma.FloatFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  club?: Prisma.ClubUpdateOneRequiredWithoutPlayersNestedInput
+  club?: Prisma.ClubUpdateOneWithoutPlayersNestedInput
   formationAsB?: Prisma.FormationUpdateManyWithoutSlotBPlayerNestedInput
   formationAsC?: Prisma.FormationUpdateManyWithoutSlotCPlayerNestedInput
   trainingResults?: Prisma.TrainingResultUpdateManyWithoutPlayerNestedInput
+  transferListing?: Prisma.TransferListingUpdateOneWithoutPlayerNestedInput
 }
 
 export type PlayerUncheckedUpdateWithoutFormationAsAInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  clubId?: Prisma.IntFieldUpdateOperationsInput | number
+  clubId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   firstName?: Prisma.StringFieldUpdateOperationsInput | string
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   nationality?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1483,6 +1672,7 @@ export type PlayerUncheckedUpdateWithoutFormationAsAInput = {
   formationAsB?: Prisma.FormationUncheckedUpdateManyWithoutSlotBPlayerNestedInput
   formationAsC?: Prisma.FormationUncheckedUpdateManyWithoutSlotCPlayerNestedInput
   trainingResults?: Prisma.TrainingResultUncheckedUpdateManyWithoutPlayerNestedInput
+  transferListing?: Prisma.TransferListingUncheckedUpdateOneWithoutPlayerNestedInput
 }
 
 export type PlayerUpsertWithoutFormationAsBInput = {
@@ -1521,15 +1711,16 @@ export type PlayerUpdateWithoutFormationAsBInput = {
   misura?: Prisma.FloatFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  club?: Prisma.ClubUpdateOneRequiredWithoutPlayersNestedInput
+  club?: Prisma.ClubUpdateOneWithoutPlayersNestedInput
   formationAsA?: Prisma.FormationUpdateManyWithoutSlotAPlayerNestedInput
   formationAsC?: Prisma.FormationUpdateManyWithoutSlotCPlayerNestedInput
   trainingResults?: Prisma.TrainingResultUpdateManyWithoutPlayerNestedInput
+  transferListing?: Prisma.TransferListingUpdateOneWithoutPlayerNestedInput
 }
 
 export type PlayerUncheckedUpdateWithoutFormationAsBInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  clubId?: Prisma.IntFieldUpdateOperationsInput | number
+  clubId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   firstName?: Prisma.StringFieldUpdateOperationsInput | string
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   nationality?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1557,6 +1748,7 @@ export type PlayerUncheckedUpdateWithoutFormationAsBInput = {
   formationAsA?: Prisma.FormationUncheckedUpdateManyWithoutSlotAPlayerNestedInput
   formationAsC?: Prisma.FormationUncheckedUpdateManyWithoutSlotCPlayerNestedInput
   trainingResults?: Prisma.TrainingResultUncheckedUpdateManyWithoutPlayerNestedInput
+  transferListing?: Prisma.TransferListingUncheckedUpdateOneWithoutPlayerNestedInput
 }
 
 export type PlayerUpsertWithoutFormationAsCInput = {
@@ -1595,15 +1787,16 @@ export type PlayerUpdateWithoutFormationAsCInput = {
   misura?: Prisma.FloatFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  club?: Prisma.ClubUpdateOneRequiredWithoutPlayersNestedInput
+  club?: Prisma.ClubUpdateOneWithoutPlayersNestedInput
   formationAsA?: Prisma.FormationUpdateManyWithoutSlotAPlayerNestedInput
   formationAsB?: Prisma.FormationUpdateManyWithoutSlotBPlayerNestedInput
   trainingResults?: Prisma.TrainingResultUpdateManyWithoutPlayerNestedInput
+  transferListing?: Prisma.TransferListingUpdateOneWithoutPlayerNestedInput
 }
 
 export type PlayerUncheckedUpdateWithoutFormationAsCInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  clubId?: Prisma.IntFieldUpdateOperationsInput | number
+  clubId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   firstName?: Prisma.StringFieldUpdateOperationsInput | string
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   nationality?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1631,6 +1824,7 @@ export type PlayerUncheckedUpdateWithoutFormationAsCInput = {
   formationAsA?: Prisma.FormationUncheckedUpdateManyWithoutSlotAPlayerNestedInput
   formationAsB?: Prisma.FormationUncheckedUpdateManyWithoutSlotBPlayerNestedInput
   trainingResults?: Prisma.TrainingResultUncheckedUpdateManyWithoutPlayerNestedInput
+  transferListing?: Prisma.TransferListingUncheckedUpdateOneWithoutPlayerNestedInput
 }
 
 export type PlayerCreateWithoutTrainingResultsInput = {
@@ -1658,15 +1852,16 @@ export type PlayerCreateWithoutTrainingResultsInput = {
   misura: number
   createdAt?: Date | string
   updatedAt?: Date | string
-  club: Prisma.ClubCreateNestedOneWithoutPlayersInput
+  club?: Prisma.ClubCreateNestedOneWithoutPlayersInput
   formationAsA?: Prisma.FormationCreateNestedManyWithoutSlotAPlayerInput
   formationAsB?: Prisma.FormationCreateNestedManyWithoutSlotBPlayerInput
   formationAsC?: Prisma.FormationCreateNestedManyWithoutSlotCPlayerInput
+  transferListing?: Prisma.TransferListingCreateNestedOneWithoutPlayerInput
 }
 
 export type PlayerUncheckedCreateWithoutTrainingResultsInput = {
   id?: number
-  clubId: number
+  clubId?: number | null
   firstName: string
   lastName: string
   nationality: string
@@ -1694,6 +1889,7 @@ export type PlayerUncheckedCreateWithoutTrainingResultsInput = {
   formationAsA?: Prisma.FormationUncheckedCreateNestedManyWithoutSlotAPlayerInput
   formationAsB?: Prisma.FormationUncheckedCreateNestedManyWithoutSlotBPlayerInput
   formationAsC?: Prisma.FormationUncheckedCreateNestedManyWithoutSlotCPlayerInput
+  transferListing?: Prisma.TransferListingUncheckedCreateNestedOneWithoutPlayerInput
 }
 
 export type PlayerCreateOrConnectWithoutTrainingResultsInput = {
@@ -1737,15 +1933,16 @@ export type PlayerUpdateWithoutTrainingResultsInput = {
   misura?: Prisma.FloatFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  club?: Prisma.ClubUpdateOneRequiredWithoutPlayersNestedInput
+  club?: Prisma.ClubUpdateOneWithoutPlayersNestedInput
   formationAsA?: Prisma.FormationUpdateManyWithoutSlotAPlayerNestedInput
   formationAsB?: Prisma.FormationUpdateManyWithoutSlotBPlayerNestedInput
   formationAsC?: Prisma.FormationUpdateManyWithoutSlotCPlayerNestedInput
+  transferListing?: Prisma.TransferListingUpdateOneWithoutPlayerNestedInput
 }
 
 export type PlayerUncheckedUpdateWithoutTrainingResultsInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  clubId?: Prisma.IntFieldUpdateOperationsInput | number
+  clubId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   firstName?: Prisma.StringFieldUpdateOperationsInput | string
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   nationality?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1773,6 +1970,7 @@ export type PlayerUncheckedUpdateWithoutTrainingResultsInput = {
   formationAsA?: Prisma.FormationUncheckedUpdateManyWithoutSlotAPlayerNestedInput
   formationAsB?: Prisma.FormationUncheckedUpdateManyWithoutSlotBPlayerNestedInput
   formationAsC?: Prisma.FormationUncheckedUpdateManyWithoutSlotCPlayerNestedInput
+  transferListing?: Prisma.TransferListingUncheckedUpdateOneWithoutPlayerNestedInput
 }
 
 export type PlayerCreateManyClubInput = {
@@ -1832,6 +2030,7 @@ export type PlayerUpdateWithoutClubInput = {
   formationAsB?: Prisma.FormationUpdateManyWithoutSlotBPlayerNestedInput
   formationAsC?: Prisma.FormationUpdateManyWithoutSlotCPlayerNestedInput
   trainingResults?: Prisma.TrainingResultUpdateManyWithoutPlayerNestedInput
+  transferListing?: Prisma.TransferListingUpdateOneWithoutPlayerNestedInput
 }
 
 export type PlayerUncheckedUpdateWithoutClubInput = {
@@ -1864,6 +2063,7 @@ export type PlayerUncheckedUpdateWithoutClubInput = {
   formationAsB?: Prisma.FormationUncheckedUpdateManyWithoutSlotBPlayerNestedInput
   formationAsC?: Prisma.FormationUncheckedUpdateManyWithoutSlotCPlayerNestedInput
   trainingResults?: Prisma.TrainingResultUncheckedUpdateManyWithoutPlayerNestedInput
+  transferListing?: Prisma.TransferListingUncheckedUpdateOneWithoutPlayerNestedInput
 }
 
 export type PlayerUncheckedUpdateManyWithoutClubInput = {
@@ -1979,11 +2179,12 @@ export type PlayerSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   misura?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  club?: boolean | Prisma.ClubDefaultArgs<ExtArgs>
+  club?: boolean | Prisma.Player$clubArgs<ExtArgs>
   formationAsA?: boolean | Prisma.Player$formationAsAArgs<ExtArgs>
   formationAsB?: boolean | Prisma.Player$formationAsBArgs<ExtArgs>
   formationAsC?: boolean | Prisma.Player$formationAsCArgs<ExtArgs>
   trainingResults?: boolean | Prisma.Player$trainingResultsArgs<ExtArgs>
+  transferListing?: boolean | Prisma.Player$transferListingArgs<ExtArgs>
   _count?: boolean | Prisma.PlayerCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["player"]>
 
@@ -2014,7 +2215,7 @@ export type PlayerSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extens
   misura?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  club?: boolean | Prisma.ClubDefaultArgs<ExtArgs>
+  club?: boolean | Prisma.Player$clubArgs<ExtArgs>
 }, ExtArgs["result"]["player"]>
 
 export type PlayerSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -2044,7 +2245,7 @@ export type PlayerSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extens
   misura?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  club?: boolean | Prisma.ClubDefaultArgs<ExtArgs>
+  club?: boolean | Prisma.Player$clubArgs<ExtArgs>
 }, ExtArgs["result"]["player"]>
 
 export type PlayerSelectScalar = {
@@ -2078,32 +2279,34 @@ export type PlayerSelectScalar = {
 
 export type PlayerOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "clubId" | "firstName" | "lastName" | "nationality" | "age" | "form" | "morale" | "experience" | "talent" | "potential" | "value" | "salary" | "image" | "style" | "precisione" | "diretto" | "sponde" | "tattica" | "mentalita" | "difesa" | "realizzazione" | "creativita" | "misura" | "createdAt" | "updatedAt", ExtArgs["result"]["player"]>
 export type PlayerInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  club?: boolean | Prisma.ClubDefaultArgs<ExtArgs>
+  club?: boolean | Prisma.Player$clubArgs<ExtArgs>
   formationAsA?: boolean | Prisma.Player$formationAsAArgs<ExtArgs>
   formationAsB?: boolean | Prisma.Player$formationAsBArgs<ExtArgs>
   formationAsC?: boolean | Prisma.Player$formationAsCArgs<ExtArgs>
   trainingResults?: boolean | Prisma.Player$trainingResultsArgs<ExtArgs>
+  transferListing?: boolean | Prisma.Player$transferListingArgs<ExtArgs>
   _count?: boolean | Prisma.PlayerCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type PlayerIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  club?: boolean | Prisma.ClubDefaultArgs<ExtArgs>
+  club?: boolean | Prisma.Player$clubArgs<ExtArgs>
 }
 export type PlayerIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  club?: boolean | Prisma.ClubDefaultArgs<ExtArgs>
+  club?: boolean | Prisma.Player$clubArgs<ExtArgs>
 }
 
 export type $PlayerPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Player"
   objects: {
-    club: Prisma.$ClubPayload<ExtArgs>
+    club: Prisma.$ClubPayload<ExtArgs> | null
     formationAsA: Prisma.$FormationPayload<ExtArgs>[]
     formationAsB: Prisma.$FormationPayload<ExtArgs>[]
     formationAsC: Prisma.$FormationPayload<ExtArgs>[]
     trainingResults: Prisma.$TrainingResultPayload<ExtArgs>[]
+    transferListing: Prisma.$TransferListingPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
-    clubId: number
+    clubId: number | null
     firstName: string
     lastName: string
     nationality: string
@@ -2522,11 +2725,12 @@ readonly fields: PlayerFieldRefs;
  */
 export interface Prisma__PlayerClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  club<T extends Prisma.ClubDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ClubDefaultArgs<ExtArgs>>): Prisma.Prisma__ClubClient<runtime.Types.Result.GetResult<Prisma.$ClubPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  club<T extends Prisma.Player$clubArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Player$clubArgs<ExtArgs>>): Prisma.Prisma__ClubClient<runtime.Types.Result.GetResult<Prisma.$ClubPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   formationAsA<T extends Prisma.Player$formationAsAArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Player$formationAsAArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FormationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   formationAsB<T extends Prisma.Player$formationAsBArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Player$formationAsBArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FormationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   formationAsC<T extends Prisma.Player$formationAsCArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Player$formationAsCArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FormationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   trainingResults<T extends Prisma.Player$trainingResultsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Player$trainingResultsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TrainingResultPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  transferListing<T extends Prisma.Player$transferListingArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Player$transferListingArgs<ExtArgs>>): Prisma.Prisma__TransferListingClient<runtime.Types.Result.GetResult<Prisma.$TransferListingPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2983,6 +3187,25 @@ export type PlayerDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Intern
 }
 
 /**
+ * Player.club
+ */
+export type Player$clubArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Club
+   */
+  select?: Prisma.ClubSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Club
+   */
+  omit?: Prisma.ClubOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ClubInclude<ExtArgs> | null
+  where?: Prisma.ClubWhereInput
+}
+
+/**
  * Player.formationAsA
  */
 export type Player$formationAsAArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -3076,6 +3299,25 @@ export type Player$trainingResultsArgs<ExtArgs extends runtime.Types.Extensions.
   take?: number
   skip?: number
   distinct?: Prisma.TrainingResultScalarFieldEnum | Prisma.TrainingResultScalarFieldEnum[]
+}
+
+/**
+ * Player.transferListing
+ */
+export type Player$transferListingArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the TransferListing
+   */
+  select?: Prisma.TransferListingSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the TransferListing
+   */
+  omit?: Prisma.TransferListingOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TransferListingInclude<ExtArgs> | null
+  where?: Prisma.TransferListingWhereInput
 }
 
 /**

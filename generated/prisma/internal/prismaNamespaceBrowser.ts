@@ -53,6 +53,8 @@ export const AnyNull = runtime.AnyNull
 export const ModelName = {
   Club: 'Club',
   Player: 'Player',
+  TransferListing: 'TransferListing',
+  TransferBid: 'TransferBid',
   AcademyPlayer: 'AcademyPlayer',
   Formation: 'Formation',
   TrainingPlan: 'TrainingPlan',
@@ -132,6 +134,33 @@ export const PlayerScalarFieldEnum = {
 } as const
 
 export type PlayerScalarFieldEnum = (typeof PlayerScalarFieldEnum)[keyof typeof PlayerScalarFieldEnum]
+
+
+export const TransferListingScalarFieldEnum = {
+  id: 'id',
+  playerId: 'playerId',
+  sellerClubId: 'sellerClubId',
+  listingType: 'listingType',
+  status: 'status',
+  openingPrice: 'openingPrice',
+  startsAt: 'startsAt',
+  endsAt: 'endsAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type TransferListingScalarFieldEnum = (typeof TransferListingScalarFieldEnum)[keyof typeof TransferListingScalarFieldEnum]
+
+
+export const TransferBidScalarFieldEnum = {
+  id: 'id',
+  listingId: 'listingId',
+  bidderClubId: 'bidderClubId',
+  amount: 'amount',
+  createdAt: 'createdAt'
+} as const
+
+export type TransferBidScalarFieldEnum = (typeof TransferBidScalarFieldEnum)[keyof typeof TransferBidScalarFieldEnum]
 
 
 export const AcademyPlayerScalarFieldEnum = {

@@ -28,6 +28,16 @@ export type Club = Prisma.ClubModel
  */
 export type Player = Prisma.PlayerModel
 /**
+ * Model TransferListing
+ *
+ */
+export type TransferListing = Prisma.TransferListingModel
+/**
+ * Model TransferBid
+ *
+ */
+export type TransferBid = Prisma.TransferBidModel
+/**
  * Model AcademyPlayer
  * 
  */

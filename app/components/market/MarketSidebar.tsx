@@ -1,157 +1,131 @@
 "use client";
 
 import {
+  ArrowUpRight,
   Coins,
   Gavel,
-  Eye,
-  Bell,
-  ArrowUpRight,
 } from "lucide-react";
 
-export default function MarketSidebar() {
+import type {
+  MarketUserBid,
+} from "@/app/types/market";
+
+interface MarketSidebarProps {
+  credits: number;
+  userBids: MarketUserBid[];
+}
+
+export default function MarketSidebar({
+  credits,
+  userBids,
+}: MarketSidebarProps) {
   return (
     <aside className="space-y-5">
-
-      {/* Crediti */}
-
       <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-5">
-
         <div className="flex items-center gap-3">
-
           <div className="rounded-xl bg-green-600 p-3">
-            <Coins className="text-white" size={22} />
+            <Coins
+              className="text-white"
+              size={22}
+            />
           </div>
 
           <div>
             <p className="text-sm text-zinc-400">
               Crediti disponibili
             </p>
-
             <h2 className="text-2xl font-bold text-white">
-              € 2.485.000
+              {formatCurrency(credits)}
             </h2>
           </div>
-
         </div>
-
       </div>
 
-      {/* Aste */}
-
       <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-5">
-
         <div className="mb-4 flex items-center gap-2">
-
-          <Gavel className="text-green-400" size={20} />
-
+          <Gavel
+            className="text-green-400"
+            size={20}
+          />
           <h3 className="font-semibold text-white">
-            Le mie aste
+            Le mie offerte
           </h3>
-
         </div>
 
         <div className="space-y-3">
+          {userBids.map((bid) => (
+            <div
+              key={bid.listingId}
+              className="rounded-xl bg-zinc-800 p-3"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="font-medium text-white">
+                    {bid.playerName}
+                  </p>
+                  <p className="mt-1 text-xs text-zinc-500">
+                    La tua offerta: {formatCurrency(
+                      bid.amount
+                    )}
+                  </p>
+                </div>
 
-          <div className="flex items-center justify-between rounded-xl bg-zinc-800 p-3">
+                <ArrowUpRight
+                  className={
+                    bid.isHighest
+                      ? "text-green-400"
+                      : "text-red-400"
+                  }
+                  size={18}
+                />
+              </div>
 
-            <div>
-              <p className="font-medium text-white">
-                Marco Rossi
+              <p
+                className={`mt-2 text-xs font-semibold ${
+                  bid.isHighest
+                    ? "text-green-400"
+                    : "text-red-400"
+                }`}
+              >
+                {bid.isHighest
+                  ? "Offerta migliore"
+                  : `Superata: ${formatCurrency(
+                      bid.currentPrice
+                    )}`}
               </p>
 
-              <p className="text-xs text-zinc-500">
-                Scade tra 2h 31m
-              </p>
+              {bid.expiresAtLabel && (
+                <p className="mt-1 text-xs text-zinc-500">
+                  Scadenza {bid.expiresAtLabel}
+                </p>
+              )}
             </div>
+          ))}
 
-            <ArrowUpRight className="text-green-400" size={18} />
-
-          </div>
-
-          <div className="flex items-center justify-between rounded-xl bg-zinc-800 p-3">
-
-            <div>
-              <p className="font-medium text-white">
-                Luca Bianchi
-              </p>
-
-              <p className="text-xs text-zinc-500">
-                Scade tra 5h 12m
-              </p>
-            </div>
-
-            <ArrowUpRight className="text-green-400" size={18} />
-
-          </div>
-
+          {userBids.length === 0 && (
+            <p className="rounded-xl bg-zinc-800 p-3 text-sm text-zinc-400">
+              Non hai offerte attive.
+            </p>
+          )}
         </div>
-
       </div>
 
-      {/* Osservati */}
-
-      <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-5">
-
-        <div className="mb-4 flex items-center gap-2">
-
-          <Eye className="text-yellow-400" size={20} />
-
-          <h3 className="font-semibold text-white">
-            Osservati
-          </h3>
-
-        </div>
-
-        <div className="space-y-2">
-
-          <p className="rounded-lg bg-zinc-800 p-3 text-white">
-            Francesco Galli
-          </p>
-
-          <p className="rounded-lg bg-zinc-800 p-3 text-white">
-            Paolo Verdi
-          </p>
-
-          <p className="rounded-lg bg-zinc-800 p-3 text-white">
-            Andrea Neri
-          </p>
-
-        </div>
-
+      <div className="rounded-2xl border border-blue-500/20 bg-blue-500/5 p-5">
+        <h3 className="font-semibold text-blue-300">
+          Mercato reale
+        </h3>
+        <p className="mt-2 text-sm leading-6 text-zinc-400">
+          Giocatori, prezzi, scadenze e offerte sono ora letti dal database.
+        </p>
       </div>
-
-      {/* Notifiche */}
-
-      <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-5">
-
-        <div className="mb-4 flex items-center gap-2">
-
-          <Bell className="text-blue-400" size={20} />
-
-          <h3 className="font-semibold text-white">
-            Notifiche
-          </h3>
-
-        </div>
-
-        <div className="space-y-3 text-sm">
-
-          <div className="rounded-xl bg-zinc-800 p-3 text-zinc-300">
-            Hai superato un&apos;offerta per <strong>Marco Rossi</strong>.
-          </div>
-
-          <div className="rounded-xl bg-zinc-800 p-3 text-zinc-300">
-            È iniziata l&apos;asta di <strong>Francesco Galli</strong>.
-          </div>
-
-          <div className="rounded-xl bg-zinc-800 p-3 text-zinc-300">
-            Hai vinto l&apos;asta di <strong>Luca Bianchi</strong>.
-          </div>
-
-        </div>
-
-      </div>
-
     </aside>
   );
+}
+
+function formatCurrency(value: number) {
+  return new Intl.NumberFormat("it-IT", {
+    style: "currency",
+    currency: "EUR",
+    maximumFractionDigits: 0,
+  }).format(value);
 }

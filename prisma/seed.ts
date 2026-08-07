@@ -222,6 +222,162 @@ const initialPlayers = [
     creativita: 79,
     misura: 73,
   },
+  {
+    id: 4,
+    clubId: 2,
+    firstName: "Marco",
+    lastName: "Rossi",
+    nationality: "🇮🇹",
+    age: 24,
+    form: 7,
+    morale: 7,
+    experience: 46,
+    talent: 81,
+    potential: 86,
+    value: 97000,
+    salary: 900,
+    image: "",
+    style: ["Regolare"],
+    precisione: 83,
+    diretto: 81,
+    sponde: 79,
+    tattica: 78,
+    mentalita: 80,
+    difesa: 76,
+    realizzazione: 81,
+    creativita: 77,
+    misura: 82,
+  },
+  {
+    id: 5,
+    clubId: 3,
+    firstName: "Andrea",
+    lastName: "Verdi",
+    nationality: "🇮🇹",
+    age: 33,
+    form: 8,
+    morale: 8,
+    experience: 74,
+    talent: 88,
+    potential: 89,
+    value: 221000,
+    salary: 1800,
+    image: "",
+    style: ["Tecnico"],
+    precisione: 90,
+    diretto: 87,
+    sponde: 88,
+    tattica: 89,
+    mentalita: 86,
+    difesa: 83,
+    realizzazione: 88,
+    creativita: 85,
+    misura: 87,
+  },
+  {
+    id: 6,
+    clubId: 4,
+    firstName: "Luca",
+    lastName: "Bianchi",
+    nationality: "🇮🇹",
+    age: 21,
+    form: 6,
+    morale: 7,
+    experience: 28,
+    talent: 77,
+    potential: 87,
+    value: 58000,
+    salary: 650,
+    image: "",
+    style: ["Creativo"],
+    precisione: 74,
+    diretto: 72,
+    sponde: 77,
+    tattica: 71,
+    mentalita: 75,
+    difesa: 73,
+    realizzazione: 72,
+    creativita: 79,
+    misura: 74,
+  },
+  {
+    id: 7,
+    clubId: 5,
+    firstName: "Paolo",
+    lastName: "Neri",
+    nationality: "🇮🇹",
+    age: 37,
+    form: 8,
+    morale: 9,
+    experience: 86,
+    talent: 90,
+    potential: 90,
+    value: 310000,
+    salary: 2400,
+    image: "",
+    style: ["Leader", "Difensivo"],
+    precisione: 94,
+    diretto: 89,
+    sponde: 88,
+    tattica: 92,
+    mentalita: 91,
+    difesa: 87,
+    realizzazione: 90,
+    creativita: 84,
+    misura: 91,
+  },
+  {
+    id: 8,
+    clubId: null,
+    firstName: "Davide",
+    lastName: "Ricci",
+    nationality: "🇮🇹",
+    age: 27,
+    form: 6,
+    morale: 5,
+    experience: 51,
+    talent: 83,
+    potential: 85,
+    value: 134000,
+    salary: 1200,
+    image: "",
+    style: ["Offensivo"],
+    precisione: 82,
+    diretto: 81,
+    sponde: 84,
+    tattica: 80,
+    mentalita: 79,
+    difesa: 78,
+    realizzazione: 83,
+    creativita: 85,
+    misura: 81,
+  },
+  {
+    id: 9,
+    clubId: null,
+    firstName: "Enrico",
+    lastName: "Costa",
+    nationality: "🇮🇹",
+    age: 25,
+    form: 6,
+    morale: 5,
+    experience: 35,
+    talent: 78,
+    potential: 84,
+    value: 72000,
+    salary: 750,
+    image: "",
+    style: ["Tattico"],
+    precisione: 77,
+    diretto: 75,
+    sponde: 76,
+    tattica: 80,
+    mentalita: 74,
+    difesa: 78,
+    realizzazione: 75,
+    creativita: 73,
+    misura: 76,
+  },
 ];
 
 const initialAcademyPlayers = [
@@ -308,6 +464,112 @@ const initialAcademyPlayers = [
   },
 ];
 
+const marketSeedTime = Date.now();
+
+const initialTransferListings = [
+  {
+    id: 1,
+    playerId: 4,
+    sellerClubId: 2,
+    listingType: "AUCTION",
+    status: "ACTIVE",
+    openingPrice: 9700,
+    startsAt: new Date(marketSeedTime),
+    endsAt: new Date(
+      marketSeedTime + 72 * 60 * 60 * 1000
+    ),
+  },
+  {
+    id: 2,
+    playerId: 5,
+    sellerClubId: 3,
+    listingType: "AUCTION",
+    status: "ACTIVE",
+    openingPrice: 22100,
+    startsAt: new Date(marketSeedTime),
+    endsAt: new Date(
+      marketSeedTime + 49 * 60 * 60 * 1000
+    ),
+  },
+  {
+    id: 3,
+    playerId: 6,
+    sellerClubId: 4,
+    listingType: "AUCTION",
+    status: "ACTIVE",
+    openingPrice: 5800,
+    startsAt: new Date(marketSeedTime),
+    endsAt: new Date(
+      marketSeedTime + 18 * 60 * 60 * 1000
+    ),
+  },
+  {
+    id: 4,
+    playerId: 7,
+    sellerClubId: 5,
+    listingType: "AUCTION",
+    status: "ACTIVE",
+    openingPrice: 31000,
+    startsAt: new Date(marketSeedTime),
+    endsAt: new Date(
+      marketSeedTime + 36 * 60 * 60 * 1000
+    ),
+  },
+  {
+    id: 5,
+    playerId: 8,
+    sellerClubId: null,
+    listingType: "FREE_AGENT",
+    status: "ACTIVE",
+    openingPrice: 13400,
+    startsAt: new Date(marketSeedTime),
+    endsAt: null,
+  },
+  {
+    id: 6,
+    playerId: 9,
+    sellerClubId: null,
+    listingType: "FREE_AGENT",
+    status: "ACTIVE",
+    openingPrice: 7200,
+    startsAt: new Date(marketSeedTime),
+    endsAt: null,
+  },
+];
+
+const initialTransferBids = [
+  {
+    id: 1,
+    listingId: 1,
+    bidderClubId: 1,
+    amount: 10200,
+  },
+  {
+    id: 2,
+    listingId: 2,
+    bidderClubId: 2,
+    amount: 23000,
+  },
+  {
+    id: 3,
+    listingId: 2,
+    bidderClubId: 7,
+    amount: 24000,
+  },
+  {
+    id: 4,
+    listingId: 3,
+    bidderClubId: 8,
+    amount: 6100,
+  },
+  {
+    id: 5,
+    listingId: 4,
+    bidderClubId: 6,
+    amount: 34100,
+  },
+];
+
 async function main() {
   console.log("🌱 Inserimento dei dati iniziali...");
 
@@ -357,6 +619,36 @@ async function main() {
     });
   }
 
+  for (const listing of initialTransferListings) {
+    const { id, ...listingData } = listing;
+
+    await prisma.transferListing.upsert({
+      where: {
+        id,
+      },
+      update: listingData,
+      create: {
+        id,
+        ...listingData,
+      },
+    });
+  }
+
+  for (const bid of initialTransferBids) {
+    const { id, ...bidData } = bid;
+
+    await prisma.transferBid.upsert({
+      where: {
+        id,
+      },
+      update: bidData,
+      create: {
+        id,
+        ...bidData,
+      },
+    });
+  }
+
   await prisma.$queryRaw`
     SELECT setval(
       pg_get_serial_sequence('"Club"', 'id'),
@@ -364,6 +656,40 @@ async function main() {
         (
           SELECT COALESCE(MAX(id), 1)
           FROM "Club"
+        ),
+        1
+      ),
+      true
+    )
+  `;
+
+  await prisma.$queryRaw`
+    SELECT setval(
+      pg_get_serial_sequence(
+        '"TransferListing"',
+        'id'
+      ),
+      GREATEST(
+        (
+          SELECT COALESCE(MAX(id), 1)
+          FROM "TransferListing"
+        ),
+        1
+      ),
+      true
+    )
+  `;
+
+  await prisma.$queryRaw`
+    SELECT setval(
+      pg_get_serial_sequence(
+        '"TransferBid"',
+        'id'
+      ),
+      GREATEST(
+        (
+          SELECT COALESCE(MAX(id), 1)
+          FROM "TransferBid"
         ),
         1
       ),
@@ -406,6 +732,10 @@ async function main() {
   const playerCount = await prisma.player.count();
   const academyPlayerCount =
     await prisma.academyPlayer.count();
+  const transferListingCount =
+    await prisma.transferListing.count();
+  const transferBidCount =
+    await prisma.transferBid.count();
 
   console.log(
     `✅ ${clubCount} club presenti nel database`
@@ -417,6 +747,14 @@ async function main() {
 
   console.log(
     `✅ ${academyPlayerCount} giovani presenti nell'Accademia`
+  );
+
+  console.log(
+    `✅ ${transferListingCount} inserzioni presenti nel Mercato`
+  );
+
+  console.log(
+    `✅ ${transferBidCount} offerte presenti nel Mercato`
   );
 }
 

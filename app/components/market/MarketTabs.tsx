@@ -1,18 +1,26 @@
 "use client";
 
+import type {
+  MarketTab,
+} from "@/app/types/market";
+
 interface MarketTabsProps {
-  activeTab?: string;
+  activeTab: MarketTab;
+  onTabChange: (tab: MarketTab) => void;
 }
 
-const tabs = [
+const tabs: {
+  id: MarketTab;
+  label: string;
+}[] = [
   { id: "all", label: "Tutti" },
   { id: "auction", label: "In asta" },
   { id: "free", label: "Svincolati" },
-  { id: "watchlist", label: "Osservati" },
 ];
 
 export default function MarketTabs({
-  activeTab = "all",
+  activeTab,
+  onTabChange,
 }: MarketTabsProps) {
   return (
     <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-2">
@@ -26,6 +34,8 @@ export default function MarketTabs({
           return (
             <button
               key={tab.id}
+              type="button"
+              onClick={() => onTabChange(tab.id)}
               className={`
                 whitespace-nowrap
                 rounded-lg

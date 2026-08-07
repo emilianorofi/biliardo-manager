@@ -34,6 +34,9 @@ model Club {
   trainingSessions TrainingSession[]
   gameEvents       GameEvent[]
 
+  transferListings TransferListing[] @relation("TransferListingSeller")
+  transferBids     TransferBid[]     @relation("TransferBidder")
+
   leagueEntries LeagueEntry[]
 
   homeFixtures LeagueFixture[] @relation("HomeClubFixtures")
@@ -46,8 +49,8 @@ model Club {
 model Player {
   id Int @id @default(autoincrement())
 
-  clubId Int
-  club   Club @relation(fields: [clubId], references: [id], onDelete: Cascade)
+  clubId Int?
+  club   Club? @relation(fields: [clubId], references: [id], onDelete: SetNull)
 
   firstName   String
   lastName    String
@@ -83,10 +86,58 @@ model Player {
 
   trainingResults TrainingResult[]
 
+  transferListing TransferListing?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([clubId])
+}
+
+model TransferListing {
+  id Int @id @default(autoincrement())
+
+  playerId Int    @unique
+  player   Player @relation(fields: [playerId], references: [id], onDelete: Cascade)
+
+  sellerClubId Int?
+  sellerClub   Club? @relation("TransferListingSeller", fields: [sellerClubId], references: [id], onDelete: SetNull)
+
+  listingType String @default("AUCTION")
+  status      String @default("ACTIVE")
+
+  openingPrice Int
+
+  startsAt DateTime  @default(now())
+  endsAt   DateTime?
+
+  bids TransferBid[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([sellerClubId])
+  @@index([listingType])
+  @@index([status])
+  @@index([endsAt])
+}
+
+model TransferBid {
+  id Int @id @default(autoincrement())
+
+  listingId Int
+  listing   TransferListing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  bidderClubId Int
+  bidderClub   Club @relation("TransferBidder", fields: [bidderClubId], references: [id], onDelete: Cascade)
+
+  amount Int
+
+  createdAt DateTime @default(now())
+
+  @@index([listingId])
+  @@index([bidderClubId])
+  @@index([createdAt])
 }
 
 model AcademyPlayer {

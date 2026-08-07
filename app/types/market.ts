@@ -1,7 +1,19 @@
+export type MarketListingType =
+  | "AUCTION"
+  | "FREE_AGENT";
+
+export type MarketTab =
+  | "all"
+  | "auction"
+  | "free";
+
 export interface MarketPlayer {
   id: number;
+  listingId: number;
+  listingType: MarketListingType;
+
   name: string;
-  avatar: string;
+  initials: string;
   nationality: string;
   age: number;
 
@@ -11,12 +23,27 @@ export interface MarketPlayer {
   goriziana: number;
   tuttiDoppi: number;
 
-  value: number;
+  estimatedValue: number;
+  openingPrice: number;
+  currentPrice: number;
 
-  interested: number;
+  bidCount: number;
 
-  lastBid: number;
-  lastBidClub: string;
+  sellerClub: string | null;
+  lastBidClub: string | null;
 
-  remainingTime: string;
+  expiresAt: string | null;
+  expiresAtLabel: string | null;
+
+  userBid: number | null;
+  isUserHighestBid: boolean;
+}
+
+export interface MarketUserBid {
+  listingId: number;
+  playerName: string;
+  amount: number;
+  currentPrice: number;
+  isHighest: boolean;
+  expiresAtLabel: string | null;
 }

@@ -10,6 +10,8 @@
  */
 export type * from './models/Club'
 export type * from './models/Player'
+export type * from './models/TransferListing'
+export type * from './models/TransferBid'
 export type * from './models/AcademyPlayer'
 export type * from './models/Formation'
 export type * from './models/TrainingPlan'

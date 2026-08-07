@@ -3,13 +3,13 @@
 import { Search, Filter, Coins } from "lucide-react";
 
 interface MarketHeaderProps {
-  credits?: number;
+  credits: number;
   search: string;
   setSearch: (value: string) => void;
 }
 
 export default function MarketHeader({
-  credits = 2485000,
+  credits,
   search,
   setSearch,
 }: MarketHeaderProps) {

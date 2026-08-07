@@ -399,6 +399,8 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 export const ModelName = {
   Club: 'Club',
   Player: 'Player',
+  TransferListing: 'TransferListing',
+  TransferBid: 'TransferBid',
   AcademyPlayer: 'AcademyPlayer',
   Formation: 'Formation',
   TrainingPlan: 'TrainingPlan',
@@ -424,7 +426,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "club" | "player" | "academyPlayer" | "formation" | "trainingPlan" | "trainingSession" | "trainingResult" | "gameEvent" | "season" | "league" | "leagueEntry" | "leagueFixture"
+    modelProps: "club" | "player" | "transferListing" | "transferBid" | "academyPlayer" | "formation" | "trainingPlan" | "trainingSession" | "trainingResult" | "gameEvent" | "season" | "league" | "leagueEntry" | "leagueFixture"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -573,6 +575,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.PlayerCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.PlayerCountAggregateOutputType> | number
+        }
+      }
+    }
+    TransferListing: {
+      payload: Prisma.$TransferListingPayload<ExtArgs>
+      fields: Prisma.TransferListingFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.TransferListingFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TransferListingPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.TransferListingFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TransferListingPayload>
+        }
+        findFirst: {
+          args: Prisma.TransferListingFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TransferListingPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.TransferListingFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TransferListingPayload>
+        }
+        findMany: {
+          args: Prisma.TransferListingFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TransferListingPayload>[]
+        }
+        create: {
+          args: Prisma.TransferListingCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TransferListingPayload>
+        }
+        createMany: {
+          args: Prisma.TransferListingCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.TransferListingCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TransferListingPayload>[]
+        }
+        delete: {
+          args: Prisma.TransferListingDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TransferListingPayload>
+        }
+        update: {
+          args: Prisma.TransferListingUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TransferListingPayload>
+        }
+        deleteMany: {
+          args: Prisma.TransferListingDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.TransferListingUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.TransferListingUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TransferListingPayload>[]
+        }
+        upsert: {
+          args: Prisma.TransferListingUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TransferListingPayload>
+        }
+        aggregate: {
+          args: Prisma.TransferListingAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateTransferListing>
+        }
+        groupBy: {
+          args: Prisma.TransferListingGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TransferListingGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.TransferListingCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TransferListingCountAggregateOutputType> | number
+        }
+      }
+    }
+    TransferBid: {
+      payload: Prisma.$TransferBidPayload<ExtArgs>
+      fields: Prisma.TransferBidFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.TransferBidFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TransferBidPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.TransferBidFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TransferBidPayload>
+        }
+        findFirst: {
+          args: Prisma.TransferBidFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TransferBidPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.TransferBidFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TransferBidPayload>
+        }
+        findMany: {
+          args: Prisma.TransferBidFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TransferBidPayload>[]
+        }
+        create: {
+          args: Prisma.TransferBidCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TransferBidPayload>
+        }
+        createMany: {
+          args: Prisma.TransferBidCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.TransferBidCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TransferBidPayload>[]
+        }
+        delete: {
+          args: Prisma.TransferBidDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TransferBidPayload>
+        }
+        update: {
+          args: Prisma.TransferBidUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TransferBidPayload>
+        }
+        deleteMany: {
+          args: Prisma.TransferBidDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.TransferBidUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.TransferBidUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TransferBidPayload>[]
+        }
+        upsert: {
+          args: Prisma.TransferBidUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TransferBidPayload>
+        }
+        aggregate: {
+          args: Prisma.TransferBidAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateTransferBid>
+        }
+        groupBy: {
+          args: Prisma.TransferBidGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TransferBidGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.TransferBidCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TransferBidCountAggregateOutputType> | number
         }
       }
     }
@@ -1408,6 +1558,33 @@ export const PlayerScalarFieldEnum = {
 export type PlayerScalarFieldEnum = (typeof PlayerScalarFieldEnum)[keyof typeof PlayerScalarFieldEnum]
 
 
+export const TransferListingScalarFieldEnum = {
+  id: 'id',
+  playerId: 'playerId',
+  sellerClubId: 'sellerClubId',
+  listingType: 'listingType',
+  status: 'status',
+  openingPrice: 'openingPrice',
+  startsAt: 'startsAt',
+  endsAt: 'endsAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type TransferListingScalarFieldEnum = (typeof TransferListingScalarFieldEnum)[keyof typeof TransferListingScalarFieldEnum]
+
+
+export const TransferBidScalarFieldEnum = {
+  id: 'id',
+  listingId: 'listingId',
+  bidderClubId: 'bidderClubId',
+  amount: 'amount',
+  createdAt: 'createdAt'
+} as const
+
+export type TransferBidScalarFieldEnum = (typeof TransferBidScalarFieldEnum)[keyof typeof TransferBidScalarFieldEnum]
+
+
 export const AcademyPlayerScalarFieldEnum = {
   id: 'id',
   clubId: 'clubId',
@@ -1817,6 +1994,8 @@ export type PrismaClientOptions = PrismaClientOptionsWithAccelerateUrl | PrismaC
 export type GlobalOmitConfig = {
   club?: Prisma.ClubOmit
   player?: Prisma.PlayerOmit
+  transferListing?: Prisma.TransferListingOmit
+  transferBid?: Prisma.TransferBidOmit
   academyPlayer?: Prisma.AcademyPlayerOmit
   formation?: Prisma.FormationOmit
   trainingPlan?: Prisma.TrainingPlanOmit
