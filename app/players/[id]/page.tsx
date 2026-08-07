@@ -1,6 +1,9 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
+import { ArrowLeft } from "lucide-react";
 
 import type { Player } from "@/app/types/player";
+import { USER_CLUB_ID } from "@/lib/game-config";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
@@ -22,26 +25,45 @@ const attributes: {
 
 export default async function PlayerPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ from?: string }>;
 }) {
-  const { id } = await params;
+  const [{ id }, { from }] = await Promise.all([
+    params,
+    searchParams,
+  ]);
   const playerId = Number(id);
+  const comesFromMarket = from === "market";
 
   if (!Number.isInteger(playerId)) {
     notFound();
   }
 
-  const databasePlayer = await prisma.player.findFirst({
-  where: {
-    id: playerId,
-    clubId: 1,
-  },
-});
+  const databasePlayer =
+    await prisma.player.findUnique({
+      where: {
+        id: playerId,
+      },
+      include: {
+        transferListing: {
+          select: {
+            status: true,
+          },
+        },
+      },
+    });
 
-if (!databasePlayer) {
-  notFound();
-}
+  const isVisiblePlayer =
+    databasePlayer !== null &&
+    (databasePlayer.clubId === USER_CLUB_ID ||
+      databasePlayer.transferListing?.status ===
+        "ACTIVE");
+
+  if (!databasePlayer || !isVisiblePlayer) {
+    notFound();
+  }
 
 const playerAttributes: Player["attributes"] = {
   precisione: Math.round(databasePlayer.precisione),
@@ -115,7 +137,17 @@ const player: Player = {
   return (
     <main className="space-y-7">
       <header className="rounded-2xl border border-emerald-900/60 bg-[#15261f] p-6">
-        <p className="text-xs font-black uppercase tracking-[0.2em] text-emerald-400">
+        <Link
+          href={comesFromMarket ? "/market" : "/players"}
+          className="inline-flex items-center gap-2 text-sm font-semibold text-emerald-300 transition hover:text-emerald-200"
+        >
+          <ArrowLeft size={17} />
+          {comesFromMarket
+            ? "Torna al mercato"
+            : "Torna alla rosa"}
+        </Link>
+
+        <p className="mt-4 text-xs font-black uppercase tracking-[0.2em] text-emerald-400">
           Scheda giocatore
         </p>
 

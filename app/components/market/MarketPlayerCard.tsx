@@ -1,12 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import {
   AlertCircle,
   Building2,
   CheckCircle2,
   Clock3,
-  FileText,
   Gavel,
   HandCoins,
   TrendingUp,
@@ -226,14 +226,23 @@ export default function MarketPlayerCard({
     <article className="rounded-2xl border border-zinc-800 bg-zinc-900 p-5 transition-all duration-200 hover:border-green-500">
       <div className="flex items-start justify-between gap-4">
         <div className="flex gap-4">
-          <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full border border-zinc-700 bg-zinc-800 text-xl font-black text-green-300">
+          <Link
+            href={`/players/${player.id}?from=market`}
+            aria-label={`Apri la scheda di ${player.name}`}
+            className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full border border-zinc-700 bg-zinc-800 text-xl font-black text-green-300 transition duration-200 hover:scale-105 hover:border-green-500 hover:bg-zinc-700"
+          >
             {player.initials}
-          </div>
+          </Link>
 
           <div>
             <div className="flex flex-wrap items-center gap-2">
-              <h2 className="text-lg font-bold text-white">
-                {player.name}
+              <h2>
+                <Link
+                  href={`/players/${player.id}?from=market`}
+                  className="text-lg font-bold text-white transition duration-200 hover:text-green-300 hover:underline hover:decoration-green-400 hover:underline-offset-4"
+                >
+                  {player.name}
+                </Link>
               </h2>
 
               <span
@@ -507,16 +516,6 @@ export default function MarketPlayerCard({
       )}
 
       <div className="mt-6 flex justify-end gap-3">
-        <button
-          type="button"
-          disabled
-          title="La scheda mercato sarà attivata nel prossimo intervento."
-          className="flex cursor-not-allowed items-center gap-2 rounded-xl border border-zinc-700 bg-zinc-800 px-4 py-2 text-sm font-medium text-zinc-500"
-        >
-          <FileText size={18} />
-          Scheda
-        </button>
-
         {isAuction ? (
           <button
             type="button"
