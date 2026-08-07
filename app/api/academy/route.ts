@@ -4,6 +4,7 @@ import {
   MAX_FIRST_TEAM_PLAYERS,
   USER_CLUB_ID,
 } from "@/lib/game-config";
+import { getMarketCommitments } from "@/lib/market-commitments";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
@@ -234,54 +235,22 @@ export async function POST(request: Request) {
           FOR UPDATE
         `;
 
-        const [firstTeamPlayers, activeAuctions] =
+        const [firstTeamPlayers, commitments] =
           await Promise.all([
             transaction.player.count({
               where: {
                 clubId: USER_CLUB_ID,
               },
             }),
-            transaction.transferListing.findMany({
-              where: {
-                listingType: "AUCTION",
-                status: "ACTIVE",
-                endsAt: {
-                  gt: new Date(),
-                },
-                bids: {
-                  some: {
-                    bidderClubId: USER_CLUB_ID,
-                  },
-                },
-              },
-              select: {
-                bids: {
-                  orderBy: [
-                    {
-                      amount: "desc",
-                    },
-                    {
-                      createdAt: "asc",
-                    },
-                  ],
-                  take: 1,
-                  select: {
-                    bidderClubId: true,
-                  },
-                },
-              },
-            }),
+            getMarketCommitments(
+              transaction,
+              USER_CLUB_ID
+            ),
           ]);
 
-        const reservedRosterPlaces =
-          activeAuctions.filter(
-            (auction) =>
-              auction.bids[0]?.bidderClubId ===
-              USER_CLUB_ID
-          ).length;
-
         if (
-          firstTeamPlayers + reservedRosterPlaces >=
+          firstTeamPlayers +
+            commitments.reservedRosterPlaces >=
           MAX_FIRST_TEAM_PLAYERS
         ) {
           throw new AcademyPromotionError(

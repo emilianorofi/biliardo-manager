@@ -22,18 +22,22 @@ import OverallBadge from "../ui/OverallBadge";
 interface MarketPlayerCardProps {
   player: MarketPlayer;
   availableCredits: number;
-  canJoinAnotherAuction: boolean;
-  onBidPlaced: () => void;
+  canAddAnotherPlayer: boolean;
+  onMarketAction: (message: string) => void;
 }
 
 export default function MarketPlayerCard({
   player,
   availableCredits,
-  canJoinAnotherAuction,
-  onBidPlaced,
+  canAddAnotherPlayer,
+  onMarketAction,
 }: MarketPlayerCardProps) {
   const [isBidFormOpen, setIsBidFormOpen] =
     useState(false);
+  const [
+    isSigningConfirmationOpen,
+    setIsSigningConfirmationOpen,
+  ] = useState(false);
   const [bidAmount, setBidAmount] = useState("");
   const [isSubmitting, setIsSubmitting] =
     useState(false);
@@ -47,13 +51,22 @@ export default function MarketPlayerCard({
   const minimumBid = getMinimumBid(
     player.currentPrice
   );
+  const minimumAuctionCommitment =
+    minimumBid + player.salary;
+  const maximumBid = Math.max(
+    0,
+    availableCredits - player.salary
+  );
   const canAffordMinimumBid =
-    minimumBid <= availableCredits;
+    minimumAuctionCommitment <= availableCredits;
+  const canAffordSalary =
+    player.salary <= availableCredits;
 
   function openBidForm() {
     setBidAmount(String(minimumBid));
     setActionError(null);
     setActionMessage(null);
+    setIsSigningConfirmationOpen(false);
     setIsBidFormOpen(true);
   }
 
@@ -63,6 +76,22 @@ export default function MarketPlayerCard({
     }
 
     setIsBidFormOpen(false);
+    setActionError(null);
+  }
+
+  function openSigningConfirmation() {
+    setActionError(null);
+    setActionMessage(null);
+    setIsBidFormOpen(false);
+    setIsSigningConfirmationOpen(true);
+  }
+
+  function closeSigningConfirmation() {
+    if (isSubmitting) {
+      return;
+    }
+
+    setIsSigningConfirmationOpen(false);
     setActionError(null);
   }
 
@@ -81,6 +110,17 @@ export default function MarketPlayerCard({
         `L'offerta minima è ${formatCurrency(
           minimumBid
         )}.`
+      );
+      return;
+    }
+
+    if (amount + player.salary > availableCredits) {
+      setActionError(
+        `Offerta e stipendio richiedono ${formatCurrency(
+          amount + player.salary
+        )}, ma hai ${formatCurrency(
+          availableCredits
+        )} disponibili.`
       );
       return;
     }
@@ -116,16 +156,66 @@ export default function MarketPlayerCard({
         );
       }
 
-      setActionMessage(
-        data.message ?? "Offerta registrata."
-      );
+      const message =
+        data.message ?? "Offerta registrata.";
+
+      setActionMessage(message);
       setIsBidFormOpen(false);
-      onBidPlaced();
+      onMarketAction(message);
     } catch (error: unknown) {
       setActionError(
         error instanceof Error
           ? error.message
           : "Impossibile registrare l'offerta."
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
+  async function signFreeAgent() {
+    try {
+      setIsSubmitting(true);
+      setActionError(null);
+      setActionMessage(null);
+
+      const response = await fetch(
+        "/api/market/free-agents",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            listingId: player.listingId,
+          }),
+        }
+      );
+
+      const data: {
+        message?: string;
+        error?: string;
+      } = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.error ??
+            "Impossibile completare l'ingaggio."
+        );
+      }
+
+      const message =
+        data.message ??
+        `${player.name} è stato ingaggiato.`;
+
+      setActionMessage(message);
+      setIsSigningConfirmationOpen(false);
+      onMarketAction(message);
+    } catch (error: unknown) {
+      setActionError(
+        error instanceof Error
+          ? error.message
+          : "Impossibile completare l'ingaggio."
       );
     } finally {
       setIsSubmitting(false);
@@ -216,16 +306,22 @@ export default function MarketPlayerCard({
               ? player.bidCount > 0
                 ? "Offerta attuale"
                 : "Prezzo iniziale"
-              : "Costo ingaggio"
+              : "Stipendio"
           }
           value={formatCurrency(
-            player.currentPrice
+            isAuction
+              ? player.currentPrice
+              : player.salary
           )}
           detail={
             isAuction
-              ? player.lastBidClub ??
-                `${player.bidCount} offerte`
-              : null
+              ? `${
+                  player.lastBidClub ??
+                  `${player.bidCount} offerte`
+                } · Stipendio ${formatCurrency(
+                  player.salary
+                )}`
+              : "Nessun costo di acquisto"
           }
         />
 
@@ -282,7 +378,18 @@ export default function MarketPlayerCard({
                 Nuova offerta
               </p>
               <p className="mt-1 text-xs text-zinc-400">
-                Minimo {formatCurrency(minimumBid)} · Disponibile {formatCurrency(availableCredits)}
+                Offerta minima {formatCurrency(
+                  minimumBid
+                )} · Stipendio {formatCurrency(
+                  player.salary
+                )} · Impegno totale {formatCurrency(
+                  minimumAuctionCommitment
+                )}
+              </p>
+              <p className="mt-1 text-xs text-zinc-500">
+                Disponibile {formatCurrency(
+                  availableCredits
+                )}
               </p>
             </div>
 
@@ -305,7 +412,7 @@ export default function MarketPlayerCard({
               <input
                 type="number"
                 min={minimumBid}
-                max={availableCredits}
+                max={maximumBid}
                 step="1"
                 value={bidAmount}
                 onChange={(event) =>
@@ -340,6 +447,65 @@ export default function MarketPlayerCard({
         </form>
       )}
 
+      {isSigningConfirmationOpen && !isAuction && (
+        <div className="mt-5 rounded-xl border border-green-500/30 bg-green-500/5 p-4">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="font-semibold text-white">
+                Conferma ingaggio
+              </p>
+              <p className="mt-1 text-sm text-zinc-400">
+                Nessun costo di acquisto. Verrà
+                addebitato soltanto lo stipendio di{" "}
+                {formatCurrency(player.salary)}.
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={closeSigningConfirmation}
+              disabled={isSubmitting}
+              aria-label="Chiudi conferma ingaggio"
+              className="rounded-lg p-1 text-zinc-500 transition hover:bg-zinc-800 hover:text-white disabled:cursor-not-allowed"
+            >
+              <X size={18} />
+            </button>
+          </div>
+
+          <div className="mt-4 flex justify-end gap-3">
+            <button
+              type="button"
+              onClick={closeSigningConfirmation}
+              disabled={isSubmitting}
+              className="rounded-xl border border-zinc-700 bg-zinc-800 px-4 py-2.5 text-sm font-semibold text-zinc-300 transition hover:border-zinc-600 hover:text-white disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              Annulla
+            </button>
+
+            <button
+              type="button"
+              onClick={signFreeAgent}
+              disabled={isSubmitting}
+              className="rounded-xl bg-green-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-green-500 disabled:cursor-not-allowed disabled:bg-green-900 disabled:text-green-500"
+            >
+              {isSubmitting
+                ? "Ingaggio..."
+                : "Conferma ingaggio"}
+            </button>
+          </div>
+
+          {actionError && (
+            <div className="mt-3 flex items-start gap-2 text-sm text-red-400">
+              <AlertCircle
+                className="mt-0.5 shrink-0"
+                size={16}
+              />
+              <span>{actionError}</span>
+            </div>
+          )}
+        </div>
+      )}
+
       <div className="mt-6 flex justify-end gap-3">
         <button
           type="button"
@@ -357,39 +523,54 @@ export default function MarketPlayerCard({
             onClick={openBidForm}
             disabled={
               player.isUserHighestBid ||
-              !canJoinAnotherAuction ||
+              !canAddAnotherPlayer ||
               !canAffordMinimumBid ||
               isSubmitting
             }
             title={
               player.isUserHighestBid
                 ? "La tua offerta è già la migliore."
-                : !canJoinAnotherAuction
+                : !canAddAnotherPlayer
                   ? "Hai già raggiunto la quantità massima di giocatori considerando la rosa e le aste in cui sei in vantaggio."
-                : !canAffordMinimumBid
-                  ? "Saldo disponibile insufficiente."
-                  : "Inserisci una nuova offerta."
+                  : !canAffordMinimumBid
+                    ? "Saldo disponibile insufficiente."
+                    : "Inserisci una nuova offerta."
             }
             className="flex items-center gap-2 rounded-xl bg-green-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-green-500 disabled:cursor-not-allowed disabled:bg-green-900 disabled:text-green-500"
           >
             <Gavel size={18} />
             {player.isUserHighestBid
               ? "Sei in vantaggio"
-              : !canJoinAnotherAuction
+              : !canAddAnotherPlayer
                 ? "Rosa al completo"
-              : canAffordMinimumBid
-                ? "Offri"
-                : "Fondi insufficienti"}
+                : canAffordMinimumBid
+                  ? "Offri"
+                  : "Fondi insufficienti"}
           </button>
         ) : (
           <button
             type="button"
-            disabled
-            title="L'ingaggio degli svincolati sarà attivato in un intervento separato."
-            className="flex cursor-not-allowed items-center gap-2 rounded-xl bg-green-900 px-4 py-2 text-sm font-semibold text-green-500"
+            onClick={openSigningConfirmation}
+            disabled={
+              !canAddAnotherPlayer ||
+              !canAffordSalary ||
+              isSubmitting
+            }
+            title={
+              !canAddAnotherPlayer
+                ? "Hai già raggiunto la quantità massima di giocatori considerando la rosa e le aste in cui sei in vantaggio."
+                : !canAffordSalary
+                  ? "Saldo disponibile insufficiente per lo stipendio."
+                  : "Conferma l'ingaggio dello svincolato."
+            }
+            className="flex items-center gap-2 rounded-xl bg-green-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-green-500 disabled:cursor-not-allowed disabled:bg-green-900 disabled:text-green-500"
           >
-            <Gavel size={18} />
-            Ingaggia
+            <HandCoins size={18} />
+            {!canAddAnotherPlayer
+              ? "Rosa al completo"
+              : canAffordSalary
+                ? "Ingaggia"
+                : "Fondi insufficienti"}
           </button>
         )}
       </div>

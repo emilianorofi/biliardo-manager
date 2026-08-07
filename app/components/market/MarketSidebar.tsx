@@ -39,7 +39,7 @@ export default function MarketSidebar({
 
           <div>
             <p className="text-sm text-zinc-400">
-              Disponibile per offerte
+              Disponibile per il mercato
             </p>
             <h2 className="text-2xl font-bold text-white">
               {formatCurrency(availableCredits)}
@@ -56,7 +56,7 @@ export default function MarketSidebar({
           </div>
 
           <div className="flex justify-between gap-3 text-zinc-400">
-            <span>Impegnato nelle aste</span>
+            <span>Impegnato in aste e stipendi</span>
             <span className="font-semibold text-yellow-400">
               {formatCurrency(reservedCredits)}
             </span>
@@ -89,6 +89,11 @@ export default function MarketSidebar({
                   <p className="mt-1 text-xs text-zinc-500">
                     La tua offerta: {formatCurrency(
                       bid.amount
+                    )}
+                  </p>
+                  <p className="mt-1 text-xs text-zinc-500">
+                    Con stipendio: {formatCurrency(
+                      bid.totalCommitment
                     )}
                   </p>
                 </div>

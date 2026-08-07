@@ -160,6 +160,7 @@ async function settleListing(
               id: true,
               firstName: true,
               lastName: true,
+              salary: true,
             },
           },
           bids: {
@@ -254,9 +255,12 @@ async function settleListing(
         },
       });
 
+    const totalCharge =
+      winningBid.amount + listing.player.salary;
+
     const winnerIsEligible =
       winnerClub !== null &&
-      winnerClub.balance >= winningBid.amount &&
+      winnerClub.balance >= totalCharge &&
       winnerClub._count.players <
         MAX_FIRST_TEAM_PLAYERS;
 
@@ -324,7 +328,7 @@ async function settleListing(
       },
       data: {
         balance: {
-          decrement: winningBid.amount,
+          decrement: totalCharge,
         },
       },
     });
@@ -411,9 +415,11 @@ async function settleListing(
         clubId: winnerClub.id,
         type: "TRANSFER_AUCTION_WON",
         title: `Asta vinta: ${playerName}`,
-        description: `${playerName} è entrato nella rosa per ${formatCurrency(
+        description: `${playerName} è entrato nella rosa. Sono stati addebitati ${formatCurrency(
           winningBid.amount
-        )}.`,
+        )} per l'acquisto e ${formatCurrency(
+          listing.player.salary
+        )} di stipendio.`,
       },
       listing.sellerClubId
         ? {

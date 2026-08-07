@@ -24,6 +24,7 @@ export interface MarketPlayer {
   tuttiDoppi: number;
 
   estimatedValue: number;
+  salary: number;
   openingPrice: number;
   currentPrice: number;
 
@@ -43,6 +44,8 @@ export interface MarketUserBid {
   listingId: number;
   playerName: string;
   amount: number;
+  salary: number;
+  totalCommitment: number;
   currentPrice: number;
   isHighest: boolean;
   expiresAtLabel: string | null;

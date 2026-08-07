@@ -17,7 +17,7 @@ interface MarketContentProps {
   initialPlayers: MarketPlayer[];
   balance: number;
   availableCredits: number;
-  canJoinAnotherAuction: boolean;
+  canAddAnotherPlayer: boolean;
   userBids: MarketUserBid[];
 }
 
@@ -25,13 +25,15 @@ export default function MarketContent({
   initialPlayers,
   balance,
   availableCredits,
-  canJoinAnotherAuction,
+  canAddAnotherPlayer,
   userBids,
 }: MarketContentProps) {
   const router = useRouter();
   const [settlementMessage, setSettlementMessage] =
     useState<string | null>(null);
   const [settlementError, setSettlementError] =
+    useState<string | null>(null);
+  const [marketActionMessage, setMarketActionMessage] =
     useState<string | null>(null);
 
   const {
@@ -110,6 +112,12 @@ export default function MarketContent({
         </div>
       )}
 
+      {marketActionMessage && (
+        <div className="rounded-xl border border-green-500/30 bg-green-500/10 px-4 py-3 text-sm text-green-300">
+          {marketActionMessage}
+        </div>
+      )}
+
       <MarketHeader
         credits={availableCredits}
         search={search}
@@ -128,10 +136,13 @@ export default function MarketContent({
               key={player.listingId}
               player={player}
               availableCredits={availableCredits}
-              canJoinAnotherAuction={
-                canJoinAnotherAuction
+              canAddAnotherPlayer={
+                canAddAnotherPlayer
               }
-              onBidPlaced={() => router.refresh()}
+              onMarketAction={(message) => {
+                setMarketActionMessage(message);
+                router.refresh();
+              }}
             />
           ))}
 

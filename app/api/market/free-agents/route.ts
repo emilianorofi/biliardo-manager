@@ -4,21 +4,16 @@ import {
   MAX_FIRST_TEAM_PLAYERS,
   USER_CLUB_ID,
 } from "@/lib/game-config";
-import {
-  AUCTION_EXTENSION_MINUTES,
-  getExtendedDeadline,
-  getMinimumBid,
-} from "@/lib/market-rules";
 import { getMarketCommitments } from "@/lib/market-commitments";
 import { prisma } from "@/lib/prisma";
 
-class MarketBidError extends Error {
+class FreeAgentSigningError extends Error {
   constructor(
     message: string,
     public readonly status: number
   ) {
     super(message);
-    this.name = "MarketBidError";
+    this.name = "FreeAgentSigningError";
   }
 }
 
@@ -29,7 +24,7 @@ export async function POST(request: Request) {
     if (typeof body !== "object" || body === null) {
       return NextResponse.json(
         {
-          error: "Dati dell'offerta non validi.",
+          error: "Dati dell'ingaggio non validi.",
         },
         {
           status: 400,
@@ -37,24 +32,18 @@ export async function POST(request: Request) {
       );
     }
 
-    const bidData = body as {
+    const signingData = body as {
       listingId?: unknown;
-      amount?: unknown;
     };
-
-    const listingId = Number(bidData.listingId);
-    const amount = Number(bidData.amount);
+    const listingId = Number(signingData.listingId);
 
     if (
       !Number.isInteger(listingId) ||
-      listingId <= 0 ||
-      !Number.isInteger(amount) ||
-      amount <= 0
+      listingId <= 0
     ) {
       return NextResponse.json(
         {
-          error:
-            "Inserzione o importo dell'offerta non validi.",
+          error: "Svincolato selezionato non valido.",
         },
         {
           status: 400,
@@ -74,7 +63,7 @@ export async function POST(request: Request) {
         `;
 
         if (lockedClub.length === 0) {
-          throw new MarketBidError(
+          throw new FreeAgentSigningError(
             "Club principale non disponibile.",
             404
           );
@@ -91,13 +80,11 @@ export async function POST(request: Request) {
           `;
 
         if (lockedListing.length === 0) {
-          throw new MarketBidError(
-            "L'asta selezionata non esiste.",
+          throw new FreeAgentSigningError(
+            "Lo svincolato selezionato non è disponibile.",
             404
           );
         }
-
-        const now = new Date();
 
         const [club, listing, commitments] =
           await Promise.all([
@@ -121,94 +108,37 @@ export async function POST(request: Request) {
               include: {
                 player: {
                   select: {
+                    id: true,
                     clubId: true,
                     firstName: true,
                     lastName: true,
                     salary: true,
                   },
                 },
-                bids: {
-                  orderBy: [
-                    {
-                      amount: "desc",
-                    },
-                    {
-                      createdAt: "asc",
-                    },
-                  ],
-                  take: 1,
-                  select: {
-                    amount: true,
-                    bidderClubId: true,
-                  },
-                },
               },
             }),
             getMarketCommitments(
               transaction,
-              USER_CLUB_ID,
-              listingId
+              USER_CLUB_ID
             ),
           ]);
 
         if (!club || !listing) {
-          throw new MarketBidError(
-            "Dati dell'asta non disponibili.",
+          throw new FreeAgentSigningError(
+            "Dati dell'ingaggio non disponibili.",
             404
           );
         }
 
         if (
           listing.status !== "ACTIVE" ||
-          listing.listingType !== "AUCTION"
+          listing.listingType !== "FREE_AGENT" ||
+          listing.sellerClubId !== null ||
+          listing.player.clubId !== null
         ) {
-          throw new MarketBidError(
-            "Questa inserzione non è un'asta attiva.",
-            400
-          );
-        }
-
-        if (
-          !listing.endsAt ||
-          listing.endsAt.getTime() <= now.getTime()
-        ) {
-          throw new MarketBidError(
-            "L'asta è già terminata.",
+          throw new FreeAgentSigningError(
+            "Questo giocatore non è più svincolato.",
             409
-          );
-        }
-
-        if (
-          listing.sellerClubId === USER_CLUB_ID ||
-          listing.player.clubId === USER_CLUB_ID
-        ) {
-          throw new MarketBidError(
-            "Non puoi fare un'offerta per un tuo giocatore.",
-            400
-          );
-        }
-
-        const highestBid = listing.bids[0] ?? null;
-
-        if (
-          highestBid?.bidderClubId === USER_CLUB_ID
-        ) {
-          throw new MarketBidError(
-            "La tua offerta è già la migliore.",
-            409
-          );
-        }
-
-        const currentPrice =
-          highestBid?.amount ?? listing.openingPrice;
-        const minimumBid = getMinimumBid(currentPrice);
-
-        if (amount < minimumBid) {
-          throw new MarketBidError(
-            `L'offerta minima è ${formatCurrency(
-              minimumBid
-            )}.`,
-            400
           );
         }
 
@@ -224,7 +154,7 @@ export async function POST(request: Request) {
             club._count.players >=
             MAX_FIRST_TEAM_PLAYERS;
 
-          throw new MarketBidError(
+          throw new FreeAgentSigningError(
             hasFullRoster
               ? `Hai già raggiunto la quantità massima di ${MAX_FIRST_TEAM_PLAYERS} giocatori.`
               : `Hai già raggiunto la quantità massima di ${MAX_FIRST_TEAM_PLAYERS} giocatori considerando le aste in cui sei in vantaggio.`,
@@ -237,14 +167,9 @@ export async function POST(request: Request) {
           club.balance - commitments.reservedCredits
         );
 
-        const totalCommitment =
-          amount + listing.player.salary;
-
-        if (totalCommitment > availableBalance) {
-          throw new MarketBidError(
-            `Per questa offerta servono ${formatCurrency(
-              totalCommitment
-            )}, compreso lo stipendio di ${formatCurrency(
+        if (listing.player.salary > availableBalance) {
+          throw new FreeAgentSigningError(
+            `Lo stipendio è ${formatCurrency(
               listing.player.salary
             )}. Saldo disponibile: ${formatCurrency(
               availableBalance
@@ -253,61 +178,74 @@ export async function POST(request: Request) {
           );
         }
 
-        const extensionWindowMilliseconds =
-          AUCTION_EXTENSION_MINUTES * 60 * 1000;
-        const shouldExtend =
-          listing.endsAt.getTime() - now.getTime() <=
-          extensionWindowMilliseconds;
-        const endsAt = shouldExtend
-          ? getExtendedDeadline(now)
-          : listing.endsAt;
+        const playerName = `${listing.player.firstName} ${listing.player.lastName}`;
+        const completedAt = new Date();
 
-        await transaction.transferBid.create({
+        await transaction.club.update({
+          where: {
+            id: USER_CLUB_ID,
+          },
           data: {
-            listingId,
-            bidderClubId: USER_CLUB_ID,
-            amount,
+            balance: {
+              decrement: listing.player.salary,
+            },
           },
         });
 
-        if (shouldExtend) {
-          await transaction.transferListing.update({
-            where: {
-              id: listingId,
-            },
-            data: {
-              endsAt,
-            },
-          });
-        }
+        await transaction.player.update({
+          where: {
+            id: listing.player.id,
+          },
+          data: {
+            clubId: USER_CLUB_ID,
+          },
+        });
+
+        await transaction.transferListing.update({
+          where: {
+            id: listingId,
+          },
+          data: {
+            status: "COMPLETED",
+            winnerClubId: USER_CLUB_ID,
+            finalPrice: 0,
+            completedAt,
+          },
+        });
+
+        await transaction.gameEvent.create({
+          data: {
+            clubId: USER_CLUB_ID,
+            type: "TRANSFER_FREE_AGENT_SIGNED",
+            title: `Svincolato ingaggiato: ${playerName}`,
+            description: `${playerName} è entrato nella rosa. È stato addebitato lo stipendio di ${formatCurrency(
+              listing.player.salary
+            )}.`,
+          },
+        });
 
         return {
-          playerName: `${listing.player.firstName} ${listing.player.lastName}`,
-          amount,
+          listingId,
+          playerName,
           salary: listing.player.salary,
-          totalCommitment,
-          minimumNextBid: getMinimumBid(amount),
-          endsAt: endsAt.toISOString(),
-          wasExtended: shouldExtend,
+          completedAt: completedAt.toISOString(),
         };
       }
     );
 
     return NextResponse.json(
       {
-        message: `Offerta di ${formatCurrency(
-          result.amount
-        )} registrata per ${result.playerName}. In caso di vittoria saranno addebitati ${formatCurrency(
-          result.totalCommitment
-        )}, compreso lo stipendio.`,
-        bid: result,
+        message: `${result.playerName} è stato ingaggiato. Stipendio addebitato: ${formatCurrency(
+          result.salary
+        )}.`,
+        signing: result,
       },
       {
         status: 201,
       }
     );
   } catch (error: unknown) {
-    if (error instanceof MarketBidError) {
+    if (error instanceof FreeAgentSigningError) {
       return NextResponse.json(
         {
           error: error.message,
@@ -319,14 +257,13 @@ export async function POST(request: Request) {
     }
 
     console.error(
-      "Errore durante la registrazione dell'offerta:",
+      "Errore durante l'ingaggio dello svincolato:",
       error
     );
 
     return NextResponse.json(
       {
-        error:
-          "Impossibile registrare l'offerta.",
+        error: "Impossibile completare l'ingaggio.",
       },
       {
         status: 500,

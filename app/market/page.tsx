@@ -8,6 +8,7 @@ import {
   MAX_FIRST_TEAM_PLAYERS,
   USER_CLUB_ID,
 } from "@/lib/game-config";
+import { getMarketCommitments } from "@/lib/market-commitments";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
@@ -15,70 +16,72 @@ export const dynamic = "force-dynamic";
 export default async function MarketPage() {
   const now = new Date();
 
-  const [club, listings] = await Promise.all([
-    prisma.club.findUnique({
-      where: {
-        id: USER_CLUB_ID,
-      },
-      select: {
-        balance: true,
-        _count: {
-          select: {
-            players: true,
-          },
+  const [club, listings, commitments] =
+    await Promise.all([
+      prisma.club.findUnique({
+        where: {
+          id: USER_CLUB_ID,
         },
-      },
-    }),
-    prisma.transferListing.findMany({
-      where: {
-        status: "ACTIVE",
-        OR: [
-          {
-            listingType: "FREE_AGENT",
-          },
-          {
-            listingType: "AUCTION",
-            endsAt: {
-              gt: now,
+        select: {
+          balance: true,
+          _count: {
+            select: {
+              players: true,
             },
           },
-        ],
-      },
-      include: {
-        player: true,
-        sellerClub: {
-          select: {
-            name: true,
-          },
         },
-        bids: {
-          include: {
-            bidderClub: {
-              select: {
-                name: true,
+      }),
+      prisma.transferListing.findMany({
+        where: {
+          status: "ACTIVE",
+          OR: [
+            {
+              listingType: "FREE_AGENT",
+            },
+            {
+              listingType: "AUCTION",
+              endsAt: {
+                gt: now,
               },
-            },
-          },
-          orderBy: [
-            {
-              amount: "desc",
-            },
-            {
-              createdAt: "asc",
             },
           ],
         },
-      },
-      orderBy: [
-        {
-          endsAt: "asc",
+        include: {
+          player: true,
+          sellerClub: {
+            select: {
+              name: true,
+            },
+          },
+          bids: {
+            include: {
+              bidderClub: {
+                select: {
+                  name: true,
+                },
+              },
+            },
+            orderBy: [
+              {
+                amount: "desc",
+              },
+              {
+                createdAt: "asc",
+              },
+            ],
+          },
         },
-        {
-          createdAt: "desc",
-        },
-      ],
-    }),
-  ]);
+        orderBy: [
+          {
+            endsAt: "asc",
+          },
+          {
+            createdAt: "desc",
+          },
+        ],
+      }),
+      getMarketCommitments(prisma, USER_CLUB_ID),
+    ]);
 
   if (!club) {
     throw new Error("Club principale non disponibile.");
@@ -118,6 +121,7 @@ export default async function MarketPage() {
           (player.diretto + player.sponde) / 2
         ),
         estimatedValue: player.value,
+        salary: player.salary,
         openingPrice: listing.openingPrice,
         currentPrice:
           highestBid?.amount ?? listing.openingPrice,
@@ -145,30 +149,22 @@ export default async function MarketPage() {
       listingId: player.listingId,
       playerName: player.name,
       amount: player.userBid as number,
+      salary: player.salary,
+      totalCommitment:
+        (player.userBid as number) + player.salary,
       currentPrice: player.currentPrice,
       isHighest: player.isUserHighestBid,
       expiresAtLabel: player.expiresAtLabel,
     }));
 
-  const reservedCredits = players.reduce(
-    (total, player) =>
-      player.isUserHighestBid
-        ? total + player.currentPrice
-        : total,
-    0
-  );
-
   const availableCredits = Math.max(
     0,
-    club.balance - reservedCredits
+    club.balance - commitments.reservedCredits
   );
 
-  const reservedRosterPlaces = players.filter(
-    (player) => player.isUserHighestBid
-  ).length;
-
-  const canJoinAnotherAuction =
-    club._count.players + reservedRosterPlaces <
+  const canAddAnotherPlayer =
+    club._count.players +
+      commitments.reservedRosterPlaces <
     MAX_FIRST_TEAM_PLAYERS;
 
   return (
@@ -176,9 +172,7 @@ export default async function MarketPage() {
       initialPlayers={players}
       balance={club.balance}
       availableCredits={availableCredits}
-      canJoinAnotherAuction={
-        canJoinAnotherAuction
-      }
+      canAddAnotherPlayer={canAddAnotherPlayer}
       userBids={userBids}
     />
   );
