@@ -396,7 +396,7 @@ function buildRoundDates(
 ) {
   const dates: Date[] = [];
 
-  let currentDate =
+  const currentDate =
     new Date(firstRoundDate);
 
   for (

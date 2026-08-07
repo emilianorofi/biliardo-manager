@@ -137,15 +137,15 @@ export default function MarketSidebar() {
         <div className="space-y-3 text-sm">
 
           <div className="rounded-xl bg-zinc-800 p-3 text-zinc-300">
-            Hai superato un'offerta per <strong>Marco Rossi</strong>.
+            Hai superato un&apos;offerta per <strong>Marco Rossi</strong>.
           </div>
 
           <div className="rounded-xl bg-zinc-800 p-3 text-zinc-300">
-            È iniziata l'asta di <strong>Francesco Galli</strong>.
+            È iniziata l&apos;asta di <strong>Francesco Galli</strong>.
           </div>
 
           <div className="rounded-xl bg-zinc-800 p-3 text-zinc-300">
-            Hai vinto l'asta di <strong>Luca Bianchi</strong>.
+            Hai vinto l&apos;asta di <strong>Luca Bianchi</strong>.
           </div>
 
         </div>
