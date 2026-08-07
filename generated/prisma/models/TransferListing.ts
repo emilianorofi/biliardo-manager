@@ -328,10 +328,10 @@ export type TransferListingOrderByWithRelationInput = {
 
 export type TransferListingWhereUniqueInput = Prisma.AtLeast<{
   id?: number
-  playerId?: number
   AND?: Prisma.TransferListingWhereInput | Prisma.TransferListingWhereInput[]
   OR?: Prisma.TransferListingWhereInput[]
   NOT?: Prisma.TransferListingWhereInput | Prisma.TransferListingWhereInput[]
+  playerId?: Prisma.IntFilter<"TransferListing"> | number
   sellerClubId?: Prisma.IntNullableFilter<"TransferListing"> | number | null
   winnerClubId?: Prisma.IntNullableFilter<"TransferListing"> | number | null
   listingType?: Prisma.StringFilter<"TransferListing"> | string
@@ -347,7 +347,7 @@ export type TransferListingWhereUniqueInput = Prisma.AtLeast<{
   sellerClub?: Prisma.XOR<Prisma.ClubNullableScalarRelationFilter, Prisma.ClubWhereInput> | null
   winnerClub?: Prisma.XOR<Prisma.ClubNullableScalarRelationFilter, Prisma.ClubWhereInput> | null
   bids?: Prisma.TransferBidListRelationFilter
-}, "id" | "playerId">
+}, "id">
 
 export type TransferListingOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -399,7 +399,7 @@ export type TransferListingCreateInput = {
   completedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  player: Prisma.PlayerCreateNestedOneWithoutTransferListingInput
+  player: Prisma.PlayerCreateNestedOneWithoutTransferListingsInput
   sellerClub?: Prisma.ClubCreateNestedOneWithoutTransferListingsInput
   winnerClub?: Prisma.ClubCreateNestedOneWithoutWonListingsInput
   bids?: Prisma.TransferBidCreateNestedManyWithoutListingInput
@@ -432,7 +432,7 @@ export type TransferListingUpdateInput = {
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  player?: Prisma.PlayerUpdateOneRequiredWithoutTransferListingNestedInput
+  player?: Prisma.PlayerUpdateOneRequiredWithoutTransferListingsNestedInput
   sellerClub?: Prisma.ClubUpdateOneWithoutTransferListingsNestedInput
   winnerClub?: Prisma.ClubUpdateOneWithoutWonListingsNestedInput
   bids?: Prisma.TransferBidUpdateManyWithoutListingNestedInput
@@ -507,11 +507,6 @@ export type TransferListingListRelationFilter = {
 
 export type TransferListingOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
-}
-
-export type TransferListingNullableScalarRelationFilter = {
-  is?: Prisma.TransferListingWhereInput | null
-  isNot?: Prisma.TransferListingWhereInput | null
 }
 
 export type TransferListingCountOrderByAggregateInput = {
@@ -669,36 +664,46 @@ export type TransferListingUncheckedUpdateManyWithoutWinnerClubNestedInput = {
   deleteMany?: Prisma.TransferListingScalarWhereInput | Prisma.TransferListingScalarWhereInput[]
 }
 
-export type TransferListingCreateNestedOneWithoutPlayerInput = {
-  create?: Prisma.XOR<Prisma.TransferListingCreateWithoutPlayerInput, Prisma.TransferListingUncheckedCreateWithoutPlayerInput>
-  connectOrCreate?: Prisma.TransferListingCreateOrConnectWithoutPlayerInput
-  connect?: Prisma.TransferListingWhereUniqueInput
+export type TransferListingCreateNestedManyWithoutPlayerInput = {
+  create?: Prisma.XOR<Prisma.TransferListingCreateWithoutPlayerInput, Prisma.TransferListingUncheckedCreateWithoutPlayerInput> | Prisma.TransferListingCreateWithoutPlayerInput[] | Prisma.TransferListingUncheckedCreateWithoutPlayerInput[]
+  connectOrCreate?: Prisma.TransferListingCreateOrConnectWithoutPlayerInput | Prisma.TransferListingCreateOrConnectWithoutPlayerInput[]
+  createMany?: Prisma.TransferListingCreateManyPlayerInputEnvelope
+  connect?: Prisma.TransferListingWhereUniqueInput | Prisma.TransferListingWhereUniqueInput[]
 }
 
-export type TransferListingUncheckedCreateNestedOneWithoutPlayerInput = {
-  create?: Prisma.XOR<Prisma.TransferListingCreateWithoutPlayerInput, Prisma.TransferListingUncheckedCreateWithoutPlayerInput>
-  connectOrCreate?: Prisma.TransferListingCreateOrConnectWithoutPlayerInput
-  connect?: Prisma.TransferListingWhereUniqueInput
+export type TransferListingUncheckedCreateNestedManyWithoutPlayerInput = {
+  create?: Prisma.XOR<Prisma.TransferListingCreateWithoutPlayerInput, Prisma.TransferListingUncheckedCreateWithoutPlayerInput> | Prisma.TransferListingCreateWithoutPlayerInput[] | Prisma.TransferListingUncheckedCreateWithoutPlayerInput[]
+  connectOrCreate?: Prisma.TransferListingCreateOrConnectWithoutPlayerInput | Prisma.TransferListingCreateOrConnectWithoutPlayerInput[]
+  createMany?: Prisma.TransferListingCreateManyPlayerInputEnvelope
+  connect?: Prisma.TransferListingWhereUniqueInput | Prisma.TransferListingWhereUniqueInput[]
 }
 
-export type TransferListingUpdateOneWithoutPlayerNestedInput = {
-  create?: Prisma.XOR<Prisma.TransferListingCreateWithoutPlayerInput, Prisma.TransferListingUncheckedCreateWithoutPlayerInput>
-  connectOrCreate?: Prisma.TransferListingCreateOrConnectWithoutPlayerInput
-  upsert?: Prisma.TransferListingUpsertWithoutPlayerInput
-  disconnect?: Prisma.TransferListingWhereInput | boolean
-  delete?: Prisma.TransferListingWhereInput | boolean
-  connect?: Prisma.TransferListingWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.TransferListingUpdateToOneWithWhereWithoutPlayerInput, Prisma.TransferListingUpdateWithoutPlayerInput>, Prisma.TransferListingUncheckedUpdateWithoutPlayerInput>
+export type TransferListingUpdateManyWithoutPlayerNestedInput = {
+  create?: Prisma.XOR<Prisma.TransferListingCreateWithoutPlayerInput, Prisma.TransferListingUncheckedCreateWithoutPlayerInput> | Prisma.TransferListingCreateWithoutPlayerInput[] | Prisma.TransferListingUncheckedCreateWithoutPlayerInput[]
+  connectOrCreate?: Prisma.TransferListingCreateOrConnectWithoutPlayerInput | Prisma.TransferListingCreateOrConnectWithoutPlayerInput[]
+  upsert?: Prisma.TransferListingUpsertWithWhereUniqueWithoutPlayerInput | Prisma.TransferListingUpsertWithWhereUniqueWithoutPlayerInput[]
+  createMany?: Prisma.TransferListingCreateManyPlayerInputEnvelope
+  set?: Prisma.TransferListingWhereUniqueInput | Prisma.TransferListingWhereUniqueInput[]
+  disconnect?: Prisma.TransferListingWhereUniqueInput | Prisma.TransferListingWhereUniqueInput[]
+  delete?: Prisma.TransferListingWhereUniqueInput | Prisma.TransferListingWhereUniqueInput[]
+  connect?: Prisma.TransferListingWhereUniqueInput | Prisma.TransferListingWhereUniqueInput[]
+  update?: Prisma.TransferListingUpdateWithWhereUniqueWithoutPlayerInput | Prisma.TransferListingUpdateWithWhereUniqueWithoutPlayerInput[]
+  updateMany?: Prisma.TransferListingUpdateManyWithWhereWithoutPlayerInput | Prisma.TransferListingUpdateManyWithWhereWithoutPlayerInput[]
+  deleteMany?: Prisma.TransferListingScalarWhereInput | Prisma.TransferListingScalarWhereInput[]
 }
 
-export type TransferListingUncheckedUpdateOneWithoutPlayerNestedInput = {
-  create?: Prisma.XOR<Prisma.TransferListingCreateWithoutPlayerInput, Prisma.TransferListingUncheckedCreateWithoutPlayerInput>
-  connectOrCreate?: Prisma.TransferListingCreateOrConnectWithoutPlayerInput
-  upsert?: Prisma.TransferListingUpsertWithoutPlayerInput
-  disconnect?: Prisma.TransferListingWhereInput | boolean
-  delete?: Prisma.TransferListingWhereInput | boolean
-  connect?: Prisma.TransferListingWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.TransferListingUpdateToOneWithWhereWithoutPlayerInput, Prisma.TransferListingUpdateWithoutPlayerInput>, Prisma.TransferListingUncheckedUpdateWithoutPlayerInput>
+export type TransferListingUncheckedUpdateManyWithoutPlayerNestedInput = {
+  create?: Prisma.XOR<Prisma.TransferListingCreateWithoutPlayerInput, Prisma.TransferListingUncheckedCreateWithoutPlayerInput> | Prisma.TransferListingCreateWithoutPlayerInput[] | Prisma.TransferListingUncheckedCreateWithoutPlayerInput[]
+  connectOrCreate?: Prisma.TransferListingCreateOrConnectWithoutPlayerInput | Prisma.TransferListingCreateOrConnectWithoutPlayerInput[]
+  upsert?: Prisma.TransferListingUpsertWithWhereUniqueWithoutPlayerInput | Prisma.TransferListingUpsertWithWhereUniqueWithoutPlayerInput[]
+  createMany?: Prisma.TransferListingCreateManyPlayerInputEnvelope
+  set?: Prisma.TransferListingWhereUniqueInput | Prisma.TransferListingWhereUniqueInput[]
+  disconnect?: Prisma.TransferListingWhereUniqueInput | Prisma.TransferListingWhereUniqueInput[]
+  delete?: Prisma.TransferListingWhereUniqueInput | Prisma.TransferListingWhereUniqueInput[]
+  connect?: Prisma.TransferListingWhereUniqueInput | Prisma.TransferListingWhereUniqueInput[]
+  update?: Prisma.TransferListingUpdateWithWhereUniqueWithoutPlayerInput | Prisma.TransferListingUpdateWithWhereUniqueWithoutPlayerInput[]
+  updateMany?: Prisma.TransferListingUpdateManyWithWhereWithoutPlayerInput | Prisma.TransferListingUpdateManyWithWhereWithoutPlayerInput[]
+  deleteMany?: Prisma.TransferListingScalarWhereInput | Prisma.TransferListingScalarWhereInput[]
 }
 
 export type NullableDateTimeFieldUpdateOperationsInput = {
@@ -729,7 +734,7 @@ export type TransferListingCreateWithoutSellerClubInput = {
   completedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  player: Prisma.PlayerCreateNestedOneWithoutTransferListingInput
+  player: Prisma.PlayerCreateNestedOneWithoutTransferListingsInput
   winnerClub?: Prisma.ClubCreateNestedOneWithoutWonListingsInput
   bids?: Prisma.TransferBidCreateNestedManyWithoutListingInput
 }
@@ -770,7 +775,7 @@ export type TransferListingCreateWithoutWinnerClubInput = {
   completedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  player: Prisma.PlayerCreateNestedOneWithoutTransferListingInput
+  player: Prisma.PlayerCreateNestedOneWithoutTransferListingsInput
   sellerClub?: Prisma.ClubCreateNestedOneWithoutTransferListingsInput
   bids?: Prisma.TransferBidCreateNestedManyWithoutListingInput
 }
@@ -888,46 +893,25 @@ export type TransferListingCreateOrConnectWithoutPlayerInput = {
   create: Prisma.XOR<Prisma.TransferListingCreateWithoutPlayerInput, Prisma.TransferListingUncheckedCreateWithoutPlayerInput>
 }
 
-export type TransferListingUpsertWithoutPlayerInput = {
-  update: Prisma.XOR<Prisma.TransferListingUpdateWithoutPlayerInput, Prisma.TransferListingUncheckedUpdateWithoutPlayerInput>
-  create: Prisma.XOR<Prisma.TransferListingCreateWithoutPlayerInput, Prisma.TransferListingUncheckedCreateWithoutPlayerInput>
-  where?: Prisma.TransferListingWhereInput
+export type TransferListingCreateManyPlayerInputEnvelope = {
+  data: Prisma.TransferListingCreateManyPlayerInput | Prisma.TransferListingCreateManyPlayerInput[]
+  skipDuplicates?: boolean
 }
 
-export type TransferListingUpdateToOneWithWhereWithoutPlayerInput = {
-  where?: Prisma.TransferListingWhereInput
+export type TransferListingUpsertWithWhereUniqueWithoutPlayerInput = {
+  where: Prisma.TransferListingWhereUniqueInput
+  update: Prisma.XOR<Prisma.TransferListingUpdateWithoutPlayerInput, Prisma.TransferListingUncheckedUpdateWithoutPlayerInput>
+  create: Prisma.XOR<Prisma.TransferListingCreateWithoutPlayerInput, Prisma.TransferListingUncheckedCreateWithoutPlayerInput>
+}
+
+export type TransferListingUpdateWithWhereUniqueWithoutPlayerInput = {
+  where: Prisma.TransferListingWhereUniqueInput
   data: Prisma.XOR<Prisma.TransferListingUpdateWithoutPlayerInput, Prisma.TransferListingUncheckedUpdateWithoutPlayerInput>
 }
 
-export type TransferListingUpdateWithoutPlayerInput = {
-  listingType?: Prisma.StringFieldUpdateOperationsInput | string
-  status?: Prisma.StringFieldUpdateOperationsInput | string
-  openingPrice?: Prisma.IntFieldUpdateOperationsInput | number
-  startsAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  endsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  finalPrice?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  sellerClub?: Prisma.ClubUpdateOneWithoutTransferListingsNestedInput
-  winnerClub?: Prisma.ClubUpdateOneWithoutWonListingsNestedInput
-  bids?: Prisma.TransferBidUpdateManyWithoutListingNestedInput
-}
-
-export type TransferListingUncheckedUpdateWithoutPlayerInput = {
-  id?: Prisma.IntFieldUpdateOperationsInput | number
-  sellerClubId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  winnerClubId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  listingType?: Prisma.StringFieldUpdateOperationsInput | string
-  status?: Prisma.StringFieldUpdateOperationsInput | string
-  openingPrice?: Prisma.IntFieldUpdateOperationsInput | number
-  startsAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  endsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  finalPrice?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  bids?: Prisma.TransferBidUncheckedUpdateManyWithoutListingNestedInput
+export type TransferListingUpdateManyWithWhereWithoutPlayerInput = {
+  where: Prisma.TransferListingScalarWhereInput
+  data: Prisma.XOR<Prisma.TransferListingUpdateManyMutationInput, Prisma.TransferListingUncheckedUpdateManyWithoutPlayerInput>
 }
 
 export type TransferListingCreateWithoutBidsInput = {
@@ -940,7 +924,7 @@ export type TransferListingCreateWithoutBidsInput = {
   completedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  player: Prisma.PlayerCreateNestedOneWithoutTransferListingInput
+  player: Prisma.PlayerCreateNestedOneWithoutTransferListingsInput
   sellerClub?: Prisma.ClubCreateNestedOneWithoutTransferListingsInput
   winnerClub?: Prisma.ClubCreateNestedOneWithoutWonListingsInput
 }
@@ -987,7 +971,7 @@ export type TransferListingUpdateWithoutBidsInput = {
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  player?: Prisma.PlayerUpdateOneRequiredWithoutTransferListingNestedInput
+  player?: Prisma.PlayerUpdateOneRequiredWithoutTransferListingsNestedInput
   sellerClub?: Prisma.ClubUpdateOneWithoutTransferListingsNestedInput
   winnerClub?: Prisma.ClubUpdateOneWithoutWonListingsNestedInput
 }
@@ -1048,7 +1032,7 @@ export type TransferListingUpdateWithoutSellerClubInput = {
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  player?: Prisma.PlayerUpdateOneRequiredWithoutTransferListingNestedInput
+  player?: Prisma.PlayerUpdateOneRequiredWithoutTransferListingsNestedInput
   winnerClub?: Prisma.ClubUpdateOneWithoutWonListingsNestedInput
   bids?: Prisma.TransferBidUpdateManyWithoutListingNestedInput
 }
@@ -1094,7 +1078,7 @@ export type TransferListingUpdateWithoutWinnerClubInput = {
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  player?: Prisma.PlayerUpdateOneRequiredWithoutTransferListingNestedInput
+  player?: Prisma.PlayerUpdateOneRequiredWithoutTransferListingsNestedInput
   sellerClub?: Prisma.ClubUpdateOneWithoutTransferListingsNestedInput
   bids?: Prisma.TransferBidUpdateManyWithoutListingNestedInput
 }
@@ -1119,6 +1103,67 @@ export type TransferListingUncheckedUpdateManyWithoutWinnerClubInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   playerId?: Prisma.IntFieldUpdateOperationsInput | number
   sellerClubId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  listingType?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  openingPrice?: Prisma.IntFieldUpdateOperationsInput | number
+  startsAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  endsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  finalPrice?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type TransferListingCreateManyPlayerInput = {
+  id?: number
+  sellerClubId?: number | null
+  winnerClubId?: number | null
+  listingType?: string
+  status?: string
+  openingPrice: number
+  startsAt?: Date | string
+  endsAt?: Date | string | null
+  finalPrice?: number | null
+  completedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type TransferListingUpdateWithoutPlayerInput = {
+  listingType?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  openingPrice?: Prisma.IntFieldUpdateOperationsInput | number
+  startsAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  endsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  finalPrice?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  sellerClub?: Prisma.ClubUpdateOneWithoutTransferListingsNestedInput
+  winnerClub?: Prisma.ClubUpdateOneWithoutWonListingsNestedInput
+  bids?: Prisma.TransferBidUpdateManyWithoutListingNestedInput
+}
+
+export type TransferListingUncheckedUpdateWithoutPlayerInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  sellerClubId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  winnerClubId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  listingType?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  openingPrice?: Prisma.IntFieldUpdateOperationsInput | number
+  startsAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  endsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  finalPrice?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  bids?: Prisma.TransferBidUncheckedUpdateManyWithoutListingNestedInput
+}
+
+export type TransferListingUncheckedUpdateManyWithoutPlayerInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  sellerClubId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  winnerClubId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   listingType?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   openingPrice?: Prisma.IntFieldUpdateOperationsInput | number

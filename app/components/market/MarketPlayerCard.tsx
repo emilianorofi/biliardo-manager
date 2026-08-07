@@ -521,13 +521,16 @@ export default function MarketPlayerCard({
             type="button"
             onClick={openBidForm}
             disabled={
+              player.isUserListing ||
               player.isUserHighestBid ||
               !canAddAnotherPlayer ||
               !canAffordMinimumBid ||
               isSubmitting
             }
             title={
-              player.isUserHighestBid
+              player.isUserListing
+                ? "Questa è una tua asta."
+                : player.isUserHighestBid
                 ? "La tua offerta è già la migliore."
                 : !canAddAnotherPlayer
                   ? "Hai già raggiunto la quantità massima di giocatori considerando la rosa e le aste in cui sei in vantaggio."
@@ -538,7 +541,9 @@ export default function MarketPlayerCard({
             className="flex items-center gap-2 rounded-xl bg-green-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-green-500 disabled:cursor-not-allowed disabled:bg-green-900 disabled:text-green-500"
           >
             <Gavel size={18} />
-            {player.isUserHighestBid
+            {player.isUserListing
+              ? "La tua asta"
+              : player.isUserHighestBid
               ? "Sei in vantaggio"
               : !canAddAnotherPlayer
                 ? "Rosa al completo"

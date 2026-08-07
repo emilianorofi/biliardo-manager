@@ -5,9 +5,16 @@ import { settleExpiredAuctions } from "@/lib/market-settlement";
 export async function POST() {
   try {
     const outcomes = await settleExpiredAuctions();
+    const pendingCount = outcomes.filter(
+      (outcome) =>
+        outcome.status === "PENDING_TRANSFER"
+    ).length;
+    const settledCount =
+      outcomes.length - pendingCount;
 
     return NextResponse.json({
-      settledCount: outcomes.length,
+      settledCount,
+      pendingCount,
       outcomes,
     });
   } catch (error: unknown) {

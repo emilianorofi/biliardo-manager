@@ -31,6 +31,7 @@ export interface MarketPlayer {
   bidCount: number;
 
   sellerClub: string | null;
+  isUserListing: boolean;
   lastBidClub: string | null;
 
   expiresAt: string | null;

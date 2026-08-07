@@ -1,5 +1,6 @@
 export const BID_INCREMENT_PERCENTAGE = 0.05;
 export const MINIMUM_BID_INCREMENT = 100;
+export const AUCTION_DURATION_HOURS = 72;
 export const AUCTION_EXTENSION_MINUTES = 3;
 
 export function getMinimumBid(
@@ -22,5 +23,12 @@ export function getExtendedDeadline(now: Date) {
   return new Date(
     now.getTime() +
       AUCTION_EXTENSION_MINUTES * 60 * 1000
+  );
+}
+
+export function getAuctionDeadline(now: Date) {
+  return new Date(
+    now.getTime() +
+      AUCTION_DURATION_HOURS * 60 * 60 * 1000
   );
 }

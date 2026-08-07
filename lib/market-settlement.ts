@@ -2,7 +2,9 @@ import "server-only";
 
 import {
   MAX_FIRST_TEAM_PLAYERS,
+  MIN_FIRST_TEAM_PLAYERS,
 } from "@/lib/game-config";
+import type { Prisma } from "@/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
 
 const MAX_SETTLEMENT_ATTEMPTS = 3;
@@ -12,7 +14,11 @@ class SettlementRetryError extends Error {}
 export type SettlementOutcome = {
   listingId: number;
   playerName: string;
-  status: "COMPLETED" | "EXPIRED" | "CANCELLED";
+  status:
+    | "COMPLETED"
+    | "EXPIRED"
+    | "CANCELLED"
+    | "PENDING_TRANSFER";
   winnerClubId: number | null;
   finalPrice: number | null;
 };
@@ -24,10 +30,17 @@ export async function settleExpiredAuctions(
     await prisma.transferListing.findMany({
       where: {
         listingType: "AUCTION",
-        status: "ACTIVE",
-        endsAt: {
-          lte: now,
-        },
+        OR: [
+          {
+            status: "ACTIVE",
+            endsAt: {
+              lte: now,
+            },
+          },
+          {
+            status: "PENDING_TRANSFER",
+          },
+        ],
       },
       select: {
         id: true,
@@ -161,6 +174,7 @@ async function settleListing(
               firstName: true,
               lastName: true,
               salary: true,
+              clubId: true,
             },
           },
           bids: {
@@ -184,10 +198,14 @@ async function settleListing(
 
     if (
       !listing ||
-      listing.status !== "ACTIVE" ||
+      ![
+        "ACTIVE",
+        "PENDING_TRANSFER",
+      ].includes(listing.status) ||
       listing.listingType !== "AUCTION" ||
       !listing.endsAt ||
-      listing.endsAt.getTime() > now.getTime()
+      (listing.status === "ACTIVE" &&
+        listing.endsAt.getTime() > now.getTime())
     ) {
       return null;
     }
@@ -204,7 +222,7 @@ async function settleListing(
 
     const playerName = `${listing.player.firstName} ${listing.player.lastName}`;
 
-    if (!winningBid) {
+    if (!winningBid && listing.status === "ACTIVE") {
       await transaction.transferListing.update({
         where: {
           id: listingId,
@@ -238,8 +256,13 @@ async function settleListing(
       };
     }
 
-    const winnerClub =
-      await transaction.club.findUnique({
+    if (!winningBid) {
+      return null;
+    }
+
+    const [winnerClub, sellerClub] =
+      await Promise.all([
+        transaction.club.findUnique({
         where: {
           id: winningBid.bidderClubId,
         },
@@ -253,7 +276,22 @@ async function settleListing(
             },
           },
         },
-      });
+        }),
+        listing.sellerClubId
+          ? transaction.club.findUnique({
+              where: {
+                id: listing.sellerClubId,
+              },
+              select: {
+                _count: {
+                  select: {
+                    players: true,
+                  },
+                },
+              },
+            })
+          : null,
+      ]);
 
     const totalCharge =
       winningBid.amount + listing.player.salary;
@@ -264,7 +302,19 @@ async function settleListing(
       winnerClub._count.players <
         MAX_FIRST_TEAM_PLAYERS;
 
-    if (!winnerClub || !winnerIsEligible) {
+    const sellerIsEligible =
+      listing.sellerClubId === null ||
+      (sellerClub !== null &&
+        listing.player.clubId ===
+          listing.sellerClubId &&
+        sellerClub._count.players >
+          MIN_FIRST_TEAM_PLAYERS);
+
+    if (
+      !winnerClub ||
+      !winnerIsEligible ||
+      !sellerIsEligible
+    ) {
       await transaction.transferListing.update({
         where: {
           id: listingId,
@@ -284,7 +334,7 @@ async function settleListing(
               type: "TRANSFER_AUCTION_CANCELLED",
               title: `Asta annullata: ${playerName}`,
               description:
-                "L'offerta vincente non era più coperta dai requisiti dell'asta.",
+                "Alla chiusura non erano più rispettati i requisiti economici o di rosa.",
             }
           : null,
         winnerClub
@@ -319,6 +369,72 @@ async function settleListing(
         status: "CANCELLED" as const,
         winnerClubId: null,
         finalPrice: null,
+      };
+    }
+
+    const playerIsInActiveMatch =
+      listing.sellerClubId !== null &&
+      (await isPlayerInActiveMatch(
+        transaction,
+        listing.sellerClubId,
+        listing.player.id
+      ));
+
+    if (playerIsInActiveMatch) {
+      if (listing.status === "PENDING_TRANSFER") {
+        return null;
+      }
+
+      await transaction.transferListing.update({
+        where: {
+          id: listingId,
+        },
+        data: {
+          status: "PENDING_TRANSFER",
+          winnerClubId: winnerClub.id,
+          finalPrice: winningBid.amount,
+          completedAt: null,
+        },
+      });
+
+      const pendingEvents = [
+        {
+          clubId: winnerClub.id,
+          type: "TRANSFER_AUCTION_PENDING_MATCH",
+          title: `Trasferimento in attesa: ${playerName}`,
+          description:
+            "L'asta è terminata, ma il giocatore è impegnato in una partita. Il trasferimento sarà completato al termine dell'incontro.",
+        },
+        listing.sellerClubId
+          ? {
+              clubId: listing.sellerClubId,
+              type: "TRANSFER_SALE_PENDING_MATCH",
+              title: `Cessione in attesa: ${playerName}`,
+              description:
+                "Il giocatore terminerà la partita in corso prima di trasferirsi.",
+            }
+          : null,
+      ].filter(
+        (
+          event
+        ): event is {
+          clubId: number;
+          type: string;
+          title: string;
+          description: string;
+        } => event !== null
+      );
+
+      await transaction.gameEvent.createMany({
+        data: pendingEvents,
+      });
+
+      return {
+        listingId,
+        playerName,
+        status: "PENDING_TRANSFER" as const,
+        winnerClubId: winnerClub.id,
+        finalPrice: winningBid.amount,
       };
     }
 
@@ -454,6 +570,53 @@ async function settleListing(
       finalPrice: winningBid.amount,
     };
   });
+}
+
+async function isPlayerInActiveMatch(
+  transaction: Prisma.TransactionClient,
+  clubId: number,
+  playerId: number
+) {
+  const formation =
+    await transaction.formation.findUnique({
+      where: {
+        clubId,
+      },
+      select: {
+        slotAPlayerId: true,
+        slotBPlayerId: true,
+        slotCPlayerId: true,
+      },
+    });
+
+  const playerIsSelected =
+    formation?.slotAPlayerId === playerId ||
+    formation?.slotBPlayerId === playerId ||
+    formation?.slotCPlayerId === playerId;
+
+  if (!playerIsSelected) {
+    return false;
+  }
+
+  const activeFixture =
+    await transaction.leagueFixture.findFirst({
+      where: {
+        status: "IN_PROGRESS",
+        OR: [
+          {
+            homeClubId: clubId,
+          },
+          {
+            awayClubId: clubId,
+          },
+        ],
+      },
+      select: {
+        id: true,
+      },
+    });
+
+  return activeFixture !== null;
 }
 
 function formatCurrency(value: number) {

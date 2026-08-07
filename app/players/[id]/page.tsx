@@ -2,8 +2,12 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 
+import TransferListingForm from "@/app/components/player/TransferListingForm";
 import type { Player } from "@/app/types/player";
-import { USER_CLUB_ID } from "@/lib/game-config";
+import {
+  MIN_FIRST_TEAM_PLAYERS,
+  USER_CLUB_ID,
+} from "@/lib/game-config";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
@@ -41,25 +45,54 @@ export default async function PlayerPage({
     notFound();
   }
 
-  const databasePlayer =
-    await prisma.player.findUnique({
-      where: {
-        id: playerId,
-      },
-      include: {
-        transferListing: {
-          select: {
-            status: true,
+  const [databasePlayer, rosterCount, activeSales] =
+    await Promise.all([
+      prisma.player.findUnique({
+        where: {
+          id: playerId,
+        },
+        include: {
+          transferListings: {
+            where: {
+              status: {
+                in: [
+                  "ACTIVE",
+                  "PENDING_TRANSFER",
+                ],
+              },
+            },
+            orderBy: {
+              createdAt: "desc",
+            },
+            take: 1,
+            select: {
+              status: true,
+              openingPrice: true,
+              endsAt: true,
+            },
           },
         },
-      },
-    });
+      }),
+      prisma.player.count({
+        where: {
+          clubId: USER_CLUB_ID,
+        },
+      }),
+      prisma.transferListing.count({
+        where: {
+          sellerClubId: USER_CLUB_ID,
+          listingType: "AUCTION",
+          status: {
+            in: ["ACTIVE", "PENDING_TRANSFER"],
+          },
+        },
+      }),
+    ]);
 
   const isVisiblePlayer =
     databasePlayer !== null &&
     (databasePlayer.clubId === USER_CLUB_ID ||
-      databasePlayer.transferListing?.status ===
-        "ACTIVE");
+      databasePlayer.transferListings.length > 0);
 
   if (!databasePlayer || !isVisiblePlayer) {
     notFound();
@@ -133,6 +166,12 @@ const player: Player = {
       value: player.specialties.tuttiDoppi,
     },
   ];
+
+  const currentListing =
+    databasePlayer.transferListings[0] ?? null;
+  const canListPlayer =
+    rosterCount - activeSales >
+    MIN_FIRST_TEAM_PLAYERS;
 
   return (
     <main className="space-y-7">
@@ -304,6 +343,27 @@ const player: Player = {
           </div>
         </section>
       </div>
+
+      {databasePlayer.clubId === USER_CLUB_ID && (
+        <TransferListingForm
+          playerId={player.id}
+          playerName={`${player.firstName} ${player.lastName}`}
+          suggestedPrice={player.value}
+          canListPlayer={canListPlayer}
+          currentListing={
+            currentListing
+              ? {
+                  status: currentListing.status,
+                  openingPrice:
+                    currentListing.openingPrice,
+                  endsAt:
+                    currentListing.endsAt?.toISOString() ??
+                    null,
+                }
+              : null
+          }
+        />
+      )}
     </main>
   );
 }

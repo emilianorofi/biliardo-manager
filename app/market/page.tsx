@@ -127,6 +127,8 @@ export default async function MarketPage() {
           highestBid?.amount ?? listing.openingPrice,
         bidCount: listing.bids.length,
         sellerClub: listing.sellerClub?.name ?? null,
+        isUserListing:
+          listing.sellerClubId === USER_CLUB_ID,
         lastBidClub:
           highestBid?.bidderClub.name ?? null,
         expiresAt:

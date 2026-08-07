@@ -87,7 +87,7 @@ model Player {
 
   trainingResults TrainingResult[]
 
-  transferListing TransferListing?
+  transferListings TransferListing[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -98,7 +98,7 @@ model Player {
 model TransferListing {
   id Int @id @default(autoincrement())
 
-  playerId Int    @unique
+  playerId Int
   player   Player @relation(fields: [playerId], references: [id], onDelete: Cascade)
 
   sellerClubId Int?
@@ -125,6 +125,7 @@ model TransferListing {
 
   @@index([sellerClubId])
   @@index([winnerClubId])
+  @@index([playerId])
   @@index([listingType])
   @@index([status])
   @@index([endsAt])

@@ -58,6 +58,7 @@ export default function MarketContent({
 
         const data: {
           settledCount?: number;
+          pendingCount?: number;
           error?: string;
         } = await response.json();
 
@@ -70,14 +71,28 @@ export default function MarketContent({
 
         if (
           !isCancelled &&
-          data.settledCount &&
-          data.settledCount > 0
+          ((data.settledCount ?? 0) > 0 ||
+            (data.pendingCount ?? 0) > 0)
         ) {
-          setSettlementMessage(
-            data.settledCount === 1
-              ? "Un'asta scaduta è stata completata."
-              : `${data.settledCount} aste scadute sono state completate.`
-          );
+          const messages: string[] = [];
+
+          if ((data.settledCount ?? 0) > 0) {
+            messages.push(
+              data.settledCount === 1
+                ? "Un'asta scaduta è stata completata."
+                : `${data.settledCount} aste scadute sono state completate.`
+            );
+          }
+
+          if ((data.pendingCount ?? 0) > 0) {
+            messages.push(
+              data.pendingCount === 1
+                ? "Un trasferimento attende la fine della partita in corso."
+                : `${data.pendingCount} trasferimenti attendono la fine delle partite in corso.`
+            );
+          }
+
+          setSettlementMessage(messages.join(" "));
           router.refresh();
         }
       } catch (error: unknown) {

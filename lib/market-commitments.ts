@@ -28,7 +28,9 @@ export async function getMarketCommitments(
             }
           : {}),
         listingType: "AUCTION",
-        status: "ACTIVE",
+        status: {
+          in: ["ACTIVE", "PENDING_TRANSFER"],
+        },
         bids: {
           some: {
             bidderClubId: clubId,
