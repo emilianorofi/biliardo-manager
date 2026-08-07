@@ -1,25 +1,31 @@
 "use client";
 
+import Link from "next/link";
 import {
   ArrowUpRight,
+  Clock3,
   Coins,
   Gavel,
+  Tags,
 } from "lucide-react";
 
 import type {
   MarketUserBid,
+  MarketUserListing,
 } from "@/app/types/market";
 
 interface MarketSidebarProps {
   balance: number;
   availableCredits: number;
   userBids: MarketUserBid[];
+  userListings: MarketUserListing[];
 }
 
 export default function MarketSidebar({
   balance,
   availableCredits,
   userBids,
+  userListings,
 }: MarketSidebarProps) {
   const reservedCredits = Math.max(
     0,
@@ -61,6 +67,82 @@ export default function MarketSidebar({
               {formatCurrency(reservedCredits)}
             </span>
           </div>
+        </div>
+      </div>
+
+      <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-5">
+        <div className="mb-4 flex items-center gap-2">
+          <Tags
+            className="text-amber-300"
+            size={20}
+          />
+          <h3 className="font-semibold text-white">
+            Le mie vendite
+          </h3>
+        </div>
+
+        <div className="space-y-3">
+          {userListings.map((listing) => {
+            const isPendingTransfer =
+              listing.status === "PENDING_TRANSFER";
+
+            return (
+              <div
+                key={listing.listingId}
+                className="rounded-xl bg-zinc-800 p-3"
+              >
+                <Link
+                  href={`/players/${listing.playerId}?from=market`}
+                  className="font-medium text-white transition hover:text-amber-200 hover:underline hover:underline-offset-4"
+                >
+                  {listing.playerName}
+                </Link>
+
+                <p className="mt-1 text-xs text-zinc-500">
+                  Prezzo iniziale: {formatCurrency(
+                    listing.openingPrice
+                  )}
+                </p>
+
+                {isPendingTransfer ? (
+                  <p className="mt-2 flex items-center gap-1.5 text-xs font-semibold text-amber-300">
+                    <Clock3 size={14} />
+                    In attesa della fine della partita
+                  </p>
+                ) : listing.bidCount > 0 ? (
+                  <>
+                    <p className="mt-2 text-xs font-semibold text-green-400">
+                      Offerta attuale: {formatCurrency(
+                        listing.currentPrice
+                      )}
+                    </p>
+                    <p className="mt-1 text-xs text-zinc-500">
+                      {listing.bidCount === 1
+                        ? "1 offerta"
+                        : `${listing.bidCount} offerte`}
+                    </p>
+                  </>
+                ) : (
+                  <p className="mt-2 text-xs font-semibold text-zinc-400">
+                    Nessuna offerta
+                  </p>
+                )}
+
+                {!isPendingTransfer &&
+                  listing.expiresAtLabel && (
+                    <p className="mt-2 text-xs text-zinc-500">
+                      Scadenza {listing.expiresAtLabel}
+                    </p>
+                  )}
+              </div>
+            );
+          })}
+
+          {userListings.length === 0 && (
+            <p className="rounded-xl bg-zinc-800 p-3 text-sm text-zinc-400">
+              Non hai vendite attive.
+            </p>
+          )}
         </div>
       </div>
 

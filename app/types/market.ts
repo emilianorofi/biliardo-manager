@@ -51,3 +51,14 @@ export interface MarketUserBid {
   isHighest: boolean;
   expiresAtLabel: string | null;
 }
+
+export interface MarketUserListing {
+  listingId: number;
+  playerId: number;
+  playerName: string;
+  openingPrice: number;
+  currentPrice: number;
+  bidCount: number;
+  status: "ACTIVE" | "PENDING_TRANSFER";
+  expiresAtLabel: string | null;
+}

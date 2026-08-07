@@ -3,6 +3,7 @@ import type {
   MarketListingType,
   MarketPlayer,
   MarketUserBid,
+  MarketUserListing,
 } from "@/app/types/market";
 import {
   MAX_FIRST_TEAM_PLAYERS,
@@ -16,7 +17,7 @@ export const dynamic = "force-dynamic";
 export default async function MarketPage() {
   const now = new Date();
 
-  const [club, listings, commitments] =
+  const [club, listings, commitments, userSales] =
     await Promise.all([
       prisma.club.findUnique({
         where: {
@@ -81,6 +82,49 @@ export default async function MarketPage() {
         ],
       }),
       getMarketCommitments(prisma, USER_CLUB_ID),
+      prisma.transferListing.findMany({
+        where: {
+          sellerClubId: USER_CLUB_ID,
+          listingType: "AUCTION",
+          status: {
+            in: ["ACTIVE", "PENDING_TRANSFER"],
+          },
+        },
+        select: {
+          id: true,
+          openingPrice: true,
+          status: true,
+          endsAt: true,
+          player: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+            },
+          },
+          bids: {
+            orderBy: [
+              {
+                amount: "desc",
+              },
+              {
+                createdAt: "asc",
+              },
+            ],
+            select: {
+              amount: true,
+            },
+          },
+        },
+        orderBy: [
+          {
+            endsAt: "asc",
+          },
+          {
+            createdAt: "desc",
+          },
+        ],
+      }),
     ]);
 
   if (!club) {
@@ -159,6 +203,23 @@ export default async function MarketPage() {
       expiresAtLabel: player.expiresAtLabel,
     }));
 
+  const userListings: MarketUserListing[] =
+    userSales.map((listing) => ({
+      listingId: listing.id,
+      playerId: listing.player.id,
+      playerName: `${listing.player.firstName} ${listing.player.lastName}`,
+      openingPrice: listing.openingPrice,
+      currentPrice:
+        listing.bids[0]?.amount ??
+        listing.openingPrice,
+      bidCount: listing.bids.length,
+      status:
+        listing.status === "PENDING_TRANSFER"
+          ? "PENDING_TRANSFER"
+          : "ACTIVE",
+      expiresAtLabel: formatDeadline(listing.endsAt),
+    }));
+
   const availableCredits = Math.max(
     0,
     club.balance - commitments.reservedCredits
@@ -176,6 +237,7 @@ export default async function MarketPage() {
       availableCredits={availableCredits}
       canAddAnotherPlayer={canAddAnotherPlayer}
       userBids={userBids}
+      userListings={userListings}
     />
   );
 }

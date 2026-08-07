@@ -11,6 +11,7 @@ import { useMarket } from "@/app/hooks/useMarket";
 import type {
   MarketPlayer,
   MarketUserBid,
+  MarketUserListing,
 } from "@/app/types/market";
 
 interface MarketContentProps {
@@ -19,6 +20,7 @@ interface MarketContentProps {
   availableCredits: number;
   canAddAnotherPlayer: boolean;
   userBids: MarketUserBid[];
+  userListings: MarketUserListing[];
 }
 
 export default function MarketContent({
@@ -27,6 +29,7 @@ export default function MarketContent({
   availableCredits,
   canAddAnotherPlayer,
   userBids,
+  userListings,
 }: MarketContentProps) {
   const router = useRouter();
   const [settlementMessage, setSettlementMessage] =
@@ -177,6 +180,7 @@ export default function MarketContent({
           balance={balance}
           availableCredits={availableCredits}
           userBids={userBids}
+          userListings={userListings}
         />
       </div>
     </div>
