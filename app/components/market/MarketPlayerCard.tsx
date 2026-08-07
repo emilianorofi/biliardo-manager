@@ -1,28 +1,134 @@
 "use client";
 
+import { useState } from "react";
 import {
+  AlertCircle,
   Building2,
+  CheckCircle2,
   Clock3,
   FileText,
   Gavel,
   HandCoins,
   TrendingUp,
+  X,
 } from "lucide-react";
 
 import type {
   MarketPlayer,
 } from "@/app/types/market";
+import { getMinimumBid } from "@/lib/market-rules";
 import OverallBadge from "../ui/OverallBadge";
 
 interface MarketPlayerCardProps {
   player: MarketPlayer;
+  availableCredits: number;
+  onBidPlaced: () => void;
 }
 
 export default function MarketPlayerCard({
   player,
+  availableCredits,
+  onBidPlaced,
 }: MarketPlayerCardProps) {
+  const [isBidFormOpen, setIsBidFormOpen] =
+    useState(false);
+  const [bidAmount, setBidAmount] = useState("");
+  const [isSubmitting, setIsSubmitting] =
+    useState(false);
+  const [actionError, setActionError] =
+    useState<string | null>(null);
+  const [actionMessage, setActionMessage] =
+    useState<string | null>(null);
+
   const isAuction =
     player.listingType === "AUCTION";
+  const minimumBid = getMinimumBid(
+    player.currentPrice
+  );
+  const canAffordMinimumBid =
+    minimumBid <= availableCredits;
+
+  function openBidForm() {
+    setBidAmount(String(minimumBid));
+    setActionError(null);
+    setActionMessage(null);
+    setIsBidFormOpen(true);
+  }
+
+  function closeBidForm() {
+    if (isSubmitting) {
+      return;
+    }
+
+    setIsBidFormOpen(false);
+    setActionError(null);
+  }
+
+  async function submitBid(
+    event: React.FormEvent<HTMLFormElement>
+  ) {
+    event.preventDefault();
+
+    const amount = Number(bidAmount);
+
+    if (
+      !Number.isInteger(amount) ||
+      amount < minimumBid
+    ) {
+      setActionError(
+        `L'offerta minima è ${formatCurrency(
+          minimumBid
+        )}.`
+      );
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+      setActionError(null);
+      setActionMessage(null);
+
+      const response = await fetch(
+        "/api/market/bids",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            listingId: player.listingId,
+            amount,
+          }),
+        }
+      );
+
+      const data: {
+        message?: string;
+        error?: string;
+      } = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.error ??
+            "Impossibile registrare l'offerta."
+        );
+      }
+
+      setActionMessage(
+        data.message ?? "Offerta registrata."
+      );
+      setIsBidFormOpen(false);
+      onBidPlaced();
+    } catch (error: unknown) {
+      setActionError(
+        error instanceof Error
+          ? error.message
+          : "Impossibile registrare l'offerta."
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
 
   return (
     <article className="rounded-2xl border border-zinc-800 bg-zinc-900 p-5 transition-all duration-200 hover:border-green-500">
@@ -153,6 +259,85 @@ export default function MarketPlayerCard({
         </div>
       )}
 
+      {actionMessage && (
+        <div className="mt-5 flex items-start gap-2 rounded-xl border border-green-500/30 bg-green-500/10 px-4 py-3 text-sm text-green-300">
+          <CheckCircle2
+            className="mt-0.5 shrink-0"
+            size={17}
+          />
+          <span>{actionMessage}</span>
+        </div>
+      )}
+
+      {isBidFormOpen && (
+        <form
+          onSubmit={submitBid}
+          className="mt-5 rounded-xl border border-green-500/30 bg-green-500/5 p-4"
+        >
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="font-semibold text-white">
+                Nuova offerta
+              </p>
+              <p className="mt-1 text-xs text-zinc-400">
+                Minimo {formatCurrency(minimumBid)} · Disponibile {formatCurrency(availableCredits)}
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={closeBidForm}
+              disabled={isSubmitting}
+              aria-label="Chiudi offerta"
+              className="rounded-lg p-1 text-zinc-500 transition hover:bg-zinc-800 hover:text-white disabled:cursor-not-allowed"
+            >
+              <X size={18} />
+            </button>
+          </div>
+
+          <div className="mt-4 flex flex-col gap-3 sm:flex-row">
+            <label className="flex-1">
+              <span className="sr-only">
+                Importo dell&apos;offerta
+              </span>
+              <input
+                type="number"
+                min={minimumBid}
+                max={availableCredits}
+                step="1"
+                value={bidAmount}
+                onChange={(event) =>
+                  setBidAmount(event.target.value)
+                }
+                disabled={isSubmitting}
+                required
+                className="w-full rounded-xl border border-zinc-700 bg-zinc-800 px-4 py-2.5 text-white outline-none transition focus:border-green-500 disabled:cursor-not-allowed disabled:opacity-60"
+              />
+            </label>
+
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="rounded-xl bg-green-600 px-5 py-2.5 font-semibold text-white transition hover:bg-green-500 disabled:cursor-not-allowed disabled:bg-green-900 disabled:text-green-500"
+            >
+              {isSubmitting
+                ? "Invio..."
+                : "Conferma offerta"}
+            </button>
+          </div>
+
+          {actionError && (
+            <div className="mt-3 flex items-start gap-2 text-sm text-red-400">
+              <AlertCircle
+                className="mt-0.5 shrink-0"
+                size={16}
+              />
+              <span>{actionError}</span>
+            </div>
+          )}
+        </form>
+      )}
+
       <div className="mt-6 flex justify-end gap-3">
         <button
           type="button"
@@ -164,15 +349,42 @@ export default function MarketPlayerCard({
           Scheda
         </button>
 
-        <button
-          type="button"
-          disabled
-          title="Le operazioni economiche saranno attivate nel prossimo intervento."
-          className="flex cursor-not-allowed items-center gap-2 rounded-xl bg-green-900 px-4 py-2 text-sm font-semibold text-green-500"
-        >
-          <Gavel size={18} />
-          {isAuction ? "Offri" : "Ingaggia"}
-        </button>
+        {isAuction ? (
+          <button
+            type="button"
+            onClick={openBidForm}
+            disabled={
+              player.isUserHighestBid ||
+              !canAffordMinimumBid ||
+              isSubmitting
+            }
+            title={
+              player.isUserHighestBid
+                ? "La tua offerta è già la migliore."
+                : !canAffordMinimumBid
+                  ? "Saldo disponibile insufficiente."
+                  : "Inserisci una nuova offerta."
+            }
+            className="flex items-center gap-2 rounded-xl bg-green-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-green-500 disabled:cursor-not-allowed disabled:bg-green-900 disabled:text-green-500"
+          >
+            <Gavel size={18} />
+            {player.isUserHighestBid
+              ? "Sei in vantaggio"
+              : canAffordMinimumBid
+                ? "Offri"
+                : "Fondi insufficienti"}
+          </button>
+        ) : (
+          <button
+            type="button"
+            disabled
+            title="L'ingaggio degli svincolati sarà attivato in un intervento separato."
+            className="flex cursor-not-allowed items-center gap-2 rounded-xl bg-green-900 px-4 py-2 text-sm font-semibold text-green-500"
+          >
+            <Gavel size={18} />
+            Ingaggia
+          </button>
+        )}
       </div>
     </article>
   );

@@ -38,7 +38,7 @@ export default function MarketHeader({
           <div>
 
             <p className="text-xs uppercase tracking-wide text-zinc-500">
-              Crediti
+              Disponibile per offerte
             </p>
 
             <p className="text-xl font-bold text-yellow-400">

@@ -1,5 +1,7 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+
 import MarketHeader from "@/app/components/market/MarketHeader";
 import MarketPlayerCard from "@/app/components/market/MarketPlayerCard";
 import MarketSidebar from "@/app/components/market/MarketSidebar";
@@ -12,15 +14,19 @@ import type {
 
 interface MarketContentProps {
   initialPlayers: MarketPlayer[];
-  credits: number;
+  balance: number;
+  availableCredits: number;
   userBids: MarketUserBid[];
 }
 
 export default function MarketContent({
   initialPlayers,
-  credits,
+  balance,
+  availableCredits,
   userBids,
 }: MarketContentProps) {
+  const router = useRouter();
+
   const {
     players,
     search,
@@ -32,7 +38,7 @@ export default function MarketContent({
   return (
     <div className="space-y-6">
       <MarketHeader
-        credits={credits}
+        credits={availableCredits}
         search={search}
         setSearch={setSearch}
       />
@@ -48,6 +54,8 @@ export default function MarketContent({
             <MarketPlayerCard
               key={player.listingId}
               player={player}
+              availableCredits={availableCredits}
+              onBidPlaced={() => router.refresh()}
             />
           ))}
 
@@ -64,7 +72,8 @@ export default function MarketContent({
         </div>
 
         <MarketSidebar
-          credits={credits}
+          balance={balance}
+          availableCredits={availableCredits}
           userBids={userBids}
         />
       </div>

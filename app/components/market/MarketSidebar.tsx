@@ -11,14 +11,21 @@ import type {
 } from "@/app/types/market";
 
 interface MarketSidebarProps {
-  credits: number;
+  balance: number;
+  availableCredits: number;
   userBids: MarketUserBid[];
 }
 
 export default function MarketSidebar({
-  credits,
+  balance,
+  availableCredits,
   userBids,
 }: MarketSidebarProps) {
+  const reservedCredits = Math.max(
+    0,
+    balance - availableCredits
+  );
+
   return (
     <aside className="space-y-5">
       <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-5">
@@ -32,11 +39,27 @@ export default function MarketSidebar({
 
           <div>
             <p className="text-sm text-zinc-400">
-              Crediti disponibili
+              Disponibile per offerte
             </p>
             <h2 className="text-2xl font-bold text-white">
-              {formatCurrency(credits)}
+              {formatCurrency(availableCredits)}
             </h2>
+          </div>
+        </div>
+
+        <div className="mt-4 space-y-2 border-t border-zinc-800 pt-4 text-sm">
+          <div className="flex justify-between gap-3 text-zinc-400">
+            <span>Saldo club</span>
+            <span className="font-semibold text-white">
+              {formatCurrency(balance)}
+            </span>
+          </div>
+
+          <div className="flex justify-between gap-3 text-zinc-400">
+            <span>Impegnato nelle aste</span>
+            <span className="font-semibold text-yellow-400">
+              {formatCurrency(reservedCredits)}
+            </span>
           </div>
         </div>
       </div>

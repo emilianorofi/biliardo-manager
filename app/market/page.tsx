@@ -142,10 +142,24 @@ export default async function MarketPage() {
       expiresAtLabel: player.expiresAtLabel,
     }));
 
+  const reservedCredits = players.reduce(
+    (total, player) =>
+      player.isUserHighestBid
+        ? total + player.currentPrice
+        : total,
+    0
+  );
+
+  const availableCredits = Math.max(
+    0,
+    club.balance - reservedCredits
+  );
+
   return (
     <MarketContent
       initialPlayers={players}
-      credits={club.balance}
+      balance={club.balance}
+      availableCredits={availableCredits}
       userBids={userBids}
     />
   );
