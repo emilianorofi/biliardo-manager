@@ -140,11 +140,14 @@ export const TransferListingScalarFieldEnum = {
   id: 'id',
   playerId: 'playerId',
   sellerClubId: 'sellerClubId',
+  winnerClubId: 'winnerClubId',
   listingType: 'listingType',
   status: 'status',
   openingPrice: 'openingPrice',
   startsAt: 'startsAt',
   endsAt: 'endsAt',
+  finalPrice: 'finalPrice',
+  completedAt: 'completedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const

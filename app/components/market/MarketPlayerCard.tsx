@@ -22,12 +22,14 @@ import OverallBadge from "../ui/OverallBadge";
 interface MarketPlayerCardProps {
   player: MarketPlayer;
   availableCredits: number;
+  canJoinAnotherAuction: boolean;
   onBidPlaced: () => void;
 }
 
 export default function MarketPlayerCard({
   player,
   availableCredits,
+  canJoinAnotherAuction,
   onBidPlaced,
 }: MarketPlayerCardProps) {
   const [isBidFormOpen, setIsBidFormOpen] =
@@ -355,12 +357,15 @@ export default function MarketPlayerCard({
             onClick={openBidForm}
             disabled={
               player.isUserHighestBid ||
+              !canJoinAnotherAuction ||
               !canAffordMinimumBid ||
               isSubmitting
             }
             title={
               player.isUserHighestBid
                 ? "La tua offerta è già la migliore."
+                : !canJoinAnotherAuction
+                  ? "Hai già raggiunto la quantità massima di giocatori considerando la rosa e le aste in cui sei in vantaggio."
                 : !canAffordMinimumBid
                   ? "Saldo disponibile insufficiente."
                   : "Inserisci una nuova offerta."
@@ -370,6 +375,8 @@ export default function MarketPlayerCard({
             <Gavel size={18} />
             {player.isUserHighestBid
               ? "Sei in vantaggio"
+              : !canJoinAnotherAuction
+                ? "Rosa al completo"
               : canAffordMinimumBid
                 ? "Offri"
                 : "Fondi insufficienti"}

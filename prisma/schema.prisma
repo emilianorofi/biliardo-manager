@@ -36,6 +36,7 @@ model Club {
 
   transferListings TransferListing[] @relation("TransferListingSeller")
   transferBids     TransferBid[]     @relation("TransferBidder")
+  wonListings      TransferListing[] @relation("TransferListingWinner")
 
   leagueEntries LeagueEntry[]
 
@@ -103,6 +104,9 @@ model TransferListing {
   sellerClubId Int?
   sellerClub   Club? @relation("TransferListingSeller", fields: [sellerClubId], references: [id], onDelete: SetNull)
 
+  winnerClubId Int?
+  winnerClub   Club? @relation("TransferListingWinner", fields: [winnerClubId], references: [id], onDelete: SetNull)
+
   listingType String @default("AUCTION")
   status      String @default("ACTIVE")
 
@@ -111,12 +115,16 @@ model TransferListing {
   startsAt DateTime  @default(now())
   endsAt   DateTime?
 
+  finalPrice  Int?
+  completedAt DateTime?
+
   bids TransferBid[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([sellerClubId])
+  @@index([winnerClubId])
   @@index([listingType])
   @@index([status])
   @@index([endsAt])

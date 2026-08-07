@@ -4,7 +4,10 @@ import type {
   MarketPlayer,
   MarketUserBid,
 } from "@/app/types/market";
-import { USER_CLUB_ID } from "@/lib/game-config";
+import {
+  MAX_FIRST_TEAM_PLAYERS,
+  USER_CLUB_ID,
+} from "@/lib/game-config";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
@@ -19,6 +22,11 @@ export default async function MarketPage() {
       },
       select: {
         balance: true,
+        _count: {
+          select: {
+            players: true,
+          },
+        },
       },
     }),
     prisma.transferListing.findMany({
@@ -155,11 +163,22 @@ export default async function MarketPage() {
     club.balance - reservedCredits
   );
 
+  const reservedRosterPlaces = players.filter(
+    (player) => player.isUserHighestBid
+  ).length;
+
+  const canJoinAnotherAuction =
+    club._count.players + reservedRosterPlaces <
+    MAX_FIRST_TEAM_PLAYERS;
+
   return (
     <MarketContent
       initialPlayers={players}
       balance={club.balance}
       availableCredits={availableCredits}
+      canJoinAnotherAuction={
+        canJoinAnotherAuction
+      }
       userBids={userBids}
     />
   );

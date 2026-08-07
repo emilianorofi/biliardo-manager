@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 
-import { USER_CLUB_ID } from "@/lib/game-config";
+import {
+  MAX_FIRST_TEAM_PLAYERS,
+  USER_CLUB_ID,
+} from "@/lib/game-config";
 import {
   AUCTION_EXTENSION_MINUTES,
   getExtendedDeadline,
@@ -103,6 +106,11 @@ export async function POST(request: Request) {
               },
               select: {
                 balance: true,
+                _count: {
+                  select: {
+                    players: true,
+                  },
+                },
               },
             }),
             transaction.transferListing.findUnique({
@@ -247,6 +255,35 @@ export async function POST(request: Request) {
             },
             0
           );
+
+        const reservedRosterPlaces =
+          otherAuctions.reduce(
+            (total, auction) =>
+              auction.bids[0]?.bidderClubId ===
+              USER_CLUB_ID
+                ? total + 1
+                : total,
+            0
+          );
+
+        const occupiedRosterPlaces =
+          club._count.players + reservedRosterPlaces;
+
+        if (
+          occupiedRosterPlaces >=
+          MAX_FIRST_TEAM_PLAYERS
+        ) {
+          const hasFullRoster =
+            club._count.players >=
+            MAX_FIRST_TEAM_PLAYERS;
+
+          throw new MarketBidError(
+            hasFullRoster
+              ? `Hai già raggiunto la quantità massima di ${MAX_FIRST_TEAM_PLAYERS} giocatori.`
+              : `Hai già raggiunto la quantità massima di ${MAX_FIRST_TEAM_PLAYERS} giocatori considerando le aste in cui sei in vantaggio.`,
+            400
+          );
+        }
 
         const availableBalance = Math.max(
           0,

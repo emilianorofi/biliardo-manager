@@ -619,6 +619,8 @@ async function main() {
     });
   }
 
+  await prisma.transferListing.deleteMany();
+
   for (const listing of initialTransferListings) {
     const { id, ...listingData } = listing;
 

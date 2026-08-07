@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import MarketHeader from "@/app/components/market/MarketHeader";
@@ -16,6 +17,7 @@ interface MarketContentProps {
   initialPlayers: MarketPlayer[];
   balance: number;
   availableCredits: number;
+  canJoinAnotherAuction: boolean;
   userBids: MarketUserBid[];
 }
 
@@ -23,9 +25,14 @@ export default function MarketContent({
   initialPlayers,
   balance,
   availableCredits,
+  canJoinAnotherAuction,
   userBids,
 }: MarketContentProps) {
   const router = useRouter();
+  const [settlementMessage, setSettlementMessage] =
+    useState<string | null>(null);
+  const [settlementError, setSettlementError] =
+    useState<string | null>(null);
 
   const {
     players,
@@ -35,8 +42,74 @@ export default function MarketContent({
     setActiveTab,
   } = useMarket(initialPlayers);
 
+  useEffect(() => {
+    let isCancelled = false;
+
+    async function settleAuctions() {
+      try {
+        const response = await fetch(
+          "/api/market/settle",
+          {
+            method: "POST",
+          }
+        );
+
+        const data: {
+          settledCount?: number;
+          error?: string;
+        } = await response.json();
+
+        if (!response.ok) {
+          throw new Error(
+            data.error ??
+              "Impossibile chiudere le aste scadute."
+          );
+        }
+
+        if (
+          !isCancelled &&
+          data.settledCount &&
+          data.settledCount > 0
+        ) {
+          setSettlementMessage(
+            data.settledCount === 1
+              ? "Un'asta scaduta è stata completata."
+              : `${data.settledCount} aste scadute sono state completate.`
+          );
+          router.refresh();
+        }
+      } catch (error: unknown) {
+        if (!isCancelled) {
+          setSettlementError(
+            error instanceof Error
+              ? error.message
+              : "Impossibile chiudere le aste scadute."
+          );
+        }
+      }
+    }
+
+    settleAuctions();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [router]);
+
   return (
     <div className="space-y-6">
+      {settlementMessage && (
+        <div className="rounded-xl border border-green-500/30 bg-green-500/10 px-4 py-3 text-sm text-green-300">
+          {settlementMessage}
+        </div>
+      )}
+
+      {settlementError && (
+        <div className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+          {settlementError}
+        </div>
+      )}
+
       <MarketHeader
         credits={availableCredits}
         search={search}
@@ -55,6 +128,9 @@ export default function MarketContent({
               key={player.listingId}
               player={player}
               availableCredits={availableCredits}
+              canJoinAnotherAuction={
+                canJoinAnotherAuction
+              }
               onBidPlaced={() => router.refresh()}
             />
           ))}

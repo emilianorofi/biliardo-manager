@@ -1,15 +1,29 @@
 import { NextResponse } from "next/server";
 
+import {
+  MAX_FIRST_TEAM_PLAYERS,
+  USER_CLUB_ID,
+} from "@/lib/game-config";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
+
+class AcademyPromotionError extends Error {
+  constructor(
+    message: string,
+    public readonly status: number
+  ) {
+    super(message);
+    this.name = "AcademyPromotionError";
+  }
+}
 
 export async function GET() {
   try {
     const databasePlayers =
       await prisma.academyPlayer.findMany({
         where: {
-          clubId: 1,
+          clubId: USER_CLUB_ID,
         },
         orderBy: [
           {
@@ -154,7 +168,7 @@ export async function POST(request: Request) {
       await prisma.academyPlayer.findFirst({
         where: {
           id: playerId,
-          clubId: 1,
+          clubId: USER_CLUB_ID,
         },
       });
 
@@ -213,6 +227,69 @@ export async function POST(request: Request) {
 
     const promotedPlayer =
       await prisma.$transaction(async (transaction) => {
+        await transaction.$queryRaw`
+          SELECT "id"
+          FROM "Club"
+          WHERE "id" = ${USER_CLUB_ID}
+          FOR UPDATE
+        `;
+
+        const [firstTeamPlayers, activeAuctions] =
+          await Promise.all([
+            transaction.player.count({
+              where: {
+                clubId: USER_CLUB_ID,
+              },
+            }),
+            transaction.transferListing.findMany({
+              where: {
+                listingType: "AUCTION",
+                status: "ACTIVE",
+                endsAt: {
+                  gt: new Date(),
+                },
+                bids: {
+                  some: {
+                    bidderClubId: USER_CLUB_ID,
+                  },
+                },
+              },
+              select: {
+                bids: {
+                  orderBy: [
+                    {
+                      amount: "desc",
+                    },
+                    {
+                      createdAt: "asc",
+                    },
+                  ],
+                  take: 1,
+                  select: {
+                    bidderClubId: true,
+                  },
+                },
+              },
+            }),
+          ]);
+
+        const reservedRosterPlaces =
+          activeAuctions.filter(
+            (auction) =>
+              auction.bids[0]?.bidderClubId ===
+              USER_CLUB_ID
+          ).length;
+
+        if (
+          firstTeamPlayers + reservedRosterPlaces >=
+          MAX_FIRST_TEAM_PLAYERS
+        ) {
+          throw new AcademyPromotionError(
+            `Non puoi superare la quantità massima di ${MAX_FIRST_TEAM_PLAYERS} giocatori considerando anche le aste in cui sei in vantaggio.`,
+            400
+          );
+        }
+
         const player = await transaction.player.create({
           data: {
             clubId: academyPlayer.clubId,
@@ -286,7 +363,18 @@ export async function POST(request: Request) {
         status: 201,
       }
     );
-  } catch (error) {
+  } catch (error: unknown) {
+    if (error instanceof AcademyPromotionError) {
+      return NextResponse.json(
+        {
+          error: error.message,
+        },
+        {
+          status: error.status,
+        }
+      );
+    }
+
     console.error(
       "Errore durante la promozione del giovane:",
       error
