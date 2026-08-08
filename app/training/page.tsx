@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import {
   useEffect,
   useState,
@@ -407,8 +408,8 @@ export default function TrainingPage() {
 
   if (isLoading) {
     return (
-      <main className="min-h-screen bg-[#0a0a0a] p-6 text-white">
-        <div className="mx-auto max-w-7xl rounded-2xl border border-white/10 bg-[#141414] p-10 text-center">
+      <main className="text-white">
+        <div className="rounded-2xl border border-white/10 bg-[#141414] p-10 text-center">
           <p className="text-lg font-semibold">
             Caricamento allenamento...
           </p>
@@ -424,8 +425,8 @@ export default function TrainingPage() {
 
   if (error) {
     return (
-      <main className="min-h-screen bg-[#0a0a0a] p-6 text-white">
-        <div className="mx-auto max-w-7xl rounded-2xl border border-red-500/30 bg-red-500/10 p-10 text-center">
+      <main className="text-white">
+        <div className="rounded-2xl border border-red-500/30 bg-red-500/10 p-10 text-center">
           <p className="font-semibold text-red-300">
             {error}
           </p>
@@ -445,23 +446,54 @@ export default function TrainingPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#0a0a0a] p-4 text-white sm:p-6">
-      <div className="mx-auto max-w-7xl space-y-6">
-        <div>
-          <p className="text-sm font-medium text-yellow-400">
-            Sviluppo giocatori
-          </p>
+    <main className="space-y-4 text-white">
+        <header className="relative overflow-hidden rounded-2xl border border-emerald-900/60 bg-[linear-gradient(135deg,#183129_0%,#12231d_68%,#101e19_100%)] px-5 py-4 shadow-lg shadow-black/10">
+          <div className="pointer-events-none absolute -right-20 -top-24 h-56 w-56 rounded-full bg-amber-400/10 blur-3xl" />
 
-          <h1 className="mt-1 text-3xl font-bold">
-            Allenamento
-          </h1>
+          <div className="relative flex flex-col justify-between gap-4 xl:flex-row xl:items-center">
+            <div>
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-400">
+                Sviluppo giocatori
+              </p>
 
-          <p className="mt-1 text-sm text-zinc-400">
-            Programma la sessione
-            settimanale della prima
-            squadra
-          </p>
-        </div>
+              <h1 className="mt-1 text-3xl font-black">
+                Allenamento
+              </h1>
+
+              <p className="mt-1 text-sm text-zinc-400">
+                Programma la sessione settimanale della prima squadra.
+              </p>
+            </div>
+
+            <div className="grid gap-2 sm:grid-cols-3">
+              <HeaderValue
+                label="Prossima sessione"
+                value="Mercoledì · 21:00"
+                highlight
+              />
+
+              <HeaderValue
+                label="Allenatore"
+                value={`Livello ${trainerLevel} · ${trainerEfficiency}%`}
+              />
+
+              <Link
+                href="/training/history"
+                className="rounded-xl border border-zinc-700 bg-black/15 px-3 py-2 transition hover:border-amber-400/40 hover:bg-amber-400/5"
+              >
+                <p className="text-[8px] font-bold uppercase tracking-wider text-zinc-500">
+                  Ultima sessione
+                </p>
+
+                <p className="mt-1 text-xs font-black text-zinc-200">
+                  {lastProcessedAt
+                    ? formatShortDate(lastProcessedAt)
+                    : "Nessun risultato"}
+                </p>
+              </Link>
+            </div>
+          </div>
+        </header>
 
         {actionError && (
           <div className="flex items-start justify-between gap-4 rounded-2xl border border-red-500/30 bg-red-500/10 p-4">
@@ -514,100 +546,44 @@ export default function TrainingPage() {
           </div>
         )}
 
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          <div className="rounded-2xl border border-yellow-400/20 bg-yellow-400/[0.05] p-5">
-            <p className="text-xs font-semibold uppercase tracking-wider text-yellow-400">
-              Prossimo allenamento
-            </p>
-
-            <p className="mt-2 text-2xl font-bold">
-              Mercoledì
-            </p>
-
-            <p className="mt-1 text-sm text-yellow-400">
-              Ore 21:00
-            </p>
-          </div>
-
-          <div className="rounded-2xl border border-white/10 bg-[#141414] p-5">
-            <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
-              Giocatori
-            </p>
-
-            <p className="mt-2 text-3xl font-bold">
-              {players.length}
-            </p>
-
-            <p className="mt-1 text-sm text-zinc-400">
-              Prima squadra
-            </p>
-          </div>
-
-          <div className="rounded-2xl border border-white/10 bg-[#141414] p-5">
-            <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
-              Allenatore
-            </p>
-
-            <p className="mt-2 text-3xl font-bold text-yellow-400">
-              Livello {trainerLevel}
-            </p>
-
-            <p className="mt-1 text-sm text-zinc-400">
-              Efficienza{" "}
-              {trainerEfficiency}%
-            </p>
-          </div>
-
-          <div className="rounded-2xl border border-white/10 bg-[#141414] p-5">
-            <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
-              Stato
-            </p>
-
-            <p className="mt-2 text-2xl font-bold text-emerald-400">
-              Programmabile
-            </p>
-
-            <p className="mt-1 text-sm text-zinc-400">
-              Modificabile fino alle
-              20:59
-            </p>
-          </div>
-        </div>
-
-        <section className="rounded-2xl border border-white/10 bg-[#141414] p-5 sm:p-6">
-          <div>
+        <section className="rounded-2xl border border-white/10 bg-[#141414] p-4">
+          <div className="flex flex-col justify-between gap-2 sm:flex-row sm:items-center">
+            <div>
             <h2 className="text-lg font-bold">
               Programma settimanale
             </h2>
 
-            <p className="mt-1 text-sm text-zinc-400">
-              Scegli le due
-              caratteristiche da
-              allenare questa settimana
+            <p className="mt-0.5 text-xs text-zinc-400">
+              Seleziona due caratteristiche diverse entro mercoledì alle 20:59.
             </p>
+            </div>
+
+            <span className="text-xs font-semibold text-zinc-500">
+              {players.length} giocatori coinvolti
+            </span>
           </div>
 
-          <div className="mt-6 grid gap-5 lg:grid-cols-2">
-            <div className="rounded-2xl border border-yellow-400/30 bg-yellow-400/[0.05] p-5">
+          <div className="mt-3 grid gap-3 lg:grid-cols-2">
+            <div className="rounded-xl border border-yellow-400/30 bg-yellow-400/[0.05] p-3">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-wider text-yellow-400">
                     Focus primario
                   </p>
 
-                  <h3 className="mt-1 text-xl font-bold">
+                  <h3 className="mt-0.5 text-base font-bold">
                     Intensità 100%
                   </h3>
                 </div>
 
-                <span className="rounded-full border border-yellow-400/30 bg-yellow-400/10 px-3 py-1 text-xs font-bold text-yellow-400">
+                <span className="rounded-full border border-yellow-400/30 bg-yellow-400/10 px-2 py-0.5 text-[9px] font-bold text-yellow-400">
                   PRINCIPALE
                 </span>
               </div>
 
               <label
                 htmlFor="primary-focus"
-                className="mt-5 block text-xs font-semibold uppercase tracking-wider text-zinc-500"
+                className="sr-only"
               >
                 Caratteristica
               </label>
@@ -625,7 +601,7 @@ export default function TrainingPage() {
                   setSuccessMessage(null);
                 }}
                 disabled={isSaving}
-                className="mt-2 w-full rounded-xl border border-white/10 bg-[#0f0f0f] px-4 py-3 text-sm text-white outline-none focus:border-yellow-400/50 disabled:cursor-not-allowed disabled:opacity-50"
+                className="mt-2 w-full rounded-xl border border-white/10 bg-[#0f0f0f] px-3 py-2.5 text-sm text-white outline-none focus:border-yellow-400/50 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {SKILLS.map(
                   (skill) => (
@@ -640,26 +616,26 @@ export default function TrainingPage() {
               </select>
             </div>
 
-            <div className="rounded-2xl border border-white/10 bg-[#0f0f0f] p-5">
+            <div className="rounded-xl border border-white/10 bg-[#0f0f0f] p-3">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
                     Focus secondario
                   </p>
 
-                  <h3 className="mt-1 text-xl font-bold">
+                  <h3 className="mt-0.5 text-base font-bold">
                     Intensità 50%
                   </h3>
                 </div>
 
-                <span className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-xs font-semibold text-zinc-400">
+                <span className="rounded-full border border-white/10 bg-white/[0.03] px-2 py-0.5 text-[9px] font-semibold text-zinc-400">
                   SECONDARIO
                 </span>
               </div>
 
               <label
                 htmlFor="secondary-focus"
-                className="mt-5 block text-xs font-semibold uppercase tracking-wider text-zinc-500"
+                className="sr-only"
               >
                 Caratteristica
               </label>
@@ -677,7 +653,7 @@ export default function TrainingPage() {
                   setSuccessMessage(null);
                 }}
                 disabled={isSaving}
-                className="mt-2 w-full rounded-xl border border-white/10 bg-[#141414] px-4 py-3 text-sm text-white outline-none focus:border-yellow-400/50 disabled:cursor-not-allowed disabled:opacity-50"
+                className="mt-2 w-full rounded-xl border border-white/10 bg-[#141414] px-3 py-2.5 text-sm text-white outline-none focus:border-yellow-400/50 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {SKILLS.map(
                   (skill) => (
@@ -693,13 +669,13 @@ export default function TrainingPage() {
             </div>
           </div>
 
-          <div className="mt-5 flex flex-col gap-4 rounded-xl border border-white/5 bg-[#0f0f0f] p-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="mt-3 flex flex-col gap-3 rounded-xl border border-white/5 bg-[#0f0f0f] p-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <p className="font-semibold">
                 Impostazioni attuali
               </p>
 
-              <p className="mt-1 text-sm text-zinc-400">
+              <p className="mt-0.5 text-xs text-zinc-400">
                 {getSkillLabel(
                   primaryFocus
                 )}{" "}
@@ -729,7 +705,7 @@ export default function TrainingPage() {
                 primaryFocus ===
                   secondaryFocus
               }
-              className="rounded-xl bg-yellow-400 px-6 py-3 text-sm font-bold text-black transition hover:bg-yellow-300 disabled:cursor-not-allowed disabled:opacity-40"
+              className="rounded-xl bg-yellow-400 px-5 py-2.5 text-sm font-bold text-black transition hover:bg-yellow-300 disabled:cursor-not-allowed disabled:opacity-40"
             >
               {isSaving
                 ? "Salvataggio..."
@@ -740,38 +716,35 @@ export default function TrainingPage() {
           </div>
         </section>
 
-        <div className="grid gap-6 xl:grid-cols-[1fr_380px]">
+        <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_300px]">
           <section className="overflow-hidden rounded-2xl border border-white/10 bg-[#141414]">
-            <div className="border-b border-white/10 p-5">
-              <h2 className="text-lg font-bold">
+            <div className="border-b border-white/10 px-4 py-3">
+              <h2 className="text-base font-bold">
                 Giocatori allenati
               </h2>
 
-              <p className="mt-1 text-sm text-zinc-400">
-                L&apos;intensità
-                individuale dipende
-                dall&apos;utilizzo nella
-                formazione salvata
+              <p className="mt-0.5 text-xs text-zinc-400">
+                Intensità calcolata in base alla formazione salvata.
               </p>
             </div>
 
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[760px] text-left">
+              <table className="w-full min-w-[680px] text-left">
                 <thead className="border-b border-white/10 bg-white/[0.02]">
-                  <tr className="text-xs uppercase tracking-wider text-zinc-500">
-                    <th className="px-5 py-4">
+                  <tr className="text-[9px] uppercase tracking-wider text-zinc-500">
+                    <th className="px-4 py-2.5">
                       Giocatore
                     </th>
 
-                    <th className="px-4 py-4">
+                    <th className="px-3 py-2.5">
                       Utilizzo
                     </th>
 
-                    <th className="px-4 py-4">
+                    <th className="px-3 py-2.5">
                       Intensità
                     </th>
 
-                    <th className="px-5 py-4">
+                    <th className="px-4 py-2.5">
                       Stato
                     </th>
                   </tr>
@@ -784,8 +757,8 @@ export default function TrainingPage() {
                         key={player.id}
                         className="border-b border-white/5 last:border-0"
                       >
-                        <td className="px-5 py-4">
-                          <p className="font-semibold text-white">
+                        <td className="px-4 py-2.5">
+                          <p className="text-sm font-semibold text-white">
                             {
                               player.firstName
                             }{" "}
@@ -794,7 +767,7 @@ export default function TrainingPage() {
                             }
                           </p>
 
-                          <p className="mt-1 text-xs text-zinc-500">
+                          <p className="mt-0.5 text-[10px] text-zinc-500">
                             Overall{" "}
                             {
                               player.overall
@@ -809,12 +782,12 @@ export default function TrainingPage() {
                           </p>
                         </td>
 
-                        <td className="px-4 py-4 text-sm text-zinc-300">
+                        <td className="px-3 py-2.5 text-xs text-zinc-300">
                           {player.usage}
                         </td>
 
-                        <td className="px-4 py-4">
-                          <span className="font-bold text-yellow-400">
+                        <td className="px-3 py-2.5">
+                          <span className="text-sm font-bold text-yellow-400">
                             {
                               player.intensity
                             }
@@ -822,16 +795,16 @@ export default function TrainingPage() {
                           </span>
                         </td>
 
-                        <td className="px-5 py-4">
+                        <td className="px-4 py-2.5">
                           {player.formationSlot ? (
-                            <span className="rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-1 text-xs font-semibold text-emerald-400">
+                            <span className="rounded-full border border-emerald-400/20 bg-emerald-400/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-400">
                               Slot{" "}
                               {
                                 player.formationSlot
                               }
                             </span>
                           ) : (
-                            <span className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-xs font-semibold text-zinc-400">
+                            <span className="rounded-full border border-white/10 bg-white/[0.03] px-2 py-0.5 text-[10px] font-semibold text-zinc-400">
                               Panchina
                             </span>
                           )}
@@ -853,29 +826,27 @@ export default function TrainingPage() {
             </div>
           </section>
 
-          <aside className="rounded-2xl border border-white/10 bg-[#141414] p-5">
-            <h2 className="text-lg font-bold">
+          <aside className="rounded-2xl border border-white/10 bg-[#141414] p-4">
+            <h2 className="text-base font-bold">
               Intensità di utilizzo
             </h2>
 
-            <p className="mt-1 text-sm text-zinc-400">
-              Percentuale di
-              allenamento ricevuta in
-              base alle partite giocate
+            <p className="mt-0.5 text-xs text-zinc-400">
+              Percentuale ricevuta in base alle partite giocate.
             </p>
 
-            <div className="mt-5 space-y-3">
+            <div className="mt-3 space-y-2">
               {TRAINING_USAGE.map(
                 (item) => (
                   <div
                     key={item.usage}
-                    className="flex items-center justify-between rounded-xl border border-white/5 bg-[#0f0f0f] px-4 py-3"
+                    className="flex items-center justify-between rounded-lg border border-white/5 bg-[#0f0f0f] px-3 py-2"
                   >
-                    <span className="text-sm text-zinc-300">
+                    <span className="text-xs text-zinc-300">
                       {item.usage}
                     </span>
 
-                    <span className="font-bold text-yellow-400">
+                    <span className="text-sm font-bold text-yellow-400">
                       {
                         item.intensity
                       }
@@ -887,40 +858,23 @@ export default function TrainingPage() {
           </aside>
         </div>
 
-        <section className="rounded-2xl border border-yellow-400/20 bg-yellow-400/[0.05] p-5">
-          <p className="text-xs font-semibold uppercase tracking-wider text-yellow-400">
-            Regole allenamento
-          </p>
+        <details className="group rounded-xl border border-yellow-400/20 bg-yellow-400/[0.04]">
+          <summary className="flex cursor-pointer list-none items-center justify-between px-4 py-3 text-xs font-bold text-yellow-300">
+            Regole dell&apos;allenamento
+            <span className="text-base text-yellow-300/60 transition group-open:rotate-45">
+              +
+            </span>
+          </summary>
 
-          <h2 className="mt-1 text-xl font-bold">
-            Sessione ogni mercoledì
-            alle 21:00
-          </h2>
-
-          <p className="mt-2 max-w-4xl text-sm leading-6 text-zinc-400">
-            Il focus primario viene
-            allenato al 100% e il focus
-            secondario al 50%.
-            L&apos;efficacia finale
-            dipende dall&apos;utilizzo
-            del giocatore e dal livello
-            dell&apos;allenatore. Le
-            impostazioni possono essere
-            modificate fino a un minuto
-            prima della sessione.
-          </p>
-
-          {lastProcessedAt && (
-            <p className="mt-3 text-xs font-semibold text-yellow-400">
-              Ultima sessione
-              elaborata:{" "}
-              {formatDate(
-                lastProcessedAt
-              )}
+          <div className="border-t border-yellow-400/15 px-4 py-3">
+            <p className="max-w-4xl text-xs leading-5 text-zinc-400">
+              Il focus primario viene allenato al 100% e il secondario al 50%.
+              L&apos;efficacia finale dipende dall&apos;utilizzo del giocatore e
+              dal livello dell&apos;allenatore. Le impostazioni possono essere
+              modificate fino a un minuto prima della sessione.
             </p>
-          )}
-        </section>
-      </div>
+          </div>
+        </details>
     </main>
   );
 }
@@ -934,6 +888,37 @@ function getSkillLabel(
         skill.key === focus
     )?.label ?? focus
   );
+}
+
+function HeaderValue({
+  label,
+  value,
+  highlight = false,
+}: {
+  label: string;
+  value: string;
+  highlight?: boolean;
+}) {
+  return (
+    <div className="rounded-xl border border-zinc-700 bg-black/15 px-3 py-2">
+      <p className="text-[8px] font-bold uppercase tracking-wider text-zinc-500">
+        {label}
+      </p>
+
+      <p className={`mt-1 text-xs font-black ${highlight ? "text-yellow-300" : "text-zinc-200"}`}>
+        {value}
+      </p>
+    </div>
+  );
+}
+
+function formatShortDate(date: Date) {
+  return new Intl.DateTimeFormat("it-IT", {
+    day: "2-digit",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(date);
 }
 
 function formatDate(

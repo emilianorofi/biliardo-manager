@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import {
   useEffect,
   useState,
@@ -139,8 +140,8 @@ export default function TrainingHistoryPage() {
 
   if (isLoading) {
     return (
-      <main className="min-h-screen bg-[#0a0a0a] p-6 text-white">
-        <div className="mx-auto max-w-7xl rounded-2xl border border-white/10 bg-[#141414] p-10 text-center">
+      <main className="text-white">
+        <div className="rounded-2xl border border-white/10 bg-[#141414] p-10 text-center">
           <p className="text-lg font-semibold">
             Caricamento storico...
           </p>
@@ -156,8 +157,8 @@ export default function TrainingHistoryPage() {
 
   if (error) {
     return (
-      <main className="min-h-screen bg-[#0a0a0a] p-6 text-white">
-        <div className="mx-auto max-w-7xl rounded-2xl border border-red-500/30 bg-red-500/10 p-10 text-center">
+      <main className="text-white">
+        <div className="rounded-2xl border border-red-500/30 bg-red-500/10 p-10 text-center">
           <p className="font-semibold text-red-300">
             {error}
           </p>
@@ -188,75 +189,39 @@ export default function TrainingHistoryPage() {
     );
 
   return (
-    <main className="min-h-screen bg-[#0a0a0a] p-4 text-white sm:p-6">
-      <div className="mx-auto max-w-7xl space-y-6">
-        <div>
-          <p className="text-sm font-medium text-yellow-400">
-            Sviluppo giocatori
-          </p>
+    <main className="space-y-4 text-white">
+        <header className="relative overflow-hidden rounded-2xl border border-emerald-900/60 bg-[linear-gradient(135deg,#183129_0%,#12231d_68%,#101e19_100%)] px-5 py-4 shadow-lg shadow-black/10">
+          <div className="pointer-events-none absolute -right-20 -top-24 h-56 w-56 rounded-full bg-amber-400/10 blur-3xl" />
 
-          <h1 className="mt-1 text-3xl font-bold">
-            Storico allenamenti
-          </h1>
+          <div className="relative flex flex-col justify-between gap-4 lg:flex-row lg:items-center">
+            <div>
+              <Link
+                href="/training"
+                className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-400 transition hover:text-emerald-300"
+              >
+                ← Allenamento
+              </Link>
 
-          <p className="mt-1 text-sm text-zinc-400">
-            Controlla la crescita
-            ottenuta dai giocatori
-            durante ogni sessione
-            settimanale
-          </p>
-        </div>
+              <h1 className="mt-1 text-3xl font-black">
+                Storico allenamenti
+              </h1>
 
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          <div className="rounded-2xl border border-white/10 bg-[#141414] p-5">
-            <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
-              Sessioni registrate
-            </p>
+              <p className="mt-1 text-sm text-zinc-400">
+                Crescita ottenuta nelle sessioni settimanali.
+              </p>
+            </div>
 
-            <p className="mt-2 text-3xl font-bold">
-              {sessions.length}
-            </p>
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+              <SummaryValue label="Sessioni" value={sessions.length.toString()} />
+              <SummaryValue label="Risultati" value={totalRecordedResults.toString()} />
+              <SummaryValue label="Ultima settimana" value={latestSession?.weekKey ?? "—"} highlight />
+              <SummaryValue
+                label="Allenatore"
+                value={latestSession ? `Lv. ${latestSession.trainerLevel} · ${latestSession.trainerEfficiency}%` : "—"}
+              />
+            </div>
           </div>
-
-          <div className="rounded-2xl border border-white/10 bg-[#141414] p-5">
-            <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
-              Risultati giocatori
-            </p>
-
-            <p className="mt-2 text-3xl font-bold">
-              {totalRecordedResults}
-            </p>
-          </div>
-
-          <div className="rounded-2xl border border-yellow-400/20 bg-yellow-400/[0.05] p-5">
-            <p className="text-xs font-semibold uppercase tracking-wider text-yellow-400">
-              Ultima settimana
-            </p>
-
-            <p className="mt-2 text-2xl font-bold">
-              {latestSession?.weekKey ??
-                "Nessuna"}
-            </p>
-          </div>
-
-          <div className="rounded-2xl border border-white/10 bg-[#141414] p-5">
-            <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
-              Ultimo allenatore
-            </p>
-
-            <p className="mt-2 text-2xl font-bold">
-              {latestSession
-                ? `Livello ${latestSession.trainerLevel}`
-                : "—"}
-            </p>
-
-            <p className="mt-1 text-sm text-zinc-400">
-              {latestSession
-                ? `Efficienza ${latestSession.trainerEfficiency}%`
-                : "Nessuna sessione"}
-            </p>
-          </div>
-        </div>
+        </header>
 
         {sessions.length === 0 ? (
           <section className="rounded-2xl border border-white/10 bg-[#141414] p-10 text-center">
@@ -272,107 +237,77 @@ export default function TrainingHistoryPage() {
             </p>
           </section>
         ) : (
-          <div className="space-y-6">
+          <div className="space-y-3">
             {sessions.map(
-              (session) => (
-                <section
+              (session, sessionIndex) => (
+                <details
                   key={session.id}
-                  className="overflow-hidden rounded-2xl border border-white/10 bg-[#141414]"
+                  open={sessionIndex === 0}
+                  className="group overflow-hidden rounded-2xl border border-white/10 bg-[#141414] open:border-emerald-900/60"
                 >
-                  <div className="border-b border-white/10 p-5 sm:p-6">
-                    <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                  <summary className="cursor-pointer list-none p-4 marker:hidden">
+                    <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
                       <div>
-                        <div className="flex flex-wrap items-center gap-3">
-                          <h2 className="text-xl font-bold">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="text-xs text-zinc-500 transition group-open:rotate-90">
+                            ▶
+                          </span>
+
+                          <h2 className="text-base font-black">
                             Settimana{" "}
                             {
                               session.weekKey
                             }
                           </h2>
 
-                          <span className="rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-1 text-xs font-semibold text-emerald-400">
-                            Elaborato
-                          </span>
+                          {sessionIndex === 0 && (
+                            <span className="rounded-full border border-emerald-400/20 bg-emerald-400/10 px-2 py-0.5 text-[9px] font-bold uppercase text-emerald-400">
+                              Ultima sessione
+                            </span>
+                          )}
                         </div>
 
-                        <p className="mt-2 text-sm text-zinc-400">
+                        <p className="mt-1 pl-5 text-xs text-zinc-500">
                           {formatDate(
                             session.processedAt
                           )}
                         </p>
                       </div>
 
-                      <div className="grid gap-3 sm:grid-cols-3">
-                        <div className="rounded-xl border border-yellow-400/20 bg-yellow-400/[0.05] px-4 py-3">
-                          <p className="text-xs font-semibold uppercase tracking-wider text-yellow-400">
-                            Primario
-                          </p>
-
-                          <p className="mt-1 font-bold">
-                            {getSkillLabel(
-                              session.primaryFocus
-                            )}
-                          </p>
-                        </div>
-
-                        <div className="rounded-xl border border-white/10 bg-[#0f0f0f] px-4 py-3">
-                          <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
-                            Secondario
-                          </p>
-
-                          <p className="mt-1 font-bold">
-                            {getSkillLabel(
-                              session.secondaryFocus
-                            )}
-                          </p>
-                        </div>
-
-                        <div className="rounded-xl border border-white/10 bg-[#0f0f0f] px-4 py-3">
-                          <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
-                            Allenatore
-                          </p>
-
-                          <p className="mt-1 font-bold">
-                            Livello{" "}
-                            {
-                              session.trainerLevel
-                            }{" "}
-                            ·{" "}
-                            {
-                              session.trainerEfficiency
-                            }
-                            %
-                          </p>
-                        </div>
+                      <div className="flex flex-wrap gap-2 text-xs">
+                        <SessionTag label="Primario" value={getSkillLabel(session.primaryFocus)} highlight />
+                        <SessionTag label="Secondario" value={getSkillLabel(session.secondaryFocus)} />
+                        <SessionTag label="Allenatore" value={`Lv. ${session.trainerLevel} · ${session.trainerEfficiency}%`} />
+                        <SessionTag label="Giocatori" value={session.results.length.toString()} />
                       </div>
                     </div>
-                  </div>
+                  </summary>
 
-                  <div className="overflow-x-auto">
-                    <table className="w-full min-w-[1050px] text-left">
+                  <div className="overflow-x-auto border-t border-white/10">
+                    <table className="w-full min-w-[820px] text-left">
                       <thead className="border-b border-white/10 bg-white/[0.02]">
                         <tr className="text-xs uppercase tracking-wider text-zinc-500">
-                          <th className="px-5 py-4">
+                          <th className="px-4 py-2.5">
                             Giocatore
                           </th>
 
-                          <th className="px-4 py-4">
+                          <th className="px-3 py-2.5">
                             Utilizzo
                           </th>
 
-                          <th className="px-4 py-4">
+                          <th className="px-3 py-2.5">
                             Intensità
                           </th>
 
-                          <th className="px-4 py-4">
+                          <th className="px-3 py-2.5">
                             Primario
                           </th>
 
-                          <th className="px-4 py-4">
+                          <th className="px-3 py-2.5">
                             Secondario
                           </th>
 
-                          <th className="px-5 py-4">
+                          <th className="px-4 py-2.5">
                             Overall
                           </th>
                         </tr>
@@ -387,7 +322,7 @@ export default function TrainingHistoryPage() {
                               }
                               className="border-b border-white/5 last:border-0"
                             >
-                              <td className="px-5 py-4">
+                              <td className="px-4 py-2.5">
                                 <p className="font-semibold">
                                   {
                                     result.firstName
@@ -397,7 +332,7 @@ export default function TrainingHistoryPage() {
                                   }
                                 </p>
 
-                                <p className="mt-1 text-xs text-zinc-500">
+                                <p className="text-[10px] text-zinc-500">
                                   {
                                     result.age
                                   }{" "}
@@ -405,13 +340,13 @@ export default function TrainingHistoryPage() {
                                 </p>
                               </td>
 
-                              <td className="px-4 py-4 text-sm text-zinc-300">
+                              <td className="px-3 py-2.5 text-xs text-zinc-300">
                                 {
                                   result.usage
                                 }
                               </td>
 
-                              <td className="px-4 py-4">
+                              <td className="px-3 py-2.5 text-sm">
                                 <span className="font-bold text-yellow-400">
                                   {
                                     result.intensity
@@ -420,7 +355,7 @@ export default function TrainingHistoryPage() {
                                 </span>
                               </td>
 
-                              <td className="px-4 py-4">
+                              <td className="px-3 py-2.5">
                                 <p className="text-sm text-zinc-300">
                                   {formatValue(
                                     result.primaryBefore
@@ -431,7 +366,7 @@ export default function TrainingHistoryPage() {
                                   )}
                                 </p>
 
-                                <p className="mt-1 text-xs font-bold text-emerald-400">
+                                <p className="text-[10px] font-bold text-emerald-400">
                                   +
                                   {formatGain(
                                     result.primaryGain
@@ -439,7 +374,7 @@ export default function TrainingHistoryPage() {
                                 </p>
                               </td>
 
-                              <td className="px-4 py-4">
+                              <td className="px-3 py-2.5">
                                 <p className="text-sm text-zinc-300">
                                   {formatValue(
                                     result.secondaryBefore
@@ -450,7 +385,7 @@ export default function TrainingHistoryPage() {
                                   )}
                                 </p>
 
-                                <p className="mt-1 text-xs font-bold text-emerald-400">
+                                <p className="text-[10px] font-bold text-emerald-400">
                                   +
                                   {formatGain(
                                     result.secondaryGain
@@ -458,7 +393,7 @@ export default function TrainingHistoryPage() {
                                 </p>
                               </td>
 
-                              <td className="px-5 py-4">
+                              <td className="px-4 py-2.5">
                                 <p className="font-semibold">
                                   {formatValue(
                                     result.overallBefore
@@ -469,7 +404,7 @@ export default function TrainingHistoryPage() {
                                   )}
                                 </p>
 
-                                <p className="mt-1 text-xs font-bold text-emerald-400">
+                                <p className="text-[10px] font-bold text-emerald-400">
                                   +
                                   {formatGain(
                                     result.overallAfter -
@@ -483,13 +418,51 @@ export default function TrainingHistoryPage() {
                       </tbody>
                     </table>
                   </div>
-                </section>
+                </details>
               )
             )}
           </div>
         )}
-      </div>
     </main>
+  );
+}
+
+function SummaryValue({
+  label,
+  value,
+  highlight = false,
+}: {
+  label: string;
+  value: string;
+  highlight?: boolean;
+}) {
+  return (
+    <div className="rounded-xl border border-zinc-700 bg-black/15 px-3 py-2">
+      <p className="text-[8px] font-bold uppercase tracking-wider text-zinc-500">
+        {label}
+      </p>
+
+      <p className={`mt-1 text-xs font-black ${highlight ? "text-amber-300" : "text-zinc-200"}`}>
+        {value}
+      </p>
+    </div>
+  );
+}
+
+function SessionTag({
+  label,
+  value,
+  highlight = false,
+}: {
+  label: string;
+  value: string;
+  highlight?: boolean;
+}) {
+  return (
+    <span className={`rounded-lg border px-2.5 py-1.5 ${highlight ? "border-yellow-400/20 bg-yellow-400/[0.05] text-yellow-300" : "border-white/10 bg-[#0f0f0f] text-zinc-300"}`}>
+      <span className="text-[9px] font-bold uppercase text-zinc-500">{label}</span>{" "}
+      <strong>{value}</strong>
+    </span>
   );
 }
 
