@@ -1,6 +1,6 @@
 import "./globals.css";
 import type { Metadata } from "next";
-import Sidebar from "./components/Sidebar";
+import AppShell from "./components/AppShell";
 
 export const metadata: Metadata = {
   title: "Biliardo Manager",
@@ -15,13 +15,8 @@ export default function RootLayout({
   return (
     <html lang="it">
       <body className="bg-[#0a0a0a] text-white">
-  <div className="flex min-h-screen">
-    <Sidebar />
-    <main className="flex-1 min-w-0 p-6">
-      {children}
-    </main>
-  </div>
-</body>
+        <AppShell>{children}</AppShell>
+      </body>
     </html>
   );
 }

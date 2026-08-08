@@ -30,7 +30,11 @@ export default function Home() {
             {["Home", "Features", "Rankings", "Login"].map((item) => (
               <a
                 key={item}
-                href={`#${item.toLowerCase()}`}
+                href={
+                  item === "Login"
+                    ? "/login"
+                    : `#${item.toLowerCase()}`
+                }
                 className="text-sm font-medium text-zinc-400 transition-colors hover:text-[#d4af37]"
               >
                 {item}
@@ -47,7 +51,7 @@ export default function Home() {
           </button>
 
           <a
-            href="#login"
+            href="/login"
             className="hidden rounded-lg border border-[#c9a227]/30 px-4 py-2 text-sm font-medium text-[#d4af37] transition hover:border-[#d4af37]/60 hover:bg-[#d4af37]/10 md:inline-flex"
           >
             Login
@@ -84,13 +88,13 @@ export default function Home() {
 
               <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center lg:justify-start">
                 <a
-                  href="#"
+                  href="/register"
                   className="w-full rounded-xl bg-gradient-to-r from-[#b8941f] via-[#d4af37] to-[#c9a227] px-8 py-3.5 text-center text-sm font-semibold text-[#0a0a0a] shadow-lg shadow-[#d4af37]/20 transition hover:brightness-110 sm:w-auto"
                 >
                   New Career
                 </a>
                 <a
-                  href="#"
+                  href="/login"
                   className="w-full rounded-xl border border-zinc-700 bg-[#141414] px-8 py-3.5 text-center text-sm font-semibold text-zinc-100 transition hover:border-zinc-500 hover:bg-[#1a1a1a] sm:w-auto"
                 >
                   Continue Career

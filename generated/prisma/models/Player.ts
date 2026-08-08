@@ -1034,14 +1034,6 @@ export type PlayerUpdatestyleInput = {
   push?: string | string[]
 }
 
-export type NullableIntFieldUpdateOperationsInput = {
-  set?: number | null
-  increment?: number
-  decrement?: number
-  multiply?: number
-  divide?: number
-}
-
 export type PlayerCreateNestedOneWithoutTransferListingsInput = {
   create?: Prisma.XOR<Prisma.PlayerCreateWithoutTransferListingsInput, Prisma.PlayerUncheckedCreateWithoutTransferListingsInput>
   connectOrCreate?: Prisma.PlayerCreateOrConnectWithoutTransferListingsInput
