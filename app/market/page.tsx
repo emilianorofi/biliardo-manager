@@ -1,5 +1,6 @@
 import MarketContent from "@/app/components/market/MarketContent";
 import type {
+  MarketHistoryItem,
   MarketListingType,
   MarketPlayer,
   MarketUserBid,
@@ -17,7 +18,13 @@ export const dynamic = "force-dynamic";
 export default async function MarketPage() {
   const now = new Date();
 
-  const [club, listings, commitments, userSales] =
+  const [
+    club,
+    listings,
+    commitments,
+    userSales,
+    userHistory,
+  ] =
     await Promise.all([
       prisma.club.findUnique({
         where: {
@@ -125,6 +132,55 @@ export default async function MarketPage() {
           },
         ],
       }),
+      prisma.transferListing.findMany({
+        where: {
+          status: {
+            in: [
+              "COMPLETED",
+              "EXPIRED",
+              "CANCELLED",
+            ],
+          },
+          OR: [
+            {
+              sellerClubId: USER_CLUB_ID,
+            },
+            {
+              winnerClubId: USER_CLUB_ID,
+            },
+          ],
+        },
+        select: {
+          id: true,
+          listingType: true,
+          status: true,
+          openingPrice: true,
+          finalPrice: true,
+          completedAt: true,
+          winnerClubId: true,
+          player: {
+            select: {
+              firstName: true,
+              lastName: true,
+              salary: true,
+            },
+          },
+          sellerClub: {
+            select: {
+              name: true,
+            },
+          },
+          winnerClub: {
+            select: {
+              name: true,
+            },
+          },
+        },
+        orderBy: {
+          completedAt: "desc",
+        },
+        take: 30,
+      }),
     ]);
 
   if (!club) {
@@ -220,6 +276,33 @@ export default async function MarketPage() {
       expiresAtLabel: formatDeadline(listing.endsAt),
     }));
 
+  const historyItems: MarketHistoryItem[] =
+    userHistory.map((listing) => {
+      const kind = getHistoryKind({
+        listingType: listing.listingType,
+        status: listing.status,
+        winnerClubId: listing.winnerClubId,
+      });
+
+      return {
+        listingId: listing.id,
+        playerName: `${listing.player.firstName} ${listing.player.lastName}`,
+        kind,
+        finalPrice: listing.finalPrice,
+        openingPrice: listing.openingPrice,
+        salary: listing.player.salary,
+        counterpartClub:
+          kind === "SALE"
+            ? listing.winnerClub?.name ?? null
+            : kind === "PURCHASE"
+              ? listing.sellerClub?.name ?? null
+              : null,
+        completedAtLabel: formatHistoryDate(
+          listing.completedAt
+        ),
+      };
+    });
+
   const availableCredits = Math.max(
     0,
     club.balance - commitments.reservedCredits
@@ -238,8 +321,33 @@ export default async function MarketPage() {
       canAddAnotherPlayer={canAddAnotherPlayer}
       userBids={userBids}
       userListings={userListings}
+      historyItems={historyItems}
     />
   );
+}
+
+function getHistoryKind(listing: {
+  listingType: string;
+  status: string;
+  winnerClubId: number | null;
+}): MarketHistoryItem["kind"] {
+  if (listing.status === "EXPIRED") {
+    return "EXPIRED";
+  }
+
+  if (listing.status === "CANCELLED") {
+    return "CANCELLED";
+  }
+
+  if (listing.listingType === "FREE_AGENT") {
+    return "FREE_AGENT";
+  }
+
+  if (listing.winnerClubId === USER_CLUB_ID) {
+    return "PURCHASE";
+  }
+
+  return "SALE";
 }
 
 function calculateOverall(player: {
@@ -275,6 +383,21 @@ function formatDeadline(value: Date | null) {
   return new Intl.DateTimeFormat("it-IT", {
     day: "2-digit",
     month: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZone: "Europe/Rome",
+  }).format(value);
+}
+
+function formatHistoryDate(value: Date | null) {
+  if (!value) {
+    return "Data non disponibile";
+  }
+
+  return new Intl.DateTimeFormat("it-IT", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
     hour: "2-digit",
     minute: "2-digit",
     timeZone: "Europe/Rome",

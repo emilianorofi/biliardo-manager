@@ -16,6 +16,7 @@ const tabs: {
   { id: "all", label: "Tutti" },
   { id: "auction", label: "In asta" },
   { id: "free", label: "Svincolati" },
+  { id: "history", label: "Storico" },
 ];
 
 export default function MarketTabs({

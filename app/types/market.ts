@@ -5,7 +5,15 @@ export type MarketListingType =
 export type MarketTab =
   | "all"
   | "auction"
-  | "free";
+  | "free"
+  | "history";
+
+export type MarketHistoryKind =
+  | "PURCHASE"
+  | "SALE"
+  | "FREE_AGENT"
+  | "EXPIRED"
+  | "CANCELLED";
 
 export interface MarketPlayer {
   id: number;
@@ -61,4 +69,15 @@ export interface MarketUserListing {
   bidCount: number;
   status: "ACTIVE" | "PENDING_TRANSFER";
   expiresAtLabel: string | null;
+}
+
+export interface MarketHistoryItem {
+  listingId: number;
+  playerName: string;
+  kind: MarketHistoryKind;
+  finalPrice: number | null;
+  openingPrice: number;
+  salary: number;
+  counterpartClub: string | null;
+  completedAtLabel: string;
 }
