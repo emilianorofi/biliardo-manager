@@ -17,6 +17,7 @@ import type {
   MarketPlayer,
 } from "@/app/types/market";
 import { getMinimumBid } from "@/lib/market-rules";
+import FreeAgentCountdown from "./FreeAgentCountdown";
 import OverallBadge from "../ui/OverallBadge";
 
 interface MarketPlayerCardProps {
@@ -342,10 +343,21 @@ export default function MarketPlayerCard({
               : "text-blue-400"
           }
           label={
-            isAuction ? "Scadenza" : "Disponibilità"
+            isAuction
+              ? "Scadenza"
+              : "Uscita dal gioco"
           }
           value={
-            player.expiresAtLabel ?? "Immediata"
+            isAuction ? (
+              player.expiresAtLabel ??
+              "Non disponibile"
+            ) : player.expiresAt ? (
+              <FreeAgentCountdown
+                expiresAt={player.expiresAt}
+              />
+            ) : (
+              "Non disponibile"
+            )
           }
         />
       </div>
@@ -611,7 +623,7 @@ function MarketInfo({
   icon: React.ReactNode;
   iconClassName: string;
   label: string;
-  value: string;
+  value: React.ReactNode;
   detail?: string | null;
 }) {
   return (

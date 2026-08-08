@@ -85,6 +85,7 @@ export default function MarketContent({
         const data: {
           settledCount?: number;
           pendingCount?: number;
+          expiredFreeAgentsCount?: number;
           error?: string;
         } = await response.json();
 
@@ -98,7 +99,9 @@ export default function MarketContent({
         if (
           !isCancelled &&
           ((data.settledCount ?? 0) > 0 ||
-            (data.pendingCount ?? 0) > 0)
+            (data.pendingCount ?? 0) > 0 ||
+            (data.expiredFreeAgentsCount ?? 0) >
+              0)
         ) {
           const messages: string[] = [];
 
@@ -115,6 +118,16 @@ export default function MarketContent({
               data.pendingCount === 1
                 ? "Un trasferimento attende la fine della partita in corso."
                 : `${data.pendingCount} trasferimenti attendono la fine delle partite in corso.`
+            );
+          }
+
+          if (
+            (data.expiredFreeAgentsCount ?? 0) > 0
+          ) {
+            messages.push(
+              data.expiredFreeAgentsCount === 1
+                ? "Uno svincolato ha lasciato il gioco."
+                : `${data.expiredFreeAgentsCount} svincolati hanno lasciato il gioco.`
             );
           }
 

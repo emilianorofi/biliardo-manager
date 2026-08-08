@@ -134,7 +134,9 @@ export async function POST(request: Request) {
           listing.status !== "ACTIVE" ||
           listing.listingType !== "FREE_AGENT" ||
           listing.sellerClubId !== null ||
-          listing.player.clubId !== null
+          listing.player.clubId !== null ||
+          !listing.endsAt ||
+          listing.endsAt.getTime() <= Date.now()
         ) {
           throw new FreeAgentSigningError(
             "Questo giocatore non è più svincolato.",

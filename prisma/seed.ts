@@ -2,6 +2,7 @@ import "dotenv/config";
 
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../generated/prisma/client";
+import { getFreeAgentDeadline } from "../lib/market-rules";
 
 const connectionString =
   process.env.DIRECT_URL ?? process.env.DATABASE_URL;
@@ -523,7 +524,9 @@ const initialTransferListings = [
     status: "ACTIVE",
     openingPrice: 0,
     startsAt: new Date(marketSeedTime),
-    endsAt: null,
+    endsAt: getFreeAgentDeadline(
+      new Date(marketSeedTime)
+    ),
   },
   {
     id: 6,
@@ -533,7 +536,9 @@ const initialTransferListings = [
     status: "ACTIVE",
     openingPrice: 0,
     startsAt: new Date(marketSeedTime),
-    endsAt: null,
+    endsAt: getFreeAgentDeadline(
+      new Date(marketSeedTime)
+    ),
   },
 ];
 

@@ -45,6 +45,9 @@ export default async function MarketPage() {
           OR: [
             {
               listingType: "FREE_AGENT",
+              endsAt: {
+                gt: now,
+              },
             },
             {
               listingType: "AUCTION",

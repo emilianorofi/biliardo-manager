@@ -1,7 +1,12 @@
-# Chiusura automatica delle aste
+# Automazione del mercato
 
-La chiusura automatica usa Supabase Cron per chiamare ogni minuto l'endpoint
+L'automazione usa Supabase Cron per chiamare ogni minuto l'endpoint
 `GET /api/cron/market-settlement` della produzione Vercel.
+
+Lo stesso controllo chiude le aste scadute e archivia gli svincolati rimasti
+senza club per 105 giorni. Il termine di ogni svincolato è calcolato dal suo
+`startsAt`; la procedura registra l'inserzione come `EXPIRED` senza eliminare
+il giocatore dal database, preservandone così statistiche e storico.
 
 L'endpoint richiede l'header:
 
@@ -61,6 +66,6 @@ select cron.schedule(
 );
 ```
 
-Il processo è idempotente: le aste già concluse non vengono elaborate una
-seconda volta. La chiusura manuale dalla pagina Mercato resta disponibile come
-controllo aggiuntivo.
+Il processo è idempotente: aste e svincolati già conclusi non vengono elaborati
+una seconda volta. Il controllo manuale dalla pagina Mercato resta disponibile
+come protezione aggiuntiva.

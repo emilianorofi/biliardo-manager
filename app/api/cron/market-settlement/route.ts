@@ -1,6 +1,7 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
+import { expireUnavailableFreeAgents } from "@/lib/free-agent-expiration";
 import { settleExpiredAuctions } from "@/lib/market-settlement";
 
 export const dynamic = "force-dynamic";
@@ -29,7 +30,12 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const outcomes = await settleExpiredAuctions();
+    const checkedAt = new Date();
+    const [outcomes, expiredFreeAgents] =
+      await Promise.all([
+        settleExpiredAuctions(checkedAt),
+        expireUnavailableFreeAgents(checkedAt),
+      ]);
     const pendingCount = outcomes.filter(
       (outcome) =>
         outcome.status === "PENDING_TRANSFER"
@@ -39,21 +45,24 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      checkedAt: new Date().toISOString(),
+      checkedAt: checkedAt.toISOString(),
       settledCount,
       pendingCount,
+      expiredFreeAgentsCount:
+        expiredFreeAgents.length,
       outcomes,
+      expiredFreeAgents,
     });
   } catch (error: unknown) {
     console.error(
-      "Errore durante la chiusura automatica delle aste:",
+      "Errore durante l'aggiornamento automatico del mercato:",
       error
     );
 
     return NextResponse.json(
       {
         error:
-          "Impossibile completare la chiusura automatica delle aste.",
+          "Impossibile completare l'aggiornamento automatico del mercato.",
       },
       {
         status: 500,
