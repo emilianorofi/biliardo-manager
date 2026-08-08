@@ -38,7 +38,7 @@ const menu = [
   },
   {
     label: "Lega",
-    href: "/league",
+    href: "/campionato",
     icon: Trophy,
   },
   {
