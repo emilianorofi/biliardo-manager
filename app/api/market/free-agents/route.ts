@@ -2,8 +2,8 @@ import { NextResponse } from "next/server";
 
 import {
   MAX_FIRST_TEAM_PLAYERS,
-  USER_CLUB_ID,
 } from "@/lib/game-config";
+import { getApiClubAccess } from "@/lib/api-club-access";
 import { getMarketCommitments } from "@/lib/market-commitments";
 import { prisma } from "@/lib/prisma";
 
@@ -19,6 +19,13 @@ class FreeAgentSigningError extends Error {
 
 export async function POST(request: Request) {
   try {
+    const access = await getApiClubAccess();
+
+    if (!access.granted) {
+      return access.response;
+    }
+
+    const { clubId } = access;
     const body: unknown = await request.json();
 
     if (typeof body !== "object" || body === null) {
@@ -58,7 +65,7 @@ export async function POST(request: Request) {
         >`
           SELECT "id"
           FROM "Club"
-          WHERE "id" = ${USER_CLUB_ID}
+          WHERE "id" = ${clubId}
           FOR UPDATE
         `;
 
@@ -90,7 +97,7 @@ export async function POST(request: Request) {
           await Promise.all([
             transaction.club.findUnique({
               where: {
-                id: USER_CLUB_ID,
+                id: clubId,
               },
               select: {
                 balance: true,
@@ -119,7 +126,7 @@ export async function POST(request: Request) {
             }),
             getMarketCommitments(
               transaction,
-              USER_CLUB_ID
+              clubId
             ),
           ]);
 
@@ -185,7 +192,7 @@ export async function POST(request: Request) {
 
         await transaction.club.update({
           where: {
-            id: USER_CLUB_ID,
+            id: clubId,
           },
           data: {
             balance: {
@@ -199,7 +206,7 @@ export async function POST(request: Request) {
             id: listing.player.id,
           },
           data: {
-            clubId: USER_CLUB_ID,
+            clubId,
           },
         });
 
@@ -209,7 +216,7 @@ export async function POST(request: Request) {
           },
           data: {
             status: "COMPLETED",
-            winnerClubId: USER_CLUB_ID,
+            winnerClubId: clubId,
             finalPrice: 0,
             completedAt,
           },
@@ -217,7 +224,7 @@ export async function POST(request: Request) {
 
         await transaction.gameEvent.create({
           data: {
-            clubId: USER_CLUB_ID,
+            clubId,
             type: "TRANSFER_FREE_AGENT_SIGNED",
             title: `Svincolato ingaggiato: ${playerName}`,
             description: `${playerName} è entrato nella rosa. È stato addebitato lo stipendio di ${formatCurrency(

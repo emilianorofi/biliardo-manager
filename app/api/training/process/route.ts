@@ -1,8 +1,6 @@
 import { NextResponse } from "next/server";
 
-import {
-  USER_CLUB_ID,
-} from "@/lib/game-config";
+import { getApiClubAccess } from "@/lib/api-club-access";
 
 import { prisma } from "@/lib/prisma";
 
@@ -21,11 +19,18 @@ export const dynamic =
 
 export async function POST() {
   try {
+    const access = await getApiClubAccess();
+
+    if (!access.granted) {
+      return access.response;
+    }
+
+    const { clubId } = access;
     const club =
       await prisma.club.findUnique({
         where: {
           id:
-            USER_CLUB_ID,
+            clubId,
         },
 
         include: {
@@ -127,7 +132,7 @@ export async function POST() {
         where: {
           clubId_weekKey: {
             clubId:
-              USER_CLUB_ID,
+              clubId,
 
             weekKey,
           },
@@ -187,7 +192,7 @@ export async function POST() {
             await transaction.trainingSession.create({
               data: {
                 clubId:
-                  USER_CLUB_ID,
+                  clubId,
 
                 weekKey,
 
@@ -427,7 +432,7 @@ export async function POST() {
           await transaction.trainingPlan.update({
             where: {
               clubId:
-                USER_CLUB_ID,
+                clubId,
             },
 
             data: {
@@ -439,7 +444,7 @@ export async function POST() {
           await transaction.gameEvent.create({
             data: {
               clubId:
-                USER_CLUB_ID,
+                clubId,
 
               type:
                 "Allenamento",

@@ -19,7 +19,8 @@ export default function AppShell({
 }) {
   const pathname = usePathname();
   const isOutsideGameShell =
-    PAGES_WITHOUT_GAME_SHELL.includes(pathname);
+    PAGES_WITHOUT_GAME_SHELL.includes(pathname) ||
+    pathname.startsWith("/onboarding/");
 
   if (isOutsideGameShell) {
     return children;
@@ -28,7 +29,7 @@ export default function AppShell({
   return (
     <div className="flex min-h-screen">
       <Sidebar />
-      <main className="min-w-0 flex-1 p-6">
+      <main className="min-w-0 flex-1 bg-[#0b1712] p-4 lg:p-5">
         {children}
       </main>
     </div>

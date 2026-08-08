@@ -6,9 +6,7 @@ import {
 
 import Card from "@/app/components/ui/Card";
 
-import {
-  USER_CLUB_ID,
-} from "@/lib/game-config";
+import { getCurrentClubId } from "@/lib/current-club";
 
 import {
   createLeagueTable,
@@ -17,6 +15,7 @@ import {
 import { prisma } from "@/lib/prisma";
 
 export default async function StandingsCard() {
+  const clubId = await getCurrentClubId();
   const league =
     await prisma.league.findFirst({
       where: {
@@ -123,7 +122,7 @@ export default async function StandingsCard() {
           (entry) => {
             const isUserClub =
               entry.clubId ===
-              USER_CLUB_ID;
+              clubId;
 
             return (
               <div

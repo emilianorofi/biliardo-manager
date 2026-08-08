@@ -1,8 +1,6 @@
 import { NextResponse } from "next/server";
 
-import {
-  USER_CLUB_ID,
-} from "@/lib/game-config";
+import { getApiClubAccess } from "@/lib/api-club-access";
 
 import { prisma } from "@/lib/prisma";
 
@@ -38,6 +36,13 @@ function calculateOverall(player: {
 
 export async function GET() {
   try {
+    const access = await getApiClubAccess();
+
+    if (!access.granted) {
+      return access.response;
+    }
+
+    const { clubId } = access;
     const [
       databasePlayers,
       databaseFormation,
@@ -45,7 +50,7 @@ export async function GET() {
       prisma.player.findMany({
         where: {
           clubId:
-            USER_CLUB_ID,
+            clubId,
         },
 
         orderBy: [
@@ -63,7 +68,7 @@ export async function GET() {
       prisma.formation.findUnique({
         where: {
           clubId:
-            USER_CLUB_ID,
+            clubId,
         },
       }),
     ]);
@@ -236,6 +241,13 @@ export async function POST(
   request: Request
 ) {
   try {
+    const access = await getApiClubAccess();
+
+    if (!access.granted) {
+      return access.response;
+    }
+
+    const { clubId } = access;
     const body: unknown =
       await request.json();
 
@@ -331,7 +343,7 @@ export async function POST(
       await prisma.player.count({
         where: {
           clubId:
-            USER_CLUB_ID,
+            clubId,
 
           id: {
             in:
@@ -362,7 +374,7 @@ export async function POST(
       await prisma.formation.upsert({
         where: {
           clubId:
-            USER_CLUB_ID,
+            clubId,
         },
 
         update: {
@@ -374,7 +386,7 @@ export async function POST(
 
         create: {
           clubId:
-            USER_CLUB_ID,
+            clubId,
 
           slotAPlayerId,
           slotBPlayerId,

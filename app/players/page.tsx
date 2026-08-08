@@ -1,23 +1,35 @@
 import PlayerListCard from "@/app/components/player/PlayerListCard";
 import type { Player } from "@/app/types/player";
+import { getCurrentClubId } from "@/lib/current-club";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
 export default async function PlayersPage() {
-  const databasePlayers = await prisma.player.findMany({
+  const clubId = await getCurrentClubId();
+  const club = await prisma.club.findUnique({
     where: {
-      clubId: 1,
+      id: clubId,
     },
-    orderBy: [
-      {
-        lastName: "asc",
+    include: {
+      players: {
+        orderBy: [
+          {
+            lastName: "asc",
+          },
+          {
+            firstName: "asc",
+          },
+        ],
       },
-      {
-        firstName: "asc",
-      },
-    ],
+    },
   });
+
+  if (!club) {
+    throw new Error("Club principale non disponibile.");
+  }
+
+  const databasePlayers = club.players;
 
   const players: Player[] = databasePlayers.map(
     (player) => {
@@ -99,52 +111,70 @@ export default async function PlayersPage() {
       : 0;
 
   return (
-    <main className="space-y-7">
-      <header className="flex flex-col justify-between gap-5 xl:flex-row xl:items-end">
-        <div>
-          <p className="text-xs font-black uppercase tracking-[0.2em] text-emerald-400">
-            Prima squadra
-          </p>
+    <main className="space-y-4">
+      <header className="relative overflow-hidden rounded-2xl border border-emerald-900/60 bg-[linear-gradient(135deg,#183129_0%,#12231d_68%,#101e19_100%)] px-5 py-4 shadow-xl shadow-black/10 sm:px-6">
+        <div
+          className="absolute inset-x-0 top-0 h-1.5"
+          style={{
+            background: `linear-gradient(90deg, ${club.primaryColor}, ${club.secondaryColor})`,
+          }}
+        />
 
-          <h1 className="mt-2 text-4xl font-black text-white">
-            Rosa giocatori
-          </h1>
+        <div
+          className="pointer-events-none absolute -right-20 -top-24 h-64 w-64 rounded-full opacity-10 blur-3xl"
+          style={{ backgroundColor: club.secondaryColor }}
+        />
 
-          <p className="mt-2 max-w-2xl text-slate-400">
-            Controlla caratteristiche, stato e specialità
-            dei giocatori della tua squadra.
-          </p>
-        </div>
+        <div className="relative flex flex-col justify-between gap-4 xl:flex-row xl:items-center">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.2em] text-emerald-400">
+              Prima squadra
+            </p>
 
-        <div className="grid grid-cols-3 gap-3">
-          <TeamStat
-            label="Giocatori"
-            value={players.length}
-          />
+            <h1 className="mt-1 text-3xl font-black text-white">
+              Rosa giocatori
+            </h1>
 
-          <TeamStat
-            label="Età media"
-            value={averageAge}
-          />
+            <p className="mt-1 max-w-2xl text-sm leading-5 text-slate-400">
+              Una panoramica rapida della rosa. Apri un giocatore
+              per consultare tutte le caratteristiche tecniche.
+            </p>
+          </div>
 
-          <TeamStat
-            label="Overall medio"
-            value={averageOverall}
-            highlight
-          />
+          <div className="grid grid-cols-3 gap-3">
+            <TeamStat
+              label="Giocatori"
+              value={players.length}
+            />
+
+            <TeamStat
+              label="Età media"
+              value={averageAge}
+            />
+
+            <TeamStat
+              label="Overall medio"
+              value={averageOverall}
+              highlight
+            />
+          </div>
         </div>
       </header>
 
-      <section className="space-y-4">
+      <section className="grid items-stretch gap-3 md:grid-cols-2 xl:grid-cols-3">
         {players.map((player) => (
           <PlayerListCard
             key={player.id}
             player={player}
+            clubColors={{
+              primary: club.primaryColor,
+              secondary: club.secondaryColor,
+            }}
           />
         ))}
 
         {players.length === 0 && (
-          <div className="rounded-2xl border border-emerald-900/60 bg-[#15261f] p-10 text-center">
+          <div className="rounded-2xl border border-emerald-900/60 bg-[#15261f] p-10 text-center md:col-span-2 xl:col-span-3">
             <p className="font-bold text-white">
               Nessun giocatore presente
             </p>
@@ -169,13 +199,13 @@ function TeamStat({
   highlight?: boolean;
 }) {
   return (
-    <div className="min-w-28 rounded-2xl border border-emerald-900/60 bg-[#183129] px-4 py-3 text-center">
+    <div className="min-w-24 rounded-xl border border-emerald-900/60 bg-[#183129] px-3 py-2 text-center">
       <p className="text-[10px] font-bold uppercase tracking-wider text-emerald-300/70">
         {label}
       </p>
 
       <p
-        className={`mt-1 text-2xl font-black ${
+        className={`mt-0.5 text-xl font-black ${
           highlight
             ? "text-amber-300"
             : "text-white"

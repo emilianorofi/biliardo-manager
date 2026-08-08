@@ -2,8 +2,8 @@ import { NextResponse } from "next/server";
 
 import {
   MAX_FIRST_TEAM_PLAYERS,
-  USER_CLUB_ID,
 } from "@/lib/game-config";
+import { getApiClubAccess } from "@/lib/api-club-access";
 import { getMarketCommitments } from "@/lib/market-commitments";
 import { prisma } from "@/lib/prisma";
 
@@ -21,10 +21,17 @@ class AcademyPromotionError extends Error {
 
 export async function GET() {
   try {
+    const access = await getApiClubAccess();
+
+    if (!access.granted) {
+      return access.response;
+    }
+
+    const { clubId } = access;
     const databasePlayers =
       await prisma.academyPlayer.findMany({
         where: {
-          clubId: USER_CLUB_ID,
+          clubId,
         },
         orderBy: [
           {
@@ -140,6 +147,13 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
+    const access = await getApiClubAccess();
+
+    if (!access.granted) {
+      return access.response;
+    }
+
+    const { clubId } = access;
     const body: unknown = await request.json();
 
     const playerId =
@@ -169,7 +183,7 @@ export async function POST(request: Request) {
       await prisma.academyPlayer.findFirst({
         where: {
           id: playerId,
-          clubId: USER_CLUB_ID,
+          clubId,
         },
       });
 
@@ -231,7 +245,7 @@ export async function POST(request: Request) {
         await transaction.$queryRaw`
           SELECT "id"
           FROM "Club"
-          WHERE "id" = ${USER_CLUB_ID}
+          WHERE "id" = ${clubId}
           FOR UPDATE
         `;
 
@@ -239,12 +253,12 @@ export async function POST(request: Request) {
           await Promise.all([
             transaction.player.count({
               where: {
-                clubId: USER_CLUB_ID,
+                clubId,
               },
             }),
             getMarketCommitments(
               transaction,
-              USER_CLUB_ID
+              clubId
             ),
           ]);
 

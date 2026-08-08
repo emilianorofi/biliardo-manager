@@ -20,234 +20,120 @@ export default function FormationSlot({
   onChange,
 }: FormationSlotProps) {
   return (
-    <div className="rounded-2xl border border-emerald-900 bg-[#16271f] shadow-lg">
-
-      {/* Header */}
-
-      <div className="flex items-center justify-between border-b border-emerald-900 px-5 py-4">
-
-        <div>
-          <p className="text-xs uppercase tracking-[0.2em] text-emerald-400">
-            Slot
-          </p>
-
-          <h2 className="text-3xl font-black text-amber-300">
-            {slot}
-          </h2>
+    <article className="overflow-hidden rounded-2xl border border-emerald-900/70 bg-[#16271f] shadow-lg shadow-black/10">
+      <div className="flex items-center gap-3 border-b border-emerald-900/60 p-3">
+        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-amber-400 text-lg font-black text-[#122018]">
+          {slot}
         </div>
-
-        {player && (
-          <div className="text-right">
-            <p className="text-xs uppercase text-slate-400">
-              Overall
-            </p>
-
-            <p className="text-3xl font-black text-white">
-              {player.overall}
-            </p>
-          </div>
-        )}
-
-      </div>
-
-      {/* Select */}
-
-      <div className="p-5">
 
         <select
           value={currentValue ?? ""}
-          onChange={(e) => onChange(e.target.value)}
-          className="w-full rounded-xl border border-emerald-800 bg-[#10231c] px-4 py-3 font-semibold text-white outline-none transition focus:border-amber-400"
+          onChange={(event) => onChange(event.target.value)}
+          aria-label={`Giocatore per lo slot ${slot}`}
+          className="min-w-0 flex-1 rounded-xl border border-emerald-800 bg-[#10231c] px-3 py-2.5 text-sm font-semibold text-white outline-none transition focus:border-amber-400"
         >
-          <option value="">
-            Seleziona giocatore
-          </option>
+          <option value="">Seleziona giocatore</option>
 
-          {players.map((p) => {
-
+          {players.map((availablePlayer) => {
             const disabled =
-              selectedIds.includes(p.id) &&
-              p.id !== currentValue;
+              selectedIds.includes(availablePlayer.id) &&
+              availablePlayer.id !== currentValue;
 
             return (
               <option
-                key={p.id}
-                value={p.id}
+                key={availablePlayer.id}
+                value={availablePlayer.id}
                 disabled={disabled}
               >
-                {p.firstName} {p.lastName}
+                {availablePlayer.firstName} {availablePlayer.lastName}
                 {disabled ? " • già schierato" : ""}
               </option>
             );
           })}
         </select>
 
+        <div className="w-11 shrink-0 text-center">
+          <p className="text-[8px] font-black uppercase tracking-wider text-slate-500">
+            Ovr
+          </p>
+
+          <p className="mt-0.5 text-xl font-black text-amber-300">
+            {player?.overall ?? "--"}
+          </p>
+        </div>
       </div>
 
-      {/* Giocatore */}
-
       {player ? (
-        <div className="px-5 pb-5">
-
-          <div className="rounded-2xl bg-[#10231c] p-5">
-
-            <div className="flex items-center gap-4">
-
-              <div className="flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-amber-400 to-yellow-300 text-2xl font-black text-[#122018]">
-
-                {player.firstName.charAt(0)}
-                {player.lastName.charAt(0)}
-
-              </div>
-
-              <div>
-
-                <h3 className="text-xl font-black text-white">
-                  {player.firstName} {player.lastName}
-                </h3>
-
-                <p className="mt-1 text-sm text-slate-400">
-                  {player.nationality}
-                </p>
-
-                <p className="text-sm text-slate-400">
-                  {player.age} anni
-                </p>
-
-              </div>
-
+        <div className="p-3">
+          <div className="flex items-center gap-3 rounded-xl bg-[#10231c] p-3">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-amber-400 to-yellow-300 text-sm font-black text-[#122018]">
+              {player.firstName.charAt(0)}
+              {player.lastName.charAt(0)}
             </div>
 
-            {/* Statistiche */}
+            <div className="min-w-0 flex-1">
+              <h3 className="truncate text-sm font-black text-white">
+                {player.firstName} {player.lastName}
+              </h3>
 
-            <div className="mt-6 grid grid-cols-2 gap-3">
-
-              <Stat
-                label="Forma"
-                value={`${player.form}/10`}
-              />
-
-              <Stat
-                label="Morale"
-                value={`${player.morale}/10`}
-              />
-
-              <Stat
-                label="Esperienza"
-                value={player.experience}
-              />
-
-              <Stat
-                label="Valore"
-                value={`€ ${player.value.toLocaleString()}`}
-              />
-
-            </div>
-
-            {/* Specialità */}
-
-            <div className="mt-6 border-t border-emerald-900 pt-5">
-
-              <p className="mb-3 text-xs uppercase tracking-widest text-emerald-400">
-                Specialità
+              <p className="mt-0.5 text-[11px] text-slate-500">
+                {player.nationality} · {player.age} anni
               </p>
-
-              <div className="space-y-2">
-
-                <Speciality
-                  name="Italiana"
-                  value={player.specialties.italiana}
-                />
-
-                <Speciality
-                  name="Goriziana"
-                  value={player.specialties.goriziana}
-                />
-
-                <Speciality
-                  name="Tutti Doppi"
-                  value={player.specialties.tuttiDoppi}
-                />
-
-              </div>
-
             </div>
 
+            <div className="flex gap-4 text-center">
+              <CompactStat label="Forma" value={`${player.form}/10`} />
+              <CompactStat label="Morale" value={`${player.morale}/10`} />
+            </div>
           </div>
 
-        </div>
+          <div className="mt-3 grid grid-cols-3 gap-2">
+            <Speciality name="Italiana" value={player.specialties.italiana} />
+            <Speciality name="Goriziana" value={player.specialties.goriziana} />
+            <Speciality name="Tutti doppi" value={player.specialties.tuttiDoppi} />
+          </div>
 
+          <div className="mt-2 flex items-center justify-between rounded-lg border border-emerald-900/45 bg-black/10 px-3 py-2">
+            <span className="text-[9px] font-bold uppercase tracking-wider text-slate-500">
+              Esperienza
+            </span>
+
+            <span className="text-xs font-black text-slate-300">
+              {player.experience}
+            </span>
+          </div>
+        </div>
       ) : (
-
-        <div className="px-5 pb-5">
-
-          <div className="flex h-72 items-center justify-center rounded-2xl border-2 border-dashed border-emerald-900 text-center text-slate-500">
-
-            Nessun giocatore selezionato
-
+        <div className="p-3">
+          <div className="flex h-[9.6rem] items-center justify-center rounded-xl border border-dashed border-emerald-900/80 bg-black/10 px-4 text-center text-sm text-slate-500">
+            Scegli un giocatore per lo slot {slot}
           </div>
-
         </div>
-
       )}
-
-    </div>
+    </article>
   );
 }
 
-function Stat({
-  label,
-  value,
-}: {
-  label: string;
-  value: string | number;
-}) {
+function CompactStat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-xl bg-emerald-950/60 p-3">
-
-      <p className="text-[10px] uppercase tracking-widest text-slate-500">
+    <div>
+      <p className="text-[8px] font-bold uppercase tracking-wider text-slate-600">
         {label}
       </p>
 
-      <p className="mt-2 text-lg font-black text-white">
-        {value}
-      </p>
-
+      <p className="mt-0.5 text-xs font-black text-slate-300">{value}</p>
     </div>
   );
 }
 
-function Speciality({
-  name,
-  value,
-}: {
-  name: string;
-  value: number;
-}) {
+function Speciality({ name, value }: { name: string; value: number }) {
   return (
-    <div>
+    <div className="rounded-xl border border-emerald-900/45 bg-emerald-950/45 px-2 py-2.5 text-center">
+      <p className="text-base font-black text-white">{value}</p>
 
-      <div className="mb-1 flex justify-between text-sm">
-
-        <span className="text-slate-300">
-          {name}
-        </span>
-
-        <span className="font-bold text-white">
-          {value}
-        </span>
-
-      </div>
-
-      <div className="h-2 overflow-hidden rounded-full bg-slate-800">
-
-        <div
-          className="h-full rounded-full bg-gradient-to-r from-emerald-400 to-amber-300"
-          style={{ width: `${value}%` }}
-        />
-
-      </div>
-
+      <p className="mt-0.5 truncate text-[8px] font-bold uppercase tracking-wide text-emerald-300/70">
+        {name}
+      </p>
     </div>
   );
 }

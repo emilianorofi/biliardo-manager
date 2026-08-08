@@ -1,6 +1,4 @@
-import {
-  USER_CLUB_ID,
-} from "@/lib/game-config";
+import { getCurrentClubId } from "@/lib/current-club";
 
 import {
   getNextPlayableRound,
@@ -9,12 +7,13 @@ import {
 import { prisma } from "@/lib/prisma";
 
 export default async function DashboardHeader() {
+  const clubId = await getCurrentClubId();
   const [club, league] =
     await Promise.all([
       prisma.club.findUnique({
         where: {
           id:
-            USER_CLUB_ID,
+            clubId,
         },
 
         select: {
@@ -48,11 +47,11 @@ export default async function DashboardHeader() {
               OR: [
                 {
                   homeClubId:
-                    USER_CLUB_ID,
+                    clubId,
                 },
                 {
                   awayClubId:
-                    USER_CLUB_ID,
+                    clubId,
                 },
               ],
             },
@@ -122,7 +121,7 @@ export default async function DashboardHeader() {
   const opponent =
     fixture
       ? fixture.homeClubId ===
-        USER_CLUB_ID
+        clubId
         ? fixture.awayClub
         : fixture.homeClub
       : null;

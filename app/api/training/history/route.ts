@@ -1,8 +1,6 @@
 import { NextResponse } from "next/server";
 
-import {
-  USER_CLUB_ID,
-} from "@/lib/game-config";
+import { getApiClubAccess } from "@/lib/api-club-access";
 
 import { prisma } from "@/lib/prisma";
 
@@ -13,11 +11,18 @@ const MAX_SESSIONS = 10;
 
 export async function GET() {
   try {
+    const access = await getApiClubAccess();
+
+    if (!access.granted) {
+      return access.response;
+    }
+
+    const { clubId } = access;
     const clubExists =
       await prisma.club.findUnique({
         where: {
           id:
-            USER_CLUB_ID,
+            clubId,
         },
 
         select: {
@@ -42,7 +47,7 @@ export async function GET() {
       await prisma.trainingSession.findMany({
         where: {
           clubId:
-            USER_CLUB_ID,
+            clubId,
         },
 
         orderBy: {

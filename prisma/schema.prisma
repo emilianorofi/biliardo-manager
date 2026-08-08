@@ -10,9 +10,14 @@ datasource db {
 model Club {
   id Int @id @default(autoincrement())
 
-  name      String
-  shortName String
-  logo      String @default("")
+  name           String
+  normalizedName String @unique
+  shortName      String
+  logo           String @default("")
+
+  primaryColor   String @default("#065F46")
+  secondaryColor String @default("#FBBF24")
+  crestStyle     String @default("CLASSIC")
 
   city    String
   country String

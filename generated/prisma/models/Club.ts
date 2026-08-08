@@ -51,8 +51,12 @@ export type ClubSumAggregateOutputType = {
 export type ClubMinAggregateOutputType = {
   id: number | null
   name: string | null
+  normalizedName: string | null
   shortName: string | null
   logo: string | null
+  primaryColor: string | null
+  secondaryColor: string | null
+  crestStyle: string | null
   city: string | null
   country: string | null
   reputation: number | null
@@ -69,8 +73,12 @@ export type ClubMinAggregateOutputType = {
 export type ClubMaxAggregateOutputType = {
   id: number | null
   name: string | null
+  normalizedName: string | null
   shortName: string | null
   logo: string | null
+  primaryColor: string | null
+  secondaryColor: string | null
+  crestStyle: string | null
   city: string | null
   country: string | null
   reputation: number | null
@@ -87,8 +95,12 @@ export type ClubMaxAggregateOutputType = {
 export type ClubCountAggregateOutputType = {
   id: number
   name: number
+  normalizedName: number
   shortName: number
   logo: number
+  primaryColor: number
+  secondaryColor: number
+  crestStyle: number
   city: number
   country: number
   reputation: number
@@ -129,8 +141,12 @@ export type ClubSumAggregateInputType = {
 export type ClubMinAggregateInputType = {
   id?: true
   name?: true
+  normalizedName?: true
   shortName?: true
   logo?: true
+  primaryColor?: true
+  secondaryColor?: true
+  crestStyle?: true
   city?: true
   country?: true
   reputation?: true
@@ -147,8 +163,12 @@ export type ClubMinAggregateInputType = {
 export type ClubMaxAggregateInputType = {
   id?: true
   name?: true
+  normalizedName?: true
   shortName?: true
   logo?: true
+  primaryColor?: true
+  secondaryColor?: true
+  crestStyle?: true
   city?: true
   country?: true
   reputation?: true
@@ -165,8 +185,12 @@ export type ClubMaxAggregateInputType = {
 export type ClubCountAggregateInputType = {
   id?: true
   name?: true
+  normalizedName?: true
   shortName?: true
   logo?: true
+  primaryColor?: true
+  secondaryColor?: true
+  crestStyle?: true
   city?: true
   country?: true
   reputation?: true
@@ -270,8 +294,12 @@ export type ClubGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
 export type ClubGroupByOutputType = {
   id: number
   name: string
+  normalizedName: string
   shortName: string
   logo: string
+  primaryColor: string
+  secondaryColor: string
+  crestStyle: string
   city: string
   country: string
   reputation: number
@@ -311,8 +339,12 @@ export type ClubWhereInput = {
   NOT?: Prisma.ClubWhereInput | Prisma.ClubWhereInput[]
   id?: Prisma.IntFilter<"Club"> | number
   name?: Prisma.StringFilter<"Club"> | string
+  normalizedName?: Prisma.StringFilter<"Club"> | string
   shortName?: Prisma.StringFilter<"Club"> | string
   logo?: Prisma.StringFilter<"Club"> | string
+  primaryColor?: Prisma.StringFilter<"Club"> | string
+  secondaryColor?: Prisma.StringFilter<"Club"> | string
+  crestStyle?: Prisma.StringFilter<"Club"> | string
   city?: Prisma.StringFilter<"Club"> | string
   country?: Prisma.StringFilter<"Club"> | string
   reputation?: Prisma.IntFilter<"Club"> | number
@@ -342,8 +374,12 @@ export type ClubWhereInput = {
 export type ClubOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  normalizedName?: Prisma.SortOrder
   shortName?: Prisma.SortOrder
   logo?: Prisma.SortOrder
+  primaryColor?: Prisma.SortOrder
+  secondaryColor?: Prisma.SortOrder
+  crestStyle?: Prisma.SortOrder
   city?: Prisma.SortOrder
   country?: Prisma.SortOrder
   reputation?: Prisma.SortOrder
@@ -372,12 +408,16 @@ export type ClubOrderByWithRelationInput = {
 
 export type ClubWhereUniqueInput = Prisma.AtLeast<{
   id?: number
+  normalizedName?: string
   AND?: Prisma.ClubWhereInput | Prisma.ClubWhereInput[]
   OR?: Prisma.ClubWhereInput[]
   NOT?: Prisma.ClubWhereInput | Prisma.ClubWhereInput[]
   name?: Prisma.StringFilter<"Club"> | string
   shortName?: Prisma.StringFilter<"Club"> | string
   logo?: Prisma.StringFilter<"Club"> | string
+  primaryColor?: Prisma.StringFilter<"Club"> | string
+  secondaryColor?: Prisma.StringFilter<"Club"> | string
+  crestStyle?: Prisma.StringFilter<"Club"> | string
   city?: Prisma.StringFilter<"Club"> | string
   country?: Prisma.StringFilter<"Club"> | string
   reputation?: Prisma.IntFilter<"Club"> | number
@@ -402,13 +442,17 @@ export type ClubWhereUniqueInput = Prisma.AtLeast<{
   leagueEntries?: Prisma.LeagueEntryListRelationFilter
   homeFixtures?: Prisma.LeagueFixtureListRelationFilter
   awayFixtures?: Prisma.LeagueFixtureListRelationFilter
-}, "id">
+}, "id" | "normalizedName">
 
 export type ClubOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  normalizedName?: Prisma.SortOrder
   shortName?: Prisma.SortOrder
   logo?: Prisma.SortOrder
+  primaryColor?: Prisma.SortOrder
+  secondaryColor?: Prisma.SortOrder
+  crestStyle?: Prisma.SortOrder
   city?: Prisma.SortOrder
   country?: Prisma.SortOrder
   reputation?: Prisma.SortOrder
@@ -433,8 +477,12 @@ export type ClubScalarWhereWithAggregatesInput = {
   NOT?: Prisma.ClubScalarWhereWithAggregatesInput | Prisma.ClubScalarWhereWithAggregatesInput[]
   id?: Prisma.IntWithAggregatesFilter<"Club"> | number
   name?: Prisma.StringWithAggregatesFilter<"Club"> | string
+  normalizedName?: Prisma.StringWithAggregatesFilter<"Club"> | string
   shortName?: Prisma.StringWithAggregatesFilter<"Club"> | string
   logo?: Prisma.StringWithAggregatesFilter<"Club"> | string
+  primaryColor?: Prisma.StringWithAggregatesFilter<"Club"> | string
+  secondaryColor?: Prisma.StringWithAggregatesFilter<"Club"> | string
+  crestStyle?: Prisma.StringWithAggregatesFilter<"Club"> | string
   city?: Prisma.StringWithAggregatesFilter<"Club"> | string
   country?: Prisma.StringWithAggregatesFilter<"Club"> | string
   reputation?: Prisma.IntWithAggregatesFilter<"Club"> | number
@@ -450,8 +498,12 @@ export type ClubScalarWhereWithAggregatesInput = {
 
 export type ClubCreateInput = {
   name: string
+  normalizedName: string
   shortName: string
   logo?: string
+  primaryColor?: string
+  secondaryColor?: string
+  crestStyle?: string
   city: string
   country: string
   reputation?: number
@@ -481,8 +533,12 @@ export type ClubCreateInput = {
 export type ClubUncheckedCreateInput = {
   id?: number
   name: string
+  normalizedName: string
   shortName: string
   logo?: string
+  primaryColor?: string
+  secondaryColor?: string
+  crestStyle?: string
   city: string
   country: string
   reputation?: number
@@ -511,8 +567,12 @@ export type ClubUncheckedCreateInput = {
 
 export type ClubUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedName?: Prisma.StringFieldUpdateOperationsInput | string
   shortName?: Prisma.StringFieldUpdateOperationsInput | string
   logo?: Prisma.StringFieldUpdateOperationsInput | string
+  primaryColor?: Prisma.StringFieldUpdateOperationsInput | string
+  secondaryColor?: Prisma.StringFieldUpdateOperationsInput | string
+  crestStyle?: Prisma.StringFieldUpdateOperationsInput | string
   city?: Prisma.StringFieldUpdateOperationsInput | string
   country?: Prisma.StringFieldUpdateOperationsInput | string
   reputation?: Prisma.IntFieldUpdateOperationsInput | number
@@ -542,8 +602,12 @@ export type ClubUpdateInput = {
 export type ClubUncheckedUpdateInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedName?: Prisma.StringFieldUpdateOperationsInput | string
   shortName?: Prisma.StringFieldUpdateOperationsInput | string
   logo?: Prisma.StringFieldUpdateOperationsInput | string
+  primaryColor?: Prisma.StringFieldUpdateOperationsInput | string
+  secondaryColor?: Prisma.StringFieldUpdateOperationsInput | string
+  crestStyle?: Prisma.StringFieldUpdateOperationsInput | string
   city?: Prisma.StringFieldUpdateOperationsInput | string
   country?: Prisma.StringFieldUpdateOperationsInput | string
   reputation?: Prisma.IntFieldUpdateOperationsInput | number
@@ -573,8 +637,12 @@ export type ClubUncheckedUpdateInput = {
 export type ClubCreateManyInput = {
   id?: number
   name: string
+  normalizedName: string
   shortName: string
   logo?: string
+  primaryColor?: string
+  secondaryColor?: string
+  crestStyle?: string
   city: string
   country: string
   reputation?: number
@@ -590,8 +658,12 @@ export type ClubCreateManyInput = {
 
 export type ClubUpdateManyMutationInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedName?: Prisma.StringFieldUpdateOperationsInput | string
   shortName?: Prisma.StringFieldUpdateOperationsInput | string
   logo?: Prisma.StringFieldUpdateOperationsInput | string
+  primaryColor?: Prisma.StringFieldUpdateOperationsInput | string
+  secondaryColor?: Prisma.StringFieldUpdateOperationsInput | string
+  crestStyle?: Prisma.StringFieldUpdateOperationsInput | string
   city?: Prisma.StringFieldUpdateOperationsInput | string
   country?: Prisma.StringFieldUpdateOperationsInput | string
   reputation?: Prisma.IntFieldUpdateOperationsInput | number
@@ -608,8 +680,12 @@ export type ClubUpdateManyMutationInput = {
 export type ClubUncheckedUpdateManyInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedName?: Prisma.StringFieldUpdateOperationsInput | string
   shortName?: Prisma.StringFieldUpdateOperationsInput | string
   logo?: Prisma.StringFieldUpdateOperationsInput | string
+  primaryColor?: Prisma.StringFieldUpdateOperationsInput | string
+  secondaryColor?: Prisma.StringFieldUpdateOperationsInput | string
+  crestStyle?: Prisma.StringFieldUpdateOperationsInput | string
   city?: Prisma.StringFieldUpdateOperationsInput | string
   country?: Prisma.StringFieldUpdateOperationsInput | string
   reputation?: Prisma.IntFieldUpdateOperationsInput | number
@@ -626,8 +702,12 @@ export type ClubUncheckedUpdateManyInput = {
 export type ClubCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  normalizedName?: Prisma.SortOrder
   shortName?: Prisma.SortOrder
   logo?: Prisma.SortOrder
+  primaryColor?: Prisma.SortOrder
+  secondaryColor?: Prisma.SortOrder
+  crestStyle?: Prisma.SortOrder
   city?: Prisma.SortOrder
   country?: Prisma.SortOrder
   reputation?: Prisma.SortOrder
@@ -655,8 +735,12 @@ export type ClubAvgOrderByAggregateInput = {
 export type ClubMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  normalizedName?: Prisma.SortOrder
   shortName?: Prisma.SortOrder
   logo?: Prisma.SortOrder
+  primaryColor?: Prisma.SortOrder
+  secondaryColor?: Prisma.SortOrder
+  crestStyle?: Prisma.SortOrder
   city?: Prisma.SortOrder
   country?: Prisma.SortOrder
   reputation?: Prisma.SortOrder
@@ -673,8 +757,12 @@ export type ClubMaxOrderByAggregateInput = {
 export type ClubMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  normalizedName?: Prisma.SortOrder
   shortName?: Prisma.SortOrder
   logo?: Prisma.SortOrder
+  primaryColor?: Prisma.SortOrder
+  secondaryColor?: Prisma.SortOrder
+  crestStyle?: Prisma.SortOrder
   city?: Prisma.SortOrder
   country?: Prisma.SortOrder
   reputation?: Prisma.SortOrder
@@ -919,8 +1007,12 @@ export type ClubUpdateOneRequiredWithoutAwayFixturesNestedInput = {
 
 export type ClubCreateWithoutManagerInput = {
   name: string
+  normalizedName: string
   shortName: string
   logo?: string
+  primaryColor?: string
+  secondaryColor?: string
+  crestStyle?: string
   city: string
   country: string
   reputation?: number
@@ -949,8 +1041,12 @@ export type ClubCreateWithoutManagerInput = {
 export type ClubUncheckedCreateWithoutManagerInput = {
   id?: number
   name: string
+  normalizedName: string
   shortName: string
   logo?: string
+  primaryColor?: string
+  secondaryColor?: string
+  crestStyle?: string
   city: string
   country: string
   reputation?: number
@@ -994,8 +1090,12 @@ export type ClubUpdateToOneWithWhereWithoutManagerInput = {
 
 export type ClubUpdateWithoutManagerInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedName?: Prisma.StringFieldUpdateOperationsInput | string
   shortName?: Prisma.StringFieldUpdateOperationsInput | string
   logo?: Prisma.StringFieldUpdateOperationsInput | string
+  primaryColor?: Prisma.StringFieldUpdateOperationsInput | string
+  secondaryColor?: Prisma.StringFieldUpdateOperationsInput | string
+  crestStyle?: Prisma.StringFieldUpdateOperationsInput | string
   city?: Prisma.StringFieldUpdateOperationsInput | string
   country?: Prisma.StringFieldUpdateOperationsInput | string
   reputation?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1024,8 +1124,12 @@ export type ClubUpdateWithoutManagerInput = {
 export type ClubUncheckedUpdateWithoutManagerInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedName?: Prisma.StringFieldUpdateOperationsInput | string
   shortName?: Prisma.StringFieldUpdateOperationsInput | string
   logo?: Prisma.StringFieldUpdateOperationsInput | string
+  primaryColor?: Prisma.StringFieldUpdateOperationsInput | string
+  secondaryColor?: Prisma.StringFieldUpdateOperationsInput | string
+  crestStyle?: Prisma.StringFieldUpdateOperationsInput | string
   city?: Prisma.StringFieldUpdateOperationsInput | string
   country?: Prisma.StringFieldUpdateOperationsInput | string
   reputation?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1053,8 +1157,12 @@ export type ClubUncheckedUpdateWithoutManagerInput = {
 
 export type ClubCreateWithoutPlayersInput = {
   name: string
+  normalizedName: string
   shortName: string
   logo?: string
+  primaryColor?: string
+  secondaryColor?: string
+  crestStyle?: string
   city: string
   country: string
   reputation?: number
@@ -1083,8 +1191,12 @@ export type ClubCreateWithoutPlayersInput = {
 export type ClubUncheckedCreateWithoutPlayersInput = {
   id?: number
   name: string
+  normalizedName: string
   shortName: string
   logo?: string
+  primaryColor?: string
+  secondaryColor?: string
+  crestStyle?: string
   city: string
   country: string
   reputation?: number
@@ -1128,8 +1240,12 @@ export type ClubUpdateToOneWithWhereWithoutPlayersInput = {
 
 export type ClubUpdateWithoutPlayersInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedName?: Prisma.StringFieldUpdateOperationsInput | string
   shortName?: Prisma.StringFieldUpdateOperationsInput | string
   logo?: Prisma.StringFieldUpdateOperationsInput | string
+  primaryColor?: Prisma.StringFieldUpdateOperationsInput | string
+  secondaryColor?: Prisma.StringFieldUpdateOperationsInput | string
+  crestStyle?: Prisma.StringFieldUpdateOperationsInput | string
   city?: Prisma.StringFieldUpdateOperationsInput | string
   country?: Prisma.StringFieldUpdateOperationsInput | string
   reputation?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1158,8 +1274,12 @@ export type ClubUpdateWithoutPlayersInput = {
 export type ClubUncheckedUpdateWithoutPlayersInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedName?: Prisma.StringFieldUpdateOperationsInput | string
   shortName?: Prisma.StringFieldUpdateOperationsInput | string
   logo?: Prisma.StringFieldUpdateOperationsInput | string
+  primaryColor?: Prisma.StringFieldUpdateOperationsInput | string
+  secondaryColor?: Prisma.StringFieldUpdateOperationsInput | string
+  crestStyle?: Prisma.StringFieldUpdateOperationsInput | string
   city?: Prisma.StringFieldUpdateOperationsInput | string
   country?: Prisma.StringFieldUpdateOperationsInput | string
   reputation?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1187,8 +1307,12 @@ export type ClubUncheckedUpdateWithoutPlayersInput = {
 
 export type ClubCreateWithoutTransferListingsInput = {
   name: string
+  normalizedName: string
   shortName: string
   logo?: string
+  primaryColor?: string
+  secondaryColor?: string
+  crestStyle?: string
   city: string
   country: string
   reputation?: number
@@ -1217,8 +1341,12 @@ export type ClubCreateWithoutTransferListingsInput = {
 export type ClubUncheckedCreateWithoutTransferListingsInput = {
   id?: number
   name: string
+  normalizedName: string
   shortName: string
   logo?: string
+  primaryColor?: string
+  secondaryColor?: string
+  crestStyle?: string
   city: string
   country: string
   reputation?: number
@@ -1251,8 +1379,12 @@ export type ClubCreateOrConnectWithoutTransferListingsInput = {
 
 export type ClubCreateWithoutWonListingsInput = {
   name: string
+  normalizedName: string
   shortName: string
   logo?: string
+  primaryColor?: string
+  secondaryColor?: string
+  crestStyle?: string
   city: string
   country: string
   reputation?: number
@@ -1281,8 +1413,12 @@ export type ClubCreateWithoutWonListingsInput = {
 export type ClubUncheckedCreateWithoutWonListingsInput = {
   id?: number
   name: string
+  normalizedName: string
   shortName: string
   logo?: string
+  primaryColor?: string
+  secondaryColor?: string
+  crestStyle?: string
   city: string
   country: string
   reputation?: number
@@ -1326,8 +1462,12 @@ export type ClubUpdateToOneWithWhereWithoutTransferListingsInput = {
 
 export type ClubUpdateWithoutTransferListingsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedName?: Prisma.StringFieldUpdateOperationsInput | string
   shortName?: Prisma.StringFieldUpdateOperationsInput | string
   logo?: Prisma.StringFieldUpdateOperationsInput | string
+  primaryColor?: Prisma.StringFieldUpdateOperationsInput | string
+  secondaryColor?: Prisma.StringFieldUpdateOperationsInput | string
+  crestStyle?: Prisma.StringFieldUpdateOperationsInput | string
   city?: Prisma.StringFieldUpdateOperationsInput | string
   country?: Prisma.StringFieldUpdateOperationsInput | string
   reputation?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1356,8 +1496,12 @@ export type ClubUpdateWithoutTransferListingsInput = {
 export type ClubUncheckedUpdateWithoutTransferListingsInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedName?: Prisma.StringFieldUpdateOperationsInput | string
   shortName?: Prisma.StringFieldUpdateOperationsInput | string
   logo?: Prisma.StringFieldUpdateOperationsInput | string
+  primaryColor?: Prisma.StringFieldUpdateOperationsInput | string
+  secondaryColor?: Prisma.StringFieldUpdateOperationsInput | string
+  crestStyle?: Prisma.StringFieldUpdateOperationsInput | string
   city?: Prisma.StringFieldUpdateOperationsInput | string
   country?: Prisma.StringFieldUpdateOperationsInput | string
   reputation?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1396,8 +1540,12 @@ export type ClubUpdateToOneWithWhereWithoutWonListingsInput = {
 
 export type ClubUpdateWithoutWonListingsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedName?: Prisma.StringFieldUpdateOperationsInput | string
   shortName?: Prisma.StringFieldUpdateOperationsInput | string
   logo?: Prisma.StringFieldUpdateOperationsInput | string
+  primaryColor?: Prisma.StringFieldUpdateOperationsInput | string
+  secondaryColor?: Prisma.StringFieldUpdateOperationsInput | string
+  crestStyle?: Prisma.StringFieldUpdateOperationsInput | string
   city?: Prisma.StringFieldUpdateOperationsInput | string
   country?: Prisma.StringFieldUpdateOperationsInput | string
   reputation?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1426,8 +1574,12 @@ export type ClubUpdateWithoutWonListingsInput = {
 export type ClubUncheckedUpdateWithoutWonListingsInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedName?: Prisma.StringFieldUpdateOperationsInput | string
   shortName?: Prisma.StringFieldUpdateOperationsInput | string
   logo?: Prisma.StringFieldUpdateOperationsInput | string
+  primaryColor?: Prisma.StringFieldUpdateOperationsInput | string
+  secondaryColor?: Prisma.StringFieldUpdateOperationsInput | string
+  crestStyle?: Prisma.StringFieldUpdateOperationsInput | string
   city?: Prisma.StringFieldUpdateOperationsInput | string
   country?: Prisma.StringFieldUpdateOperationsInput | string
   reputation?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1455,8 +1607,12 @@ export type ClubUncheckedUpdateWithoutWonListingsInput = {
 
 export type ClubCreateWithoutTransferBidsInput = {
   name: string
+  normalizedName: string
   shortName: string
   logo?: string
+  primaryColor?: string
+  secondaryColor?: string
+  crestStyle?: string
   city: string
   country: string
   reputation?: number
@@ -1485,8 +1641,12 @@ export type ClubCreateWithoutTransferBidsInput = {
 export type ClubUncheckedCreateWithoutTransferBidsInput = {
   id?: number
   name: string
+  normalizedName: string
   shortName: string
   logo?: string
+  primaryColor?: string
+  secondaryColor?: string
+  crestStyle?: string
   city: string
   country: string
   reputation?: number
@@ -1530,8 +1690,12 @@ export type ClubUpdateToOneWithWhereWithoutTransferBidsInput = {
 
 export type ClubUpdateWithoutTransferBidsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedName?: Prisma.StringFieldUpdateOperationsInput | string
   shortName?: Prisma.StringFieldUpdateOperationsInput | string
   logo?: Prisma.StringFieldUpdateOperationsInput | string
+  primaryColor?: Prisma.StringFieldUpdateOperationsInput | string
+  secondaryColor?: Prisma.StringFieldUpdateOperationsInput | string
+  crestStyle?: Prisma.StringFieldUpdateOperationsInput | string
   city?: Prisma.StringFieldUpdateOperationsInput | string
   country?: Prisma.StringFieldUpdateOperationsInput | string
   reputation?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1560,8 +1724,12 @@ export type ClubUpdateWithoutTransferBidsInput = {
 export type ClubUncheckedUpdateWithoutTransferBidsInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedName?: Prisma.StringFieldUpdateOperationsInput | string
   shortName?: Prisma.StringFieldUpdateOperationsInput | string
   logo?: Prisma.StringFieldUpdateOperationsInput | string
+  primaryColor?: Prisma.StringFieldUpdateOperationsInput | string
+  secondaryColor?: Prisma.StringFieldUpdateOperationsInput | string
+  crestStyle?: Prisma.StringFieldUpdateOperationsInput | string
   city?: Prisma.StringFieldUpdateOperationsInput | string
   country?: Prisma.StringFieldUpdateOperationsInput | string
   reputation?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1589,8 +1757,12 @@ export type ClubUncheckedUpdateWithoutTransferBidsInput = {
 
 export type ClubCreateWithoutAcademyPlayersInput = {
   name: string
+  normalizedName: string
   shortName: string
   logo?: string
+  primaryColor?: string
+  secondaryColor?: string
+  crestStyle?: string
   city: string
   country: string
   reputation?: number
@@ -1619,8 +1791,12 @@ export type ClubCreateWithoutAcademyPlayersInput = {
 export type ClubUncheckedCreateWithoutAcademyPlayersInput = {
   id?: number
   name: string
+  normalizedName: string
   shortName: string
   logo?: string
+  primaryColor?: string
+  secondaryColor?: string
+  crestStyle?: string
   city: string
   country: string
   reputation?: number
@@ -1664,8 +1840,12 @@ export type ClubUpdateToOneWithWhereWithoutAcademyPlayersInput = {
 
 export type ClubUpdateWithoutAcademyPlayersInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedName?: Prisma.StringFieldUpdateOperationsInput | string
   shortName?: Prisma.StringFieldUpdateOperationsInput | string
   logo?: Prisma.StringFieldUpdateOperationsInput | string
+  primaryColor?: Prisma.StringFieldUpdateOperationsInput | string
+  secondaryColor?: Prisma.StringFieldUpdateOperationsInput | string
+  crestStyle?: Prisma.StringFieldUpdateOperationsInput | string
   city?: Prisma.StringFieldUpdateOperationsInput | string
   country?: Prisma.StringFieldUpdateOperationsInput | string
   reputation?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1694,8 +1874,12 @@ export type ClubUpdateWithoutAcademyPlayersInput = {
 export type ClubUncheckedUpdateWithoutAcademyPlayersInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedName?: Prisma.StringFieldUpdateOperationsInput | string
   shortName?: Prisma.StringFieldUpdateOperationsInput | string
   logo?: Prisma.StringFieldUpdateOperationsInput | string
+  primaryColor?: Prisma.StringFieldUpdateOperationsInput | string
+  secondaryColor?: Prisma.StringFieldUpdateOperationsInput | string
+  crestStyle?: Prisma.StringFieldUpdateOperationsInput | string
   city?: Prisma.StringFieldUpdateOperationsInput | string
   country?: Prisma.StringFieldUpdateOperationsInput | string
   reputation?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1723,8 +1907,12 @@ export type ClubUncheckedUpdateWithoutAcademyPlayersInput = {
 
 export type ClubCreateWithoutFormationInput = {
   name: string
+  normalizedName: string
   shortName: string
   logo?: string
+  primaryColor?: string
+  secondaryColor?: string
+  crestStyle?: string
   city: string
   country: string
   reputation?: number
@@ -1753,8 +1941,12 @@ export type ClubCreateWithoutFormationInput = {
 export type ClubUncheckedCreateWithoutFormationInput = {
   id?: number
   name: string
+  normalizedName: string
   shortName: string
   logo?: string
+  primaryColor?: string
+  secondaryColor?: string
+  crestStyle?: string
   city: string
   country: string
   reputation?: number
@@ -1798,8 +1990,12 @@ export type ClubUpdateToOneWithWhereWithoutFormationInput = {
 
 export type ClubUpdateWithoutFormationInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedName?: Prisma.StringFieldUpdateOperationsInput | string
   shortName?: Prisma.StringFieldUpdateOperationsInput | string
   logo?: Prisma.StringFieldUpdateOperationsInput | string
+  primaryColor?: Prisma.StringFieldUpdateOperationsInput | string
+  secondaryColor?: Prisma.StringFieldUpdateOperationsInput | string
+  crestStyle?: Prisma.StringFieldUpdateOperationsInput | string
   city?: Prisma.StringFieldUpdateOperationsInput | string
   country?: Prisma.StringFieldUpdateOperationsInput | string
   reputation?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1828,8 +2024,12 @@ export type ClubUpdateWithoutFormationInput = {
 export type ClubUncheckedUpdateWithoutFormationInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedName?: Prisma.StringFieldUpdateOperationsInput | string
   shortName?: Prisma.StringFieldUpdateOperationsInput | string
   logo?: Prisma.StringFieldUpdateOperationsInput | string
+  primaryColor?: Prisma.StringFieldUpdateOperationsInput | string
+  secondaryColor?: Prisma.StringFieldUpdateOperationsInput | string
+  crestStyle?: Prisma.StringFieldUpdateOperationsInput | string
   city?: Prisma.StringFieldUpdateOperationsInput | string
   country?: Prisma.StringFieldUpdateOperationsInput | string
   reputation?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1857,8 +2057,12 @@ export type ClubUncheckedUpdateWithoutFormationInput = {
 
 export type ClubCreateWithoutTrainingPlanInput = {
   name: string
+  normalizedName: string
   shortName: string
   logo?: string
+  primaryColor?: string
+  secondaryColor?: string
+  crestStyle?: string
   city: string
   country: string
   reputation?: number
@@ -1887,8 +2091,12 @@ export type ClubCreateWithoutTrainingPlanInput = {
 export type ClubUncheckedCreateWithoutTrainingPlanInput = {
   id?: number
   name: string
+  normalizedName: string
   shortName: string
   logo?: string
+  primaryColor?: string
+  secondaryColor?: string
+  crestStyle?: string
   city: string
   country: string
   reputation?: number
@@ -1932,8 +2140,12 @@ export type ClubUpdateToOneWithWhereWithoutTrainingPlanInput = {
 
 export type ClubUpdateWithoutTrainingPlanInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedName?: Prisma.StringFieldUpdateOperationsInput | string
   shortName?: Prisma.StringFieldUpdateOperationsInput | string
   logo?: Prisma.StringFieldUpdateOperationsInput | string
+  primaryColor?: Prisma.StringFieldUpdateOperationsInput | string
+  secondaryColor?: Prisma.StringFieldUpdateOperationsInput | string
+  crestStyle?: Prisma.StringFieldUpdateOperationsInput | string
   city?: Prisma.StringFieldUpdateOperationsInput | string
   country?: Prisma.StringFieldUpdateOperationsInput | string
   reputation?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1962,8 +2174,12 @@ export type ClubUpdateWithoutTrainingPlanInput = {
 export type ClubUncheckedUpdateWithoutTrainingPlanInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedName?: Prisma.StringFieldUpdateOperationsInput | string
   shortName?: Prisma.StringFieldUpdateOperationsInput | string
   logo?: Prisma.StringFieldUpdateOperationsInput | string
+  primaryColor?: Prisma.StringFieldUpdateOperationsInput | string
+  secondaryColor?: Prisma.StringFieldUpdateOperationsInput | string
+  crestStyle?: Prisma.StringFieldUpdateOperationsInput | string
   city?: Prisma.StringFieldUpdateOperationsInput | string
   country?: Prisma.StringFieldUpdateOperationsInput | string
   reputation?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1991,8 +2207,12 @@ export type ClubUncheckedUpdateWithoutTrainingPlanInput = {
 
 export type ClubCreateWithoutTrainingSessionsInput = {
   name: string
+  normalizedName: string
   shortName: string
   logo?: string
+  primaryColor?: string
+  secondaryColor?: string
+  crestStyle?: string
   city: string
   country: string
   reputation?: number
@@ -2021,8 +2241,12 @@ export type ClubCreateWithoutTrainingSessionsInput = {
 export type ClubUncheckedCreateWithoutTrainingSessionsInput = {
   id?: number
   name: string
+  normalizedName: string
   shortName: string
   logo?: string
+  primaryColor?: string
+  secondaryColor?: string
+  crestStyle?: string
   city: string
   country: string
   reputation?: number
@@ -2066,8 +2290,12 @@ export type ClubUpdateToOneWithWhereWithoutTrainingSessionsInput = {
 
 export type ClubUpdateWithoutTrainingSessionsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedName?: Prisma.StringFieldUpdateOperationsInput | string
   shortName?: Prisma.StringFieldUpdateOperationsInput | string
   logo?: Prisma.StringFieldUpdateOperationsInput | string
+  primaryColor?: Prisma.StringFieldUpdateOperationsInput | string
+  secondaryColor?: Prisma.StringFieldUpdateOperationsInput | string
+  crestStyle?: Prisma.StringFieldUpdateOperationsInput | string
   city?: Prisma.StringFieldUpdateOperationsInput | string
   country?: Prisma.StringFieldUpdateOperationsInput | string
   reputation?: Prisma.IntFieldUpdateOperationsInput | number
@@ -2096,8 +2324,12 @@ export type ClubUpdateWithoutTrainingSessionsInput = {
 export type ClubUncheckedUpdateWithoutTrainingSessionsInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedName?: Prisma.StringFieldUpdateOperationsInput | string
   shortName?: Prisma.StringFieldUpdateOperationsInput | string
   logo?: Prisma.StringFieldUpdateOperationsInput | string
+  primaryColor?: Prisma.StringFieldUpdateOperationsInput | string
+  secondaryColor?: Prisma.StringFieldUpdateOperationsInput | string
+  crestStyle?: Prisma.StringFieldUpdateOperationsInput | string
   city?: Prisma.StringFieldUpdateOperationsInput | string
   country?: Prisma.StringFieldUpdateOperationsInput | string
   reputation?: Prisma.IntFieldUpdateOperationsInput | number
@@ -2125,8 +2357,12 @@ export type ClubUncheckedUpdateWithoutTrainingSessionsInput = {
 
 export type ClubCreateWithoutGameEventsInput = {
   name: string
+  normalizedName: string
   shortName: string
   logo?: string
+  primaryColor?: string
+  secondaryColor?: string
+  crestStyle?: string
   city: string
   country: string
   reputation?: number
@@ -2155,8 +2391,12 @@ export type ClubCreateWithoutGameEventsInput = {
 export type ClubUncheckedCreateWithoutGameEventsInput = {
   id?: number
   name: string
+  normalizedName: string
   shortName: string
   logo?: string
+  primaryColor?: string
+  secondaryColor?: string
+  crestStyle?: string
   city: string
   country: string
   reputation?: number
@@ -2200,8 +2440,12 @@ export type ClubUpdateToOneWithWhereWithoutGameEventsInput = {
 
 export type ClubUpdateWithoutGameEventsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedName?: Prisma.StringFieldUpdateOperationsInput | string
   shortName?: Prisma.StringFieldUpdateOperationsInput | string
   logo?: Prisma.StringFieldUpdateOperationsInput | string
+  primaryColor?: Prisma.StringFieldUpdateOperationsInput | string
+  secondaryColor?: Prisma.StringFieldUpdateOperationsInput | string
+  crestStyle?: Prisma.StringFieldUpdateOperationsInput | string
   city?: Prisma.StringFieldUpdateOperationsInput | string
   country?: Prisma.StringFieldUpdateOperationsInput | string
   reputation?: Prisma.IntFieldUpdateOperationsInput | number
@@ -2230,8 +2474,12 @@ export type ClubUpdateWithoutGameEventsInput = {
 export type ClubUncheckedUpdateWithoutGameEventsInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedName?: Prisma.StringFieldUpdateOperationsInput | string
   shortName?: Prisma.StringFieldUpdateOperationsInput | string
   logo?: Prisma.StringFieldUpdateOperationsInput | string
+  primaryColor?: Prisma.StringFieldUpdateOperationsInput | string
+  secondaryColor?: Prisma.StringFieldUpdateOperationsInput | string
+  crestStyle?: Prisma.StringFieldUpdateOperationsInput | string
   city?: Prisma.StringFieldUpdateOperationsInput | string
   country?: Prisma.StringFieldUpdateOperationsInput | string
   reputation?: Prisma.IntFieldUpdateOperationsInput | number
@@ -2259,8 +2507,12 @@ export type ClubUncheckedUpdateWithoutGameEventsInput = {
 
 export type ClubCreateWithoutLeagueEntriesInput = {
   name: string
+  normalizedName: string
   shortName: string
   logo?: string
+  primaryColor?: string
+  secondaryColor?: string
+  crestStyle?: string
   city: string
   country: string
   reputation?: number
@@ -2289,8 +2541,12 @@ export type ClubCreateWithoutLeagueEntriesInput = {
 export type ClubUncheckedCreateWithoutLeagueEntriesInput = {
   id?: number
   name: string
+  normalizedName: string
   shortName: string
   logo?: string
+  primaryColor?: string
+  secondaryColor?: string
+  crestStyle?: string
   city: string
   country: string
   reputation?: number
@@ -2334,8 +2590,12 @@ export type ClubUpdateToOneWithWhereWithoutLeagueEntriesInput = {
 
 export type ClubUpdateWithoutLeagueEntriesInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedName?: Prisma.StringFieldUpdateOperationsInput | string
   shortName?: Prisma.StringFieldUpdateOperationsInput | string
   logo?: Prisma.StringFieldUpdateOperationsInput | string
+  primaryColor?: Prisma.StringFieldUpdateOperationsInput | string
+  secondaryColor?: Prisma.StringFieldUpdateOperationsInput | string
+  crestStyle?: Prisma.StringFieldUpdateOperationsInput | string
   city?: Prisma.StringFieldUpdateOperationsInput | string
   country?: Prisma.StringFieldUpdateOperationsInput | string
   reputation?: Prisma.IntFieldUpdateOperationsInput | number
@@ -2364,8 +2624,12 @@ export type ClubUpdateWithoutLeagueEntriesInput = {
 export type ClubUncheckedUpdateWithoutLeagueEntriesInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedName?: Prisma.StringFieldUpdateOperationsInput | string
   shortName?: Prisma.StringFieldUpdateOperationsInput | string
   logo?: Prisma.StringFieldUpdateOperationsInput | string
+  primaryColor?: Prisma.StringFieldUpdateOperationsInput | string
+  secondaryColor?: Prisma.StringFieldUpdateOperationsInput | string
+  crestStyle?: Prisma.StringFieldUpdateOperationsInput | string
   city?: Prisma.StringFieldUpdateOperationsInput | string
   country?: Prisma.StringFieldUpdateOperationsInput | string
   reputation?: Prisma.IntFieldUpdateOperationsInput | number
@@ -2393,8 +2657,12 @@ export type ClubUncheckedUpdateWithoutLeagueEntriesInput = {
 
 export type ClubCreateWithoutHomeFixturesInput = {
   name: string
+  normalizedName: string
   shortName: string
   logo?: string
+  primaryColor?: string
+  secondaryColor?: string
+  crestStyle?: string
   city: string
   country: string
   reputation?: number
@@ -2423,8 +2691,12 @@ export type ClubCreateWithoutHomeFixturesInput = {
 export type ClubUncheckedCreateWithoutHomeFixturesInput = {
   id?: number
   name: string
+  normalizedName: string
   shortName: string
   logo?: string
+  primaryColor?: string
+  secondaryColor?: string
+  crestStyle?: string
   city: string
   country: string
   reputation?: number
@@ -2457,8 +2729,12 @@ export type ClubCreateOrConnectWithoutHomeFixturesInput = {
 
 export type ClubCreateWithoutAwayFixturesInput = {
   name: string
+  normalizedName: string
   shortName: string
   logo?: string
+  primaryColor?: string
+  secondaryColor?: string
+  crestStyle?: string
   city: string
   country: string
   reputation?: number
@@ -2487,8 +2763,12 @@ export type ClubCreateWithoutAwayFixturesInput = {
 export type ClubUncheckedCreateWithoutAwayFixturesInput = {
   id?: number
   name: string
+  normalizedName: string
   shortName: string
   logo?: string
+  primaryColor?: string
+  secondaryColor?: string
+  crestStyle?: string
   city: string
   country: string
   reputation?: number
@@ -2532,8 +2812,12 @@ export type ClubUpdateToOneWithWhereWithoutHomeFixturesInput = {
 
 export type ClubUpdateWithoutHomeFixturesInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedName?: Prisma.StringFieldUpdateOperationsInput | string
   shortName?: Prisma.StringFieldUpdateOperationsInput | string
   logo?: Prisma.StringFieldUpdateOperationsInput | string
+  primaryColor?: Prisma.StringFieldUpdateOperationsInput | string
+  secondaryColor?: Prisma.StringFieldUpdateOperationsInput | string
+  crestStyle?: Prisma.StringFieldUpdateOperationsInput | string
   city?: Prisma.StringFieldUpdateOperationsInput | string
   country?: Prisma.StringFieldUpdateOperationsInput | string
   reputation?: Prisma.IntFieldUpdateOperationsInput | number
@@ -2562,8 +2846,12 @@ export type ClubUpdateWithoutHomeFixturesInput = {
 export type ClubUncheckedUpdateWithoutHomeFixturesInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedName?: Prisma.StringFieldUpdateOperationsInput | string
   shortName?: Prisma.StringFieldUpdateOperationsInput | string
   logo?: Prisma.StringFieldUpdateOperationsInput | string
+  primaryColor?: Prisma.StringFieldUpdateOperationsInput | string
+  secondaryColor?: Prisma.StringFieldUpdateOperationsInput | string
+  crestStyle?: Prisma.StringFieldUpdateOperationsInput | string
   city?: Prisma.StringFieldUpdateOperationsInput | string
   country?: Prisma.StringFieldUpdateOperationsInput | string
   reputation?: Prisma.IntFieldUpdateOperationsInput | number
@@ -2602,8 +2890,12 @@ export type ClubUpdateToOneWithWhereWithoutAwayFixturesInput = {
 
 export type ClubUpdateWithoutAwayFixturesInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedName?: Prisma.StringFieldUpdateOperationsInput | string
   shortName?: Prisma.StringFieldUpdateOperationsInput | string
   logo?: Prisma.StringFieldUpdateOperationsInput | string
+  primaryColor?: Prisma.StringFieldUpdateOperationsInput | string
+  secondaryColor?: Prisma.StringFieldUpdateOperationsInput | string
+  crestStyle?: Prisma.StringFieldUpdateOperationsInput | string
   city?: Prisma.StringFieldUpdateOperationsInput | string
   country?: Prisma.StringFieldUpdateOperationsInput | string
   reputation?: Prisma.IntFieldUpdateOperationsInput | number
@@ -2632,8 +2924,12 @@ export type ClubUpdateWithoutAwayFixturesInput = {
 export type ClubUncheckedUpdateWithoutAwayFixturesInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedName?: Prisma.StringFieldUpdateOperationsInput | string
   shortName?: Prisma.StringFieldUpdateOperationsInput | string
   logo?: Prisma.StringFieldUpdateOperationsInput | string
+  primaryColor?: Prisma.StringFieldUpdateOperationsInput | string
+  secondaryColor?: Prisma.StringFieldUpdateOperationsInput | string
+  crestStyle?: Prisma.StringFieldUpdateOperationsInput | string
   city?: Prisma.StringFieldUpdateOperationsInput | string
   country?: Prisma.StringFieldUpdateOperationsInput | string
   reputation?: Prisma.IntFieldUpdateOperationsInput | number
@@ -2774,8 +3070,12 @@ export type ClubCountOutputTypeCountAwayFixturesArgs<ExtArgs extends runtime.Typ
 export type ClubSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
+  normalizedName?: boolean
   shortName?: boolean
   logo?: boolean
+  primaryColor?: boolean
+  secondaryColor?: boolean
+  crestStyle?: boolean
   city?: boolean
   country?: boolean
   reputation?: boolean
@@ -2806,8 +3106,12 @@ export type ClubSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
 export type ClubSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
+  normalizedName?: boolean
   shortName?: boolean
   logo?: boolean
+  primaryColor?: boolean
+  secondaryColor?: boolean
+  crestStyle?: boolean
   city?: boolean
   country?: boolean
   reputation?: boolean
@@ -2824,8 +3128,12 @@ export type ClubSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
 export type ClubSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
+  normalizedName?: boolean
   shortName?: boolean
   logo?: boolean
+  primaryColor?: boolean
+  secondaryColor?: boolean
+  crestStyle?: boolean
   city?: boolean
   country?: boolean
   reputation?: boolean
@@ -2842,8 +3150,12 @@ export type ClubSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
 export type ClubSelectScalar = {
   id?: boolean
   name?: boolean
+  normalizedName?: boolean
   shortName?: boolean
   logo?: boolean
+  primaryColor?: boolean
+  secondaryColor?: boolean
+  crestStyle?: boolean
   city?: boolean
   country?: boolean
   reputation?: boolean
@@ -2857,7 +3169,7 @@ export type ClubSelectScalar = {
   updatedAt?: boolean
 }
 
-export type ClubOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "shortName" | "logo" | "city" | "country" | "reputation" | "fans" | "balance" | "weeklyExpenses" | "weeklyIncome" | "trainerLevel" | "youthCoachLevel" | "createdAt" | "updatedAt", ExtArgs["result"]["club"]>
+export type ClubOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "normalizedName" | "shortName" | "logo" | "primaryColor" | "secondaryColor" | "crestStyle" | "city" | "country" | "reputation" | "fans" | "balance" | "weeklyExpenses" | "weeklyIncome" | "trainerLevel" | "youthCoachLevel" | "createdAt" | "updatedAt", ExtArgs["result"]["club"]>
 export type ClubInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   players?: boolean | Prisma.Club$playersArgs<ExtArgs>
   academyPlayers?: boolean | Prisma.Club$academyPlayersArgs<ExtArgs>
@@ -2897,8 +3209,12 @@ export type $ClubPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
     name: string
+    normalizedName: string
     shortName: string
     logo: string
+    primaryColor: string
+    secondaryColor: string
+    crestStyle: string
     city: string
     country: string
     reputation: number
@@ -3348,8 +3664,12 @@ export interface Prisma__ClubClient<T, Null = never, ExtArgs extends runtime.Typ
 export interface ClubFieldRefs {
   readonly id: Prisma.FieldRef<"Club", 'Int'>
   readonly name: Prisma.FieldRef<"Club", 'String'>
+  readonly normalizedName: Prisma.FieldRef<"Club", 'String'>
   readonly shortName: Prisma.FieldRef<"Club", 'String'>
   readonly logo: Prisma.FieldRef<"Club", 'String'>
+  readonly primaryColor: Prisma.FieldRef<"Club", 'String'>
+  readonly secondaryColor: Prisma.FieldRef<"Club", 'String'>
+  readonly crestStyle: Prisma.FieldRef<"Club", 'String'>
   readonly city: Prisma.FieldRef<"Club", 'String'>
   readonly country: Prisma.FieldRef<"Club", 'String'>
   readonly reputation: Prisma.FieldRef<"Club", 'Int'>

@@ -1,8 +1,6 @@
 import { NextResponse } from "next/server";
 
-import {
-  USER_CLUB_ID,
-} from "@/lib/game-config";
+import { getApiClubAccess } from "@/lib/api-club-access";
 
 import { prisma } from "@/lib/prisma";
 
@@ -34,11 +32,18 @@ type FormationPlayer = {
 
 export async function GET() {
   try {
+    const access = await getApiClubAccess();
+
+    if (!access.granted) {
+      return access.response;
+    }
+
+    const { clubId } = access;
     const formation =
       await prisma.formation.findUnique({
         where: {
           clubId:
-            USER_CLUB_ID,
+            clubId,
         },
 
         include: {

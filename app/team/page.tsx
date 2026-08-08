@@ -11,14 +11,16 @@ import {
   WalletCards,
 } from "lucide-react";
 
+import { getCurrentClubId } from "@/lib/current-club";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
 export default async function TeamPage() {
+  const clubId = await getCurrentClubId();
   const club = await prisma.club.findUnique({
     where: {
-      id: 1,
+      id: clubId,
     },
     include: {
       players: true,
@@ -65,13 +67,28 @@ export default async function TeamPage() {
     .slice(0, 5);
 
   return (
-    <main className="space-y-6">
-      <header className="relative overflow-hidden rounded-3xl border border-emerald-900/60 bg-[#15261f] p-6 sm:p-8">
-        <div className="pointer-events-none absolute right-0 top-0 h-72 w-72 rounded-full bg-amber-400/5 blur-3xl" />
+    <main className="space-y-4">
+      <header className="relative overflow-hidden rounded-3xl border border-emerald-900/60 bg-[linear-gradient(135deg,#183129_0%,#12231d_68%,#101e19_100%)] p-5 shadow-xl shadow-black/10 sm:px-6 sm:py-5">
+        <div
+          className="absolute inset-x-0 top-0 h-1.5"
+          style={{
+            background: `linear-gradient(90deg, ${club.primaryColor}, ${club.secondaryColor})`,
+          }}
+        />
 
-        <div className="relative flex flex-col justify-between gap-8 lg:flex-row lg:items-center">
-          <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
-            <div className="flex h-24 w-24 shrink-0 items-center justify-center rounded-3xl border border-amber-400/30 bg-amber-400/10 text-3xl font-black text-amber-300">
+        <div
+          className="pointer-events-none absolute -right-16 -top-20 h-72 w-72 rounded-full opacity-10 blur-3xl"
+          style={{ backgroundColor: club.secondaryColor }}
+        />
+
+        <div className="relative flex flex-col justify-between gap-5 lg:flex-row lg:items-center">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+            <div
+              className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl border border-white/15 text-xl font-black text-white shadow-xl shadow-black/20"
+              style={{
+                background: `linear-gradient(145deg, ${club.primaryColor}, ${club.secondaryColor})`,
+              }}
+            >
               {club.shortName}
             </div>
 
@@ -80,11 +97,11 @@ export default async function TeamPage() {
                 Il tuo club
               </p>
 
-              <h1 className="mt-2 text-3xl font-black text-white sm:text-4xl">
+              <h1 className="mt-1 text-2xl font-black text-white sm:text-3xl">
                 {club.name}
               </h1>
 
-              <div className="mt-3 flex flex-wrap items-center gap-4 text-sm text-slate-400">
+              <div className="mt-2 flex flex-wrap items-center gap-4 text-sm text-slate-400">
                 <span className="flex items-center gap-2">
                   <MapPin size={16} />
                   {club.city}, {club.country}
@@ -98,9 +115,9 @@ export default async function TeamPage() {
             </div>
           </div>
 
-          <div className="flex items-center gap-4 rounded-2xl border border-amber-400/20 bg-amber-400/5 px-5 py-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-400/10 text-amber-300">
-              <Star size={24} />
+          <div className="flex items-center gap-3 rounded-2xl border border-amber-400/20 bg-amber-400/5 px-4 py-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-400/10 text-amber-300">
+              <Star size={20} />
             </div>
 
             <div>
@@ -108,7 +125,7 @@ export default async function TeamPage() {
                 Reputazione
               </p>
 
-              <p className="mt-1 text-2xl font-black text-amber-300">
+              <p className="mt-0.5 text-xl font-black text-amber-300">
                 {club.reputation}/100
               </p>
             </div>
@@ -116,7 +133,7 @@ export default async function TeamPage() {
         </div>
       </header>
 
-      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <SummaryCard
           label="Bilancio"
           value={formatCurrency(club.balance)}
@@ -152,15 +169,15 @@ export default async function TeamPage() {
         />
       </section>
 
-      <div className="grid gap-6 xl:grid-cols-[1.4fr_0.8fr]">
+      <div className="grid gap-4 xl:grid-cols-[1.5fr_0.8fr]">
         <section className="overflow-hidden rounded-2xl border border-emerald-900/60 bg-[#15261f]">
-          <div className="flex items-center justify-between gap-4 border-b border-emerald-900/60 p-5 sm:p-6">
+          <div className="flex items-center justify-between gap-4 border-b border-emerald-900/60 px-4 py-3.5 sm:px-5">
             <div>
               <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-400">
                 Prima squadra
               </p>
 
-              <h2 className="mt-1 text-2xl font-black text-white">
+              <h2 className="mt-0.5 text-xl font-black text-white">
                 Rosa
               </h2>
 
@@ -172,57 +189,27 @@ export default async function TeamPage() {
 
             <Link
               href="/players"
-              className="flex items-center gap-2 rounded-xl bg-amber-400 px-4 py-2 text-sm font-black text-[#122018] transition hover:bg-amber-300"
+              className="flex items-center gap-2 rounded-xl bg-amber-400 px-3 py-2 text-xs font-black text-[#122018] transition hover:bg-amber-300"
             >
               Rosa completa
               <ArrowRight size={16} />
             </Link>
           </div>
 
-          <div className="divide-y divide-emerald-900/40">
+          <div className="divide-y divide-emerald-900/40 px-3 py-1 sm:px-4">
             {topPlayers.map((player) => (
-              <Link
+              <RosterPlayerCard
                 key={player.id}
-                href={`/players/${player.id}`}
-                className="flex items-center gap-4 p-4 transition hover:bg-emerald-950/40 sm:px-6"
-              >
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-emerald-950/70 font-black text-emerald-300">
-                  {player.firstName.charAt(0)}
-                  {player.lastName.charAt(0)}
-                </div>
-
-                <div className="min-w-0 flex-1">
-                  <p className="truncate font-bold text-white">
-                    {player.firstName} {player.lastName}
-                  </p>
-
-                  <p className="mt-1 text-xs text-slate-500">
-                    {player.nationality} · {player.age} anni
-                  </p>
-                </div>
-
-                <div className="hidden gap-6 text-center sm:flex">
-                  <PlayerValue
-                    label="Forma"
-                    value={`${player.form}/10`}
-                  />
-
-                  <PlayerValue
-                    label="Morale"
-                    value={`${player.morale}/10`}
-                  />
-                </div>
-
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-amber-400/30 bg-amber-400/10 text-lg font-black text-amber-300">
-                  {player.overall}
-                </div>
-              </Link>
+                player={player}
+                primaryColor={club.primaryColor}
+                secondaryColor={club.secondaryColor}
+              />
             ))}
           </div>
         </section>
 
-        <div className="space-y-6">
-          <section className="rounded-2xl border border-emerald-900/60 bg-[#15261f] p-5 sm:p-6">
+        <div className="space-y-4">
+          <section className="rounded-2xl border border-emerald-900/60 bg-[#15261f] p-4 sm:p-5">
             <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-400">
               Staff tecnico
             </p>
@@ -231,7 +218,7 @@ export default async function TeamPage() {
               Struttura sportiva
             </h2>
 
-            <div className="mt-6 space-y-4">
+            <div className="mt-4 space-y-3">
               <StaffLevel
                 label="Allenatore prima squadra"
                 description={`Efficienza ${getTrainerEfficiency(
@@ -250,7 +237,7 @@ export default async function TeamPage() {
             </div>
           </section>
 
-          <section className="rounded-2xl border border-amber-400/20 bg-amber-400/5 p-5 sm:p-6">
+          <section className="rounded-2xl border border-amber-400/20 bg-amber-400/5 p-4 sm:p-5">
             <p className="text-xs font-black uppercase tracking-[0.18em] text-amber-300">
               Situazione economica
             </p>
@@ -321,7 +308,7 @@ function SummaryCard({
 
   return (
     <article
-      className={`rounded-2xl border p-5 ${style.border} ${style.background}`}
+      className={`rounded-2xl border px-4 py-3.5 ${style.border} ${style.background}`}
     >
       <div className={`flex items-center gap-2 ${style.text}`}>
         {icon}
@@ -331,29 +318,97 @@ function SummaryCard({
         </p>
       </div>
 
-      <p className={`mt-3 text-2xl font-black ${style.text}`}>
+      <p className={`mt-2 text-xl font-black ${style.text}`}>
         {value}
       </p>
     </article>
   );
 }
 
-function PlayerValue({
-  label,
-  value,
+function RosterPlayerCard({
+  player,
+  primaryColor,
+  secondaryColor,
 }: {
-  label: string;
-  value: string;
+  player: {
+    id: number;
+    firstName: string;
+    lastName: string;
+    nationality: string;
+    age: number;
+    form: number;
+    morale: number;
+    overall: number;
+    style: string[];
+  };
+  primaryColor: string;
+  secondaryColor: string;
 }) {
   return (
-    <div>
-      <p className="text-[10px] font-bold uppercase tracking-wider text-slate-600">
-        {label}
+    <Link
+      href={`/players/${player.id}`}
+      className="group relative flex items-center gap-3 px-3 py-3 transition duration-200 hover:bg-emerald-950/45 sm:px-4"
+    >
+      <div
+        className="absolute inset-y-0 left-0 w-1"
+        style={{
+          background: `linear-gradient(180deg, ${primaryColor}, ${secondaryColor})`,
+        }}
+      />
+
+      <div
+        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-white/10 text-xs font-black text-white"
+        style={{
+          background: `linear-gradient(145deg, ${primaryColor}, ${secondaryColor})`,
+        }}
+      >
+        {player.firstName.charAt(0)}
+        {player.lastName.charAt(0)}
+      </div>
+
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-sm font-black text-white transition group-hover:text-amber-200">
+          {player.firstName} {player.lastName}
+        </p>
+
+        <p className="mt-0.5 text-[11px] text-slate-500">
+          {player.nationality} · {player.age} anni
+        </p>
+      </div>
+
+      <p className="hidden w-28 truncate text-[10px] font-bold uppercase tracking-wide text-emerald-300/80 lg:block">
+        {player.style[0] ?? "Completo"}
       </p>
 
-      <p className="mt-1 text-sm font-black text-slate-300">
+      <div className="hidden items-center gap-5 sm:flex">
+        <RosterStatus label="Forma" value={`${player.form}/10`} />
+        <RosterStatus label="Morale" value={`${player.morale}/10`} />
+      </div>
+
+      <div className="shrink-0 text-center">
+        <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-amber-400/30 bg-amber-400/10 text-base font-black text-amber-300">
+          {player.overall}
+        </div>
+      </div>
+
+      <ArrowRight
+        size={16}
+        className="shrink-0 text-slate-600 transition group-hover:translate-x-0.5 group-hover:text-amber-300"
+      />
+    </Link>
+  );
+}
+
+function RosterStatus({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="w-12 text-center">
+      <span className="block text-[8px] font-bold uppercase tracking-wider text-slate-600">
+        {label}
+      </span>
+
+      <span className="mt-0.5 block text-xs font-black text-slate-300">
         {value}
-      </p>
+      </span>
     </div>
   );
 }

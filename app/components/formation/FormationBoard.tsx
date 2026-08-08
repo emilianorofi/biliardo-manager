@@ -378,19 +378,19 @@ export default function FormationBoard() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <section className="overflow-hidden rounded-2xl border border-emerald-900/60 bg-[#15261f]">
-        <div className="flex flex-col justify-between gap-5 border-b border-emerald-900/60 p-5 lg:flex-row lg:items-center lg:p-6">
+        <div className="flex flex-col justify-between gap-3 border-b border-emerald-900/60 p-4 lg:flex-row lg:items-center">
           <div>
             <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-400">
               Schieramento
             </p>
 
-            <h2 className="mt-2 text-2xl font-black text-white">
+            <h2 className="mt-1 text-xl font-black text-white">
               Assegna gli slot A, B e C
             </h2>
 
-            <p className="mt-1 max-w-2xl text-sm leading-6 text-slate-400">
+            <p className="mt-1 max-w-2xl text-xs leading-5 text-slate-400">
               Scegli tre giocatori
               diversi. Le sei partite
               della giornata verranno
@@ -398,7 +398,7 @@ export default function FormationBoard() {
             </p>
           </div>
 
-          <div className="flex flex-col gap-3 sm:flex-row">
+          <div className="flex flex-col gap-2 sm:flex-row">
             <button
               type="button"
               onClick={
@@ -408,7 +408,7 @@ export default function FormationBoard() {
                 players.length < 3 ||
                 isSaving
               }
-              className="flex items-center justify-center gap-2 rounded-xl border border-amber-400/40 bg-amber-400/10 px-4 py-2.5 text-sm font-black text-amber-300 transition hover:bg-amber-400/20 disabled:cursor-not-allowed disabled:opacity-40"
+              className="flex items-center justify-center gap-2 rounded-xl border border-amber-400/40 bg-amber-400/10 px-3 py-2 text-xs font-black text-amber-300 transition hover:bg-amber-400/20 disabled:cursor-not-allowed disabled:opacity-40"
             >
               <Sparkles size={17} />
 
@@ -419,7 +419,7 @@ export default function FormationBoard() {
               type="button"
               onClick={resetFormation}
               disabled={isSaving}
-              className="flex items-center justify-center gap-2 rounded-xl border border-emerald-800 px-4 py-2.5 text-sm font-bold text-slate-300 transition hover:bg-white/5 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+              className="flex items-center justify-center gap-2 rounded-xl border border-emerald-800 px-3 py-2 text-xs font-bold text-slate-300 transition hover:bg-white/5 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
             >
               <RotateCcw size={17} />
 
@@ -433,7 +433,7 @@ export default function FormationBoard() {
                 !formationComplete ||
                 isSaving
               }
-              className="flex items-center justify-center gap-2 rounded-xl bg-amber-400 px-4 py-2.5 text-sm font-black text-[#122018] transition hover:bg-amber-300 disabled:cursor-not-allowed disabled:opacity-40"
+              className="flex items-center justify-center gap-2 rounded-xl bg-amber-400 px-3 py-2 text-xs font-black text-[#122018] transition hover:bg-amber-300 disabled:cursor-not-allowed disabled:opacity-40"
             >
               <Save size={17} />
 
@@ -444,7 +444,7 @@ export default function FormationBoard() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 gap-5 p-5 lg:grid-cols-3 lg:p-6">
+        <div className="grid grid-cols-1 gap-3 p-4 lg:grid-cols-3">
           <FormationSlot
             slot="A"
             player={playerA}
@@ -488,7 +488,7 @@ export default function FormationBoard() {
           />
         </div>
 
-        <div className="px-5 pb-5 lg:px-6 lg:pb-6">
+        <div className="px-4 pb-4">
           {actionError && (
             <div className="mb-3 flex items-start justify-between gap-4 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3">
               <div className="flex gap-3">
@@ -562,8 +562,8 @@ export default function FormationBoard() {
         </div>
       </section>
 
-      <div className="grid grid-cols-1 gap-6 2xl:grid-cols-[minmax(0,1.5fr)_minmax(320px,0.7fr)]">
-        <section className="rounded-2xl border border-emerald-900/60 bg-[#15261f] p-5 lg:p-6">
+      <div className="grid grid-cols-1 gap-4 2xl:grid-cols-[minmax(0,1.5fr)_minmax(320px,0.7fr)]">
+        <section className="rounded-2xl border border-emerald-900/60 bg-[#15261f] p-4 lg:p-5">
           <div className="flex items-center gap-3">
             <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-400/10 text-emerald-300">
               <Users size={21} />
@@ -580,7 +580,7 @@ export default function FormationBoard() {
             </div>
           </div>
 
-          <div className="mt-6 grid grid-cols-1 gap-4 xl:grid-cols-2">
+          <div className="mt-4 grid grid-cols-1 gap-3 xl:grid-cols-2">
             <MatchCard
               number={1}
               specialty="Italiana 80"

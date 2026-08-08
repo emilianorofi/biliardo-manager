@@ -1,8 +1,6 @@
 import FormationBoard from "../components/formation/FormationBoard";
 
-import {
-  USER_CLUB_ID,
-} from "@/lib/game-config";
+import { getCurrentClubId } from "@/lib/current-club";
 
 import {
   getNextPlayableRound,
@@ -14,6 +12,7 @@ export const dynamic =
   "force-dynamic";
 
 export default async function FormationPage() {
+  const clubId = await getCurrentClubId();
   const league =
     await prisma.league.findFirst({
       where: {
@@ -30,11 +29,11 @@ export default async function FormationPage() {
             OR: [
               {
                 homeClubId:
-                  USER_CLUB_ID,
+                  clubId,
               },
               {
                 awayClubId:
-                  USER_CLUB_ID,
+                  clubId,
               },
             ],
           },
@@ -95,7 +94,7 @@ export default async function FormationPage() {
   const opponent =
     currentFixture
       ? currentFixture.homeClubId ===
-        USER_CLUB_ID
+        clubId
         ? currentFixture.awayClub
         : currentFixture.homeClub
       : null;
@@ -118,17 +117,19 @@ export default async function FormationPage() {
             : `Prossimo incontro contro ${opponent?.name ?? "avversario da definire"}. Assegna tre giocatori agli slot A, B e C.`;
 
   return (
-    <main className="space-y-7">
-      <header>
-        <p className="text-xs font-black uppercase tracking-[0.2em] text-emerald-400">
-          {roundLabel}
-        </p>
+    <main className="space-y-4">
+      <header className="flex flex-col justify-between gap-3 lg:flex-row lg:items-end">
+        <div>
+          <p className="text-xs font-black uppercase tracking-[0.2em] text-emerald-400">
+            {roundLabel}
+          </p>
 
-        <h1 className="mt-2 text-4xl font-black text-white">
-          Prepara la formazione
-        </h1>
+          <h1 className="mt-1 text-3xl font-black text-white">
+            Prepara la formazione
+          </h1>
+        </div>
 
-        <p className="mt-2 max-w-3xl text-slate-400">
+        <p className="max-w-2xl text-sm leading-5 text-slate-400 lg:text-right">
           {description}
         </p>
       </header>

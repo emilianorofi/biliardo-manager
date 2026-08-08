@@ -9,20 +9,19 @@ import {
 
 import Card from "@/app/components/ui/Card";
 
-import {
-  USER_CLUB_ID,
-} from "@/lib/game-config";
+import { getCurrentClubId } from "@/lib/current-club";
 
 import { prisma } from "@/lib/prisma";
 
 export default async function NewsCard() {
+  const clubId = await getCurrentClubId();
   const events =
     await prisma.gameEvent.findMany({
       where: {
         OR: [
           {
             clubId:
-              USER_CLUB_ID,
+              clubId,
           },
           {
             clubId:

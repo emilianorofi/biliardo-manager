@@ -8,13 +8,12 @@ import Card from "@/app/components/ui/Card";
 import ProgressBar from "@/app/components/ui/ProgressBar";
 import StatBadge from "@/app/components/ui/StatBadge";
 
-import {
-  USER_CLUB_ID,
-} from "@/lib/game-config";
+import { getCurrentClubId } from "@/lib/current-club";
 
 import { prisma } from "@/lib/prisma";
 
 export default async function TeamStatusCard() {
+  const clubId = await getCurrentClubId();
   const [
     club,
     recentFixtures,
@@ -22,7 +21,7 @@ export default async function TeamStatusCard() {
     prisma.club.findUnique({
       where: {
         id:
-          USER_CLUB_ID,
+          clubId,
       },
 
       include: {
@@ -49,11 +48,11 @@ export default async function TeamStatusCard() {
         OR: [
           {
             homeClubId:
-              USER_CLUB_ID,
+              clubId,
           },
           {
             awayClubId:
-              USER_CLUB_ID,
+              clubId,
           },
         ],
       },
@@ -166,7 +165,7 @@ export default async function TeamStatusCard() {
 
         const isHome =
           fixture.homeClubId ===
-          USER_CLUB_ID;
+          clubId;
 
         const userScore =
           isHome

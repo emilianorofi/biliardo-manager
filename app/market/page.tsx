@@ -8,14 +8,15 @@ import type {
 } from "@/app/types/market";
 import {
   MAX_FIRST_TEAM_PLAYERS,
-  USER_CLUB_ID,
 } from "@/lib/game-config";
+import { getCurrentClubId } from "@/lib/current-club";
 import { getMarketCommitments } from "@/lib/market-commitments";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
 export default async function MarketPage() {
+  const clubId = await getCurrentClubId();
   const now = new Date();
 
   const [
@@ -28,7 +29,7 @@ export default async function MarketPage() {
     await Promise.all([
       prisma.club.findUnique({
         where: {
-          id: USER_CLUB_ID,
+          id: clubId,
         },
         select: {
           balance: true,
@@ -91,10 +92,10 @@ export default async function MarketPage() {
           },
         ],
       }),
-      getMarketCommitments(prisma, USER_CLUB_ID),
+      getMarketCommitments(prisma, clubId),
       prisma.transferListing.findMany({
         where: {
-          sellerClubId: USER_CLUB_ID,
+          sellerClubId: clubId,
           listingType: "AUCTION",
           status: {
             in: ["ACTIVE", "PENDING_TRANSFER"],
@@ -146,10 +147,10 @@ export default async function MarketPage() {
           },
           OR: [
             {
-              sellerClubId: USER_CLUB_ID,
+              sellerClubId: clubId,
             },
             {
-              winnerClubId: USER_CLUB_ID,
+              winnerClubId: clubId,
             },
           ],
         },
@@ -197,7 +198,7 @@ export default async function MarketPage() {
       const userBid =
         listing.bids.find(
           (bid) =>
-            bid.bidderClubId === USER_CLUB_ID
+            bid.bidderClubId === clubId
         ) ?? null;
 
       const listingType: MarketListingType =
@@ -231,7 +232,7 @@ export default async function MarketPage() {
         bidCount: listing.bids.length,
         sellerClub: listing.sellerClub?.name ?? null,
         isUserListing:
-          listing.sellerClubId === USER_CLUB_ID,
+          listing.sellerClubId === clubId,
         lastBidClub:
           highestBid?.bidderClub.name ?? null,
         expiresAt:
@@ -241,7 +242,7 @@ export default async function MarketPage() {
         ),
         userBid: userBid?.amount ?? null,
         isUserHighestBid:
-          highestBid?.bidderClubId === USER_CLUB_ID,
+          highestBid?.bidderClubId === clubId,
       };
     }
   );
@@ -285,6 +286,7 @@ export default async function MarketPage() {
         listingType: listing.listingType,
         status: listing.status,
         winnerClubId: listing.winnerClubId,
+        clubId,
       });
 
       return {
@@ -333,6 +335,7 @@ function getHistoryKind(listing: {
   listingType: string;
   status: string;
   winnerClubId: number | null;
+  clubId: number;
 }): MarketHistoryItem["kind"] {
   if (listing.status === "EXPIRED") {
     return "EXPIRED";
@@ -346,7 +349,7 @@ function getHistoryKind(listing: {
     return "FREE_AGENT";
   }
 
-  if (listing.winnerClubId === USER_CLUB_ID) {
+  if (listing.winnerClubId === listing.clubId) {
     return "PURCHASE";
   }
 

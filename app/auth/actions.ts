@@ -155,7 +155,7 @@ export async function loginManager(
     }
 
     if (manager.clubId !== null) {
-      destination = "/dashboard";
+      destination = "/team";
     }
   } catch (error: unknown) {
     console.error(

@@ -2,8 +2,8 @@ import { NextResponse } from "next/server";
 
 import {
   MIN_FIRST_TEAM_PLAYERS,
-  USER_CLUB_ID,
 } from "@/lib/game-config";
+import { getApiClubAccess } from "@/lib/api-club-access";
 import {
   AUCTION_DURATION_HOURS,
   getAuctionDeadline,
@@ -24,6 +24,13 @@ class MarketListingError extends Error {
 
 export async function POST(request: Request) {
   try {
+    const access = await getApiClubAccess();
+
+    if (!access.granted) {
+      return access.response;
+    }
+
+    const { clubId } = access;
     const body: unknown = await request.json();
 
     if (typeof body !== "object" || body === null) {
@@ -71,7 +78,7 @@ export async function POST(request: Request) {
         >`
           SELECT "id"
           FROM "Club"
-          WHERE "id" = ${USER_CLUB_ID}
+          WHERE "id" = ${clubId}
           FOR UPDATE
         `;
 
@@ -103,7 +110,7 @@ export async function POST(request: Request) {
           await Promise.all([
             transaction.club.findUnique({
               where: {
-                id: USER_CLUB_ID,
+                id: clubId,
               },
               select: {
                 _count: {
@@ -125,7 +132,7 @@ export async function POST(request: Request) {
             }),
             transaction.transferListing.count({
               where: {
-                sellerClubId: USER_CLUB_ID,
+                sellerClubId: clubId,
                 listingType: "AUCTION",
                 status: {
                   in: [
@@ -158,7 +165,7 @@ export async function POST(request: Request) {
           );
         }
 
-        if (player.clubId !== USER_CLUB_ID) {
+        if (player.clubId !== clubId) {
           throw new MarketListingError(
             "Puoi mettere all'asta soltanto un tuo giocatore.",
             403
@@ -193,7 +200,7 @@ export async function POST(request: Request) {
           await transaction.transferListing.create({
             data: {
               playerId,
-              sellerClubId: USER_CLUB_ID,
+              sellerClubId: clubId,
               listingType: "AUCTION",
               status: "ACTIVE",
               openingPrice,
@@ -207,7 +214,7 @@ export async function POST(request: Request) {
 
         await transaction.gameEvent.create({
           data: {
-            clubId: USER_CLUB_ID,
+            clubId,
             type: "TRANSFER_PLAYER_LISTED",
             title: `Giocatore all'asta: ${playerName}`,
             description: `${playerName} è stato messo all'asta per ${formatCurrency(

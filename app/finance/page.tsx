@@ -10,18 +10,17 @@ import {
   WalletCards,
 } from "lucide-react";
 
-import {
-  USER_CLUB_ID,
-} from "@/lib/game-config";
+import { getCurrentClubId } from "@/lib/current-club";
 
 import { prisma } from "@/lib/prisma";
 
 export default async function FinancePage() {
+  const clubId = await getCurrentClubId();
   const club =
     await prisma.club.findUnique({
       where: {
         id:
-          USER_CLUB_ID,
+          clubId,
       },
 
       select: {

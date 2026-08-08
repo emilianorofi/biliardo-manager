@@ -87,8 +87,12 @@ export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof
 export const ClubScalarFieldEnum = {
   id: 'id',
   name: 'name',
+  normalizedName: 'normalizedName',
   shortName: 'shortName',
   logo: 'logo',
+  primaryColor: 'primaryColor',
+  secondaryColor: 'secondaryColor',
+  crestStyle: 'crestStyle',
   city: 'city',
   country: 'country',
   reputation: 'reputation',

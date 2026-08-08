@@ -1,8 +1,6 @@
 import Link from "next/link";
 
-import {
-  USER_CLUB_ID,
-} from "@/lib/game-config";
+import { getCurrentClubId } from "@/lib/current-club";
 
 import {
   getNextPlayableRound,
@@ -11,6 +9,7 @@ import {
 import { prisma } from "@/lib/prisma";
 
 export default async function NextMatchCard() {
+  const clubId = await getCurrentClubId();
   const [league, formation] =
     await Promise.all([
       prisma.league.findFirst({
@@ -28,11 +27,11 @@ export default async function NextMatchCard() {
               OR: [
                 {
                   homeClubId:
-                    USER_CLUB_ID,
+                    clubId,
                 },
                 {
                   awayClubId:
-                    USER_CLUB_ID,
+                    clubId,
                 },
               ],
             },
@@ -67,7 +66,7 @@ export default async function NextMatchCard() {
       prisma.formation.findUnique({
         where: {
           clubId:
-            USER_CLUB_ID,
+            clubId,
         },
       }),
     ]);
@@ -155,7 +154,7 @@ export default async function NextMatchCard() {
 
   const isHome =
     fixture.homeClubId ===
-    USER_CLUB_ID;
+    clubId;
 
   const userClub =
     isHome
@@ -211,7 +210,7 @@ export default async function NextMatchCard() {
             }
             isUser={
               fixture.homeClubId ===
-              USER_CLUB_ID
+              clubId
             }
           />
 
@@ -255,7 +254,7 @@ export default async function NextMatchCard() {
             }
             isUser={
               fixture.awayClubId ===
-              USER_CLUB_ID
+              clubId
             }
             align="right"
           />

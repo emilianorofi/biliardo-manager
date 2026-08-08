@@ -2,8 +2,8 @@ import { NextResponse } from "next/server";
 
 import {
   MAX_FIRST_TEAM_PLAYERS,
-  USER_CLUB_ID,
 } from "@/lib/game-config";
+import { getApiClubAccess } from "@/lib/api-club-access";
 import {
   AUCTION_EXTENSION_MINUTES,
   getExtendedDeadline,
@@ -24,6 +24,13 @@ class MarketBidError extends Error {
 
 export async function POST(request: Request) {
   try {
+    const access = await getApiClubAccess();
+
+    if (!access.granted) {
+      return access.response;
+    }
+
+    const { clubId } = access;
     const body: unknown = await request.json();
 
     if (typeof body !== "object" || body === null) {
@@ -69,7 +76,7 @@ export async function POST(request: Request) {
         >`
           SELECT "id"
           FROM "Club"
-          WHERE "id" = ${USER_CLUB_ID}
+          WHERE "id" = ${clubId}
           FOR UPDATE
         `;
 
@@ -103,7 +110,7 @@ export async function POST(request: Request) {
           await Promise.all([
             transaction.club.findUnique({
               where: {
-                id: USER_CLUB_ID,
+                id: clubId,
               },
               select: {
                 balance: true,
@@ -146,7 +153,7 @@ export async function POST(request: Request) {
             }),
             getMarketCommitments(
               transaction,
-              USER_CLUB_ID,
+              clubId,
               listingId
             ),
           ]);
@@ -179,8 +186,8 @@ export async function POST(request: Request) {
         }
 
         if (
-          listing.sellerClubId === USER_CLUB_ID ||
-          listing.player.clubId === USER_CLUB_ID
+          listing.sellerClubId === clubId ||
+          listing.player.clubId === clubId
         ) {
           throw new MarketBidError(
             "Non puoi fare un'offerta per un tuo giocatore.",
@@ -191,7 +198,7 @@ export async function POST(request: Request) {
         const highestBid = listing.bids[0] ?? null;
 
         if (
-          highestBid?.bidderClubId === USER_CLUB_ID
+          highestBid?.bidderClubId === clubId
         ) {
           throw new MarketBidError(
             "La tua offerta è già la migliore.",
@@ -265,7 +272,7 @@ export async function POST(request: Request) {
         await transaction.transferBid.create({
           data: {
             listingId,
-            bidderClubId: USER_CLUB_ID,
+            bidderClubId: clubId,
             amount,
           },
         });

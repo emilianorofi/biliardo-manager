@@ -9,9 +9,7 @@ import {
 
 import Card from "@/app/components/ui/Card";
 
-import {
-  USER_CLUB_ID,
-} from "@/lib/game-config";
+import { getCurrentClubId } from "@/lib/current-club";
 
 import {
   getNextPlayableRound,
@@ -20,12 +18,13 @@ import {
 import { prisma } from "@/lib/prisma";
 
 export default async function UpcomingEventsCard() {
+  const clubId = await getCurrentClubId();
   const [trainingPlan, league] =
     await Promise.all([
       prisma.trainingPlan.findUnique({
         where: {
           clubId:
-            USER_CLUB_ID,
+            clubId,
         },
 
         select: {
@@ -54,11 +53,11 @@ export default async function UpcomingEventsCard() {
               OR: [
                 {
                   homeClubId:
-                    USER_CLUB_ID,
+                    clubId,
                 },
                 {
                   awayClubId:
-                    USER_CLUB_ID,
+                    clubId,
                 },
               ],
             },

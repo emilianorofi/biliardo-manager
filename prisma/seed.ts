@@ -580,15 +580,23 @@ async function main() {
 
   for (const club of initialClubs) {
     const { id, ...clubData } = club;
+    const normalizedName = club.name
+      .replace(/\s+/g, " ")
+      .trim()
+      .toLocaleLowerCase("it-IT");
 
     await prisma.club.upsert({
       where: {
         id,
       },
-      update: clubData,
+      update: {
+        ...clubData,
+        normalizedName,
+      },
       create: {
         id,
         ...clubData,
+        normalizedName,
       },
     });
   }

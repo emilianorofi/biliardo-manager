@@ -4,10 +4,8 @@ import { ArrowLeft } from "lucide-react";
 
 import TransferListingForm from "@/app/components/player/TransferListingForm";
 import type { Player } from "@/app/types/player";
-import {
-  MIN_FIRST_TEAM_PLAYERS,
-  USER_CLUB_ID,
-} from "@/lib/game-config";
+import { getCurrentClubId } from "@/lib/current-club";
+import { MIN_FIRST_TEAM_PLAYERS } from "@/lib/game-config";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
@@ -40,6 +38,7 @@ export default async function PlayerPage({
   ]);
   const playerId = Number(id);
   const comesFromMarket = from === "market";
+  const clubId = await getCurrentClubId();
 
   if (!Number.isInteger(playerId)) {
     notFound();
@@ -75,12 +74,12 @@ export default async function PlayerPage({
       }),
       prisma.player.count({
         where: {
-          clubId: USER_CLUB_ID,
+          clubId,
         },
       }),
       prisma.transferListing.count({
         where: {
-          sellerClubId: USER_CLUB_ID,
+          sellerClubId: clubId,
           listingType: "AUCTION",
           status: {
             in: ["ACTIVE", "PENDING_TRANSFER"],
@@ -91,7 +90,7 @@ export default async function PlayerPage({
 
   const isVisiblePlayer =
     databasePlayer !== null &&
-    (databasePlayer.clubId === USER_CLUB_ID ||
+    (databasePlayer.clubId === clubId ||
       databasePlayer.transferListings.length > 0);
 
   if (!databasePlayer || !isVisiblePlayer) {
@@ -344,7 +343,7 @@ const player: Player = {
         </section>
       </div>
 
-      {databasePlayer.clubId === USER_CLUB_ID && (
+      {databasePlayer.clubId === clubId && (
         <TransferListingForm
           playerId={player.id}
           playerName={`${player.firstName} ${player.lastName}`}
