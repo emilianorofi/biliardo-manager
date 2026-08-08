@@ -293,13 +293,17 @@ export async function POST(request: Request) {
       }
     );
 
+    const extensionMessage = result.wasExtended
+      ? ` L'asta è stata prorogata: la nuova scadenza è tra ${AUCTION_EXTENSION_MINUTES} minuti.`
+      : "";
+
     return NextResponse.json(
       {
         message: `Offerta di ${formatCurrency(
           result.amount
         )} registrata per ${result.playerName}. In caso di vittoria saranno addebitati ${formatCurrency(
           result.totalCommitment
-        )}, compreso lo stipendio.`,
+        )}, compreso lo stipendio.${extensionMessage}`,
         bid: result,
       },
       {
