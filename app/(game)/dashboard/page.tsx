@@ -9,10 +9,10 @@ import UpcomingEventsCard from "../../components/dashboard/AgendaCard";
 export default function DashboardPage() {
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <DashboardHeader />
 
-      <section className="grid grid-cols-1 gap-6 xl:grid-cols-12">
+      <section className="grid grid-cols-1 gap-4 xl:grid-cols-12">
         <div className="xl:col-span-8">
           <NextMatchCard />
         </div>
@@ -22,7 +22,7 @@ export default function DashboardPage() {
         </div>
       </section>
 
-      <section className="grid grid-cols-1 gap-6 xl:grid-cols-12">
+      <section className="grid grid-cols-1 gap-4 xl:grid-cols-12">
         <div className="xl:col-span-7">
           <NewsCard />
         </div>
@@ -32,7 +32,7 @@ export default function DashboardPage() {
         </div>
       </section>
 
-      <section className="grid grid-cols-1 gap-6 xl:grid-cols-12">
+      <section className="grid grid-cols-1 gap-4 xl:grid-cols-12">
         <div className="xl:col-span-5">
           <FinancesCard />
         </div>

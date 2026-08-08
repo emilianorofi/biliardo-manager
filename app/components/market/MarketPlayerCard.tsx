@@ -224,30 +224,30 @@ export default function MarketPlayerCard({
   }
 
   return (
-    <article className="rounded-2xl border border-zinc-800 bg-zinc-900 p-5 transition-all duration-200 hover:border-green-500">
-      <div className="flex items-start justify-between gap-4">
-        <div className="flex gap-4">
+    <article className="rounded-2xl border border-zinc-800 bg-zinc-900 p-4 transition-all duration-200 hover:border-green-500">
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex min-w-0 gap-3">
           <Link
             href={`/players/${player.id}?from=market`}
             aria-label={`Apri la scheda di ${player.name}`}
-            className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full border border-zinc-700 bg-zinc-800 text-xl font-black text-green-300 transition duration-200 hover:scale-105 hover:border-green-500 hover:bg-zinc-700"
+            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-zinc-700 bg-zinc-800 text-sm font-black text-green-300 transition duration-200 hover:scale-105 hover:border-green-500 hover:bg-zinc-700"
           >
             {player.initials}
           </Link>
 
-          <div>
+          <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2">
               <h2>
                 <Link
                   href={`/players/${player.id}?from=market`}
-                  className="text-lg font-bold text-white transition duration-200 hover:text-green-300 hover:underline hover:decoration-green-400 hover:underline-offset-4"
+                  className="line-clamp-1 text-base font-bold text-white transition duration-200 hover:text-green-300 hover:underline hover:decoration-green-400 hover:underline-offset-4"
                 >
                   {player.name}
                 </Link>
               </h2>
 
               <span
-                className={`rounded-full px-2.5 py-1 text-xs font-bold ${
+                className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
                   isAuction
                     ? "bg-green-500/15 text-green-400"
                     : "bg-blue-500/15 text-blue-400"
@@ -259,11 +259,11 @@ export default function MarketPlayerCard({
               </span>
             </div>
 
-            <p className="mt-1 text-sm text-zinc-400">
+            <p className="mt-0.5 text-xs text-zinc-400">
               {player.nationality} · {player.age} anni
             </p>
 
-            <p className="mt-2 text-sm text-zinc-500">
+            <p className="mt-1 text-xs text-zinc-500">
               Valore stimato: {formatCurrency(
                 player.estimatedValue
               )}
@@ -273,11 +273,11 @@ export default function MarketPlayerCard({
 
         <OverallBadge
           value={player.overall}
-          size="lg"
+          size="md"
         />
       </div>
 
-      <div className="mt-5 grid grid-cols-3 gap-3">
+      <div className="mt-3 grid grid-cols-3 gap-2">
         <SpecialtyValue
           label="Italiana"
           value={player.italiana}
@@ -292,9 +292,9 @@ export default function MarketPlayerCard({
         />
       </div>
 
-      <div className="mt-5 grid gap-4 sm:grid-cols-3">
+      <div className="mt-3 grid grid-cols-3 gap-2 border-t border-zinc-800 pt-3">
         <MarketInfo
-          icon={<Building2 size={18} />}
+          icon={<Building2 size={15} />}
           iconClassName="text-green-400"
           label={isAuction ? "Venditore" : "Stato"}
           value={
@@ -305,9 +305,9 @@ export default function MarketPlayerCard({
         <MarketInfo
           icon={
             isAuction ? (
-              <TrendingUp size={18} />
+              <TrendingUp size={15} />
             ) : (
-              <HandCoins size={18} />
+              <HandCoins size={15} />
             )
           }
           iconClassName="text-yellow-400"
@@ -336,7 +336,7 @@ export default function MarketPlayerCard({
         />
 
         <MarketInfo
-          icon={<Clock3 size={18} />}
+          icon={<Clock3 size={15} />}
           iconClassName={
             isAuction
               ? "text-red-400"
@@ -364,7 +364,7 @@ export default function MarketPlayerCard({
 
       {player.userBid !== null && (
         <div
-          className={`mt-5 rounded-xl border px-4 py-3 text-sm ${
+          className={`mt-3 rounded-xl border px-3 py-2 text-xs ${
             player.isUserHighestBid
               ? "border-green-500/30 bg-green-500/10 text-green-300"
               : "border-red-500/30 bg-red-500/10 text-red-300"
@@ -379,7 +379,7 @@ export default function MarketPlayerCard({
       )}
 
       {actionMessage && (
-        <div className="mt-5 flex items-start gap-2 rounded-xl border border-green-500/30 bg-green-500/10 px-4 py-3 text-sm text-green-300">
+        <div className="mt-3 flex items-start gap-2 rounded-xl border border-green-500/30 bg-green-500/10 px-3 py-2 text-xs text-green-300">
           <CheckCircle2
             className="mt-0.5 shrink-0"
             size={17}
@@ -391,7 +391,7 @@ export default function MarketPlayerCard({
       {isBidFormOpen && (
         <form
           onSubmit={submitBid}
-          className="mt-5 rounded-xl border border-green-500/30 bg-green-500/5 p-4"
+          className="mt-3 rounded-xl border border-green-500/30 bg-green-500/5 p-3"
         >
           <div className="flex items-start justify-between gap-4">
             <div>
@@ -425,7 +425,7 @@ export default function MarketPlayerCard({
             </button>
           </div>
 
-          <div className="mt-4 flex flex-col gap-3 sm:flex-row">
+          <div className="mt-3 flex flex-col gap-2 sm:flex-row">
             <label className="flex-1">
               <span className="sr-only">
                 Importo dell&apos;offerta
@@ -469,7 +469,7 @@ export default function MarketPlayerCard({
       )}
 
       {isSigningConfirmationOpen && !isAuction && (
-        <div className="mt-5 rounded-xl border border-green-500/30 bg-green-500/5 p-4">
+        <div className="mt-3 rounded-xl border border-green-500/30 bg-green-500/5 p-3">
           <div className="flex items-start justify-between gap-4">
             <div>
               <p className="font-semibold text-white">
@@ -493,7 +493,7 @@ export default function MarketPlayerCard({
             </button>
           </div>
 
-          <div className="mt-4 flex justify-end gap-3">
+          <div className="mt-3 flex justify-end gap-2">
             <button
               type="button"
               onClick={closeSigningConfirmation}
@@ -527,7 +527,7 @@ export default function MarketPlayerCard({
         </div>
       )}
 
-      <div className="mt-6 flex justify-end gap-3">
+      <div className="mt-3 flex justify-end gap-2 border-t border-zinc-800 pt-3">
         {isAuction ? (
           <button
             type="button"
@@ -550,7 +550,7 @@ export default function MarketPlayerCard({
                     ? "Saldo disponibile insufficiente."
                     : "Inserisci una nuova offerta."
             }
-            className="flex items-center gap-2 rounded-xl bg-green-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-green-500 disabled:cursor-not-allowed disabled:bg-green-900 disabled:text-green-500"
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-green-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-green-500 disabled:cursor-not-allowed disabled:bg-green-900 disabled:text-green-500"
           >
             <Gavel size={18} />
             {player.isUserListing
@@ -579,7 +579,7 @@ export default function MarketPlayerCard({
                   ? "Saldo disponibile insufficiente per lo stipendio."
                   : "Conferma l'ingaggio dello svincolato."
             }
-            className="flex items-center gap-2 rounded-xl bg-green-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-green-500 disabled:cursor-not-allowed disabled:bg-green-900 disabled:text-green-500"
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-green-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-green-500 disabled:cursor-not-allowed disabled:bg-green-900 disabled:text-green-500"
           >
             <HandCoins size={18} />
             {!canAddAnotherPlayer
@@ -602,11 +602,11 @@ function SpecialtyValue({
   value: number;
 }) {
   return (
-    <div className="rounded-xl bg-zinc-800 p-3 text-center">
-      <p className="text-xs uppercase text-zinc-500">
+    <div className="rounded-lg bg-zinc-800 px-2 py-2 text-center">
+      <p className="truncate text-[9px] uppercase text-zinc-500">
         {label}
       </p>
-      <p className="mt-1 text-lg font-bold text-white">
+      <p className="mt-0.5 text-base font-bold text-white">
         {value}
       </p>
     </div>
@@ -627,19 +627,20 @@ function MarketInfo({
   detail?: string | null;
 }) {
   return (
-    <div className="flex items-center gap-2 text-zinc-300">
-      <span className={iconClassName}>{icon}</span>
-      <div>
-        <p className="text-xs text-zinc-500">
+    <div className="min-w-0 text-zinc-300">
+      <div className="flex items-center gap-1.5">
+        <span className={iconClassName}>{icon}</span>
+        <p className="truncate text-[9px] uppercase tracking-wide text-zinc-500">
           {label}
         </p>
-        <p className="font-semibold">{value}</p>
-        {detail && (
-          <p className="text-xs text-zinc-500">
-            {detail}
-          </p>
-        )}
       </div>
+
+      <p className="mt-1 truncate text-xs font-semibold">{value}</p>
+      {detail && (
+        <p className="mt-0.5 line-clamp-2 text-[9px] leading-3 text-zinc-500">
+          {detail}
+        </p>
+      )}
     </div>
   );
 }

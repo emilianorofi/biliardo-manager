@@ -135,19 +135,19 @@ export default async function DashboardHeader() {
       : `Giornata ${playableRound}`;
 
   return (
-    <div className="rounded-2xl border border-zinc-800 bg-zinc-900 px-6 py-6 sm:px-8 sm:py-7">
-      <div className="flex flex-col justify-between gap-6 lg:flex-row lg:items-center">
+    <div className="rounded-2xl border border-zinc-800 bg-zinc-900 px-5 py-4">
+      <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-center">
         <div>
-          <p className="text-sm uppercase tracking-[0.25em] text-zinc-500">
+          <p className="text-xs uppercase tracking-[0.25em] text-zinc-500">
             Biliardo Manager
           </p>
 
-          <h1 className="mt-2 text-3xl font-black text-white sm:text-4xl">
+          <h1 className="mt-1 text-2xl font-black text-white sm:text-3xl">
             {club?.name ??
               "Squadra non disponibile"}
           </h1>
 
-          <div className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-zinc-400">
+          <div className="mt-2 flex flex-wrap items-center gap-x-5 gap-y-1 text-xs text-zinc-400">
             <span>
               🏆 Prima Squadra
             </span>
@@ -163,7 +163,7 @@ export default async function DashboardHeader() {
           </div>
         </div>
 
-        <div className="rounded-xl border border-green-500/20 bg-green-600/15 px-6 py-4 text-left lg:text-right">
+        <div className="rounded-xl border border-green-500/20 bg-green-600/15 px-4 py-3 text-left lg:min-w-64 lg:text-right">
           <div className="text-xs font-bold uppercase tracking-wider text-green-400">
             {fixture?.status ===
             "PLAYED"
@@ -171,7 +171,7 @@ export default async function DashboardHeader() {
               : "Prossima partita"}
           </div>
 
-          <div className="mt-2 text-2xl font-bold text-white">
+          <div className="mt-1 text-lg font-bold text-white">
             {opponent?.name ??
               "Nessun avversario"}
           </div>

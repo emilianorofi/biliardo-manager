@@ -27,17 +27,17 @@ export default function StatBadge({
   return (
     <div
       className={clsx(
-        "flex items-center justify-between rounded-xl border px-4 py-3",
+        "flex min-w-0 items-center justify-between gap-2 rounded-xl border px-3 py-2",
         colors[color],
         className
       )}
     >
-      <div className="flex items-center gap-2">
+      <div className="flex min-w-0 items-center gap-1.5">
         {icon}
-        <span className="text-sm font-medium">{label}</span>
+        <span className="truncate text-xs font-medium">{label}</span>
       </div>
 
-      <span className="text-lg font-bold">
+      <span className="shrink-0 text-sm font-bold">
         {value}
       </span>
     </div>

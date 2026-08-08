@@ -24,7 +24,7 @@ export default function MarketTabs({
   onTabChange,
 }: MarketTabsProps) {
   return (
-    <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-2">
+    <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-1.5">
 
       <div className="flex gap-2 overflow-x-auto">
 
@@ -40,8 +40,9 @@ export default function MarketTabs({
               className={`
                 whitespace-nowrap
                 rounded-lg
-                px-5
-                py-2.5
+                px-4
+                py-2
+                text-sm
                 font-medium
                 transition-all
                 ${

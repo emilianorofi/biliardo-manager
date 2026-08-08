@@ -36,7 +36,7 @@ export default async function NewsCard() {
       },
 
       take:
-        5,
+        4,
     });
 
   return (
@@ -61,7 +61,7 @@ export default async function NewsCard() {
           </p>
         </div>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-2">
           {events.map((event) => {
             const appearance =
               getEventAppearance(
@@ -71,11 +71,11 @@ export default async function NewsCard() {
             return (
               <div
                 key={event.id}
-                className="rounded-xl border border-zinc-800 bg-zinc-800/40 p-4 transition hover:border-zinc-700 hover:bg-zinc-800"
+                className="rounded-xl border border-zinc-800 bg-zinc-800/40 p-3 transition hover:border-zinc-700 hover:bg-zinc-800"
               >
-                <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+                <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
                   <div
-                    className={`flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold ${appearance.colors}`}
+                    className={`flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[10px] font-semibold ${appearance.colors}`}
                   >
                     {appearance.icon}
 
@@ -91,12 +91,12 @@ export default async function NewsCard() {
                   </span>
                 </div>
 
-                <p className="text-sm font-semibold leading-6 text-zinc-200">
+                <p className="text-sm font-semibold leading-5 text-zinc-200">
                   {event.title}
                 </p>
 
                 {event.description ? (
-                  <p className="mt-2 text-sm leading-6 text-zinc-400">
+                  <p className="mt-1 line-clamp-1 text-xs leading-5 text-zinc-400">
                     {event.description}
                   </p>
                 ) : null}

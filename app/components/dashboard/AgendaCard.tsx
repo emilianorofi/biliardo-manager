@@ -129,7 +129,7 @@ export default async function UpcomingEventsCard() {
         />
       }
     >
-      <div className="space-y-4">
+      <div className="space-y-2">
         <AgendaItem
           icon={
             <Dumbbell
@@ -229,11 +229,11 @@ function AgendaItem({
   return (
     <Link
       href={href}
-      className="block rounded-xl border border-zinc-800 bg-zinc-800/40 p-4 transition hover:border-zinc-700 hover:bg-zinc-800"
+      className="block rounded-xl border border-zinc-800 bg-zinc-800/40 p-3 transition hover:border-zinc-700 hover:bg-zinc-800"
     >
-      <div className="flex items-start gap-4">
+      <div className="flex items-start gap-3">
         <div
-          className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border ${style.icon}`}
+          className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border ${style.icon}`}
         >
           {icon}
         </div>
@@ -267,7 +267,7 @@ function AgendaItem({
             </div>
           </div>
 
-          <p className="mt-2 text-sm leading-6 text-zinc-400">
+          <p className="mt-1 line-clamp-1 text-xs leading-5 text-zinc-400">
             {description}
           </p>
         </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { Search, Filter, Coins } from "lucide-react";
+import { Coins, Search } from "lucide-react";
 
 interface MarketHeaderProps {
   credits: number;
@@ -14,72 +14,49 @@ export default function MarketHeader({
   setSearch,
 }: MarketHeaderProps) {
   return (
-    <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-5">
-
-      <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
-
+    <header className="rounded-2xl border border-zinc-800 bg-zinc-900 p-4">
+      <div className="grid gap-3 lg:grid-cols-[minmax(180px,1fr)_minmax(280px,420px)_auto] lg:items-center">
         <div>
-          <h1 className="text-3xl font-bold text-white">
+          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-400">
+            Trasferimenti
+          </p>
+
+          <h1 className="mt-0.5 text-2xl font-black text-white">
             Mercato
           </h1>
-
-          <p className="mt-1 text-zinc-400">
-            Acquista i migliori giocatori disponibili.
-          </p>
         </div>
 
-        <div className="flex items-center gap-3 rounded-xl border border-zinc-700 bg-zinc-800 px-5 py-3">
-
-          <Coins
-            size={24}
-            className="text-yellow-400"
-          />
-
-          <div>
-
-            <p className="text-xs uppercase tracking-wide text-zinc-500">
-              Disponibile per offerte
-            </p>
-
-            <p className="text-xl font-bold text-yellow-400">
-              € {credits.toLocaleString("it-IT")}
-            </p>
-
-          </div>
-
-        </div>
-
-      </div>
-
-      <div className="mt-6 flex gap-3">
-
-        <div className="relative flex-1">
+        <label className="relative block">
+          <span className="sr-only">Cerca giocatore</span>
 
           <Search
-            size={18}
-            className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500"
+            size={17}
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500"
           />
 
           <input
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            type="text"
-            placeholder="Cerca giocatore..."
-            className="w-full rounded-xl border border-zinc-700 bg-zinc-800 py-3 pl-11 pr-4 text-white placeholder-zinc-500 outline-none transition focus:border-green-500"
+            onChange={(event) => setSearch(event.target.value)}
+            type="search"
+            placeholder="Cerca giocatore o club..."
+            className="w-full rounded-xl border border-zinc-700 bg-zinc-800 py-2.5 pl-10 pr-3 text-sm text-white placeholder-zinc-500 outline-none transition focus:border-green-500"
           />
+        </label>
 
+        <div className="flex items-center gap-3 rounded-xl border border-yellow-500/20 bg-yellow-500/5 px-4 py-2.5">
+          <Coins size={20} className="text-yellow-400" />
+
+          <div>
+            <p className="text-[9px] font-bold uppercase tracking-wider text-zinc-500">
+              Disponibile
+            </p>
+
+            <p className="text-base font-black text-yellow-400">
+              € {credits.toLocaleString("it-IT")}
+            </p>
+          </div>
         </div>
-
-        <button className="flex items-center gap-2 rounded-xl bg-green-600 px-5 font-semibold text-white transition hover:bg-green-700">
-
-          <Filter size={18} />
-
-          Filtri
-
-        </button>
-
       </div>
-
-    </div>
+    </header>
   );
 }

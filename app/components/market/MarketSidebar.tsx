@@ -33,10 +33,10 @@ export default function MarketSidebar({
   );
 
   return (
-    <aside className="space-y-5">
-      <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-5">
+    <aside className="space-y-3">
+      <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-4">
         <div className="flex items-center gap-3">
-          <div className="rounded-xl bg-green-600 p-3">
+          <div className="rounded-xl bg-green-600 p-2.5">
             <Coins
               className="text-white"
               size={22}
@@ -47,13 +47,13 @@ export default function MarketSidebar({
             <p className="text-sm text-zinc-400">
               Disponibile per il mercato
             </p>
-            <h2 className="text-2xl font-bold text-white">
+            <h2 className="text-xl font-bold text-white">
               {formatCurrency(availableCredits)}
             </h2>
           </div>
         </div>
 
-        <div className="mt-4 space-y-2 border-t border-zinc-800 pt-4 text-sm">
+        <div className="mt-3 space-y-1.5 border-t border-zinc-800 pt-3 text-xs">
           <div className="flex justify-between gap-3 text-zinc-400">
             <span>Saldo club</span>
             <span className="font-semibold text-white">
@@ -70,8 +70,8 @@ export default function MarketSidebar({
         </div>
       </div>
 
-      <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-5">
-        <div className="mb-4 flex items-center gap-2">
+      <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-4">
+        <div className="mb-3 flex items-center gap-2">
           <Tags
             className="text-amber-300"
             size={20}
@@ -81,7 +81,7 @@ export default function MarketSidebar({
           </h3>
         </div>
 
-        <div className="space-y-3">
+        <div className="space-y-2">
           {userListings.map((listing) => {
             const isPendingTransfer =
               listing.status === "PENDING_TRANSFER";
@@ -89,7 +89,7 @@ export default function MarketSidebar({
             return (
               <div
                 key={listing.listingId}
-                className="rounded-xl bg-zinc-800 p-3"
+                className="rounded-xl bg-zinc-800 p-2.5 text-sm"
               >
                 <Link
                   href={`/players/${listing.playerId}?from=market`}
@@ -146,8 +146,8 @@ export default function MarketSidebar({
         </div>
       </div>
 
-      <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-5">
-        <div className="mb-4 flex items-center gap-2">
+      <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-4">
+        <div className="mb-3 flex items-center gap-2">
           <Gavel
             className="text-green-400"
             size={20}
@@ -157,11 +157,11 @@ export default function MarketSidebar({
           </h3>
         </div>
 
-        <div className="space-y-3">
+        <div className="space-y-2">
           {userBids.map((bid) => (
             <div
               key={bid.listingId}
-              className="rounded-xl bg-zinc-800 p-3"
+              className="rounded-xl bg-zinc-800 p-2.5 text-sm"
             >
               <div className="flex items-start justify-between gap-3">
                 <div>
@@ -220,11 +220,11 @@ export default function MarketSidebar({
         </div>
       </div>
 
-      <div className="rounded-2xl border border-blue-500/20 bg-blue-500/5 p-5">
+      <div className="rounded-2xl border border-blue-500/20 bg-blue-500/5 p-4">
         <h3 className="font-semibold text-blue-300">
           Mercato reale
         </h3>
-        <p className="mt-2 text-sm leading-6 text-zinc-400">
+        <p className="mt-1 text-xs leading-5 text-zinc-400">
           Giocatori, prezzi, scadenze e offerte sono ora letti dal database.
         </p>
       </div>

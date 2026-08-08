@@ -72,13 +72,13 @@ export default async function FinancesCard() {
         </Link>
       }
     >
-      <div className="space-y-5">
-        <div className="rounded-xl border border-amber-400/20 bg-amber-400/5 p-4">
+      <div className="space-y-3">
+        <div className="rounded-xl border border-amber-400/20 bg-amber-400/5 p-3">
           <p className="text-xs font-bold uppercase tracking-wider text-zinc-500">
             Saldo disponibile
           </p>
 
-          <p className="mt-2 text-3xl font-black text-amber-300">
+          <p className="mt-1 text-2xl font-black text-amber-300">
             {formatCurrency(
               club.balance
             )}
@@ -113,7 +113,7 @@ export default async function FinancesCard() {
           />
         </div>
 
-        <div className="flex items-center justify-between gap-4 border-t border-zinc-800 pt-4">
+        <div className="flex items-center justify-between gap-4 border-t border-zinc-800 pt-3">
           <span className="text-sm text-zinc-400">
             Risultato settimanale
           </span>
@@ -155,7 +155,7 @@ function FinancialBox({
 
   return (
     <div
-      className={`rounded-xl border p-4 ${style}`}
+      className={`rounded-xl border p-3 ${style}`}
     >
       <div className="flex items-center gap-2">
         {icon}

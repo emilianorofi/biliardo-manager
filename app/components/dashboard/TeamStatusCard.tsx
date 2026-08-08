@@ -217,79 +217,83 @@ export default async function TeamStatusCard() {
         />
       }
     >
-      <div className="space-y-6">
-        <div>
-          <div className="mb-2 flex justify-between text-sm">
-            <span className="text-zinc-400">
-              Forma media
-            </span>
+      <div className="space-y-4">
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <div className="mb-2 flex justify-between text-sm">
+              <span className="text-zinc-400">
+                Forma media
+              </span>
 
-            <span className="font-bold text-white">
-              {averageForm}%
-            </span>
+              <span className="font-bold text-white">
+                {averageForm}%
+              </span>
+            </div>
+
+            <ProgressBar
+              value={
+                averageForm
+              }
+              color="green"
+            />
           </div>
 
-          <ProgressBar
+          <div>
+            <div className="mb-2 flex justify-between text-sm">
+              <span className="text-zinc-400">
+                Morale medio
+              </span>
+
+              <span className="font-bold text-white">
+                {averageMorale}%
+              </span>
+            </div>
+
+            <ProgressBar
+              value={
+                averageMorale
+              }
+              color="yellow"
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-2">
+          <StatBadge
+            label="Giocatori in rosa"
             value={
-              averageForm
+              playersCount
             }
-            color="green"
+            icon={
+              <Users
+                size={16}
+              />
+            }
+            color="blue"
+          />
+
+          <StatBadge
+            label="Formazione"
+            value={
+              formationComplete
+                ? "Completa"
+                : "Da preparare"
+            }
+            icon={
+              <CheckCircle2
+                size={16}
+              />
+            }
+            color={
+              formationComplete
+                ? "green"
+                : "yellow"
+            }
           />
         </div>
 
         <div>
-          <div className="mb-2 flex justify-between text-sm">
-            <span className="text-zinc-400">
-              Morale medio
-            </span>
-
-            <span className="font-bold text-white">
-              {averageMorale}%
-            </span>
-          </div>
-
-          <ProgressBar
-            value={
-              averageMorale
-            }
-            color="yellow"
-          />
-        </div>
-
-        <StatBadge
-          label="Giocatori in rosa"
-          value={
-            playersCount
-          }
-          icon={
-            <Users
-              size={16}
-            />
-          }
-          color="blue"
-        />
-
-        <StatBadge
-          label="Formazione"
-          value={
-            formationComplete
-              ? "Completa"
-              : "Da preparare"
-          }
-          icon={
-            <CheckCircle2
-              size={16}
-            />
-          }
-          color={
-            formationComplete
-              ? "green"
-              : "yellow"
-          }
-        />
-
-        <div>
-          <p className="mb-3 text-sm font-semibold uppercase tracking-wider text-zinc-400">
+          <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-zinc-400">
             Ultime 5 partite
           </p>
 
@@ -305,7 +309,7 @@ export default async function TeamStatusCard() {
                     key={
                       index
                     }
-                    className={`flex h-10 w-10 items-center justify-center rounded-lg font-bold text-white ${
+                    className={`flex h-8 w-8 items-center justify-center rounded-lg text-xs font-bold text-white ${
                       resultColor[
                         result
                       ]

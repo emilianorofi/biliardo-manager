@@ -73,7 +73,7 @@ export default async function NextMatchCard() {
 
   if (!league) {
     return (
-      <section className="flex h-full flex-col rounded-2xl border border-emerald-900/60 bg-[#15261f] p-6">
+      <section className="flex h-full flex-col rounded-2xl border border-emerald-900/60 bg-[#15261f] p-4">
         <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-400">
           Campionato
         </p>
@@ -129,7 +129,7 @@ export default async function NextMatchCard() {
 
   if (!fixture) {
     return (
-      <section className="flex h-full flex-col rounded-2xl border border-emerald-900/60 bg-[#15261f] p-6">
+      <section className="flex h-full flex-col rounded-2xl border border-emerald-900/60 bg-[#15261f] p-4">
         <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-400">
           {league.name}
         </p>
@@ -156,29 +156,19 @@ export default async function NextMatchCard() {
     fixture.homeClubId ===
     clubId;
 
-  const userClub =
-    isHome
-      ? fixture.homeClub
-      : fixture.awayClub;
-
-  const opponent =
-    isHome
-      ? fixture.awayClub
-      : fixture.homeClub;
-
   const matchPlayed =
     fixture.status ===
     "PLAYED";
 
   return (
     <section className="flex h-full flex-col overflow-hidden rounded-2xl border border-emerald-900/60 bg-[#15261f]">
-      <div className="flex flex-col justify-between gap-4 border-b border-emerald-900/60 p-5 sm:flex-row sm:items-center sm:p-6">
+        <div className="flex flex-col justify-between gap-3 border-b border-emerald-900/60 p-4 sm:flex-row sm:items-center">
         <div>
           <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-400">
             {league.name}
           </p>
 
-          <h2 className="mt-2 text-2xl font-black text-white">
+          <h2 className="mt-1 text-xl font-black text-white">
             Partita della giornata
           </h2>
         </div>
@@ -196,7 +186,7 @@ export default async function NextMatchCard() {
         </div>
       </div>
 
-      <div className="flex flex-1 flex-col p-5 sm:p-6">
+      <div className="flex flex-1 flex-col p-4">
         <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
           <ClubSide
             name={
@@ -260,42 +250,28 @@ export default async function NextMatchCard() {
           />
         </div>
 
-        <div className="mt-6 grid gap-3 sm:grid-cols-3">
-          <StatusBox
-            label="La tua squadra"
-            value={userClub.name}
-          />
+        <div className="mt-4 flex flex-col gap-3 border-t border-emerald-900/50 pt-4 sm:flex-row sm:items-center">
+          <div className="flex flex-1 items-center justify-between rounded-xl border border-emerald-900/50 bg-emerald-950/30 px-3 py-2">
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
+              Formazione
+            </span>
 
-          <StatusBox
-            label="Avversario"
-            value={opponent.name}
-          />
+            <span className={`text-sm font-black ${formationComplete ? "text-emerald-300" : "text-amber-300"}`}>
+              {formationComplete ? "Completa" : "Da preparare"}
+            </span>
+          </div>
 
-          <StatusBox
-            label="Formazione"
-            value={
-              formationComplete
-                ? "Completa"
-                : "Da preparare"
-            }
-            highlight={
-              formationComplete
-            }
-          />
-        </div>
-
-        <div className="mt-auto flex flex-col gap-3 pt-6 sm:flex-row">
           {matchPlayed ? (
             <Link
               href="/campionato"
-              className="flex-1 rounded-xl bg-amber-400 px-4 py-3 text-center text-sm font-black text-[#122018] transition hover:bg-amber-300"
+              className="flex-1 rounded-xl bg-amber-400 px-4 py-2.5 text-center text-sm font-black text-[#122018] transition hover:bg-amber-300"
             >
               Vedi risultato e classifica
             </Link>
           ) : (
             <Link
               href="/formation"
-              className="flex-1 rounded-xl bg-amber-400 px-4 py-3 text-center text-sm font-black text-[#122018] transition hover:bg-amber-300"
+              className="flex-1 rounded-xl bg-amber-400 px-4 py-2.5 text-center text-sm font-black text-[#122018] transition hover:bg-amber-300"
             >
               Prepara la formazione
             </Link>
@@ -303,7 +279,7 @@ export default async function NextMatchCard() {
 
           <Link
             href="/campionato"
-            className="flex-1 rounded-xl border border-emerald-800 px-4 py-3 text-center text-sm font-bold text-slate-300 transition hover:bg-white/5 hover:text-white"
+            className="flex-1 rounded-xl border border-emerald-800 px-4 py-2.5 text-center text-sm font-bold text-slate-300 transition hover:bg-white/5 hover:text-white"
           >
             Vai al campionato
           </Link>
@@ -336,7 +312,7 @@ function ClubSide({
       className={`flex min-w-0 flex-col ${alignment}`}
     >
       <div
-        className={`flex h-14 w-14 items-center justify-center rounded-xl border text-sm font-black ${
+        className={`flex h-11 w-11 items-center justify-center rounded-xl border text-xs font-black ${
           isUser
             ? "border-amber-400/40 bg-amber-400/10 text-amber-300"
             : "border-emerald-900/60 bg-emerald-950/50 text-emerald-300"
@@ -346,7 +322,7 @@ function ClubSide({
       </div>
 
       <p
-        className={`mt-3 font-black ${
+        className={`mt-2 text-sm font-black ${
           isUser
             ? "text-amber-300"
             : "text-white"
@@ -360,34 +336,6 @@ function ClubSide({
         {isUser
           ? " · La tua squadra"
           : ""}
-      </p>
-    </div>
-  );
-}
-
-function StatusBox({
-  label,
-  value,
-  highlight = false,
-}: {
-  label: string;
-  value: string;
-  highlight?: boolean;
-}) {
-  return (
-    <div className="rounded-xl border border-emerald-900/50 bg-emerald-950/30 p-4">
-      <p className="text-xs font-bold uppercase tracking-wider text-slate-500">
-        {label}
-      </p>
-
-      <p
-        className={`mt-2 font-black ${
-          highlight
-            ? "text-emerald-300"
-            : "text-white"
-        }`}
-      >
-        {value}
       </p>
     </div>
   );

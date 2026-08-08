@@ -153,7 +153,7 @@ export default function MarketContent({
   }, [router]);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-3">
       {settlementMessage && (
         <div className="rounded-xl border border-green-500/30 bg-green-500/10 px-4 py-3 text-sm text-green-300">
           {settlementMessage}
@@ -183,12 +183,12 @@ export default function MarketContent({
         onTabChange={setActiveTab}
       />
 
-      <div className="grid grid-cols-1 gap-6 xl:grid-cols-4">
-        <div className="space-y-4 xl:col-span-3">
+      <div className="grid grid-cols-1 gap-4 xl:grid-cols-4">
+        <div className="xl:col-span-3">
           {activeTab === "history" ? (
             <MarketHistory items={filteredHistory} />
           ) : (
-            <>
+            <div className="grid items-start gap-3 md:grid-cols-2">
               {players.map((player) => (
                 <MarketPlayerCard
                   key={player.listingId}
@@ -205,7 +205,7 @@ export default function MarketContent({
               ))}
 
               {players.length === 0 && (
-                <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-10 text-center">
+                <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-10 text-center md:col-span-2">
                   <p className="font-semibold text-white">
                     Nessun giocatore trovato.
                   </p>
@@ -214,7 +214,7 @@ export default function MarketContent({
                   </p>
                 </div>
               )}
-            </>
+            </div>
           )}
         </div>
 
