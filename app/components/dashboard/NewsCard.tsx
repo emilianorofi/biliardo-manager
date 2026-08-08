@@ -80,7 +80,9 @@ export default async function NewsCard() {
                   >
                     {appearance.icon}
 
-                    {event.type}
+                    {event.type.startsWith("TRANSFER_")
+                      ? "Mercato"
+                      : event.type}
                   </div>
 
                   <span className="text-xs text-zinc-500">
@@ -111,6 +113,19 @@ export default async function NewsCard() {
 function getEventAppearance(
   type: string
 ) {
+  if (type.startsWith("TRANSFER_")) {
+    return {
+      icon: (
+        <Search
+          size={16}
+        />
+      ),
+
+      colors:
+        "border-yellow-500/20 bg-yellow-500/15 text-yellow-400",
+    };
+  }
+
   switch (type) {
     case "Allenamento":
       return {

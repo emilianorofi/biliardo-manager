@@ -281,12 +281,58 @@ export async function POST(request: Request) {
           });
         }
 
+        const playerName = `${listing.player.firstName} ${listing.player.lastName}`;
+        const minimumNextBid =
+          getMinimumBid(amount);
+        const bidEvents: {
+          clubId: number;
+          type: string;
+          title: string;
+          description: string;
+        }[] = [];
+
+        if (highestBid) {
+          bidEvents.push({
+            clubId: highestBid.bidderClubId,
+            type: "TRANSFER_BID_OUTBID",
+            title: `Offerta superata: ${playerName}`,
+            description: `Un altro club ha offerto ${formatCurrency(
+              amount
+            )}. Per tornare in testa servirà almeno ${formatCurrency(
+              minimumNextBid
+            )}.`,
+          });
+        }
+
+        if (listing.sellerClubId) {
+          bidEvents.push({
+            clubId: listing.sellerClubId,
+            type: "TRANSFER_NEW_BID",
+            title: `Nuova offerta: ${playerName}`,
+            description: `È stata presentata un'offerta di ${formatCurrency(
+              amount
+            )}. La prossima offerta minima sarà ${formatCurrency(
+              minimumNextBid
+            )}.${
+              shouldExtend
+                ? ` La scadenza è stata riportata a ${AUCTION_EXTENSION_MINUTES} minuti.`
+                : ""
+            }`,
+          });
+        }
+
+        if (bidEvents.length > 0) {
+          await transaction.gameEvent.createMany({
+            data: bidEvents,
+          });
+        }
+
         return {
-          playerName: `${listing.player.firstName} ${listing.player.lastName}`,
+          playerName,
           amount,
           salary: listing.player.salary,
           totalCommitment,
-          minimumNextBid: getMinimumBid(amount),
+          minimumNextBid,
           endsAt: endsAt.toISOString(),
           wasExtended: shouldExtend,
         };
