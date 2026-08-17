@@ -102,6 +102,7 @@ export const ClubScalarFieldEnum = {
   weeklyIncome: 'weeklyIncome',
   trainerLevel: 'trainerLevel',
   youthCoachLevel: 'youthCoachLevel',
+  academyInitialized: 'academyInitialized',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -133,7 +134,6 @@ export const PlayerScalarFieldEnum = {
   morale: 'morale',
   experience: 'experience',
   talent: 'talent',
-  potential: 'potential',
   value: 'value',
   salary: 'salary',
   image: 'image',
@@ -192,10 +192,11 @@ export const AcademyPlayerScalarFieldEnum = {
   nationality: 'nationality',
   age: 'age',
   talent: 'talent',
-  potential: 'potential',
   revealedAttributes: 'revealedAttributes',
   totalAttributes: 'totalAttributes',
+  estimatedAttributeKeys: 'estimatedAttributeKeys',
   revealedAttributeKeys: 'revealedAttributeKeys',
+  nextScoutingAt: 'nextScoutingAt',
   precisione: 'precisione',
   diretto: 'diretto',
   sponde: 'sponde',

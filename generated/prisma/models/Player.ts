@@ -34,7 +34,6 @@ export type PlayerAvgAggregateOutputType = {
   morale: number | null
   experience: number | null
   talent: number | null
-  potential: number | null
   value: number | null
   salary: number | null
   precisione: number | null
@@ -56,7 +55,6 @@ export type PlayerSumAggregateOutputType = {
   morale: number | null
   experience: number | null
   talent: number | null
-  potential: number | null
   value: number | null
   salary: number | null
   precisione: number | null
@@ -81,7 +79,6 @@ export type PlayerMinAggregateOutputType = {
   morale: number | null
   experience: number | null
   talent: number | null
-  potential: number | null
   value: number | null
   salary: number | null
   image: string | null
@@ -109,7 +106,6 @@ export type PlayerMaxAggregateOutputType = {
   morale: number | null
   experience: number | null
   talent: number | null
-  potential: number | null
   value: number | null
   salary: number | null
   image: string | null
@@ -137,7 +133,6 @@ export type PlayerCountAggregateOutputType = {
   morale: number
   experience: number
   talent: number
-  potential: number
   value: number
   salary: number
   image: number
@@ -165,7 +160,6 @@ export type PlayerAvgAggregateInputType = {
   morale?: true
   experience?: true
   talent?: true
-  potential?: true
   value?: true
   salary?: true
   precisione?: true
@@ -187,7 +181,6 @@ export type PlayerSumAggregateInputType = {
   morale?: true
   experience?: true
   talent?: true
-  potential?: true
   value?: true
   salary?: true
   precisione?: true
@@ -212,7 +205,6 @@ export type PlayerMinAggregateInputType = {
   morale?: true
   experience?: true
   talent?: true
-  potential?: true
   value?: true
   salary?: true
   image?: true
@@ -240,7 +232,6 @@ export type PlayerMaxAggregateInputType = {
   morale?: true
   experience?: true
   talent?: true
-  potential?: true
   value?: true
   salary?: true
   image?: true
@@ -268,7 +259,6 @@ export type PlayerCountAggregateInputType = {
   morale?: true
   experience?: true
   talent?: true
-  potential?: true
   value?: true
   salary?: true
   image?: true
@@ -384,7 +374,6 @@ export type PlayerGroupByOutputType = {
   morale: number
   experience: number
   talent: number
-  potential: number
   value: number
   salary: number
   image: string
@@ -436,7 +425,6 @@ export type PlayerWhereInput = {
   morale?: Prisma.IntFilter<"Player"> | number
   experience?: Prisma.FloatFilter<"Player"> | number
   talent?: Prisma.FloatFilter<"Player"> | number
-  potential?: Prisma.FloatFilter<"Player"> | number
   value?: Prisma.IntFilter<"Player"> | number
   salary?: Prisma.IntFilter<"Player"> | number
   image?: Prisma.StringFilter<"Player"> | string
@@ -471,7 +459,6 @@ export type PlayerOrderByWithRelationInput = {
   morale?: Prisma.SortOrder
   experience?: Prisma.SortOrder
   talent?: Prisma.SortOrder
-  potential?: Prisma.SortOrder
   value?: Prisma.SortOrder
   salary?: Prisma.SortOrder
   image?: Prisma.SortOrder
@@ -509,7 +496,6 @@ export type PlayerWhereUniqueInput = Prisma.AtLeast<{
   morale?: Prisma.IntFilter<"Player"> | number
   experience?: Prisma.FloatFilter<"Player"> | number
   talent?: Prisma.FloatFilter<"Player"> | number
-  potential?: Prisma.FloatFilter<"Player"> | number
   value?: Prisma.IntFilter<"Player"> | number
   salary?: Prisma.IntFilter<"Player"> | number
   image?: Prisma.StringFilter<"Player"> | string
@@ -544,7 +530,6 @@ export type PlayerOrderByWithAggregationInput = {
   morale?: Prisma.SortOrder
   experience?: Prisma.SortOrder
   talent?: Prisma.SortOrder
-  potential?: Prisma.SortOrder
   value?: Prisma.SortOrder
   salary?: Prisma.SortOrder
   image?: Prisma.SortOrder
@@ -581,7 +566,6 @@ export type PlayerScalarWhereWithAggregatesInput = {
   morale?: Prisma.IntWithAggregatesFilter<"Player"> | number
   experience?: Prisma.FloatWithAggregatesFilter<"Player"> | number
   talent?: Prisma.FloatWithAggregatesFilter<"Player"> | number
-  potential?: Prisma.FloatWithAggregatesFilter<"Player"> | number
   value?: Prisma.IntWithAggregatesFilter<"Player"> | number
   salary?: Prisma.IntWithAggregatesFilter<"Player"> | number
   image?: Prisma.StringWithAggregatesFilter<"Player"> | string
@@ -608,7 +592,6 @@ export type PlayerCreateInput = {
   morale?: number
   experience?: number
   talent: number
-  potential: number
   value?: number
   salary?: number
   image?: string
@@ -643,7 +626,6 @@ export type PlayerUncheckedCreateInput = {
   morale?: number
   experience?: number
   talent: number
-  potential: number
   value?: number
   salary?: number
   image?: string
@@ -675,7 +657,6 @@ export type PlayerUpdateInput = {
   morale?: Prisma.IntFieldUpdateOperationsInput | number
   experience?: Prisma.FloatFieldUpdateOperationsInput | number
   talent?: Prisma.FloatFieldUpdateOperationsInput | number
-  potential?: Prisma.FloatFieldUpdateOperationsInput | number
   value?: Prisma.IntFieldUpdateOperationsInput | number
   salary?: Prisma.IntFieldUpdateOperationsInput | number
   image?: Prisma.StringFieldUpdateOperationsInput | string
@@ -710,7 +691,6 @@ export type PlayerUncheckedUpdateInput = {
   morale?: Prisma.IntFieldUpdateOperationsInput | number
   experience?: Prisma.FloatFieldUpdateOperationsInput | number
   talent?: Prisma.FloatFieldUpdateOperationsInput | number
-  potential?: Prisma.FloatFieldUpdateOperationsInput | number
   value?: Prisma.IntFieldUpdateOperationsInput | number
   salary?: Prisma.IntFieldUpdateOperationsInput | number
   image?: Prisma.StringFieldUpdateOperationsInput | string
@@ -744,7 +724,6 @@ export type PlayerCreateManyInput = {
   morale?: number
   experience?: number
   talent: number
-  potential: number
   value?: number
   salary?: number
   image?: string
@@ -771,7 +750,6 @@ export type PlayerUpdateManyMutationInput = {
   morale?: Prisma.IntFieldUpdateOperationsInput | number
   experience?: Prisma.FloatFieldUpdateOperationsInput | number
   talent?: Prisma.FloatFieldUpdateOperationsInput | number
-  potential?: Prisma.FloatFieldUpdateOperationsInput | number
   value?: Prisma.IntFieldUpdateOperationsInput | number
   salary?: Prisma.IntFieldUpdateOperationsInput | number
   image?: Prisma.StringFieldUpdateOperationsInput | string
@@ -800,7 +778,6 @@ export type PlayerUncheckedUpdateManyInput = {
   morale?: Prisma.IntFieldUpdateOperationsInput | number
   experience?: Prisma.FloatFieldUpdateOperationsInput | number
   talent?: Prisma.FloatFieldUpdateOperationsInput | number
-  potential?: Prisma.FloatFieldUpdateOperationsInput | number
   value?: Prisma.IntFieldUpdateOperationsInput | number
   salary?: Prisma.IntFieldUpdateOperationsInput | number
   image?: Prisma.StringFieldUpdateOperationsInput | string
@@ -847,7 +824,6 @@ export type PlayerCountOrderByAggregateInput = {
   morale?: Prisma.SortOrder
   experience?: Prisma.SortOrder
   talent?: Prisma.SortOrder
-  potential?: Prisma.SortOrder
   value?: Prisma.SortOrder
   salary?: Prisma.SortOrder
   image?: Prisma.SortOrder
@@ -873,7 +849,6 @@ export type PlayerAvgOrderByAggregateInput = {
   morale?: Prisma.SortOrder
   experience?: Prisma.SortOrder
   talent?: Prisma.SortOrder
-  potential?: Prisma.SortOrder
   value?: Prisma.SortOrder
   salary?: Prisma.SortOrder
   precisione?: Prisma.SortOrder
@@ -898,7 +873,6 @@ export type PlayerMaxOrderByAggregateInput = {
   morale?: Prisma.SortOrder
   experience?: Prisma.SortOrder
   talent?: Prisma.SortOrder
-  potential?: Prisma.SortOrder
   value?: Prisma.SortOrder
   salary?: Prisma.SortOrder
   image?: Prisma.SortOrder
@@ -926,7 +900,6 @@ export type PlayerMinOrderByAggregateInput = {
   morale?: Prisma.SortOrder
   experience?: Prisma.SortOrder
   talent?: Prisma.SortOrder
-  potential?: Prisma.SortOrder
   value?: Prisma.SortOrder
   salary?: Prisma.SortOrder
   image?: Prisma.SortOrder
@@ -951,7 +924,6 @@ export type PlayerSumOrderByAggregateInput = {
   morale?: Prisma.SortOrder
   experience?: Prisma.SortOrder
   talent?: Prisma.SortOrder
-  potential?: Prisma.SortOrder
   value?: Prisma.SortOrder
   salary?: Prisma.SortOrder
   precisione?: Prisma.SortOrder
@@ -1121,7 +1093,6 @@ export type PlayerCreateWithoutClubInput = {
   morale?: number
   experience?: number
   talent: number
-  potential: number
   value?: number
   salary?: number
   image?: string
@@ -1154,7 +1125,6 @@ export type PlayerUncheckedCreateWithoutClubInput = {
   morale?: number
   experience?: number
   talent: number
-  potential: number
   value?: number
   salary?: number
   image?: string
@@ -1217,7 +1187,6 @@ export type PlayerScalarWhereInput = {
   morale?: Prisma.IntFilter<"Player"> | number
   experience?: Prisma.FloatFilter<"Player"> | number
   talent?: Prisma.FloatFilter<"Player"> | number
-  potential?: Prisma.FloatFilter<"Player"> | number
   value?: Prisma.IntFilter<"Player"> | number
   salary?: Prisma.IntFilter<"Player"> | number
   image?: Prisma.StringFilter<"Player"> | string
@@ -1244,7 +1213,6 @@ export type PlayerCreateWithoutTransferListingsInput = {
   morale?: number
   experience?: number
   talent: number
-  potential: number
   value?: number
   salary?: number
   image?: string
@@ -1278,7 +1246,6 @@ export type PlayerUncheckedCreateWithoutTransferListingsInput = {
   morale?: number
   experience?: number
   talent: number
-  potential: number
   value?: number
   salary?: number
   image?: string
@@ -1325,7 +1292,6 @@ export type PlayerUpdateWithoutTransferListingsInput = {
   morale?: Prisma.IntFieldUpdateOperationsInput | number
   experience?: Prisma.FloatFieldUpdateOperationsInput | number
   talent?: Prisma.FloatFieldUpdateOperationsInput | number
-  potential?: Prisma.FloatFieldUpdateOperationsInput | number
   value?: Prisma.IntFieldUpdateOperationsInput | number
   salary?: Prisma.IntFieldUpdateOperationsInput | number
   image?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1359,7 +1325,6 @@ export type PlayerUncheckedUpdateWithoutTransferListingsInput = {
   morale?: Prisma.IntFieldUpdateOperationsInput | number
   experience?: Prisma.FloatFieldUpdateOperationsInput | number
   talent?: Prisma.FloatFieldUpdateOperationsInput | number
-  potential?: Prisma.FloatFieldUpdateOperationsInput | number
   value?: Prisma.IntFieldUpdateOperationsInput | number
   salary?: Prisma.IntFieldUpdateOperationsInput | number
   image?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1390,7 +1355,6 @@ export type PlayerCreateWithoutFormationAsAInput = {
   morale?: number
   experience?: number
   talent: number
-  potential: number
   value?: number
   salary?: number
   image?: string
@@ -1424,7 +1388,6 @@ export type PlayerUncheckedCreateWithoutFormationAsAInput = {
   morale?: number
   experience?: number
   talent: number
-  potential: number
   value?: number
   salary?: number
   image?: string
@@ -1460,7 +1423,6 @@ export type PlayerCreateWithoutFormationAsBInput = {
   morale?: number
   experience?: number
   talent: number
-  potential: number
   value?: number
   salary?: number
   image?: string
@@ -1494,7 +1456,6 @@ export type PlayerUncheckedCreateWithoutFormationAsBInput = {
   morale?: number
   experience?: number
   talent: number
-  potential: number
   value?: number
   salary?: number
   image?: string
@@ -1530,7 +1491,6 @@ export type PlayerCreateWithoutFormationAsCInput = {
   morale?: number
   experience?: number
   talent: number
-  potential: number
   value?: number
   salary?: number
   image?: string
@@ -1564,7 +1524,6 @@ export type PlayerUncheckedCreateWithoutFormationAsCInput = {
   morale?: number
   experience?: number
   talent: number
-  potential: number
   value?: number
   salary?: number
   image?: string
@@ -1611,7 +1570,6 @@ export type PlayerUpdateWithoutFormationAsAInput = {
   morale?: Prisma.IntFieldUpdateOperationsInput | number
   experience?: Prisma.FloatFieldUpdateOperationsInput | number
   talent?: Prisma.FloatFieldUpdateOperationsInput | number
-  potential?: Prisma.FloatFieldUpdateOperationsInput | number
   value?: Prisma.IntFieldUpdateOperationsInput | number
   salary?: Prisma.IntFieldUpdateOperationsInput | number
   image?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1645,7 +1603,6 @@ export type PlayerUncheckedUpdateWithoutFormationAsAInput = {
   morale?: Prisma.IntFieldUpdateOperationsInput | number
   experience?: Prisma.FloatFieldUpdateOperationsInput | number
   talent?: Prisma.FloatFieldUpdateOperationsInput | number
-  potential?: Prisma.FloatFieldUpdateOperationsInput | number
   value?: Prisma.IntFieldUpdateOperationsInput | number
   salary?: Prisma.IntFieldUpdateOperationsInput | number
   image?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1687,7 +1644,6 @@ export type PlayerUpdateWithoutFormationAsBInput = {
   morale?: Prisma.IntFieldUpdateOperationsInput | number
   experience?: Prisma.FloatFieldUpdateOperationsInput | number
   talent?: Prisma.FloatFieldUpdateOperationsInput | number
-  potential?: Prisma.FloatFieldUpdateOperationsInput | number
   value?: Prisma.IntFieldUpdateOperationsInput | number
   salary?: Prisma.IntFieldUpdateOperationsInput | number
   image?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1721,7 +1677,6 @@ export type PlayerUncheckedUpdateWithoutFormationAsBInput = {
   morale?: Prisma.IntFieldUpdateOperationsInput | number
   experience?: Prisma.FloatFieldUpdateOperationsInput | number
   talent?: Prisma.FloatFieldUpdateOperationsInput | number
-  potential?: Prisma.FloatFieldUpdateOperationsInput | number
   value?: Prisma.IntFieldUpdateOperationsInput | number
   salary?: Prisma.IntFieldUpdateOperationsInput | number
   image?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1763,7 +1718,6 @@ export type PlayerUpdateWithoutFormationAsCInput = {
   morale?: Prisma.IntFieldUpdateOperationsInput | number
   experience?: Prisma.FloatFieldUpdateOperationsInput | number
   talent?: Prisma.FloatFieldUpdateOperationsInput | number
-  potential?: Prisma.FloatFieldUpdateOperationsInput | number
   value?: Prisma.IntFieldUpdateOperationsInput | number
   salary?: Prisma.IntFieldUpdateOperationsInput | number
   image?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1797,7 +1751,6 @@ export type PlayerUncheckedUpdateWithoutFormationAsCInput = {
   morale?: Prisma.IntFieldUpdateOperationsInput | number
   experience?: Prisma.FloatFieldUpdateOperationsInput | number
   talent?: Prisma.FloatFieldUpdateOperationsInput | number
-  potential?: Prisma.FloatFieldUpdateOperationsInput | number
   value?: Prisma.IntFieldUpdateOperationsInput | number
   salary?: Prisma.IntFieldUpdateOperationsInput | number
   image?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1828,7 +1781,6 @@ export type PlayerCreateWithoutTrainingResultsInput = {
   morale?: number
   experience?: number
   talent: number
-  potential: number
   value?: number
   salary?: number
   image?: string
@@ -1862,7 +1814,6 @@ export type PlayerUncheckedCreateWithoutTrainingResultsInput = {
   morale?: number
   experience?: number
   talent: number
-  potential: number
   value?: number
   salary?: number
   image?: string
@@ -1909,7 +1860,6 @@ export type PlayerUpdateWithoutTrainingResultsInput = {
   morale?: Prisma.IntFieldUpdateOperationsInput | number
   experience?: Prisma.FloatFieldUpdateOperationsInput | number
   talent?: Prisma.FloatFieldUpdateOperationsInput | number
-  potential?: Prisma.FloatFieldUpdateOperationsInput | number
   value?: Prisma.IntFieldUpdateOperationsInput | number
   salary?: Prisma.IntFieldUpdateOperationsInput | number
   image?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1943,7 +1893,6 @@ export type PlayerUncheckedUpdateWithoutTrainingResultsInput = {
   morale?: Prisma.IntFieldUpdateOperationsInput | number
   experience?: Prisma.FloatFieldUpdateOperationsInput | number
   talent?: Prisma.FloatFieldUpdateOperationsInput | number
-  potential?: Prisma.FloatFieldUpdateOperationsInput | number
   value?: Prisma.IntFieldUpdateOperationsInput | number
   salary?: Prisma.IntFieldUpdateOperationsInput | number
   image?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1975,7 +1924,6 @@ export type PlayerCreateManyClubInput = {
   morale?: number
   experience?: number
   talent: number
-  potential: number
   value?: number
   salary?: number
   image?: string
@@ -2002,7 +1950,6 @@ export type PlayerUpdateWithoutClubInput = {
   morale?: Prisma.IntFieldUpdateOperationsInput | number
   experience?: Prisma.FloatFieldUpdateOperationsInput | number
   talent?: Prisma.FloatFieldUpdateOperationsInput | number
-  potential?: Prisma.FloatFieldUpdateOperationsInput | number
   value?: Prisma.IntFieldUpdateOperationsInput | number
   salary?: Prisma.IntFieldUpdateOperationsInput | number
   image?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2035,7 +1982,6 @@ export type PlayerUncheckedUpdateWithoutClubInput = {
   morale?: Prisma.IntFieldUpdateOperationsInput | number
   experience?: Prisma.FloatFieldUpdateOperationsInput | number
   talent?: Prisma.FloatFieldUpdateOperationsInput | number
-  potential?: Prisma.FloatFieldUpdateOperationsInput | number
   value?: Prisma.IntFieldUpdateOperationsInput | number
   salary?: Prisma.IntFieldUpdateOperationsInput | number
   image?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2068,7 +2014,6 @@ export type PlayerUncheckedUpdateManyWithoutClubInput = {
   morale?: Prisma.IntFieldUpdateOperationsInput | number
   experience?: Prisma.FloatFieldUpdateOperationsInput | number
   talent?: Prisma.FloatFieldUpdateOperationsInput | number
-  potential?: Prisma.FloatFieldUpdateOperationsInput | number
   value?: Prisma.IntFieldUpdateOperationsInput | number
   salary?: Prisma.IntFieldUpdateOperationsInput | number
   image?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2164,7 +2109,6 @@ export type PlayerSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   morale?: boolean
   experience?: boolean
   talent?: boolean
-  potential?: boolean
   value?: boolean
   salary?: boolean
   image?: boolean
@@ -2200,7 +2144,6 @@ export type PlayerSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extens
   morale?: boolean
   experience?: boolean
   talent?: boolean
-  potential?: boolean
   value?: boolean
   salary?: boolean
   image?: boolean
@@ -2230,7 +2173,6 @@ export type PlayerSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extens
   morale?: boolean
   experience?: boolean
   talent?: boolean
-  potential?: boolean
   value?: boolean
   salary?: boolean
   image?: boolean
@@ -2260,7 +2202,6 @@ export type PlayerSelectScalar = {
   morale?: boolean
   experience?: boolean
   talent?: boolean
-  potential?: boolean
   value?: boolean
   salary?: boolean
   image?: boolean
@@ -2278,7 +2219,7 @@ export type PlayerSelectScalar = {
   updatedAt?: boolean
 }
 
-export type PlayerOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "clubId" | "firstName" | "lastName" | "nationality" | "age" | "form" | "morale" | "experience" | "talent" | "potential" | "value" | "salary" | "image" | "style" | "precisione" | "diretto" | "sponde" | "tattica" | "mentalita" | "difesa" | "realizzazione" | "creativita" | "misura" | "createdAt" | "updatedAt", ExtArgs["result"]["player"]>
+export type PlayerOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "clubId" | "firstName" | "lastName" | "nationality" | "age" | "form" | "morale" | "experience" | "talent" | "value" | "salary" | "image" | "style" | "precisione" | "diretto" | "sponde" | "tattica" | "mentalita" | "difesa" | "realizzazione" | "creativita" | "misura" | "createdAt" | "updatedAt", ExtArgs["result"]["player"]>
 export type PlayerInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   club?: boolean | Prisma.Player$clubArgs<ExtArgs>
   formationAsA?: boolean | Prisma.Player$formationAsAArgs<ExtArgs>
@@ -2316,7 +2257,6 @@ export type $PlayerPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     morale: number
     experience: number
     talent: number
-    potential: number
     value: number
     salary: number
     image: string
@@ -2771,7 +2711,6 @@ export interface PlayerFieldRefs {
   readonly morale: Prisma.FieldRef<"Player", 'Int'>
   readonly experience: Prisma.FieldRef<"Player", 'Float'>
   readonly talent: Prisma.FieldRef<"Player", 'Float'>
-  readonly potential: Prisma.FieldRef<"Player", 'Float'>
   readonly value: Prisma.FieldRef<"Player", 'Int'>
   readonly salary: Prisma.FieldRef<"Player", 'Int'>
   readonly image: Prisma.FieldRef<"Player", 'String'>

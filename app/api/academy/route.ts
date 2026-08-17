@@ -1,9 +1,15 @@
 import { NextResponse } from "next/server";
 
+import { ensureInitialAcademy } from "@/lib/academy-initialization";
+import {
+  advanceAcademyScouting,
+  getAcademyEstimatedRange,
+  getAcademyRangeWidth,
+} from "@/lib/academy-scouting";
+import { getApiClubAccess } from "@/lib/api-club-access";
 import {
   MAX_FIRST_TEAM_PLAYERS,
 } from "@/lib/game-config";
-import { getApiClubAccess } from "@/lib/api-club-access";
 import { getMarketCommitments } from "@/lib/market-commitments";
 import { prisma } from "@/lib/prisma";
 
@@ -28,39 +34,78 @@ export async function GET() {
     }
 
     const { clubId } = access;
-    const databasePlayers =
-      await prisma.academyPlayer.findMany({
-        where: {
-          clubId,
-        },
-        orderBy: [
-          {
-            age: "desc",
-          },
-          {
-            lastName: "asc",
-          },
-        ],
-      });
+    const { databasePlayers, youthCoachLevel } = await prisma.$transaction(
+      async (transaction) => {
+        await ensureInitialAcademy(transaction, clubId);
+        await advanceAcademyScouting(transaction, clubId);
+
+        const [club, players] = await Promise.all([
+          transaction.club.findUnique({
+            where: {
+              id: clubId,
+            },
+            select: {
+              youthCoachLevel: true,
+            },
+          }),
+          transaction.academyPlayer.findMany({
+            where: {
+              clubId,
+            },
+            orderBy: [
+              {
+                age: "desc",
+              },
+              {
+                lastName: "asc",
+              },
+            ],
+          }),
+        ]);
+
+        return {
+          databasePlayers: players,
+          youthCoachLevel: club?.youthCoachLevel ?? 1,
+        };
+      }
+    );
 
     const players = databasePlayers.map((player) => {
-      const usesExplicitRevealKeys =
-        player.revealedAttributeKeys.length > 0;
-
       function getVisibleValue(
-        key: string,
+        key: keyof typeof attributeValues,
         value: number | null
       ) {
-        const isRevealed = usesExplicitRevealKeys
-          ? player.revealedAttributeKeys.includes(key)
-          : value !== null;
-
-        if (!isRevealed || value === null) {
+        if (value === null) {
           return null;
         }
 
-        return Math.round(value);
+        if (player.revealedAttributeKeys.includes(key)) {
+          return Math.round(value);
+        }
+
+        if (player.estimatedAttributeKeys.includes(key)) {
+          return getAcademyEstimatedRange({
+            playerId: player.id,
+            attribute: key,
+            value,
+            youthCoachLevel,
+          });
+        }
+
+        return null;
       }
+
+      const attributeValues = {
+        precisione: player.precisione,
+        diretto: player.diretto,
+        sponde: player.sponde,
+        tattica: player.tattica,
+        mentalita: player.mentalita,
+        difesa: player.difesa,
+        realizzazione: player.realizzazione,
+        creativita: player.creativita,
+        misura: player.misura,
+      };
 
       return {
         id: player.id,
@@ -69,56 +114,56 @@ export async function GET() {
         nationality: player.nationality,
         age: player.age,
 
-        revealedAttributes: usesExplicitRevealKeys
-          ? player.revealedAttributeKeys.length
-          : player.revealedAttributes,
+        estimatedAttributes: player.estimatedAttributeKeys.length,
+        revealedAttributes: player.revealedAttributeKeys.length,
 
         totalAttributes: player.totalAttributes,
+        nextScoutingAt: player.nextScoutingAt?.toISOString() ?? null,
 
         attributes: {
           precisione: getVisibleValue(
             "precisione",
-            player.precisione
+            attributeValues.precisione
           ),
 
           diretto: getVisibleValue(
             "diretto",
-            player.diretto
+            attributeValues.diretto
           ),
 
           sponde: getVisibleValue(
             "sponde",
-            player.sponde
+            attributeValues.sponde
           ),
 
           tattica: getVisibleValue(
             "tattica",
-            player.tattica
+            attributeValues.tattica
           ),
 
           mentalita: getVisibleValue(
             "mentalita",
-            player.mentalita
+            attributeValues.mentalita
           ),
 
           difesa: getVisibleValue(
             "difesa",
-            player.difesa
+            attributeValues.difesa
           ),
 
           realizzazione: getVisibleValue(
             "realizzazione",
-            player.realizzazione
+            attributeValues.realizzazione
           ),
 
           creativita: getVisibleValue(
             "creativita",
-            player.creativita
+            attributeValues.creativita
           ),
 
           misura: getVisibleValue(
             "misura",
-            player.misura
+            attributeValues.misura
           ),
         },
       };
@@ -126,6 +171,8 @@ export async function GET() {
 
     return NextResponse.json({
       players,
+      youthCoachLevel,
+      scoutingRangeWidth: getAcademyRangeWidth(youthCoachLevel),
     });
   } catch (error) {
     console.error(
@@ -287,7 +334,6 @@ export async function POST(request: Request) {
             experience: 0,
 
             talent: academyPlayer.talent,
-            potential: academyPlayer.potential,
 
             value: 0,
             salary: 0,

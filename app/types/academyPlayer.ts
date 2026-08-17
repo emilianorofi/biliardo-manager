@@ -1,13 +1,23 @@
+export type AcademyAttributeEstimate = {
+  minimum: number;
+  maximum: number;
+};
+
+export type AcademyAttributeValue =
+  | number
+  | AcademyAttributeEstimate
+  | null;
+
 export type AcademyAttributes = {
-  precisione: number | null;
-  diretto: number | null;
-  sponde: number | null;
-  tattica: number | null;
-  mentalita: number | null;
-  difesa: number | null;
-  realizzazione: number | null;
-  creativita: number | null;
-  misura: number | null;
+  precisione: AcademyAttributeValue;
+  diretto: AcademyAttributeValue;
+  sponde: AcademyAttributeValue;
+  tattica: AcademyAttributeValue;
+  mentalita: AcademyAttributeValue;
+  difesa: AcademyAttributeValue;
+  realizzazione: AcademyAttributeValue;
+  creativita: AcademyAttributeValue;
+  misura: AcademyAttributeValue;
 };
 
 export interface AcademyPlayer {
@@ -17,8 +27,10 @@ export interface AcademyPlayer {
   age: number;
   nationality: string;
 
+  estimatedAttributes: number;
   revealedAttributes: number;
   totalAttributes: 9;
+  nextScoutingAt: string | null;
 
   attributes: AcademyAttributes;
 }

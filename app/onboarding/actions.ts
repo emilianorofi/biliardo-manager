@@ -21,6 +21,7 @@ import {
   normalizeIdentityText,
   STARTING_BALANCE,
 } from "@/lib/onboarding/club-rules";
+import { createInitialAcademy } from "@/lib/onboarding/initial-academy";
 import { createInitialSquad } from "@/lib/onboarding/initial-squad";
 import { prisma } from "@/lib/prisma";
 
@@ -74,6 +75,7 @@ export async function createManagerClub(
   const normalizedName = normalizeClubName(clubName);
   const shortName = createClubShortName(clubName);
   const initialSquad = createInitialSquad();
+  const initialAcademy = createInitialAcademy();
 
   try {
     await prisma.$transaction(
@@ -185,6 +187,7 @@ export async function createManagerClub(
           secondaryColor,
           crestStyle,
           initialSquad,
+          initialAcademy,
         });
       },
       {
@@ -235,6 +238,7 @@ async function replaceAiClub({
   secondaryColor,
   crestStyle,
   initialSquad,
+  initialAcademy,
 }: {
   transaction: Prisma.TransactionClient;
   clubId: number;
@@ -247,6 +251,7 @@ async function replaceAiClub({
   secondaryColor: string;
   crestStyle: string;
   initialSquad: ReturnType<typeof createInitialSquad>;
+  initialAcademy: ReturnType<typeof createInitialAcademy>;
 }) {
   const previousPlayers =
     await transaction.player.findMany({
@@ -370,6 +375,7 @@ async function replaceAiClub({
       weeklyIncome: 0,
       trainerLevel: 1,
       youthCoachLevel: 1,
+      academyInitialized: true,
     },
   });
 
@@ -385,6 +391,13 @@ async function replaceAiClub({
 
   await transaction.player.createMany({
     data: initialSquad.map((player) => ({
+      ...player,
+      clubId,
+    })),
+  });
+
+  await transaction.academyPlayer.createMany({
+    data: initialAcademy.map((player) => ({
       ...player,
       clubId,
     })),

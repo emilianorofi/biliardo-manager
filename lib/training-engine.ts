@@ -28,8 +28,7 @@ export type TrainingPlayerValues = {
 type TrainingGainInput = {
   age: number;
   talent: number;
-  potential: number;
-  currentOverall: number;
+  currentValue: number;
   intensity: number;
   trainerEfficiency: number;
   focusWeight: number;
@@ -82,8 +81,7 @@ export function calculateOverall(
 export function calculateTrainingGain({
   age,
   talent,
-  potential,
-  currentOverall,
+  currentValue,
   intensity,
   trainerEfficiency,
   focusWeight,
@@ -112,11 +110,8 @@ export function calculateTrainingGain({
   const talentMultiplier =
     getTalentMultiplier(talent);
 
-  const potentialMultiplier =
-    getPotentialMultiplier(
-      currentOverall,
-      potential
-    );
+  const skillLevelMultiplier =
+    getSkillLevelMultiplier(currentValue);
 
   const gain =
     BASE_WEEKLY_GAIN *
@@ -125,7 +120,7 @@ export function calculateTrainingGain({
     normalizedFocusWeight *
     ageMultiplier *
     talentMultiplier *
-    potentialMultiplier;
+    skillLevelMultiplier;
 
   return roundToThreeDecimals(
     Math.max(0, gain)
@@ -217,36 +212,17 @@ function getTalentMultiplier(
   const normalizedTalent =
     clamp(talent, 0, 100);
 
-  return (
-    0.7 +
-    (normalizedTalent / 100) * 0.6
-  );
+  return 0.9 + (normalizedTalent / 100) * 0.2;
 }
 
-function getPotentialMultiplier(
-  currentOverall: number,
-  potential: number
-) {
-  const gap =
-    potential - currentOverall;
+function getSkillLevelMultiplier(currentValue: number) {
+  const normalizedValue = clamp(currentValue, 0, 100) / 100;
 
-  if (gap <= 0) {
+  if (normalizedValue >= 1) {
     return 0;
   }
 
-  if (gap < 3) {
-    return 0.2;
-  }
-
-  if (gap < 8) {
-    return 0.5;
-  }
-
-  if (gap < 15) {
-    return 0.8;
-  }
-
-  return 1;
+  return 1 - 0.8 * Math.pow(normalizedValue, 2);
 }
 
 function clamp(

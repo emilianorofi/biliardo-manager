@@ -60,7 +60,6 @@ type PlayerProfile = {
   overall: number;
   experience: [number, number];
   talent: [number, number];
-  potential: [number, number];
 };
 
 const INITIAL_PROFILES: PlayerProfile[] = [
@@ -69,35 +68,30 @@ const INITIAL_PROFILES: PlayerProfile[] = [
     overall: 64,
     experience: [45, 63],
     talent: [62, 68],
-    potential: [65, 70],
   },
   {
     age: [35, 45],
     overall: 65,
     experience: [48, 66],
     talent: [63, 69],
-    potential: [66, 71],
   },
   {
     age: [35, 45],
     overall: 66,
     experience: [50, 68],
     talent: [64, 70],
-    potential: [67, 72],
   },
   {
     age: [55, 65],
     overall: 62,
     experience: [76, 90],
     talent: [59, 64],
-    potential: [61, 65],
   },
   {
     age: [20, 25],
     overall: 60,
     experience: [12, 28],
     talent: [72, 80],
-    potential: [78, 86],
   },
 ];
 
@@ -136,7 +130,6 @@ function createInitialPlayer(
     morale: randomInteger(5, 7),
     experience: randomInteger(...profile.experience),
     talent: randomInteger(...profile.talent),
-    potential: randomInteger(...profile.potential),
     value: Math.pow(profile.overall - 50, 2) * 100,
     salary: Math.max(
       350,

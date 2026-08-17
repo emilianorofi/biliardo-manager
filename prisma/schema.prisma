@@ -32,6 +32,8 @@ model Club {
   trainerLevel    Int @default(1)
   youthCoachLevel Int @default(1)
 
+  academyInitialized Boolean @default(false)
+
   players          Player[]
   academyPlayers   AcademyPlayer[]
   formation        Formation?
@@ -84,8 +86,7 @@ model Player {
   morale     Int   @default(5)
   experience Float @default(0)
 
-  talent    Float
-  potential Float
+  talent Float
 
   value  Int @default(0)
   salary Int @default(0)
@@ -182,12 +183,13 @@ model AcademyPlayer {
   nationality String
   age         Int
 
-  talent    Float
-  potential Float
+  talent Float
 
-  revealedAttributes    Int      @default(0)
-  totalAttributes       Int      @default(9)
-  revealedAttributeKeys String[] @default([])
+  revealedAttributes     Int       @default(0)
+  totalAttributes        Int       @default(9)
+  estimatedAttributeKeys String[]  @default([])
+  revealedAttributeKeys  String[]  @default([])
+  nextScoutingAt         DateTime?
 
   precisione    Float?
   diretto       Float?

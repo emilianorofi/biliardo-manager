@@ -281,11 +281,8 @@ export async function POST() {
                 talent:
                   player.talent,
 
-                potential:
-                  player.potential,
-
-                currentOverall:
-                  overallBefore,
+                currentValue:
+                  primaryBefore,
 
                 intensity,
                 trainerEfficiency,
@@ -302,11 +299,8 @@ export async function POST() {
                 talent:
                   player.talent,
 
-                potential:
-                  player.potential,
-
-                currentOverall:
-                  overallBefore,
+                currentValue:
+                  secondaryBefore,
 
                 intensity,
                 trainerEfficiency,
