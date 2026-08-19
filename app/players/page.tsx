@@ -21,6 +21,22 @@ export default async function PlayersPage() {
             firstName: "asc",
           },
         ],
+        include: {
+          fixtureAppearances: {
+            orderBy: {
+              playedAt: "desc",
+            },
+            take: 1,
+            select: {
+              playedAt: true,
+              opponentClubName: true,
+              teamScore: true,
+              opponentScore: true,
+              formationSlot: true,
+              performanceRating: true,
+            },
+          },
+        },
       },
     },
   });
@@ -110,9 +126,29 @@ export default async function PlayersPage() {
         )
       : 0;
 
+  const latestPerformances = new Map(
+    databasePlayers.map((player) => {
+      const performance = player.fixtureAppearances[0];
+
+      return [
+        player.id,
+        performance
+          ? {
+              playedAt: performance.playedAt.toISOString(),
+              opponentClubName: performance.opponentClubName,
+              teamScore: performance.teamScore,
+              opponentScore: performance.opponentScore,
+              formationSlot: performance.formationSlot,
+              performanceRating: performance.performanceRating,
+            }
+          : null,
+      ] as const;
+    })
+  );
+
   return (
-    <main className="space-y-4">
-      <header className="relative overflow-hidden rounded-2xl border border-emerald-900/60 bg-[linear-gradient(135deg,#183129_0%,#12231d_68%,#101e19_100%)] px-5 py-4 shadow-xl shadow-black/10 sm:px-6">
+    <main className="space-y-3">
+      <header className="relative overflow-hidden rounded-2xl border border-emerald-900/60 bg-[linear-gradient(135deg,#183129_0%,#12231d_68%,#101e19_100%)] px-4 py-3 shadow-xl shadow-black/10 sm:px-5">
         <div
           className="absolute inset-x-0 top-0 h-1.5"
           style={{
@@ -131,17 +167,17 @@ export default async function PlayersPage() {
               Prima squadra
             </p>
 
-            <h1 className="mt-1 text-3xl font-black text-white">
+            <h1 className="text-2xl font-black text-white">
               Rosa giocatori
             </h1>
 
-            <p className="mt-1 max-w-2xl text-sm leading-5 text-slate-400">
-              Una panoramica rapida della rosa. Apri un giocatore
-              per consultare tutte le caratteristiche tecniche.
+            <p className="mt-0.5 max-w-2xl text-xs leading-5 text-slate-400">
+              Tutti i dati tecnici e l&apos;ultima prestazione dei
+              giocatori in un unico elenco.
             </p>
           </div>
 
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-3 gap-2">
             <TeamStat
               label="Giocatori"
               value={players.length}
@@ -161,7 +197,7 @@ export default async function PlayersPage() {
         </div>
       </header>
 
-      <section className="grid items-stretch gap-3 md:grid-cols-2 xl:grid-cols-3">
+      <section className="space-y-2">
         {players.map((player) => (
           <PlayerListCard
             key={player.id}
@@ -170,11 +206,14 @@ export default async function PlayersPage() {
               primary: club.primaryColor,
               secondary: club.secondaryColor,
             }}
+            latestPerformance={
+              latestPerformances.get(player.id) ?? null
+            }
           />
         ))}
 
         {players.length === 0 && (
-          <div className="rounded-2xl border border-emerald-900/60 bg-[#15261f] p-10 text-center md:col-span-2 xl:col-span-3">
+          <div className="rounded-2xl border border-emerald-900/60 bg-[#15261f] p-10 text-center">
             <p className="font-bold text-white">
               Nessun giocatore presente
             </p>
@@ -199,13 +238,13 @@ function TeamStat({
   highlight?: boolean;
 }) {
   return (
-    <div className="min-w-24 rounded-xl border border-emerald-900/60 bg-[#183129] px-3 py-2 text-center">
+    <div className="min-w-20 rounded-lg border border-emerald-900/60 bg-[#183129] px-2.5 py-1.5 text-center">
       <p className="text-[10px] font-bold uppercase tracking-wider text-emerald-300/70">
         {label}
       </p>
 
       <p
-        className={`mt-0.5 text-xl font-black ${
+        className={`text-lg font-black ${
           highlight
             ? "text-amber-300"
             : "text-white"

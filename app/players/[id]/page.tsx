@@ -2,10 +2,13 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 
+import PlayerCareerSection from "@/app/components/player/PlayerCareerSection";
+import PlayerPortrait from "@/app/components/player/PlayerPortrait";
 import TransferListingForm from "@/app/components/player/TransferListingForm";
 import type { Player } from "@/app/types/player";
 import { getCurrentClubId } from "@/lib/current-club";
 import { MIN_FIRST_TEAM_PLAYERS } from "@/lib/game-config";
+import { buildPlayerCareerView } from "@/lib/player-career-stats";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
@@ -68,6 +71,42 @@ export default async function PlayerPage({
               status: true,
               openingPrice: true,
               endsAt: true,
+            },
+          },
+          fixtureAppearances: {
+            orderBy: {
+              playedAt: "desc",
+            },
+            include: {
+              fixture: {
+                select: {
+                  round: true,
+                  league: {
+                    select: {
+                      name: true,
+                      season: {
+                        select: {
+                          number: true,
+                          name: true,
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+              gamePerformances: {
+                select: {
+                  result: true,
+                  performanceRating: true,
+                  fixtureGame: {
+                    select: {
+                      order: true,
+                      specialty: true,
+                      gameType: true,
+                    },
+                  },
+                },
+              },
             },
           },
         },
@@ -171,45 +210,48 @@ const player: Player = {
   const canListPlayer =
     rosterCount - activeSales >
     MIN_FIRST_TEAM_PLAYERS;
+  const career = buildPlayerCareerView(
+    databasePlayer.fixtureAppearances
+  );
+  const isOwnPlayer = databasePlayer.clubId === clubId;
 
   return (
-    <main className="space-y-7">
-      <header className="rounded-2xl border border-emerald-900/60 bg-[#15261f] p-6">
+    <main className="space-y-3">
+      <header className="rounded-2xl border border-emerald-900/60 bg-[#15261f] p-3 sm:p-4">
         <Link
           href={comesFromMarket ? "/market" : "/players"}
-          className="inline-flex items-center gap-2 text-sm font-semibold text-emerald-300 transition hover:text-emerald-200"
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-300 transition hover:text-emerald-200"
         >
-          <ArrowLeft size={17} />
+          <ArrowLeft size={14} />
           {comesFromMarket
             ? "Torna al mercato"
             : "Torna alla rosa"}
         </Link>
 
-        <p className="mt-4 text-xs font-black uppercase tracking-[0.2em] text-emerald-400">
-          Scheda giocatore
-        </p>
+        <div className="mt-2 grid gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(340px,0.75fr)] lg:items-center">
+          <div className="flex min-w-0 items-center gap-3">
+            <PlayerPortrait
+              player={player}
+              className="aspect-[2/3] w-12 shrink-0"
+            />
 
-        <div className="mt-4 flex flex-col justify-between gap-6 lg:flex-row lg:items-center">
-          <div className="flex items-center gap-4">
-            <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-300 to-amber-500 text-2xl font-black text-[#122018]">
-              {player.firstName.charAt(0)}
-              {player.lastName.charAt(0)}
-            </div>
-
-            <div>
-              <h1 className="text-3xl font-black text-white">
+            <div className="min-w-0">
+              <p className="text-[10px] font-black uppercase tracking-[0.17em] text-emerald-400">
+                Scheda giocatore
+              </p>
+              <h1 className="truncate text-xl font-black text-white">
                 {player.firstName} {player.lastName}
               </h1>
 
-              <p className="mt-2 text-sm text-slate-400">
+              <p className="mt-0.5 text-xs text-slate-400">
                 {player.nationality} · {player.age} anni
               </p>
 
-              <div className="mt-3 flex flex-wrap gap-2">
+              <div className="mt-1.5 flex flex-wrap gap-1.5">
                 {player.style.map((style) => (
                   <span
                     key={style}
-                    className="rounded-full border border-emerald-800/70 bg-emerald-950/50 px-3 py-1 text-xs font-semibold text-emerald-200"
+                    className="rounded-full border border-emerald-800/70 bg-emerald-950/50 px-2 py-0.5 text-[10px] font-semibold text-emerald-200"
                   >
                     {style}
                   </span>
@@ -218,122 +260,121 @@ const player: Player = {
             </div>
           </div>
 
-          <div className="flex h-28 w-28 shrink-0 flex-col items-center justify-center rounded-full border-4 border-amber-400 bg-amber-400/10">
-            <span className="text-4xl font-black text-amber-300">
-              {player.overall}
-            </span>
+          <div className="space-y-2">
+            <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-4">
+              <ProfileMetric
+                label="Overall"
+                value={player.overall}
+                highlight="amber"
+              />
+              <ProfileMetric
+                label="Forma"
+                value={`${player.form}/10`}
+                highlight="emerald"
+              />
+              <ProfileMetric
+                label="Morale"
+                value={`${player.morale}/10`}
+                highlight="sky"
+              />
+              <ProfileMetric
+                label="Esperienza"
+                value={player.experience}
+                highlight="slate"
+              />
+            </div>
 
-            <span className="mt-1 text-[10px] font-black uppercase tracking-[0.2em] text-amber-200/60">
-              Overall
-            </span>
+            {isOwnPlayer && (
+              <TransferListingForm
+                playerId={player.id}
+                playerName={`${player.firstName} ${player.lastName}`}
+                suggestedPrice={player.value}
+                canListPlayer={canListPlayer}
+                currentListing={
+                  currentListing
+                    ? {
+                        status: currentListing.status,
+                        openingPrice:
+                          currentListing.openingPrice,
+                        endsAt:
+                          currentListing.endsAt?.toISOString() ??
+                          null,
+                      }
+                    : null
+                }
+              />
+            )}
           </div>
         </div>
       </header>
 
-      <section className="grid gap-4 sm:grid-cols-3">
-        <StatusCard
-          label="Forma"
-          value={`${player.form}/10`}
-          highlight="emerald"
-        />
+      <div className="grid items-start gap-3 lg:grid-cols-[minmax(0,1.55fr)_minmax(280px,0.65fr)]">
+        <section className="rounded-2xl border border-emerald-900/60 bg-[#15261f] p-3">
+          <CompactHeading
+            eyebrow="Valori tecnici"
+            title="Caratteristiche"
+          />
 
-        <StatusCard
-          label="Morale"
-          value={`${player.morale}/10`}
-          highlight="amber"
-        />
+          <div className="mt-2 grid gap-1.5 sm:grid-cols-2 md:grid-cols-3">
+            {attributes.map((attribute) => {
+              const value = player.attributes[attribute.key];
 
-        <StatusCard
-          label="Esperienza"
-          value={player.experience}
-          highlight="sky"
-        />
-      </section>
+              return (
+                <AttributeValue
+                  key={attribute.key}
+                  label={attribute.label}
+                  value={value}
+                />
+              );
+            })}
+          </div>
 
-      <section className="rounded-2xl border border-emerald-900/60 bg-[#15261f] p-6">
-        <div>
-          <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-400">
-            Valori tecnici
-          </p>
-
-          <h2 className="mt-2 text-2xl font-black text-white">
-            Caratteristiche
-          </h2>
-        </div>
-
-        <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {attributes.map((attribute) => {
-            const value = player.attributes[attribute.key];
-
-            return (
-              <AttributeValue
-                key={attribute.key}
-                label={attribute.label}
-                value={value}
-              />
-            );
-          })}
-        </div>
-      </section>
-
-      <div className="grid gap-6 lg:grid-cols-2">
-        <section className="rounded-2xl border border-emerald-900/60 bg-[#15261f] p-6">
-          <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-400">
-            Prestazioni
-          </p>
-
-          <h2 className="mt-2 text-2xl font-black text-white">
-            Specialità
-          </h2>
-
-          <div className="mt-6 space-y-3">
-            {specialties.map((specialty) => (
-              <div
-                key={specialty.label}
-                className="flex items-center justify-between rounded-xl border border-emerald-900/50 bg-emerald-950/35 px-4 py-3"
-              >
-                <span className="font-semibold text-slate-300">
-                  {specialty.label}
-                </span>
-
-                <span
-                  className={`text-xl font-black ${getValueClass(
-                    specialty.value
-                  )}`}
+          <div className="mt-3 border-t border-emerald-900/50 pt-2.5">
+            <p className="text-[10px] font-black uppercase tracking-[0.16em] text-emerald-400">
+              Rendimento per specialità
+            </p>
+            <div className="mt-1.5 grid gap-1.5 sm:grid-cols-3">
+              {specialties.map((specialty) => (
+                <div
+                  key={specialty.label}
+                  className="flex items-center justify-between rounded-lg border border-emerald-900/50 bg-emerald-950/35 px-2.5 py-1.5"
                 >
-                  {specialty.value}
-                </span>
-              </div>
-            ))}
+                  <span className="text-xs font-semibold text-slate-300">
+                    {specialty.label}
+                  </span>
+                  <span
+                    className={`text-base font-black ${getValueClass(
+                      specialty.value
+                    )}`}
+                  >
+                    {specialty.value}
+                  </span>
+                </div>
+              ))}
+            </div>
           </div>
         </section>
 
-        <section className="rounded-2xl border border-emerald-900/60 bg-[#15261f] p-6">
-          <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-400">
-            Situazione economica
-          </p>
+        <section className="rounded-2xl border border-emerald-900/60 bg-[#15261f] p-3">
+          <CompactHeading
+            eyebrow="Profilo e costi"
+            title="Informazioni"
+          />
 
-          <h2 className="mt-2 text-2xl font-black text-white">
-            Informazioni
-          </h2>
-
-          <div className="mt-6 space-y-4">
+          <div className="mt-2 space-y-1.5">
             <InfoRow
               label="Valore giocatore"
               value={formatCurrency(player.value)}
               highlight
             />
-
             <InfoRow
               label="Stipendio"
               value={formatCurrency(player.salary)}
             />
-
             <InfoRow
               label="Età"
               value={`${player.age} anni`}
             />
-
             <InfoRow
               label="Nazionalità"
               value={player.nationality}
@@ -343,57 +384,56 @@ const player: Player = {
         </section>
       </div>
 
-      {databasePlayer.clubId === clubId && (
-        <TransferListingForm
-          playerId={player.id}
-          playerName={`${player.firstName} ${player.lastName}`}
-          suggestedPrice={player.value}
-          canListPlayer={canListPlayer}
-          currentListing={
-            currentListing
-              ? {
-                  status: currentListing.status,
-                  openingPrice:
-                    currentListing.openingPrice,
-                  endsAt:
-                    currentListing.endsAt?.toISOString() ??
-                    null,
-                }
-              : null
-          }
-        />
-      )}
+      <PlayerCareerSection career={career} />
+
     </main>
   );
 }
 
-function StatusCard({
+function ProfileMetric({
   label,
   value,
   highlight,
 }: {
   label: string;
   value: string | number;
-  highlight: "emerald" | "amber" | "sky";
+  highlight: "amber" | "emerald" | "sky" | "slate";
 }) {
   const colors = {
-    emerald: "text-emerald-300 border-emerald-800/60",
-    amber: "text-amber-300 border-amber-400/30",
-    sky: "text-sky-300 border-sky-500/30",
+    amber: "border-amber-400/30 text-amber-300",
+    emerald: "border-emerald-600/40 text-emerald-300",
+    sky: "border-sky-500/30 text-sky-300",
+    slate: "border-slate-600/50 text-slate-200",
   };
 
   return (
-    <article
-      className={`rounded-2xl border bg-[#15261f] p-5 ${colors[highlight]}`}
+    <div
+      className={`rounded-lg border bg-emerald-950/35 px-2 py-1.5 text-center ${colors[highlight]}`}
     >
-      <p className="text-xs font-black uppercase tracking-wider text-slate-500">
+      <p className="text-[9px] font-black uppercase tracking-wide text-slate-500">
         {label}
       </p>
+      <p className="text-base font-black">{value}</p>
+    </div>
+  );
+}
 
-      <p className={`mt-2 text-3xl font-black ${colors[highlight]}`}>
-        {value}
+function CompactHeading({
+  eyebrow,
+  title,
+}: {
+  eyebrow: string;
+  title: string;
+}) {
+  return (
+    <div>
+      <p className="text-[10px] font-black uppercase tracking-[0.16em] text-emerald-400">
+        {eyebrow}
       </p>
-    </article>
+      <h2 className="text-lg font-black text-white">
+        {title}
+      </h2>
+    </div>
   );
 }
 
@@ -405,18 +445,18 @@ function AttributeValue({
   value: number;
 }) {
   return (
-    <div className="rounded-xl border border-emerald-900/50 bg-emerald-950/35 p-4">
+    <div className="rounded-lg border border-emerald-900/50 bg-emerald-950/35 px-2.5 py-1.5">
       <div className="flex items-center justify-between gap-4">
-        <span className="text-sm font-semibold text-slate-300">
+        <span className="text-xs font-semibold text-slate-300">
           {label}
         </span>
 
-        <span className={`text-lg font-black ${getValueClass(value)}`}>
+        <span className={`text-base font-black ${getValueClass(value)}`}>
           {value}
         </span>
       </div>
 
-      <div className="mt-3 h-2 overflow-hidden rounded-full bg-black/30">
+      <div className="mt-1 h-1 overflow-hidden rounded-full bg-black/30">
         <div
           className="h-full rounded-full bg-emerald-400"
           style={{ width: `${value}%` }}
@@ -440,13 +480,13 @@ function InfoRow({
   return (
     <div
       className={`flex items-center justify-between gap-4 ${
-        last ? "" : "border-b border-emerald-900/50 pb-4"
+        last ? "" : "border-b border-emerald-900/50 pb-1.5"
       }`}
     >
-      <span className="text-slate-400">{label}</span>
+      <span className="text-xs text-slate-400">{label}</span>
 
       <span
-        className={`font-black ${
+        className={`text-xs font-black ${
           highlight ? "text-amber-300" : "text-white"
         }`}
       >
@@ -472,6 +512,7 @@ function getValueClass(value: number) {
 
   return "text-slate-300";
 }
+
 function calculateOverall(
   playerAttributes: Player["attributes"]
 ) {
