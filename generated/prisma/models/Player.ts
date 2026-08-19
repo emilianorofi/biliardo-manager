@@ -445,6 +445,7 @@ export type PlayerWhereInput = {
   formationAsB?: Prisma.FormationListRelationFilter
   formationAsC?: Prisma.FormationListRelationFilter
   trainingResults?: Prisma.TrainingResultListRelationFilter
+  fixtureAppearances?: Prisma.PlayerFixtureAppearanceListRelationFilter
   transferListings?: Prisma.TransferListingListRelationFilter
 }
 
@@ -479,6 +480,7 @@ export type PlayerOrderByWithRelationInput = {
   formationAsB?: Prisma.FormationOrderByRelationAggregateInput
   formationAsC?: Prisma.FormationOrderByRelationAggregateInput
   trainingResults?: Prisma.TrainingResultOrderByRelationAggregateInput
+  fixtureAppearances?: Prisma.PlayerFixtureAppearanceOrderByRelationAggregateInput
   transferListings?: Prisma.TransferListingOrderByRelationAggregateInput
 }
 
@@ -516,6 +518,7 @@ export type PlayerWhereUniqueInput = Prisma.AtLeast<{
   formationAsB?: Prisma.FormationListRelationFilter
   formationAsC?: Prisma.FormationListRelationFilter
   trainingResults?: Prisma.TrainingResultListRelationFilter
+  fixtureAppearances?: Prisma.PlayerFixtureAppearanceListRelationFilter
   transferListings?: Prisma.TransferListingListRelationFilter
 }, "id">
 
@@ -612,6 +615,7 @@ export type PlayerCreateInput = {
   formationAsB?: Prisma.FormationCreateNestedManyWithoutSlotBPlayerInput
   formationAsC?: Prisma.FormationCreateNestedManyWithoutSlotCPlayerInput
   trainingResults?: Prisma.TrainingResultCreateNestedManyWithoutPlayerInput
+  fixtureAppearances?: Prisma.PlayerFixtureAppearanceCreateNestedManyWithoutPlayerInput
   transferListings?: Prisma.TransferListingCreateNestedManyWithoutPlayerInput
 }
 
@@ -645,6 +649,7 @@ export type PlayerUncheckedCreateInput = {
   formationAsB?: Prisma.FormationUncheckedCreateNestedManyWithoutSlotBPlayerInput
   formationAsC?: Prisma.FormationUncheckedCreateNestedManyWithoutSlotCPlayerInput
   trainingResults?: Prisma.TrainingResultUncheckedCreateNestedManyWithoutPlayerInput
+  fixtureAppearances?: Prisma.PlayerFixtureAppearanceUncheckedCreateNestedManyWithoutPlayerInput
   transferListings?: Prisma.TransferListingUncheckedCreateNestedManyWithoutPlayerInput
 }
 
@@ -677,6 +682,7 @@ export type PlayerUpdateInput = {
   formationAsB?: Prisma.FormationUpdateManyWithoutSlotBPlayerNestedInput
   formationAsC?: Prisma.FormationUpdateManyWithoutSlotCPlayerNestedInput
   trainingResults?: Prisma.TrainingResultUpdateManyWithoutPlayerNestedInput
+  fixtureAppearances?: Prisma.PlayerFixtureAppearanceUpdateManyWithoutPlayerNestedInput
   transferListings?: Prisma.TransferListingUpdateManyWithoutPlayerNestedInput
 }
 
@@ -710,6 +716,7 @@ export type PlayerUncheckedUpdateInput = {
   formationAsB?: Prisma.FormationUncheckedUpdateManyWithoutSlotBPlayerNestedInput
   formationAsC?: Prisma.FormationUncheckedUpdateManyWithoutSlotCPlayerNestedInput
   trainingResults?: Prisma.TrainingResultUncheckedUpdateManyWithoutPlayerNestedInput
+  fixtureAppearances?: Prisma.PlayerFixtureAppearanceUncheckedUpdateManyWithoutPlayerNestedInput
   transferListings?: Prisma.TransferListingUncheckedUpdateManyWithoutPlayerNestedInput
 }
 
@@ -1084,6 +1091,22 @@ export type PlayerUpdateOneWithoutTrainingResultsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.PlayerUpdateToOneWithWhereWithoutTrainingResultsInput, Prisma.PlayerUpdateWithoutTrainingResultsInput>, Prisma.PlayerUncheckedUpdateWithoutTrainingResultsInput>
 }
 
+export type PlayerCreateNestedOneWithoutFixtureAppearancesInput = {
+  create?: Prisma.XOR<Prisma.PlayerCreateWithoutFixtureAppearancesInput, Prisma.PlayerUncheckedCreateWithoutFixtureAppearancesInput>
+  connectOrCreate?: Prisma.PlayerCreateOrConnectWithoutFixtureAppearancesInput
+  connect?: Prisma.PlayerWhereUniqueInput
+}
+
+export type PlayerUpdateOneWithoutFixtureAppearancesNestedInput = {
+  create?: Prisma.XOR<Prisma.PlayerCreateWithoutFixtureAppearancesInput, Prisma.PlayerUncheckedCreateWithoutFixtureAppearancesInput>
+  connectOrCreate?: Prisma.PlayerCreateOrConnectWithoutFixtureAppearancesInput
+  upsert?: Prisma.PlayerUpsertWithoutFixtureAppearancesInput
+  disconnect?: Prisma.PlayerWhereInput | boolean
+  delete?: Prisma.PlayerWhereInput | boolean
+  connect?: Prisma.PlayerWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PlayerUpdateToOneWithWhereWithoutFixtureAppearancesInput, Prisma.PlayerUpdateWithoutFixtureAppearancesInput>, Prisma.PlayerUncheckedUpdateWithoutFixtureAppearancesInput>
+}
+
 export type PlayerCreateWithoutClubInput = {
   firstName: string
   lastName: string
@@ -1112,6 +1135,7 @@ export type PlayerCreateWithoutClubInput = {
   formationAsB?: Prisma.FormationCreateNestedManyWithoutSlotBPlayerInput
   formationAsC?: Prisma.FormationCreateNestedManyWithoutSlotCPlayerInput
   trainingResults?: Prisma.TrainingResultCreateNestedManyWithoutPlayerInput
+  fixtureAppearances?: Prisma.PlayerFixtureAppearanceCreateNestedManyWithoutPlayerInput
   transferListings?: Prisma.TransferListingCreateNestedManyWithoutPlayerInput
 }
 
@@ -1144,6 +1168,7 @@ export type PlayerUncheckedCreateWithoutClubInput = {
   formationAsB?: Prisma.FormationUncheckedCreateNestedManyWithoutSlotBPlayerInput
   formationAsC?: Prisma.FormationUncheckedCreateNestedManyWithoutSlotCPlayerInput
   trainingResults?: Prisma.TrainingResultUncheckedCreateNestedManyWithoutPlayerInput
+  fixtureAppearances?: Prisma.PlayerFixtureAppearanceUncheckedCreateNestedManyWithoutPlayerInput
   transferListings?: Prisma.TransferListingUncheckedCreateNestedManyWithoutPlayerInput
 }
 
@@ -1233,6 +1258,7 @@ export type PlayerCreateWithoutTransferListingsInput = {
   formationAsB?: Prisma.FormationCreateNestedManyWithoutSlotBPlayerInput
   formationAsC?: Prisma.FormationCreateNestedManyWithoutSlotCPlayerInput
   trainingResults?: Prisma.TrainingResultCreateNestedManyWithoutPlayerInput
+  fixtureAppearances?: Prisma.PlayerFixtureAppearanceCreateNestedManyWithoutPlayerInput
 }
 
 export type PlayerUncheckedCreateWithoutTransferListingsInput = {
@@ -1265,6 +1291,7 @@ export type PlayerUncheckedCreateWithoutTransferListingsInput = {
   formationAsB?: Prisma.FormationUncheckedCreateNestedManyWithoutSlotBPlayerInput
   formationAsC?: Prisma.FormationUncheckedCreateNestedManyWithoutSlotCPlayerInput
   trainingResults?: Prisma.TrainingResultUncheckedCreateNestedManyWithoutPlayerInput
+  fixtureAppearances?: Prisma.PlayerFixtureAppearanceUncheckedCreateNestedManyWithoutPlayerInput
 }
 
 export type PlayerCreateOrConnectWithoutTransferListingsInput = {
@@ -1312,6 +1339,7 @@ export type PlayerUpdateWithoutTransferListingsInput = {
   formationAsB?: Prisma.FormationUpdateManyWithoutSlotBPlayerNestedInput
   formationAsC?: Prisma.FormationUpdateManyWithoutSlotCPlayerNestedInput
   trainingResults?: Prisma.TrainingResultUpdateManyWithoutPlayerNestedInput
+  fixtureAppearances?: Prisma.PlayerFixtureAppearanceUpdateManyWithoutPlayerNestedInput
 }
 
 export type PlayerUncheckedUpdateWithoutTransferListingsInput = {
@@ -1344,6 +1372,7 @@ export type PlayerUncheckedUpdateWithoutTransferListingsInput = {
   formationAsB?: Prisma.FormationUncheckedUpdateManyWithoutSlotBPlayerNestedInput
   formationAsC?: Prisma.FormationUncheckedUpdateManyWithoutSlotCPlayerNestedInput
   trainingResults?: Prisma.TrainingResultUncheckedUpdateManyWithoutPlayerNestedInput
+  fixtureAppearances?: Prisma.PlayerFixtureAppearanceUncheckedUpdateManyWithoutPlayerNestedInput
 }
 
 export type PlayerCreateWithoutFormationAsAInput = {
@@ -1374,6 +1403,7 @@ export type PlayerCreateWithoutFormationAsAInput = {
   formationAsB?: Prisma.FormationCreateNestedManyWithoutSlotBPlayerInput
   formationAsC?: Prisma.FormationCreateNestedManyWithoutSlotCPlayerInput
   trainingResults?: Prisma.TrainingResultCreateNestedManyWithoutPlayerInput
+  fixtureAppearances?: Prisma.PlayerFixtureAppearanceCreateNestedManyWithoutPlayerInput
   transferListings?: Prisma.TransferListingCreateNestedManyWithoutPlayerInput
 }
 
@@ -1406,6 +1436,7 @@ export type PlayerUncheckedCreateWithoutFormationAsAInput = {
   formationAsB?: Prisma.FormationUncheckedCreateNestedManyWithoutSlotBPlayerInput
   formationAsC?: Prisma.FormationUncheckedCreateNestedManyWithoutSlotCPlayerInput
   trainingResults?: Prisma.TrainingResultUncheckedCreateNestedManyWithoutPlayerInput
+  fixtureAppearances?: Prisma.PlayerFixtureAppearanceUncheckedCreateNestedManyWithoutPlayerInput
   transferListings?: Prisma.TransferListingUncheckedCreateNestedManyWithoutPlayerInput
 }
 
@@ -1442,6 +1473,7 @@ export type PlayerCreateWithoutFormationAsBInput = {
   formationAsA?: Prisma.FormationCreateNestedManyWithoutSlotAPlayerInput
   formationAsC?: Prisma.FormationCreateNestedManyWithoutSlotCPlayerInput
   trainingResults?: Prisma.TrainingResultCreateNestedManyWithoutPlayerInput
+  fixtureAppearances?: Prisma.PlayerFixtureAppearanceCreateNestedManyWithoutPlayerInput
   transferListings?: Prisma.TransferListingCreateNestedManyWithoutPlayerInput
 }
 
@@ -1474,6 +1506,7 @@ export type PlayerUncheckedCreateWithoutFormationAsBInput = {
   formationAsA?: Prisma.FormationUncheckedCreateNestedManyWithoutSlotAPlayerInput
   formationAsC?: Prisma.FormationUncheckedCreateNestedManyWithoutSlotCPlayerInput
   trainingResults?: Prisma.TrainingResultUncheckedCreateNestedManyWithoutPlayerInput
+  fixtureAppearances?: Prisma.PlayerFixtureAppearanceUncheckedCreateNestedManyWithoutPlayerInput
   transferListings?: Prisma.TransferListingUncheckedCreateNestedManyWithoutPlayerInput
 }
 
@@ -1510,6 +1543,7 @@ export type PlayerCreateWithoutFormationAsCInput = {
   formationAsA?: Prisma.FormationCreateNestedManyWithoutSlotAPlayerInput
   formationAsB?: Prisma.FormationCreateNestedManyWithoutSlotBPlayerInput
   trainingResults?: Prisma.TrainingResultCreateNestedManyWithoutPlayerInput
+  fixtureAppearances?: Prisma.PlayerFixtureAppearanceCreateNestedManyWithoutPlayerInput
   transferListings?: Prisma.TransferListingCreateNestedManyWithoutPlayerInput
 }
 
@@ -1542,6 +1576,7 @@ export type PlayerUncheckedCreateWithoutFormationAsCInput = {
   formationAsA?: Prisma.FormationUncheckedCreateNestedManyWithoutSlotAPlayerInput
   formationAsB?: Prisma.FormationUncheckedCreateNestedManyWithoutSlotBPlayerInput
   trainingResults?: Prisma.TrainingResultUncheckedCreateNestedManyWithoutPlayerInput
+  fixtureAppearances?: Prisma.PlayerFixtureAppearanceUncheckedCreateNestedManyWithoutPlayerInput
   transferListings?: Prisma.TransferListingUncheckedCreateNestedManyWithoutPlayerInput
 }
 
@@ -1589,6 +1624,7 @@ export type PlayerUpdateWithoutFormationAsAInput = {
   formationAsB?: Prisma.FormationUpdateManyWithoutSlotBPlayerNestedInput
   formationAsC?: Prisma.FormationUpdateManyWithoutSlotCPlayerNestedInput
   trainingResults?: Prisma.TrainingResultUpdateManyWithoutPlayerNestedInput
+  fixtureAppearances?: Prisma.PlayerFixtureAppearanceUpdateManyWithoutPlayerNestedInput
   transferListings?: Prisma.TransferListingUpdateManyWithoutPlayerNestedInput
 }
 
@@ -1621,6 +1657,7 @@ export type PlayerUncheckedUpdateWithoutFormationAsAInput = {
   formationAsB?: Prisma.FormationUncheckedUpdateManyWithoutSlotBPlayerNestedInput
   formationAsC?: Prisma.FormationUncheckedUpdateManyWithoutSlotCPlayerNestedInput
   trainingResults?: Prisma.TrainingResultUncheckedUpdateManyWithoutPlayerNestedInput
+  fixtureAppearances?: Prisma.PlayerFixtureAppearanceUncheckedUpdateManyWithoutPlayerNestedInput
   transferListings?: Prisma.TransferListingUncheckedUpdateManyWithoutPlayerNestedInput
 }
 
@@ -1663,6 +1700,7 @@ export type PlayerUpdateWithoutFormationAsBInput = {
   formationAsA?: Prisma.FormationUpdateManyWithoutSlotAPlayerNestedInput
   formationAsC?: Prisma.FormationUpdateManyWithoutSlotCPlayerNestedInput
   trainingResults?: Prisma.TrainingResultUpdateManyWithoutPlayerNestedInput
+  fixtureAppearances?: Prisma.PlayerFixtureAppearanceUpdateManyWithoutPlayerNestedInput
   transferListings?: Prisma.TransferListingUpdateManyWithoutPlayerNestedInput
 }
 
@@ -1695,6 +1733,7 @@ export type PlayerUncheckedUpdateWithoutFormationAsBInput = {
   formationAsA?: Prisma.FormationUncheckedUpdateManyWithoutSlotAPlayerNestedInput
   formationAsC?: Prisma.FormationUncheckedUpdateManyWithoutSlotCPlayerNestedInput
   trainingResults?: Prisma.TrainingResultUncheckedUpdateManyWithoutPlayerNestedInput
+  fixtureAppearances?: Prisma.PlayerFixtureAppearanceUncheckedUpdateManyWithoutPlayerNestedInput
   transferListings?: Prisma.TransferListingUncheckedUpdateManyWithoutPlayerNestedInput
 }
 
@@ -1737,6 +1776,7 @@ export type PlayerUpdateWithoutFormationAsCInput = {
   formationAsA?: Prisma.FormationUpdateManyWithoutSlotAPlayerNestedInput
   formationAsB?: Prisma.FormationUpdateManyWithoutSlotBPlayerNestedInput
   trainingResults?: Prisma.TrainingResultUpdateManyWithoutPlayerNestedInput
+  fixtureAppearances?: Prisma.PlayerFixtureAppearanceUpdateManyWithoutPlayerNestedInput
   transferListings?: Prisma.TransferListingUpdateManyWithoutPlayerNestedInput
 }
 
@@ -1769,6 +1809,7 @@ export type PlayerUncheckedUpdateWithoutFormationAsCInput = {
   formationAsA?: Prisma.FormationUncheckedUpdateManyWithoutSlotAPlayerNestedInput
   formationAsB?: Prisma.FormationUncheckedUpdateManyWithoutSlotBPlayerNestedInput
   trainingResults?: Prisma.TrainingResultUncheckedUpdateManyWithoutPlayerNestedInput
+  fixtureAppearances?: Prisma.PlayerFixtureAppearanceUncheckedUpdateManyWithoutPlayerNestedInput
   transferListings?: Prisma.TransferListingUncheckedUpdateManyWithoutPlayerNestedInput
 }
 
@@ -1800,6 +1841,7 @@ export type PlayerCreateWithoutTrainingResultsInput = {
   formationAsA?: Prisma.FormationCreateNestedManyWithoutSlotAPlayerInput
   formationAsB?: Prisma.FormationCreateNestedManyWithoutSlotBPlayerInput
   formationAsC?: Prisma.FormationCreateNestedManyWithoutSlotCPlayerInput
+  fixtureAppearances?: Prisma.PlayerFixtureAppearanceCreateNestedManyWithoutPlayerInput
   transferListings?: Prisma.TransferListingCreateNestedManyWithoutPlayerInput
 }
 
@@ -1832,6 +1874,7 @@ export type PlayerUncheckedCreateWithoutTrainingResultsInput = {
   formationAsA?: Prisma.FormationUncheckedCreateNestedManyWithoutSlotAPlayerInput
   formationAsB?: Prisma.FormationUncheckedCreateNestedManyWithoutSlotBPlayerInput
   formationAsC?: Prisma.FormationUncheckedCreateNestedManyWithoutSlotCPlayerInput
+  fixtureAppearances?: Prisma.PlayerFixtureAppearanceUncheckedCreateNestedManyWithoutPlayerInput
   transferListings?: Prisma.TransferListingUncheckedCreateNestedManyWithoutPlayerInput
 }
 
@@ -1879,6 +1922,7 @@ export type PlayerUpdateWithoutTrainingResultsInput = {
   formationAsA?: Prisma.FormationUpdateManyWithoutSlotAPlayerNestedInput
   formationAsB?: Prisma.FormationUpdateManyWithoutSlotBPlayerNestedInput
   formationAsC?: Prisma.FormationUpdateManyWithoutSlotCPlayerNestedInput
+  fixtureAppearances?: Prisma.PlayerFixtureAppearanceUpdateManyWithoutPlayerNestedInput
   transferListings?: Prisma.TransferListingUpdateManyWithoutPlayerNestedInput
 }
 
@@ -1911,6 +1955,153 @@ export type PlayerUncheckedUpdateWithoutTrainingResultsInput = {
   formationAsA?: Prisma.FormationUncheckedUpdateManyWithoutSlotAPlayerNestedInput
   formationAsB?: Prisma.FormationUncheckedUpdateManyWithoutSlotBPlayerNestedInput
   formationAsC?: Prisma.FormationUncheckedUpdateManyWithoutSlotCPlayerNestedInput
+  fixtureAppearances?: Prisma.PlayerFixtureAppearanceUncheckedUpdateManyWithoutPlayerNestedInput
+  transferListings?: Prisma.TransferListingUncheckedUpdateManyWithoutPlayerNestedInput
+}
+
+export type PlayerCreateWithoutFixtureAppearancesInput = {
+  firstName: string
+  lastName: string
+  nationality: string
+  age: number
+  form?: number
+  morale?: number
+  experience?: number
+  talent: number
+  value?: number
+  salary?: number
+  image?: string
+  style?: Prisma.PlayerCreatestyleInput | string[]
+  precisione: number
+  diretto: number
+  sponde: number
+  tattica: number
+  mentalita: number
+  difesa: number
+  realizzazione: number
+  creativita: number
+  misura: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  club?: Prisma.ClubCreateNestedOneWithoutPlayersInput
+  formationAsA?: Prisma.FormationCreateNestedManyWithoutSlotAPlayerInput
+  formationAsB?: Prisma.FormationCreateNestedManyWithoutSlotBPlayerInput
+  formationAsC?: Prisma.FormationCreateNestedManyWithoutSlotCPlayerInput
+  trainingResults?: Prisma.TrainingResultCreateNestedManyWithoutPlayerInput
+  transferListings?: Prisma.TransferListingCreateNestedManyWithoutPlayerInput
+}
+
+export type PlayerUncheckedCreateWithoutFixtureAppearancesInput = {
+  id?: number
+  clubId?: number | null
+  firstName: string
+  lastName: string
+  nationality: string
+  age: number
+  form?: number
+  morale?: number
+  experience?: number
+  talent: number
+  value?: number
+  salary?: number
+  image?: string
+  style?: Prisma.PlayerCreatestyleInput | string[]
+  precisione: number
+  diretto: number
+  sponde: number
+  tattica: number
+  mentalita: number
+  difesa: number
+  realizzazione: number
+  creativita: number
+  misura: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  formationAsA?: Prisma.FormationUncheckedCreateNestedManyWithoutSlotAPlayerInput
+  formationAsB?: Prisma.FormationUncheckedCreateNestedManyWithoutSlotBPlayerInput
+  formationAsC?: Prisma.FormationUncheckedCreateNestedManyWithoutSlotCPlayerInput
+  trainingResults?: Prisma.TrainingResultUncheckedCreateNestedManyWithoutPlayerInput
+  transferListings?: Prisma.TransferListingUncheckedCreateNestedManyWithoutPlayerInput
+}
+
+export type PlayerCreateOrConnectWithoutFixtureAppearancesInput = {
+  where: Prisma.PlayerWhereUniqueInput
+  create: Prisma.XOR<Prisma.PlayerCreateWithoutFixtureAppearancesInput, Prisma.PlayerUncheckedCreateWithoutFixtureAppearancesInput>
+}
+
+export type PlayerUpsertWithoutFixtureAppearancesInput = {
+  update: Prisma.XOR<Prisma.PlayerUpdateWithoutFixtureAppearancesInput, Prisma.PlayerUncheckedUpdateWithoutFixtureAppearancesInput>
+  create: Prisma.XOR<Prisma.PlayerCreateWithoutFixtureAppearancesInput, Prisma.PlayerUncheckedCreateWithoutFixtureAppearancesInput>
+  where?: Prisma.PlayerWhereInput
+}
+
+export type PlayerUpdateToOneWithWhereWithoutFixtureAppearancesInput = {
+  where?: Prisma.PlayerWhereInput
+  data: Prisma.XOR<Prisma.PlayerUpdateWithoutFixtureAppearancesInput, Prisma.PlayerUncheckedUpdateWithoutFixtureAppearancesInput>
+}
+
+export type PlayerUpdateWithoutFixtureAppearancesInput = {
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  nationality?: Prisma.StringFieldUpdateOperationsInput | string
+  age?: Prisma.IntFieldUpdateOperationsInput | number
+  form?: Prisma.IntFieldUpdateOperationsInput | number
+  morale?: Prisma.IntFieldUpdateOperationsInput | number
+  experience?: Prisma.FloatFieldUpdateOperationsInput | number
+  talent?: Prisma.FloatFieldUpdateOperationsInput | number
+  value?: Prisma.IntFieldUpdateOperationsInput | number
+  salary?: Prisma.IntFieldUpdateOperationsInput | number
+  image?: Prisma.StringFieldUpdateOperationsInput | string
+  style?: Prisma.PlayerUpdatestyleInput | string[]
+  precisione?: Prisma.FloatFieldUpdateOperationsInput | number
+  diretto?: Prisma.FloatFieldUpdateOperationsInput | number
+  sponde?: Prisma.FloatFieldUpdateOperationsInput | number
+  tattica?: Prisma.FloatFieldUpdateOperationsInput | number
+  mentalita?: Prisma.FloatFieldUpdateOperationsInput | number
+  difesa?: Prisma.FloatFieldUpdateOperationsInput | number
+  realizzazione?: Prisma.FloatFieldUpdateOperationsInput | number
+  creativita?: Prisma.FloatFieldUpdateOperationsInput | number
+  misura?: Prisma.FloatFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  club?: Prisma.ClubUpdateOneWithoutPlayersNestedInput
+  formationAsA?: Prisma.FormationUpdateManyWithoutSlotAPlayerNestedInput
+  formationAsB?: Prisma.FormationUpdateManyWithoutSlotBPlayerNestedInput
+  formationAsC?: Prisma.FormationUpdateManyWithoutSlotCPlayerNestedInput
+  trainingResults?: Prisma.TrainingResultUpdateManyWithoutPlayerNestedInput
+  transferListings?: Prisma.TransferListingUpdateManyWithoutPlayerNestedInput
+}
+
+export type PlayerUncheckedUpdateWithoutFixtureAppearancesInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  clubId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  nationality?: Prisma.StringFieldUpdateOperationsInput | string
+  age?: Prisma.IntFieldUpdateOperationsInput | number
+  form?: Prisma.IntFieldUpdateOperationsInput | number
+  morale?: Prisma.IntFieldUpdateOperationsInput | number
+  experience?: Prisma.FloatFieldUpdateOperationsInput | number
+  talent?: Prisma.FloatFieldUpdateOperationsInput | number
+  value?: Prisma.IntFieldUpdateOperationsInput | number
+  salary?: Prisma.IntFieldUpdateOperationsInput | number
+  image?: Prisma.StringFieldUpdateOperationsInput | string
+  style?: Prisma.PlayerUpdatestyleInput | string[]
+  precisione?: Prisma.FloatFieldUpdateOperationsInput | number
+  diretto?: Prisma.FloatFieldUpdateOperationsInput | number
+  sponde?: Prisma.FloatFieldUpdateOperationsInput | number
+  tattica?: Prisma.FloatFieldUpdateOperationsInput | number
+  mentalita?: Prisma.FloatFieldUpdateOperationsInput | number
+  difesa?: Prisma.FloatFieldUpdateOperationsInput | number
+  realizzazione?: Prisma.FloatFieldUpdateOperationsInput | number
+  creativita?: Prisma.FloatFieldUpdateOperationsInput | number
+  misura?: Prisma.FloatFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  formationAsA?: Prisma.FormationUncheckedUpdateManyWithoutSlotAPlayerNestedInput
+  formationAsB?: Prisma.FormationUncheckedUpdateManyWithoutSlotBPlayerNestedInput
+  formationAsC?: Prisma.FormationUncheckedUpdateManyWithoutSlotCPlayerNestedInput
+  trainingResults?: Prisma.TrainingResultUncheckedUpdateManyWithoutPlayerNestedInput
   transferListings?: Prisma.TransferListingUncheckedUpdateManyWithoutPlayerNestedInput
 }
 
@@ -1969,6 +2160,7 @@ export type PlayerUpdateWithoutClubInput = {
   formationAsB?: Prisma.FormationUpdateManyWithoutSlotBPlayerNestedInput
   formationAsC?: Prisma.FormationUpdateManyWithoutSlotCPlayerNestedInput
   trainingResults?: Prisma.TrainingResultUpdateManyWithoutPlayerNestedInput
+  fixtureAppearances?: Prisma.PlayerFixtureAppearanceUpdateManyWithoutPlayerNestedInput
   transferListings?: Prisma.TransferListingUpdateManyWithoutPlayerNestedInput
 }
 
@@ -2001,6 +2193,7 @@ export type PlayerUncheckedUpdateWithoutClubInput = {
   formationAsB?: Prisma.FormationUncheckedUpdateManyWithoutSlotBPlayerNestedInput
   formationAsC?: Prisma.FormationUncheckedUpdateManyWithoutSlotCPlayerNestedInput
   trainingResults?: Prisma.TrainingResultUncheckedUpdateManyWithoutPlayerNestedInput
+  fixtureAppearances?: Prisma.PlayerFixtureAppearanceUncheckedUpdateManyWithoutPlayerNestedInput
   transferListings?: Prisma.TransferListingUncheckedUpdateManyWithoutPlayerNestedInput
 }
 
@@ -2041,6 +2234,7 @@ export type PlayerCountOutputType = {
   formationAsB: number
   formationAsC: number
   trainingResults: number
+  fixtureAppearances: number
   transferListings: number
 }
 
@@ -2049,6 +2243,7 @@ export type PlayerCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions
   formationAsB?: boolean | PlayerCountOutputTypeCountFormationAsBArgs
   formationAsC?: boolean | PlayerCountOutputTypeCountFormationAsCArgs
   trainingResults?: boolean | PlayerCountOutputTypeCountTrainingResultsArgs
+  fixtureAppearances?: boolean | PlayerCountOutputTypeCountFixtureAppearancesArgs
   transferListings?: boolean | PlayerCountOutputTypeCountTransferListingsArgs
 }
 
@@ -2093,6 +2288,13 @@ export type PlayerCountOutputTypeCountTrainingResultsArgs<ExtArgs extends runtim
 /**
  * PlayerCountOutputType without action
  */
+export type PlayerCountOutputTypeCountFixtureAppearancesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PlayerFixtureAppearanceWhereInput
+}
+
+/**
+ * PlayerCountOutputType without action
+ */
 export type PlayerCountOutputTypeCountTransferListingsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.TransferListingWhereInput
 }
@@ -2129,6 +2331,7 @@ export type PlayerSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   formationAsB?: boolean | Prisma.Player$formationAsBArgs<ExtArgs>
   formationAsC?: boolean | Prisma.Player$formationAsCArgs<ExtArgs>
   trainingResults?: boolean | Prisma.Player$trainingResultsArgs<ExtArgs>
+  fixtureAppearances?: boolean | Prisma.Player$fixtureAppearancesArgs<ExtArgs>
   transferListings?: boolean | Prisma.Player$transferListingsArgs<ExtArgs>
   _count?: boolean | Prisma.PlayerCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["player"]>
@@ -2226,6 +2429,7 @@ export type PlayerInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   formationAsB?: boolean | Prisma.Player$formationAsBArgs<ExtArgs>
   formationAsC?: boolean | Prisma.Player$formationAsCArgs<ExtArgs>
   trainingResults?: boolean | Prisma.Player$trainingResultsArgs<ExtArgs>
+  fixtureAppearances?: boolean | Prisma.Player$fixtureAppearancesArgs<ExtArgs>
   transferListings?: boolean | Prisma.Player$transferListingsArgs<ExtArgs>
   _count?: boolean | Prisma.PlayerCountOutputTypeDefaultArgs<ExtArgs>
 }
@@ -2244,6 +2448,7 @@ export type $PlayerPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     formationAsB: Prisma.$FormationPayload<ExtArgs>[]
     formationAsC: Prisma.$FormationPayload<ExtArgs>[]
     trainingResults: Prisma.$TrainingResultPayload<ExtArgs>[]
+    fixtureAppearances: Prisma.$PlayerFixtureAppearancePayload<ExtArgs>[]
     transferListings: Prisma.$TransferListingPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -2671,6 +2876,7 @@ export interface Prisma__PlayerClient<T, Null = never, ExtArgs extends runtime.T
   formationAsB<T extends Prisma.Player$formationAsBArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Player$formationAsBArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FormationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   formationAsC<T extends Prisma.Player$formationAsCArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Player$formationAsCArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FormationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   trainingResults<T extends Prisma.Player$trainingResultsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Player$trainingResultsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TrainingResultPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  fixtureAppearances<T extends Prisma.Player$fixtureAppearancesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Player$fixtureAppearancesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PlayerFixtureAppearancePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   transferListings<T extends Prisma.Player$transferListingsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Player$transferListingsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TransferListingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -3239,6 +3445,30 @@ export type Player$trainingResultsArgs<ExtArgs extends runtime.Types.Extensions.
   take?: number
   skip?: number
   distinct?: Prisma.TrainingResultScalarFieldEnum | Prisma.TrainingResultScalarFieldEnum[]
+}
+
+/**
+ * Player.fixtureAppearances
+ */
+export type Player$fixtureAppearancesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PlayerFixtureAppearance
+   */
+  select?: Prisma.PlayerFixtureAppearanceSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PlayerFixtureAppearance
+   */
+  omit?: Prisma.PlayerFixtureAppearanceOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PlayerFixtureAppearanceInclude<ExtArgs> | null
+  where?: Prisma.PlayerFixtureAppearanceWhereInput
+  orderBy?: Prisma.PlayerFixtureAppearanceOrderByWithRelationInput | Prisma.PlayerFixtureAppearanceOrderByWithRelationInput[]
+  cursor?: Prisma.PlayerFixtureAppearanceWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PlayerFixtureAppearanceScalarFieldEnum | Prisma.PlayerFixtureAppearanceScalarFieldEnum[]
 }
 
 /**

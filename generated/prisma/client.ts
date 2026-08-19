@@ -116,3 +116,18 @@ export type LeagueEntry = Prisma.LeagueEntryModel
  *
  */
 export type LeagueFixture = Prisma.LeagueFixtureModel
+/**
+ * Model LeagueFixtureGame
+ *
+ */
+export type LeagueFixtureGame = Prisma.LeagueFixtureGameModel
+/**
+ * Model PlayerFixtureAppearance
+ *
+ */
+export type PlayerFixtureAppearance = Prisma.PlayerFixtureAppearanceModel
+/**
+ * Model PlayerGamePerformance
+ *
+ */
+export type PlayerGamePerformance = Prisma.PlayerGamePerformanceModel

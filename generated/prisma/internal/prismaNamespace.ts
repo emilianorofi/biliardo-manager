@@ -411,7 +411,10 @@ export const ModelName = {
   Season: 'Season',
   League: 'League',
   LeagueEntry: 'LeagueEntry',
-  LeagueFixture: 'LeagueFixture'
+  LeagueFixture: 'LeagueFixture',
+  LeagueFixtureGame: 'LeagueFixtureGame',
+  PlayerFixtureAppearance: 'PlayerFixtureAppearance',
+  PlayerGamePerformance: 'PlayerGamePerformance'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -427,7 +430,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "club" | "manager" | "player" | "transferListing" | "transferBid" | "academyPlayer" | "formation" | "trainingPlan" | "trainingSession" | "trainingResult" | "gameEvent" | "season" | "league" | "leagueEntry" | "leagueFixture"
+    modelProps: "club" | "manager" | "player" | "transferListing" | "transferBid" | "academyPlayer" | "formation" | "trainingPlan" | "trainingSession" | "trainingResult" | "gameEvent" | "season" | "league" | "leagueEntry" | "leagueFixture" | "leagueFixtureGame" | "playerFixtureAppearance" | "playerGamePerformance"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1541,6 +1544,228 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    LeagueFixtureGame: {
+      payload: Prisma.$LeagueFixtureGamePayload<ExtArgs>
+      fields: Prisma.LeagueFixtureGameFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.LeagueFixtureGameFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LeagueFixtureGamePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.LeagueFixtureGameFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LeagueFixtureGamePayload>
+        }
+        findFirst: {
+          args: Prisma.LeagueFixtureGameFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LeagueFixtureGamePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.LeagueFixtureGameFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LeagueFixtureGamePayload>
+        }
+        findMany: {
+          args: Prisma.LeagueFixtureGameFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LeagueFixtureGamePayload>[]
+        }
+        create: {
+          args: Prisma.LeagueFixtureGameCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LeagueFixtureGamePayload>
+        }
+        createMany: {
+          args: Prisma.LeagueFixtureGameCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.LeagueFixtureGameCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LeagueFixtureGamePayload>[]
+        }
+        delete: {
+          args: Prisma.LeagueFixtureGameDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LeagueFixtureGamePayload>
+        }
+        update: {
+          args: Prisma.LeagueFixtureGameUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LeagueFixtureGamePayload>
+        }
+        deleteMany: {
+          args: Prisma.LeagueFixtureGameDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.LeagueFixtureGameUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.LeagueFixtureGameUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LeagueFixtureGamePayload>[]
+        }
+        upsert: {
+          args: Prisma.LeagueFixtureGameUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LeagueFixtureGamePayload>
+        }
+        aggregate: {
+          args: Prisma.LeagueFixtureGameAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateLeagueFixtureGame>
+        }
+        groupBy: {
+          args: Prisma.LeagueFixtureGameGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.LeagueFixtureGameGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.LeagueFixtureGameCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.LeagueFixtureGameCountAggregateOutputType> | number
+        }
+      }
+    }
+    PlayerFixtureAppearance: {
+      payload: Prisma.$PlayerFixtureAppearancePayload<ExtArgs>
+      fields: Prisma.PlayerFixtureAppearanceFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PlayerFixtureAppearanceFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlayerFixtureAppearancePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PlayerFixtureAppearanceFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlayerFixtureAppearancePayload>
+        }
+        findFirst: {
+          args: Prisma.PlayerFixtureAppearanceFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlayerFixtureAppearancePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PlayerFixtureAppearanceFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlayerFixtureAppearancePayload>
+        }
+        findMany: {
+          args: Prisma.PlayerFixtureAppearanceFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlayerFixtureAppearancePayload>[]
+        }
+        create: {
+          args: Prisma.PlayerFixtureAppearanceCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlayerFixtureAppearancePayload>
+        }
+        createMany: {
+          args: Prisma.PlayerFixtureAppearanceCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PlayerFixtureAppearanceCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlayerFixtureAppearancePayload>[]
+        }
+        delete: {
+          args: Prisma.PlayerFixtureAppearanceDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlayerFixtureAppearancePayload>
+        }
+        update: {
+          args: Prisma.PlayerFixtureAppearanceUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlayerFixtureAppearancePayload>
+        }
+        deleteMany: {
+          args: Prisma.PlayerFixtureAppearanceDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PlayerFixtureAppearanceUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PlayerFixtureAppearanceUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlayerFixtureAppearancePayload>[]
+        }
+        upsert: {
+          args: Prisma.PlayerFixtureAppearanceUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlayerFixtureAppearancePayload>
+        }
+        aggregate: {
+          args: Prisma.PlayerFixtureAppearanceAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePlayerFixtureAppearance>
+        }
+        groupBy: {
+          args: Prisma.PlayerFixtureAppearanceGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PlayerFixtureAppearanceGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PlayerFixtureAppearanceCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PlayerFixtureAppearanceCountAggregateOutputType> | number
+        }
+      }
+    }
+    PlayerGamePerformance: {
+      payload: Prisma.$PlayerGamePerformancePayload<ExtArgs>
+      fields: Prisma.PlayerGamePerformanceFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PlayerGamePerformanceFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlayerGamePerformancePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PlayerGamePerformanceFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlayerGamePerformancePayload>
+        }
+        findFirst: {
+          args: Prisma.PlayerGamePerformanceFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlayerGamePerformancePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PlayerGamePerformanceFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlayerGamePerformancePayload>
+        }
+        findMany: {
+          args: Prisma.PlayerGamePerformanceFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlayerGamePerformancePayload>[]
+        }
+        create: {
+          args: Prisma.PlayerGamePerformanceCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlayerGamePerformancePayload>
+        }
+        createMany: {
+          args: Prisma.PlayerGamePerformanceCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PlayerGamePerformanceCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlayerGamePerformancePayload>[]
+        }
+        delete: {
+          args: Prisma.PlayerGamePerformanceDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlayerGamePerformancePayload>
+        }
+        update: {
+          args: Prisma.PlayerGamePerformanceUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlayerGamePerformancePayload>
+        }
+        deleteMany: {
+          args: Prisma.PlayerGamePerformanceDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PlayerGamePerformanceUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PlayerGamePerformanceUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlayerGamePerformancePayload>[]
+        }
+        upsert: {
+          args: Prisma.PlayerGamePerformanceUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlayerGamePerformancePayload>
+        }
+        aggregate: {
+          args: Prisma.PlayerGamePerformanceAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePlayerGamePerformance>
+        }
+        groupBy: {
+          args: Prisma.PlayerGamePerformanceGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PlayerGamePerformanceGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PlayerGamePerformanceCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PlayerGamePerformanceCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1852,6 +2077,68 @@ export const LeagueFixtureScalarFieldEnum = {
 export type LeagueFixtureScalarFieldEnum = (typeof LeagueFixtureScalarFieldEnum)[keyof typeof LeagueFixtureScalarFieldEnum]
 
 
+export const LeagueFixtureGameScalarFieldEnum = {
+  id: 'id',
+  fixtureId: 'fixtureId',
+  order: 'order',
+  specialty: 'specialty',
+  gameType: 'gameType',
+  targetPoints: 'targetPoints',
+  winnerSide: 'winnerSide',
+  homePerformanceRating: 'homePerformanceRating',
+  awayPerformanceRating: 'awayPerformanceRating',
+  homeWinProbability: 'homeWinProbability',
+  awayWinProbability: 'awayWinProbability',
+  randomValue: 'randomValue',
+  createdAt: 'createdAt'
+} as const
+
+export type LeagueFixtureGameScalarFieldEnum = (typeof LeagueFixtureGameScalarFieldEnum)[keyof typeof LeagueFixtureGameScalarFieldEnum]
+
+
+export const PlayerFixtureAppearanceScalarFieldEnum = {
+  id: 'id',
+  fixtureId: 'fixtureId',
+  playerId: 'playerId',
+  clubId: 'clubId',
+  playerFirstName: 'playerFirstName',
+  playerLastName: 'playerLastName',
+  playerNationality: 'playerNationality',
+  playerAge: 'playerAge',
+  clubName: 'clubName',
+  opponentClubName: 'opponentClubName',
+  side: 'side',
+  formationSlot: 'formationSlot',
+  teamScore: 'teamScore',
+  opponentScore: 'opponentScore',
+  overall: 'overall',
+  form: 'form',
+  morale: 'morale',
+  experience: 'experience',
+  performanceRating: 'performanceRating',
+  playedAt: 'playedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type PlayerFixtureAppearanceScalarFieldEnum = (typeof PlayerFixtureAppearanceScalarFieldEnum)[keyof typeof PlayerFixtureAppearanceScalarFieldEnum]
+
+
+export const PlayerGamePerformanceScalarFieldEnum = {
+  id: 'id',
+  fixtureGameId: 'fixtureGameId',
+  appearanceId: 'appearanceId',
+  result: 'result',
+  specialtyRating: 'specialtyRating',
+  performanceRating: 'performanceRating',
+  formModifier: 'formModifier',
+  moraleModifier: 'moraleModifier',
+  experienceModifier: 'experienceModifier',
+  createdAt: 'createdAt'
+} as const
+
+export type PlayerGamePerformanceScalarFieldEnum = (typeof PlayerGamePerformanceScalarFieldEnum)[keyof typeof PlayerGamePerformanceScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -2110,6 +2397,9 @@ export type GlobalOmitConfig = {
   league?: Prisma.LeagueOmit
   leagueEntry?: Prisma.LeagueEntryOmit
   leagueFixture?: Prisma.LeagueFixtureOmit
+  leagueFixtureGame?: Prisma.LeagueFixtureGameOmit
+  playerFixtureAppearance?: Prisma.PlayerFixtureAppearanceOmit
+  playerGamePerformance?: Prisma.PlayerGamePerformanceOmit
 }
 
 /* Types for Logging */

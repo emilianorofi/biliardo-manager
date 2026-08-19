@@ -65,7 +65,10 @@ export const ModelName = {
   Season: 'Season',
   League: 'League',
   LeagueEntry: 'LeagueEntry',
-  LeagueFixture: 'LeagueFixture'
+  LeagueFixture: 'LeagueFixture',
+  LeagueFixtureGame: 'LeagueFixtureGame',
+  PlayerFixtureAppearance: 'PlayerFixtureAppearance',
+  PlayerGamePerformance: 'PlayerGamePerformance'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -354,6 +357,68 @@ export const LeagueFixtureScalarFieldEnum = {
 } as const
 
 export type LeagueFixtureScalarFieldEnum = (typeof LeagueFixtureScalarFieldEnum)[keyof typeof LeagueFixtureScalarFieldEnum]
+
+
+export const LeagueFixtureGameScalarFieldEnum = {
+  id: 'id',
+  fixtureId: 'fixtureId',
+  order: 'order',
+  specialty: 'specialty',
+  gameType: 'gameType',
+  targetPoints: 'targetPoints',
+  winnerSide: 'winnerSide',
+  homePerformanceRating: 'homePerformanceRating',
+  awayPerformanceRating: 'awayPerformanceRating',
+  homeWinProbability: 'homeWinProbability',
+  awayWinProbability: 'awayWinProbability',
+  randomValue: 'randomValue',
+  createdAt: 'createdAt'
+} as const
+
+export type LeagueFixtureGameScalarFieldEnum = (typeof LeagueFixtureGameScalarFieldEnum)[keyof typeof LeagueFixtureGameScalarFieldEnum]
+
+
+export const PlayerFixtureAppearanceScalarFieldEnum = {
+  id: 'id',
+  fixtureId: 'fixtureId',
+  playerId: 'playerId',
+  clubId: 'clubId',
+  playerFirstName: 'playerFirstName',
+  playerLastName: 'playerLastName',
+  playerNationality: 'playerNationality',
+  playerAge: 'playerAge',
+  clubName: 'clubName',
+  opponentClubName: 'opponentClubName',
+  side: 'side',
+  formationSlot: 'formationSlot',
+  teamScore: 'teamScore',
+  opponentScore: 'opponentScore',
+  overall: 'overall',
+  form: 'form',
+  morale: 'morale',
+  experience: 'experience',
+  performanceRating: 'performanceRating',
+  playedAt: 'playedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type PlayerFixtureAppearanceScalarFieldEnum = (typeof PlayerFixtureAppearanceScalarFieldEnum)[keyof typeof PlayerFixtureAppearanceScalarFieldEnum]
+
+
+export const PlayerGamePerformanceScalarFieldEnum = {
+  id: 'id',
+  fixtureGameId: 'fixtureGameId',
+  appearanceId: 'appearanceId',
+  result: 'result',
+  specialtyRating: 'specialtyRating',
+  performanceRating: 'performanceRating',
+  formModifier: 'formModifier',
+  moraleModifier: 'moraleModifier',
+  experienceModifier: 'experienceModifier',
+  createdAt: 'createdAt'
+} as const
+
+export type PlayerGamePerformanceScalarFieldEnum = (typeof PlayerGamePerformanceScalarFieldEnum)[keyof typeof PlayerGamePerformanceScalarFieldEnum]
 
 
 export const SortOrder = {

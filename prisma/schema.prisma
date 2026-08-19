@@ -34,12 +34,13 @@ model Club {
 
   academyInitialized Boolean @default(false)
 
-  players          Player[]
-  academyPlayers   AcademyPlayer[]
-  formation        Formation?
-  trainingPlan     TrainingPlan?
-  trainingSessions TrainingSession[]
-  gameEvents       GameEvent[]
+  players           Player[]
+  academyPlayers    AcademyPlayer[]
+  formation         Formation?
+  trainingPlan      TrainingPlan?
+  trainingSessions  TrainingSession[]
+  gameEvents        GameEvent[]
+  playerAppearances PlayerFixtureAppearance[]
 
   transferListings TransferListing[] @relation("TransferListingSeller")
   transferBids     TransferBid[]     @relation("TransferBidder")
@@ -108,7 +109,8 @@ model Player {
   formationAsB Formation[] @relation("FormationSlotB")
   formationAsC Formation[] @relation("FormationSlotC")
 
-  trainingResults TrainingResult[]
+  trainingResults    TrainingResult[]
+  fixtureAppearances PlayerFixtureAppearance[]
 
   transferListings TransferListing[]
 
@@ -412,6 +414,9 @@ model LeagueFixture {
 
   playedAt DateTime?
 
+  games             LeagueFixtureGame[]
+  playerAppearances PlayerFixtureAppearance[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -421,4 +426,104 @@ model LeagueFixture {
   @@index([homeClubId])
   @@index([awayClubId])
   @@index([scheduledAt])
+}
+
+model LeagueFixtureGame {
+  id Int @id @default(autoincrement())
+
+  fixtureId Int
+  fixture   LeagueFixture @relation(fields: [fixtureId], references: [id], onDelete: Cascade)
+
+  order        Int
+  specialty    String
+  gameType     String
+  targetPoints Int
+
+  winnerSide String
+
+  homePerformanceRating Float
+  awayPerformanceRating Float
+
+  homeWinProbability Float
+  awayWinProbability Float
+  randomValue        Float
+
+  playerPerformances PlayerGamePerformance[]
+
+  createdAt DateTime @default(now())
+
+  @@unique([fixtureId, order])
+  @@index([fixtureId])
+  @@index([specialty])
+}
+
+model PlayerFixtureAppearance {
+  id Int @id @default(autoincrement())
+
+  fixtureId Int
+  fixture   LeagueFixture @relation(fields: [fixtureId], references: [id], onDelete: Cascade)
+
+  playerId Int?
+  player   Player? @relation(fields: [playerId], references: [id], onDelete: SetNull)
+
+  clubId Int?
+  club   Club? @relation(fields: [clubId], references: [id], onDelete: SetNull)
+
+  playerFirstName   String
+  playerLastName    String
+  playerNationality String
+  playerAge         Int
+
+  clubName         String
+  opponentClubName String
+
+  side          String
+  formationSlot String
+
+  teamScore     Int
+  opponentScore Int
+
+  overall           Float
+  form              Int
+  morale            Int
+  experience        Float
+  performanceRating Float
+
+  playedAt DateTime
+
+  gamePerformances PlayerGamePerformance[]
+
+  createdAt DateTime @default(now())
+
+  @@unique([fixtureId, side, formationSlot])
+  @@index([fixtureId])
+  @@index([playerId])
+  @@index([clubId])
+  @@index([playedAt])
+}
+
+model PlayerGamePerformance {
+  id Int @id @default(autoincrement())
+
+  fixtureGameId Int
+  fixtureGame   LeagueFixtureGame @relation(fields: [fixtureGameId], references: [id], onDelete: Cascade)
+
+  appearanceId Int
+  appearance   PlayerFixtureAppearance @relation(fields: [appearanceId], references: [id], onDelete: Cascade)
+
+  result String
+
+  specialtyRating   Float
+  performanceRating Float
+
+  formModifier       Float
+  moraleModifier     Float
+  experienceModifier Float
+
+  createdAt DateTime @default(now())
+
+  @@unique([fixtureGameId, appearanceId])
+  @@index([fixtureGameId])
+  @@index([appearanceId])
+  @@index([result])
 }
