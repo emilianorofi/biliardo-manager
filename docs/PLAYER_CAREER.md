@@ -57,3 +57,18 @@ Questa struttura permette di ottenere senza duplicare dati:
 - club rappresentati nel corso della carriera.
 
 Trasferimenti, crescita delle caratteristiche, trofei, premi e ritiro verranno collegati nelle fasi successive del percorso individuale.
+
+## Registrazione automatica della partita
+
+La partita reale viene giocata tramite `playLeagueFixture`. Il servizio:
+
+1. controlla campionato, giornata, orario e stato dell'incontro;
+2. utilizza la formazione salvata oppure crea la migliore formazione automatica disponibile;
+3. simula le sei prove con i giocatori effettivamente schierati;
+4. aggiorna risultato, classifica e avanzamento del campionato;
+5. registra sei presenze, sei prove e diciotto prestazioni individuali;
+6. pubblica la notizia del risultato.
+
+Tutte le operazioni avvengono nella stessa transazione. Se anche una sola registrazione fallisce, vengono annullati anche risultato e aggiornamento della classifica: non può quindi esistere una partita salvata soltanto in parte.
+
+L'endpoint `POST /api/league/play-fixture` è utilizzabile soltanto da un manager coinvolto nell'incontro e non permette di giocare prima dell'orario programmato. Il servizio interno rimane riutilizzabile dalla futura automazione delle giornate.
