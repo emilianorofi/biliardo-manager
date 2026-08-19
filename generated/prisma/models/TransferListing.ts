@@ -706,10 +706,6 @@ export type TransferListingUncheckedUpdateManyWithoutPlayerNestedInput = {
   deleteMany?: Prisma.TransferListingScalarWhereInput | Prisma.TransferListingScalarWhereInput[]
 }
 
-export type NullableDateTimeFieldUpdateOperationsInput = {
-  set?: Date | string | null
-}
-
 export type TransferListingCreateNestedOneWithoutBidsInput = {
   create?: Prisma.XOR<Prisma.TransferListingCreateWithoutBidsInput, Prisma.TransferListingUncheckedCreateWithoutBidsInput>
   connectOrCreate?: Prisma.TransferListingCreateOrConnectWithoutBidsInput

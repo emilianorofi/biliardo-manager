@@ -117,6 +117,7 @@ export async function POST(request: Request) {
                   select: {
                     id: true,
                     clubId: true,
+                    careerStatus: true,
                     firstName: true,
                     lastName: true,
                     salary: true,
@@ -142,6 +143,7 @@ export async function POST(request: Request) {
           listing.listingType !== "FREE_AGENT" ||
           listing.sellerClubId !== null ||
           listing.player.clubId !== null ||
+          listing.player.careerStatus !== "ACTIVE" ||
           !listing.endsAt ||
           listing.endsAt.getTime() <= Date.now()
         ) {

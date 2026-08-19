@@ -26,6 +26,9 @@ import {
   recordPlayerFixtureCareer,
 } from "@/lib/player-career-recording";
 import { prisma } from "@/lib/prisma";
+import {
+  completeSeasonIfReady,
+} from "@/lib/season-completion";
 
 const CAREER_PLAYER_SELECT = {
   id: true,
@@ -91,6 +94,7 @@ export async function playLeagueFixture({
           name: true,
           status: true,
           currentRound: true,
+          seasonId: true,
         },
       },
       homeClub: {
@@ -290,6 +294,12 @@ export async function playLeagueFixture({
             status: completion.status,
           },
         });
+        const seasonCompletion =
+          await completeSeasonIfReady(
+            transaction,
+            fixture.league.seasonId,
+            { now }
+          );
 
         await transaction.gameEvent.create({
           data: {
@@ -307,6 +317,7 @@ export async function playLeagueFixture({
           history,
           completion,
           updatedLeague,
+          seasonCompletion,
         };
       }
     );
@@ -367,6 +378,7 @@ export async function playLeagueFixture({
         totalRounds: settled.completion.totalRounds,
         isCompleted: settled.completion.isCompleted,
       },
+      season: settled.seasonCompletion,
     };
   } catch (error) {
     if (

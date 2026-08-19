@@ -83,6 +83,11 @@ model Player {
   nationality String
   age         Int
 
+  careerStatus       String    @default("ACTIVE")
+  retiredAt          DateTime?
+  retirementSeasonId Int?
+  retirementSeason   Season?   @relation(fields: [retirementSeasonId], references: [id], onDelete: Restrict)
+
   form       Int   @default(5)
   morale     Int   @default(5)
   experience Float @default(0)
@@ -118,6 +123,8 @@ model Player {
   updatedAt DateTime @updatedAt
 
   @@index([clubId])
+  @@index([careerStatus])
+  @@index([retirementSeasonId])
 }
 
 model TransferListing {
@@ -335,7 +342,8 @@ model Season {
   startsAt DateTime?
   endsAt   DateTime?
 
-  leagues League[]
+  leagues        League[]
+  retiredPlayers Player[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

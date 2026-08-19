@@ -175,6 +175,7 @@ async function settleListing(
               lastName: true,
               salary: true,
               clubId: true,
+              careerStatus: true,
             },
           },
           bids: {
@@ -303,12 +304,13 @@ async function settleListing(
         MAX_FIRST_TEAM_PLAYERS;
 
     const sellerIsEligible =
-      listing.sellerClubId === null ||
-      (sellerClub !== null &&
-        listing.player.clubId ===
-          listing.sellerClubId &&
-        sellerClub._count.players >
-          MIN_FIRST_TEAM_PLAYERS);
+      listing.player.careerStatus === "ACTIVE" &&
+      (listing.sellerClubId === null ||
+        (sellerClub !== null &&
+          listing.player.clubId ===
+            listing.sellerClubId &&
+          sellerClub._count.players >
+            MIN_FIRST_TEAM_PLAYERS));
 
     if (
       !winnerClub ||

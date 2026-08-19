@@ -30,6 +30,7 @@ export type PlayerAvgAggregateOutputType = {
   id: number | null
   clubId: number | null
   age: number | null
+  retirementSeasonId: number | null
   form: number | null
   morale: number | null
   experience: number | null
@@ -51,6 +52,7 @@ export type PlayerSumAggregateOutputType = {
   id: number | null
   clubId: number | null
   age: number | null
+  retirementSeasonId: number | null
   form: number | null
   morale: number | null
   experience: number | null
@@ -75,6 +77,9 @@ export type PlayerMinAggregateOutputType = {
   lastName: string | null
   nationality: string | null
   age: number | null
+  careerStatus: string | null
+  retiredAt: Date | null
+  retirementSeasonId: number | null
   form: number | null
   morale: number | null
   experience: number | null
@@ -102,6 +107,9 @@ export type PlayerMaxAggregateOutputType = {
   lastName: string | null
   nationality: string | null
   age: number | null
+  careerStatus: string | null
+  retiredAt: Date | null
+  retirementSeasonId: number | null
   form: number | null
   morale: number | null
   experience: number | null
@@ -129,6 +137,9 @@ export type PlayerCountAggregateOutputType = {
   lastName: number
   nationality: number
   age: number
+  careerStatus: number
+  retiredAt: number
+  retirementSeasonId: number
   form: number
   morale: number
   experience: number
@@ -156,6 +167,7 @@ export type PlayerAvgAggregateInputType = {
   id?: true
   clubId?: true
   age?: true
+  retirementSeasonId?: true
   form?: true
   morale?: true
   experience?: true
@@ -177,6 +189,7 @@ export type PlayerSumAggregateInputType = {
   id?: true
   clubId?: true
   age?: true
+  retirementSeasonId?: true
   form?: true
   morale?: true
   experience?: true
@@ -201,6 +214,9 @@ export type PlayerMinAggregateInputType = {
   lastName?: true
   nationality?: true
   age?: true
+  careerStatus?: true
+  retiredAt?: true
+  retirementSeasonId?: true
   form?: true
   morale?: true
   experience?: true
@@ -228,6 +244,9 @@ export type PlayerMaxAggregateInputType = {
   lastName?: true
   nationality?: true
   age?: true
+  careerStatus?: true
+  retiredAt?: true
+  retirementSeasonId?: true
   form?: true
   morale?: true
   experience?: true
@@ -255,6 +274,9 @@ export type PlayerCountAggregateInputType = {
   lastName?: true
   nationality?: true
   age?: true
+  careerStatus?: true
+  retiredAt?: true
+  retirementSeasonId?: true
   form?: true
   morale?: true
   experience?: true
@@ -370,6 +392,9 @@ export type PlayerGroupByOutputType = {
   lastName: string
   nationality: string
   age: number
+  careerStatus: string
+  retiredAt: Date | null
+  retirementSeasonId: number | null
   form: number
   morale: number
   experience: number
@@ -421,6 +446,9 @@ export type PlayerWhereInput = {
   lastName?: Prisma.StringFilter<"Player"> | string
   nationality?: Prisma.StringFilter<"Player"> | string
   age?: Prisma.IntFilter<"Player"> | number
+  careerStatus?: Prisma.StringFilter<"Player"> | string
+  retiredAt?: Prisma.DateTimeNullableFilter<"Player"> | Date | string | null
+  retirementSeasonId?: Prisma.IntNullableFilter<"Player"> | number | null
   form?: Prisma.IntFilter<"Player"> | number
   morale?: Prisma.IntFilter<"Player"> | number
   experience?: Prisma.FloatFilter<"Player"> | number
@@ -441,6 +469,7 @@ export type PlayerWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"Player"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Player"> | Date | string
   club?: Prisma.XOR<Prisma.ClubNullableScalarRelationFilter, Prisma.ClubWhereInput> | null
+  retirementSeason?: Prisma.XOR<Prisma.SeasonNullableScalarRelationFilter, Prisma.SeasonWhereInput> | null
   formationAsA?: Prisma.FormationListRelationFilter
   formationAsB?: Prisma.FormationListRelationFilter
   formationAsC?: Prisma.FormationListRelationFilter
@@ -456,6 +485,9 @@ export type PlayerOrderByWithRelationInput = {
   lastName?: Prisma.SortOrder
   nationality?: Prisma.SortOrder
   age?: Prisma.SortOrder
+  careerStatus?: Prisma.SortOrder
+  retiredAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  retirementSeasonId?: Prisma.SortOrderInput | Prisma.SortOrder
   form?: Prisma.SortOrder
   morale?: Prisma.SortOrder
   experience?: Prisma.SortOrder
@@ -476,6 +508,7 @@ export type PlayerOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   club?: Prisma.ClubOrderByWithRelationInput
+  retirementSeason?: Prisma.SeasonOrderByWithRelationInput
   formationAsA?: Prisma.FormationOrderByRelationAggregateInput
   formationAsB?: Prisma.FormationOrderByRelationAggregateInput
   formationAsC?: Prisma.FormationOrderByRelationAggregateInput
@@ -494,6 +527,9 @@ export type PlayerWhereUniqueInput = Prisma.AtLeast<{
   lastName?: Prisma.StringFilter<"Player"> | string
   nationality?: Prisma.StringFilter<"Player"> | string
   age?: Prisma.IntFilter<"Player"> | number
+  careerStatus?: Prisma.StringFilter<"Player"> | string
+  retiredAt?: Prisma.DateTimeNullableFilter<"Player"> | Date | string | null
+  retirementSeasonId?: Prisma.IntNullableFilter<"Player"> | number | null
   form?: Prisma.IntFilter<"Player"> | number
   morale?: Prisma.IntFilter<"Player"> | number
   experience?: Prisma.FloatFilter<"Player"> | number
@@ -514,6 +550,7 @@ export type PlayerWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"Player"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Player"> | Date | string
   club?: Prisma.XOR<Prisma.ClubNullableScalarRelationFilter, Prisma.ClubWhereInput> | null
+  retirementSeason?: Prisma.XOR<Prisma.SeasonNullableScalarRelationFilter, Prisma.SeasonWhereInput> | null
   formationAsA?: Prisma.FormationListRelationFilter
   formationAsB?: Prisma.FormationListRelationFilter
   formationAsC?: Prisma.FormationListRelationFilter
@@ -529,6 +566,9 @@ export type PlayerOrderByWithAggregationInput = {
   lastName?: Prisma.SortOrder
   nationality?: Prisma.SortOrder
   age?: Prisma.SortOrder
+  careerStatus?: Prisma.SortOrder
+  retiredAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  retirementSeasonId?: Prisma.SortOrderInput | Prisma.SortOrder
   form?: Prisma.SortOrder
   morale?: Prisma.SortOrder
   experience?: Prisma.SortOrder
@@ -565,6 +605,9 @@ export type PlayerScalarWhereWithAggregatesInput = {
   lastName?: Prisma.StringWithAggregatesFilter<"Player"> | string
   nationality?: Prisma.StringWithAggregatesFilter<"Player"> | string
   age?: Prisma.IntWithAggregatesFilter<"Player"> | number
+  careerStatus?: Prisma.StringWithAggregatesFilter<"Player"> | string
+  retiredAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Player"> | Date | string | null
+  retirementSeasonId?: Prisma.IntNullableWithAggregatesFilter<"Player"> | number | null
   form?: Prisma.IntWithAggregatesFilter<"Player"> | number
   morale?: Prisma.IntWithAggregatesFilter<"Player"> | number
   experience?: Prisma.FloatWithAggregatesFilter<"Player"> | number
@@ -591,6 +634,8 @@ export type PlayerCreateInput = {
   lastName: string
   nationality: string
   age: number
+  careerStatus?: string
+  retiredAt?: Date | string | null
   form?: number
   morale?: number
   experience?: number
@@ -611,6 +656,7 @@ export type PlayerCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   club?: Prisma.ClubCreateNestedOneWithoutPlayersInput
+  retirementSeason?: Prisma.SeasonCreateNestedOneWithoutRetiredPlayersInput
   formationAsA?: Prisma.FormationCreateNestedManyWithoutSlotAPlayerInput
   formationAsB?: Prisma.FormationCreateNestedManyWithoutSlotBPlayerInput
   formationAsC?: Prisma.FormationCreateNestedManyWithoutSlotCPlayerInput
@@ -626,6 +672,9 @@ export type PlayerUncheckedCreateInput = {
   lastName: string
   nationality: string
   age: number
+  careerStatus?: string
+  retiredAt?: Date | string | null
+  retirementSeasonId?: number | null
   form?: number
   morale?: number
   experience?: number
@@ -658,6 +707,8 @@ export type PlayerUpdateInput = {
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   nationality?: Prisma.StringFieldUpdateOperationsInput | string
   age?: Prisma.IntFieldUpdateOperationsInput | number
+  careerStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  retiredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   form?: Prisma.IntFieldUpdateOperationsInput | number
   morale?: Prisma.IntFieldUpdateOperationsInput | number
   experience?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -678,6 +729,7 @@ export type PlayerUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   club?: Prisma.ClubUpdateOneWithoutPlayersNestedInput
+  retirementSeason?: Prisma.SeasonUpdateOneWithoutRetiredPlayersNestedInput
   formationAsA?: Prisma.FormationUpdateManyWithoutSlotAPlayerNestedInput
   formationAsB?: Prisma.FormationUpdateManyWithoutSlotBPlayerNestedInput
   formationAsC?: Prisma.FormationUpdateManyWithoutSlotCPlayerNestedInput
@@ -693,6 +745,9 @@ export type PlayerUncheckedUpdateInput = {
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   nationality?: Prisma.StringFieldUpdateOperationsInput | string
   age?: Prisma.IntFieldUpdateOperationsInput | number
+  careerStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  retiredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  retirementSeasonId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   form?: Prisma.IntFieldUpdateOperationsInput | number
   morale?: Prisma.IntFieldUpdateOperationsInput | number
   experience?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -727,6 +782,9 @@ export type PlayerCreateManyInput = {
   lastName: string
   nationality: string
   age: number
+  careerStatus?: string
+  retiredAt?: Date | string | null
+  retirementSeasonId?: number | null
   form?: number
   morale?: number
   experience?: number
@@ -753,6 +811,8 @@ export type PlayerUpdateManyMutationInput = {
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   nationality?: Prisma.StringFieldUpdateOperationsInput | string
   age?: Prisma.IntFieldUpdateOperationsInput | number
+  careerStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  retiredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   form?: Prisma.IntFieldUpdateOperationsInput | number
   morale?: Prisma.IntFieldUpdateOperationsInput | number
   experience?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -781,6 +841,9 @@ export type PlayerUncheckedUpdateManyInput = {
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   nationality?: Prisma.StringFieldUpdateOperationsInput | string
   age?: Prisma.IntFieldUpdateOperationsInput | number
+  careerStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  retiredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  retirementSeasonId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   form?: Prisma.IntFieldUpdateOperationsInput | number
   morale?: Prisma.IntFieldUpdateOperationsInput | number
   experience?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -827,6 +890,9 @@ export type PlayerCountOrderByAggregateInput = {
   lastName?: Prisma.SortOrder
   nationality?: Prisma.SortOrder
   age?: Prisma.SortOrder
+  careerStatus?: Prisma.SortOrder
+  retiredAt?: Prisma.SortOrder
+  retirementSeasonId?: Prisma.SortOrder
   form?: Prisma.SortOrder
   morale?: Prisma.SortOrder
   experience?: Prisma.SortOrder
@@ -852,6 +918,7 @@ export type PlayerAvgOrderByAggregateInput = {
   id?: Prisma.SortOrder
   clubId?: Prisma.SortOrder
   age?: Prisma.SortOrder
+  retirementSeasonId?: Prisma.SortOrder
   form?: Prisma.SortOrder
   morale?: Prisma.SortOrder
   experience?: Prisma.SortOrder
@@ -876,6 +943,9 @@ export type PlayerMaxOrderByAggregateInput = {
   lastName?: Prisma.SortOrder
   nationality?: Prisma.SortOrder
   age?: Prisma.SortOrder
+  careerStatus?: Prisma.SortOrder
+  retiredAt?: Prisma.SortOrder
+  retirementSeasonId?: Prisma.SortOrder
   form?: Prisma.SortOrder
   morale?: Prisma.SortOrder
   experience?: Prisma.SortOrder
@@ -903,6 +973,9 @@ export type PlayerMinOrderByAggregateInput = {
   lastName?: Prisma.SortOrder
   nationality?: Prisma.SortOrder
   age?: Prisma.SortOrder
+  careerStatus?: Prisma.SortOrder
+  retiredAt?: Prisma.SortOrder
+  retirementSeasonId?: Prisma.SortOrder
   form?: Prisma.SortOrder
   morale?: Prisma.SortOrder
   experience?: Prisma.SortOrder
@@ -927,6 +1000,7 @@ export type PlayerSumOrderByAggregateInput = {
   id?: Prisma.SortOrder
   clubId?: Prisma.SortOrder
   age?: Prisma.SortOrder
+  retirementSeasonId?: Prisma.SortOrder
   form?: Prisma.SortOrder
   morale?: Prisma.SortOrder
   experience?: Prisma.SortOrder
@@ -998,6 +1072,10 @@ export type PlayerUncheckedUpdateManyWithoutClubNestedInput = {
 
 export type PlayerCreatestyleInput = {
   set: string[]
+}
+
+export type NullableDateTimeFieldUpdateOperationsInput = {
+  set?: Date | string | null
 }
 
 export type FloatFieldUpdateOperationsInput = {
@@ -1091,6 +1169,48 @@ export type PlayerUpdateOneWithoutTrainingResultsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.PlayerUpdateToOneWithWhereWithoutTrainingResultsInput, Prisma.PlayerUpdateWithoutTrainingResultsInput>, Prisma.PlayerUncheckedUpdateWithoutTrainingResultsInput>
 }
 
+export type PlayerCreateNestedManyWithoutRetirementSeasonInput = {
+  create?: Prisma.XOR<Prisma.PlayerCreateWithoutRetirementSeasonInput, Prisma.PlayerUncheckedCreateWithoutRetirementSeasonInput> | Prisma.PlayerCreateWithoutRetirementSeasonInput[] | Prisma.PlayerUncheckedCreateWithoutRetirementSeasonInput[]
+  connectOrCreate?: Prisma.PlayerCreateOrConnectWithoutRetirementSeasonInput | Prisma.PlayerCreateOrConnectWithoutRetirementSeasonInput[]
+  createMany?: Prisma.PlayerCreateManyRetirementSeasonInputEnvelope
+  connect?: Prisma.PlayerWhereUniqueInput | Prisma.PlayerWhereUniqueInput[]
+}
+
+export type PlayerUncheckedCreateNestedManyWithoutRetirementSeasonInput = {
+  create?: Prisma.XOR<Prisma.PlayerCreateWithoutRetirementSeasonInput, Prisma.PlayerUncheckedCreateWithoutRetirementSeasonInput> | Prisma.PlayerCreateWithoutRetirementSeasonInput[] | Prisma.PlayerUncheckedCreateWithoutRetirementSeasonInput[]
+  connectOrCreate?: Prisma.PlayerCreateOrConnectWithoutRetirementSeasonInput | Prisma.PlayerCreateOrConnectWithoutRetirementSeasonInput[]
+  createMany?: Prisma.PlayerCreateManyRetirementSeasonInputEnvelope
+  connect?: Prisma.PlayerWhereUniqueInput | Prisma.PlayerWhereUniqueInput[]
+}
+
+export type PlayerUpdateManyWithoutRetirementSeasonNestedInput = {
+  create?: Prisma.XOR<Prisma.PlayerCreateWithoutRetirementSeasonInput, Prisma.PlayerUncheckedCreateWithoutRetirementSeasonInput> | Prisma.PlayerCreateWithoutRetirementSeasonInput[] | Prisma.PlayerUncheckedCreateWithoutRetirementSeasonInput[]
+  connectOrCreate?: Prisma.PlayerCreateOrConnectWithoutRetirementSeasonInput | Prisma.PlayerCreateOrConnectWithoutRetirementSeasonInput[]
+  upsert?: Prisma.PlayerUpsertWithWhereUniqueWithoutRetirementSeasonInput | Prisma.PlayerUpsertWithWhereUniqueWithoutRetirementSeasonInput[]
+  createMany?: Prisma.PlayerCreateManyRetirementSeasonInputEnvelope
+  set?: Prisma.PlayerWhereUniqueInput | Prisma.PlayerWhereUniqueInput[]
+  disconnect?: Prisma.PlayerWhereUniqueInput | Prisma.PlayerWhereUniqueInput[]
+  delete?: Prisma.PlayerWhereUniqueInput | Prisma.PlayerWhereUniqueInput[]
+  connect?: Prisma.PlayerWhereUniqueInput | Prisma.PlayerWhereUniqueInput[]
+  update?: Prisma.PlayerUpdateWithWhereUniqueWithoutRetirementSeasonInput | Prisma.PlayerUpdateWithWhereUniqueWithoutRetirementSeasonInput[]
+  updateMany?: Prisma.PlayerUpdateManyWithWhereWithoutRetirementSeasonInput | Prisma.PlayerUpdateManyWithWhereWithoutRetirementSeasonInput[]
+  deleteMany?: Prisma.PlayerScalarWhereInput | Prisma.PlayerScalarWhereInput[]
+}
+
+export type PlayerUncheckedUpdateManyWithoutRetirementSeasonNestedInput = {
+  create?: Prisma.XOR<Prisma.PlayerCreateWithoutRetirementSeasonInput, Prisma.PlayerUncheckedCreateWithoutRetirementSeasonInput> | Prisma.PlayerCreateWithoutRetirementSeasonInput[] | Prisma.PlayerUncheckedCreateWithoutRetirementSeasonInput[]
+  connectOrCreate?: Prisma.PlayerCreateOrConnectWithoutRetirementSeasonInput | Prisma.PlayerCreateOrConnectWithoutRetirementSeasonInput[]
+  upsert?: Prisma.PlayerUpsertWithWhereUniqueWithoutRetirementSeasonInput | Prisma.PlayerUpsertWithWhereUniqueWithoutRetirementSeasonInput[]
+  createMany?: Prisma.PlayerCreateManyRetirementSeasonInputEnvelope
+  set?: Prisma.PlayerWhereUniqueInput | Prisma.PlayerWhereUniqueInput[]
+  disconnect?: Prisma.PlayerWhereUniqueInput | Prisma.PlayerWhereUniqueInput[]
+  delete?: Prisma.PlayerWhereUniqueInput | Prisma.PlayerWhereUniqueInput[]
+  connect?: Prisma.PlayerWhereUniqueInput | Prisma.PlayerWhereUniqueInput[]
+  update?: Prisma.PlayerUpdateWithWhereUniqueWithoutRetirementSeasonInput | Prisma.PlayerUpdateWithWhereUniqueWithoutRetirementSeasonInput[]
+  updateMany?: Prisma.PlayerUpdateManyWithWhereWithoutRetirementSeasonInput | Prisma.PlayerUpdateManyWithWhereWithoutRetirementSeasonInput[]
+  deleteMany?: Prisma.PlayerScalarWhereInput | Prisma.PlayerScalarWhereInput[]
+}
+
 export type PlayerCreateNestedOneWithoutFixtureAppearancesInput = {
   create?: Prisma.XOR<Prisma.PlayerCreateWithoutFixtureAppearancesInput, Prisma.PlayerUncheckedCreateWithoutFixtureAppearancesInput>
   connectOrCreate?: Prisma.PlayerCreateOrConnectWithoutFixtureAppearancesInput
@@ -1112,6 +1232,8 @@ export type PlayerCreateWithoutClubInput = {
   lastName: string
   nationality: string
   age: number
+  careerStatus?: string
+  retiredAt?: Date | string | null
   form?: number
   morale?: number
   experience?: number
@@ -1131,6 +1253,7 @@ export type PlayerCreateWithoutClubInput = {
   misura: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  retirementSeason?: Prisma.SeasonCreateNestedOneWithoutRetiredPlayersInput
   formationAsA?: Prisma.FormationCreateNestedManyWithoutSlotAPlayerInput
   formationAsB?: Prisma.FormationCreateNestedManyWithoutSlotBPlayerInput
   formationAsC?: Prisma.FormationCreateNestedManyWithoutSlotCPlayerInput
@@ -1145,6 +1268,9 @@ export type PlayerUncheckedCreateWithoutClubInput = {
   lastName: string
   nationality: string
   age: number
+  careerStatus?: string
+  retiredAt?: Date | string | null
+  retirementSeasonId?: number | null
   form?: number
   morale?: number
   experience?: number
@@ -1208,6 +1334,9 @@ export type PlayerScalarWhereInput = {
   lastName?: Prisma.StringFilter<"Player"> | string
   nationality?: Prisma.StringFilter<"Player"> | string
   age?: Prisma.IntFilter<"Player"> | number
+  careerStatus?: Prisma.StringFilter<"Player"> | string
+  retiredAt?: Prisma.DateTimeNullableFilter<"Player"> | Date | string | null
+  retirementSeasonId?: Prisma.IntNullableFilter<"Player"> | number | null
   form?: Prisma.IntFilter<"Player"> | number
   morale?: Prisma.IntFilter<"Player"> | number
   experience?: Prisma.FloatFilter<"Player"> | number
@@ -1234,6 +1363,8 @@ export type PlayerCreateWithoutTransferListingsInput = {
   lastName: string
   nationality: string
   age: number
+  careerStatus?: string
+  retiredAt?: Date | string | null
   form?: number
   morale?: number
   experience?: number
@@ -1254,6 +1385,7 @@ export type PlayerCreateWithoutTransferListingsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   club?: Prisma.ClubCreateNestedOneWithoutPlayersInput
+  retirementSeason?: Prisma.SeasonCreateNestedOneWithoutRetiredPlayersInput
   formationAsA?: Prisma.FormationCreateNestedManyWithoutSlotAPlayerInput
   formationAsB?: Prisma.FormationCreateNestedManyWithoutSlotBPlayerInput
   formationAsC?: Prisma.FormationCreateNestedManyWithoutSlotCPlayerInput
@@ -1268,6 +1400,9 @@ export type PlayerUncheckedCreateWithoutTransferListingsInput = {
   lastName: string
   nationality: string
   age: number
+  careerStatus?: string
+  retiredAt?: Date | string | null
+  retirementSeasonId?: number | null
   form?: number
   morale?: number
   experience?: number
@@ -1315,6 +1450,8 @@ export type PlayerUpdateWithoutTransferListingsInput = {
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   nationality?: Prisma.StringFieldUpdateOperationsInput | string
   age?: Prisma.IntFieldUpdateOperationsInput | number
+  careerStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  retiredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   form?: Prisma.IntFieldUpdateOperationsInput | number
   morale?: Prisma.IntFieldUpdateOperationsInput | number
   experience?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -1335,6 +1472,7 @@ export type PlayerUpdateWithoutTransferListingsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   club?: Prisma.ClubUpdateOneWithoutPlayersNestedInput
+  retirementSeason?: Prisma.SeasonUpdateOneWithoutRetiredPlayersNestedInput
   formationAsA?: Prisma.FormationUpdateManyWithoutSlotAPlayerNestedInput
   formationAsB?: Prisma.FormationUpdateManyWithoutSlotBPlayerNestedInput
   formationAsC?: Prisma.FormationUpdateManyWithoutSlotCPlayerNestedInput
@@ -1349,6 +1487,9 @@ export type PlayerUncheckedUpdateWithoutTransferListingsInput = {
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   nationality?: Prisma.StringFieldUpdateOperationsInput | string
   age?: Prisma.IntFieldUpdateOperationsInput | number
+  careerStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  retiredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  retirementSeasonId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   form?: Prisma.IntFieldUpdateOperationsInput | number
   morale?: Prisma.IntFieldUpdateOperationsInput | number
   experience?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -1380,6 +1521,8 @@ export type PlayerCreateWithoutFormationAsAInput = {
   lastName: string
   nationality: string
   age: number
+  careerStatus?: string
+  retiredAt?: Date | string | null
   form?: number
   morale?: number
   experience?: number
@@ -1400,6 +1543,7 @@ export type PlayerCreateWithoutFormationAsAInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   club?: Prisma.ClubCreateNestedOneWithoutPlayersInput
+  retirementSeason?: Prisma.SeasonCreateNestedOneWithoutRetiredPlayersInput
   formationAsB?: Prisma.FormationCreateNestedManyWithoutSlotBPlayerInput
   formationAsC?: Prisma.FormationCreateNestedManyWithoutSlotCPlayerInput
   trainingResults?: Prisma.TrainingResultCreateNestedManyWithoutPlayerInput
@@ -1414,6 +1558,9 @@ export type PlayerUncheckedCreateWithoutFormationAsAInput = {
   lastName: string
   nationality: string
   age: number
+  careerStatus?: string
+  retiredAt?: Date | string | null
+  retirementSeasonId?: number | null
   form?: number
   morale?: number
   experience?: number
@@ -1450,6 +1597,8 @@ export type PlayerCreateWithoutFormationAsBInput = {
   lastName: string
   nationality: string
   age: number
+  careerStatus?: string
+  retiredAt?: Date | string | null
   form?: number
   morale?: number
   experience?: number
@@ -1470,6 +1619,7 @@ export type PlayerCreateWithoutFormationAsBInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   club?: Prisma.ClubCreateNestedOneWithoutPlayersInput
+  retirementSeason?: Prisma.SeasonCreateNestedOneWithoutRetiredPlayersInput
   formationAsA?: Prisma.FormationCreateNestedManyWithoutSlotAPlayerInput
   formationAsC?: Prisma.FormationCreateNestedManyWithoutSlotCPlayerInput
   trainingResults?: Prisma.TrainingResultCreateNestedManyWithoutPlayerInput
@@ -1484,6 +1634,9 @@ export type PlayerUncheckedCreateWithoutFormationAsBInput = {
   lastName: string
   nationality: string
   age: number
+  careerStatus?: string
+  retiredAt?: Date | string | null
+  retirementSeasonId?: number | null
   form?: number
   morale?: number
   experience?: number
@@ -1520,6 +1673,8 @@ export type PlayerCreateWithoutFormationAsCInput = {
   lastName: string
   nationality: string
   age: number
+  careerStatus?: string
+  retiredAt?: Date | string | null
   form?: number
   morale?: number
   experience?: number
@@ -1540,6 +1695,7 @@ export type PlayerCreateWithoutFormationAsCInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   club?: Prisma.ClubCreateNestedOneWithoutPlayersInput
+  retirementSeason?: Prisma.SeasonCreateNestedOneWithoutRetiredPlayersInput
   formationAsA?: Prisma.FormationCreateNestedManyWithoutSlotAPlayerInput
   formationAsB?: Prisma.FormationCreateNestedManyWithoutSlotBPlayerInput
   trainingResults?: Prisma.TrainingResultCreateNestedManyWithoutPlayerInput
@@ -1554,6 +1710,9 @@ export type PlayerUncheckedCreateWithoutFormationAsCInput = {
   lastName: string
   nationality: string
   age: number
+  careerStatus?: string
+  retiredAt?: Date | string | null
+  retirementSeasonId?: number | null
   form?: number
   morale?: number
   experience?: number
@@ -1601,6 +1760,8 @@ export type PlayerUpdateWithoutFormationAsAInput = {
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   nationality?: Prisma.StringFieldUpdateOperationsInput | string
   age?: Prisma.IntFieldUpdateOperationsInput | number
+  careerStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  retiredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   form?: Prisma.IntFieldUpdateOperationsInput | number
   morale?: Prisma.IntFieldUpdateOperationsInput | number
   experience?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -1621,6 +1782,7 @@ export type PlayerUpdateWithoutFormationAsAInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   club?: Prisma.ClubUpdateOneWithoutPlayersNestedInput
+  retirementSeason?: Prisma.SeasonUpdateOneWithoutRetiredPlayersNestedInput
   formationAsB?: Prisma.FormationUpdateManyWithoutSlotBPlayerNestedInput
   formationAsC?: Prisma.FormationUpdateManyWithoutSlotCPlayerNestedInput
   trainingResults?: Prisma.TrainingResultUpdateManyWithoutPlayerNestedInput
@@ -1635,6 +1797,9 @@ export type PlayerUncheckedUpdateWithoutFormationAsAInput = {
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   nationality?: Prisma.StringFieldUpdateOperationsInput | string
   age?: Prisma.IntFieldUpdateOperationsInput | number
+  careerStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  retiredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  retirementSeasonId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   form?: Prisma.IntFieldUpdateOperationsInput | number
   morale?: Prisma.IntFieldUpdateOperationsInput | number
   experience?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -1677,6 +1842,8 @@ export type PlayerUpdateWithoutFormationAsBInput = {
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   nationality?: Prisma.StringFieldUpdateOperationsInput | string
   age?: Prisma.IntFieldUpdateOperationsInput | number
+  careerStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  retiredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   form?: Prisma.IntFieldUpdateOperationsInput | number
   morale?: Prisma.IntFieldUpdateOperationsInput | number
   experience?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -1697,6 +1864,7 @@ export type PlayerUpdateWithoutFormationAsBInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   club?: Prisma.ClubUpdateOneWithoutPlayersNestedInput
+  retirementSeason?: Prisma.SeasonUpdateOneWithoutRetiredPlayersNestedInput
   formationAsA?: Prisma.FormationUpdateManyWithoutSlotAPlayerNestedInput
   formationAsC?: Prisma.FormationUpdateManyWithoutSlotCPlayerNestedInput
   trainingResults?: Prisma.TrainingResultUpdateManyWithoutPlayerNestedInput
@@ -1711,6 +1879,9 @@ export type PlayerUncheckedUpdateWithoutFormationAsBInput = {
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   nationality?: Prisma.StringFieldUpdateOperationsInput | string
   age?: Prisma.IntFieldUpdateOperationsInput | number
+  careerStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  retiredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  retirementSeasonId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   form?: Prisma.IntFieldUpdateOperationsInput | number
   morale?: Prisma.IntFieldUpdateOperationsInput | number
   experience?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -1753,6 +1924,8 @@ export type PlayerUpdateWithoutFormationAsCInput = {
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   nationality?: Prisma.StringFieldUpdateOperationsInput | string
   age?: Prisma.IntFieldUpdateOperationsInput | number
+  careerStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  retiredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   form?: Prisma.IntFieldUpdateOperationsInput | number
   morale?: Prisma.IntFieldUpdateOperationsInput | number
   experience?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -1773,6 +1946,7 @@ export type PlayerUpdateWithoutFormationAsCInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   club?: Prisma.ClubUpdateOneWithoutPlayersNestedInput
+  retirementSeason?: Prisma.SeasonUpdateOneWithoutRetiredPlayersNestedInput
   formationAsA?: Prisma.FormationUpdateManyWithoutSlotAPlayerNestedInput
   formationAsB?: Prisma.FormationUpdateManyWithoutSlotBPlayerNestedInput
   trainingResults?: Prisma.TrainingResultUpdateManyWithoutPlayerNestedInput
@@ -1787,6 +1961,9 @@ export type PlayerUncheckedUpdateWithoutFormationAsCInput = {
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   nationality?: Prisma.StringFieldUpdateOperationsInput | string
   age?: Prisma.IntFieldUpdateOperationsInput | number
+  careerStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  retiredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  retirementSeasonId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   form?: Prisma.IntFieldUpdateOperationsInput | number
   morale?: Prisma.IntFieldUpdateOperationsInput | number
   experience?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -1818,6 +1995,8 @@ export type PlayerCreateWithoutTrainingResultsInput = {
   lastName: string
   nationality: string
   age: number
+  careerStatus?: string
+  retiredAt?: Date | string | null
   form?: number
   morale?: number
   experience?: number
@@ -1838,6 +2017,7 @@ export type PlayerCreateWithoutTrainingResultsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   club?: Prisma.ClubCreateNestedOneWithoutPlayersInput
+  retirementSeason?: Prisma.SeasonCreateNestedOneWithoutRetiredPlayersInput
   formationAsA?: Prisma.FormationCreateNestedManyWithoutSlotAPlayerInput
   formationAsB?: Prisma.FormationCreateNestedManyWithoutSlotBPlayerInput
   formationAsC?: Prisma.FormationCreateNestedManyWithoutSlotCPlayerInput
@@ -1852,6 +2032,9 @@ export type PlayerUncheckedCreateWithoutTrainingResultsInput = {
   lastName: string
   nationality: string
   age: number
+  careerStatus?: string
+  retiredAt?: Date | string | null
+  retirementSeasonId?: number | null
   form?: number
   morale?: number
   experience?: number
@@ -1899,6 +2082,8 @@ export type PlayerUpdateWithoutTrainingResultsInput = {
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   nationality?: Prisma.StringFieldUpdateOperationsInput | string
   age?: Prisma.IntFieldUpdateOperationsInput | number
+  careerStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  retiredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   form?: Prisma.IntFieldUpdateOperationsInput | number
   morale?: Prisma.IntFieldUpdateOperationsInput | number
   experience?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -1919,6 +2104,7 @@ export type PlayerUpdateWithoutTrainingResultsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   club?: Prisma.ClubUpdateOneWithoutPlayersNestedInput
+  retirementSeason?: Prisma.SeasonUpdateOneWithoutRetiredPlayersNestedInput
   formationAsA?: Prisma.FormationUpdateManyWithoutSlotAPlayerNestedInput
   formationAsB?: Prisma.FormationUpdateManyWithoutSlotBPlayerNestedInput
   formationAsC?: Prisma.FormationUpdateManyWithoutSlotCPlayerNestedInput
@@ -1933,6 +2119,9 @@ export type PlayerUncheckedUpdateWithoutTrainingResultsInput = {
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   nationality?: Prisma.StringFieldUpdateOperationsInput | string
   age?: Prisma.IntFieldUpdateOperationsInput | number
+  careerStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  retiredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  retirementSeasonId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   form?: Prisma.IntFieldUpdateOperationsInput | number
   morale?: Prisma.IntFieldUpdateOperationsInput | number
   experience?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -1959,11 +2148,13 @@ export type PlayerUncheckedUpdateWithoutTrainingResultsInput = {
   transferListings?: Prisma.TransferListingUncheckedUpdateManyWithoutPlayerNestedInput
 }
 
-export type PlayerCreateWithoutFixtureAppearancesInput = {
+export type PlayerCreateWithoutRetirementSeasonInput = {
   firstName: string
   lastName: string
   nationality: string
   age: number
+  careerStatus?: string
+  retiredAt?: Date | string | null
   form?: number
   morale?: number
   experience?: number
@@ -1988,6 +2179,104 @@ export type PlayerCreateWithoutFixtureAppearancesInput = {
   formationAsB?: Prisma.FormationCreateNestedManyWithoutSlotBPlayerInput
   formationAsC?: Prisma.FormationCreateNestedManyWithoutSlotCPlayerInput
   trainingResults?: Prisma.TrainingResultCreateNestedManyWithoutPlayerInput
+  fixtureAppearances?: Prisma.PlayerFixtureAppearanceCreateNestedManyWithoutPlayerInput
+  transferListings?: Prisma.TransferListingCreateNestedManyWithoutPlayerInput
+}
+
+export type PlayerUncheckedCreateWithoutRetirementSeasonInput = {
+  id?: number
+  clubId?: number | null
+  firstName: string
+  lastName: string
+  nationality: string
+  age: number
+  careerStatus?: string
+  retiredAt?: Date | string | null
+  form?: number
+  morale?: number
+  experience?: number
+  talent: number
+  value?: number
+  salary?: number
+  image?: string
+  style?: Prisma.PlayerCreatestyleInput | string[]
+  precisione: number
+  diretto: number
+  sponde: number
+  tattica: number
+  mentalita: number
+  difesa: number
+  realizzazione: number
+  creativita: number
+  misura: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  formationAsA?: Prisma.FormationUncheckedCreateNestedManyWithoutSlotAPlayerInput
+  formationAsB?: Prisma.FormationUncheckedCreateNestedManyWithoutSlotBPlayerInput
+  formationAsC?: Prisma.FormationUncheckedCreateNestedManyWithoutSlotCPlayerInput
+  trainingResults?: Prisma.TrainingResultUncheckedCreateNestedManyWithoutPlayerInput
+  fixtureAppearances?: Prisma.PlayerFixtureAppearanceUncheckedCreateNestedManyWithoutPlayerInput
+  transferListings?: Prisma.TransferListingUncheckedCreateNestedManyWithoutPlayerInput
+}
+
+export type PlayerCreateOrConnectWithoutRetirementSeasonInput = {
+  where: Prisma.PlayerWhereUniqueInput
+  create: Prisma.XOR<Prisma.PlayerCreateWithoutRetirementSeasonInput, Prisma.PlayerUncheckedCreateWithoutRetirementSeasonInput>
+}
+
+export type PlayerCreateManyRetirementSeasonInputEnvelope = {
+  data: Prisma.PlayerCreateManyRetirementSeasonInput | Prisma.PlayerCreateManyRetirementSeasonInput[]
+  skipDuplicates?: boolean
+}
+
+export type PlayerUpsertWithWhereUniqueWithoutRetirementSeasonInput = {
+  where: Prisma.PlayerWhereUniqueInput
+  update: Prisma.XOR<Prisma.PlayerUpdateWithoutRetirementSeasonInput, Prisma.PlayerUncheckedUpdateWithoutRetirementSeasonInput>
+  create: Prisma.XOR<Prisma.PlayerCreateWithoutRetirementSeasonInput, Prisma.PlayerUncheckedCreateWithoutRetirementSeasonInput>
+}
+
+export type PlayerUpdateWithWhereUniqueWithoutRetirementSeasonInput = {
+  where: Prisma.PlayerWhereUniqueInput
+  data: Prisma.XOR<Prisma.PlayerUpdateWithoutRetirementSeasonInput, Prisma.PlayerUncheckedUpdateWithoutRetirementSeasonInput>
+}
+
+export type PlayerUpdateManyWithWhereWithoutRetirementSeasonInput = {
+  where: Prisma.PlayerScalarWhereInput
+  data: Prisma.XOR<Prisma.PlayerUpdateManyMutationInput, Prisma.PlayerUncheckedUpdateManyWithoutRetirementSeasonInput>
+}
+
+export type PlayerCreateWithoutFixtureAppearancesInput = {
+  firstName: string
+  lastName: string
+  nationality: string
+  age: number
+  careerStatus?: string
+  retiredAt?: Date | string | null
+  form?: number
+  morale?: number
+  experience?: number
+  talent: number
+  value?: number
+  salary?: number
+  image?: string
+  style?: Prisma.PlayerCreatestyleInput | string[]
+  precisione: number
+  diretto: number
+  sponde: number
+  tattica: number
+  mentalita: number
+  difesa: number
+  realizzazione: number
+  creativita: number
+  misura: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  club?: Prisma.ClubCreateNestedOneWithoutPlayersInput
+  retirementSeason?: Prisma.SeasonCreateNestedOneWithoutRetiredPlayersInput
+  formationAsA?: Prisma.FormationCreateNestedManyWithoutSlotAPlayerInput
+  formationAsB?: Prisma.FormationCreateNestedManyWithoutSlotBPlayerInput
+  formationAsC?: Prisma.FormationCreateNestedManyWithoutSlotCPlayerInput
+  trainingResults?: Prisma.TrainingResultCreateNestedManyWithoutPlayerInput
   transferListings?: Prisma.TransferListingCreateNestedManyWithoutPlayerInput
 }
 
@@ -1998,6 +2287,9 @@ export type PlayerUncheckedCreateWithoutFixtureAppearancesInput = {
   lastName: string
   nationality: string
   age: number
+  careerStatus?: string
+  retiredAt?: Date | string | null
+  retirementSeasonId?: number | null
   form?: number
   morale?: number
   experience?: number
@@ -2045,6 +2337,8 @@ export type PlayerUpdateWithoutFixtureAppearancesInput = {
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   nationality?: Prisma.StringFieldUpdateOperationsInput | string
   age?: Prisma.IntFieldUpdateOperationsInput | number
+  careerStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  retiredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   form?: Prisma.IntFieldUpdateOperationsInput | number
   morale?: Prisma.IntFieldUpdateOperationsInput | number
   experience?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -2065,6 +2359,7 @@ export type PlayerUpdateWithoutFixtureAppearancesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   club?: Prisma.ClubUpdateOneWithoutPlayersNestedInput
+  retirementSeason?: Prisma.SeasonUpdateOneWithoutRetiredPlayersNestedInput
   formationAsA?: Prisma.FormationUpdateManyWithoutSlotAPlayerNestedInput
   formationAsB?: Prisma.FormationUpdateManyWithoutSlotBPlayerNestedInput
   formationAsC?: Prisma.FormationUpdateManyWithoutSlotCPlayerNestedInput
@@ -2079,6 +2374,9 @@ export type PlayerUncheckedUpdateWithoutFixtureAppearancesInput = {
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   nationality?: Prisma.StringFieldUpdateOperationsInput | string
   age?: Prisma.IntFieldUpdateOperationsInput | number
+  careerStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  retiredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  retirementSeasonId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   form?: Prisma.IntFieldUpdateOperationsInput | number
   morale?: Prisma.IntFieldUpdateOperationsInput | number
   experience?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -2111,6 +2409,9 @@ export type PlayerCreateManyClubInput = {
   lastName: string
   nationality: string
   age: number
+  careerStatus?: string
+  retiredAt?: Date | string | null
+  retirementSeasonId?: number | null
   form?: number
   morale?: number
   experience?: number
@@ -2137,6 +2438,8 @@ export type PlayerUpdateWithoutClubInput = {
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   nationality?: Prisma.StringFieldUpdateOperationsInput | string
   age?: Prisma.IntFieldUpdateOperationsInput | number
+  careerStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  retiredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   form?: Prisma.IntFieldUpdateOperationsInput | number
   morale?: Prisma.IntFieldUpdateOperationsInput | number
   experience?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -2156,6 +2459,7 @@ export type PlayerUpdateWithoutClubInput = {
   misura?: Prisma.FloatFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  retirementSeason?: Prisma.SeasonUpdateOneWithoutRetiredPlayersNestedInput
   formationAsA?: Prisma.FormationUpdateManyWithoutSlotAPlayerNestedInput
   formationAsB?: Prisma.FormationUpdateManyWithoutSlotBPlayerNestedInput
   formationAsC?: Prisma.FormationUpdateManyWithoutSlotCPlayerNestedInput
@@ -2170,6 +2474,9 @@ export type PlayerUncheckedUpdateWithoutClubInput = {
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   nationality?: Prisma.StringFieldUpdateOperationsInput | string
   age?: Prisma.IntFieldUpdateOperationsInput | number
+  careerStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  retiredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  retirementSeasonId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   form?: Prisma.IntFieldUpdateOperationsInput | number
   morale?: Prisma.IntFieldUpdateOperationsInput | number
   experience?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -2203,6 +2510,140 @@ export type PlayerUncheckedUpdateManyWithoutClubInput = {
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   nationality?: Prisma.StringFieldUpdateOperationsInput | string
   age?: Prisma.IntFieldUpdateOperationsInput | number
+  careerStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  retiredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  retirementSeasonId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  form?: Prisma.IntFieldUpdateOperationsInput | number
+  morale?: Prisma.IntFieldUpdateOperationsInput | number
+  experience?: Prisma.FloatFieldUpdateOperationsInput | number
+  talent?: Prisma.FloatFieldUpdateOperationsInput | number
+  value?: Prisma.IntFieldUpdateOperationsInput | number
+  salary?: Prisma.IntFieldUpdateOperationsInput | number
+  image?: Prisma.StringFieldUpdateOperationsInput | string
+  style?: Prisma.PlayerUpdatestyleInput | string[]
+  precisione?: Prisma.FloatFieldUpdateOperationsInput | number
+  diretto?: Prisma.FloatFieldUpdateOperationsInput | number
+  sponde?: Prisma.FloatFieldUpdateOperationsInput | number
+  tattica?: Prisma.FloatFieldUpdateOperationsInput | number
+  mentalita?: Prisma.FloatFieldUpdateOperationsInput | number
+  difesa?: Prisma.FloatFieldUpdateOperationsInput | number
+  realizzazione?: Prisma.FloatFieldUpdateOperationsInput | number
+  creativita?: Prisma.FloatFieldUpdateOperationsInput | number
+  misura?: Prisma.FloatFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type PlayerCreateManyRetirementSeasonInput = {
+  id?: number
+  clubId?: number | null
+  firstName: string
+  lastName: string
+  nationality: string
+  age: number
+  careerStatus?: string
+  retiredAt?: Date | string | null
+  form?: number
+  morale?: number
+  experience?: number
+  talent: number
+  value?: number
+  salary?: number
+  image?: string
+  style?: Prisma.PlayerCreatestyleInput | string[]
+  precisione: number
+  diretto: number
+  sponde: number
+  tattica: number
+  mentalita: number
+  difesa: number
+  realizzazione: number
+  creativita: number
+  misura: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type PlayerUpdateWithoutRetirementSeasonInput = {
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  nationality?: Prisma.StringFieldUpdateOperationsInput | string
+  age?: Prisma.IntFieldUpdateOperationsInput | number
+  careerStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  retiredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  form?: Prisma.IntFieldUpdateOperationsInput | number
+  morale?: Prisma.IntFieldUpdateOperationsInput | number
+  experience?: Prisma.FloatFieldUpdateOperationsInput | number
+  talent?: Prisma.FloatFieldUpdateOperationsInput | number
+  value?: Prisma.IntFieldUpdateOperationsInput | number
+  salary?: Prisma.IntFieldUpdateOperationsInput | number
+  image?: Prisma.StringFieldUpdateOperationsInput | string
+  style?: Prisma.PlayerUpdatestyleInput | string[]
+  precisione?: Prisma.FloatFieldUpdateOperationsInput | number
+  diretto?: Prisma.FloatFieldUpdateOperationsInput | number
+  sponde?: Prisma.FloatFieldUpdateOperationsInput | number
+  tattica?: Prisma.FloatFieldUpdateOperationsInput | number
+  mentalita?: Prisma.FloatFieldUpdateOperationsInput | number
+  difesa?: Prisma.FloatFieldUpdateOperationsInput | number
+  realizzazione?: Prisma.FloatFieldUpdateOperationsInput | number
+  creativita?: Prisma.FloatFieldUpdateOperationsInput | number
+  misura?: Prisma.FloatFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  club?: Prisma.ClubUpdateOneWithoutPlayersNestedInput
+  formationAsA?: Prisma.FormationUpdateManyWithoutSlotAPlayerNestedInput
+  formationAsB?: Prisma.FormationUpdateManyWithoutSlotBPlayerNestedInput
+  formationAsC?: Prisma.FormationUpdateManyWithoutSlotCPlayerNestedInput
+  trainingResults?: Prisma.TrainingResultUpdateManyWithoutPlayerNestedInput
+  fixtureAppearances?: Prisma.PlayerFixtureAppearanceUpdateManyWithoutPlayerNestedInput
+  transferListings?: Prisma.TransferListingUpdateManyWithoutPlayerNestedInput
+}
+
+export type PlayerUncheckedUpdateWithoutRetirementSeasonInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  clubId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  nationality?: Prisma.StringFieldUpdateOperationsInput | string
+  age?: Prisma.IntFieldUpdateOperationsInput | number
+  careerStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  retiredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  form?: Prisma.IntFieldUpdateOperationsInput | number
+  morale?: Prisma.IntFieldUpdateOperationsInput | number
+  experience?: Prisma.FloatFieldUpdateOperationsInput | number
+  talent?: Prisma.FloatFieldUpdateOperationsInput | number
+  value?: Prisma.IntFieldUpdateOperationsInput | number
+  salary?: Prisma.IntFieldUpdateOperationsInput | number
+  image?: Prisma.StringFieldUpdateOperationsInput | string
+  style?: Prisma.PlayerUpdatestyleInput | string[]
+  precisione?: Prisma.FloatFieldUpdateOperationsInput | number
+  diretto?: Prisma.FloatFieldUpdateOperationsInput | number
+  sponde?: Prisma.FloatFieldUpdateOperationsInput | number
+  tattica?: Prisma.FloatFieldUpdateOperationsInput | number
+  mentalita?: Prisma.FloatFieldUpdateOperationsInput | number
+  difesa?: Prisma.FloatFieldUpdateOperationsInput | number
+  realizzazione?: Prisma.FloatFieldUpdateOperationsInput | number
+  creativita?: Prisma.FloatFieldUpdateOperationsInput | number
+  misura?: Prisma.FloatFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  formationAsA?: Prisma.FormationUncheckedUpdateManyWithoutSlotAPlayerNestedInput
+  formationAsB?: Prisma.FormationUncheckedUpdateManyWithoutSlotBPlayerNestedInput
+  formationAsC?: Prisma.FormationUncheckedUpdateManyWithoutSlotCPlayerNestedInput
+  trainingResults?: Prisma.TrainingResultUncheckedUpdateManyWithoutPlayerNestedInput
+  fixtureAppearances?: Prisma.PlayerFixtureAppearanceUncheckedUpdateManyWithoutPlayerNestedInput
+  transferListings?: Prisma.TransferListingUncheckedUpdateManyWithoutPlayerNestedInput
+}
+
+export type PlayerUncheckedUpdateManyWithoutRetirementSeasonInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  clubId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  nationality?: Prisma.StringFieldUpdateOperationsInput | string
+  age?: Prisma.IntFieldUpdateOperationsInput | number
+  careerStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  retiredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   form?: Prisma.IntFieldUpdateOperationsInput | number
   morale?: Prisma.IntFieldUpdateOperationsInput | number
   experience?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -2307,6 +2748,9 @@ export type PlayerSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   lastName?: boolean
   nationality?: boolean
   age?: boolean
+  careerStatus?: boolean
+  retiredAt?: boolean
+  retirementSeasonId?: boolean
   form?: boolean
   morale?: boolean
   experience?: boolean
@@ -2327,6 +2771,7 @@ export type PlayerSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   createdAt?: boolean
   updatedAt?: boolean
   club?: boolean | Prisma.Player$clubArgs<ExtArgs>
+  retirementSeason?: boolean | Prisma.Player$retirementSeasonArgs<ExtArgs>
   formationAsA?: boolean | Prisma.Player$formationAsAArgs<ExtArgs>
   formationAsB?: boolean | Prisma.Player$formationAsBArgs<ExtArgs>
   formationAsC?: boolean | Prisma.Player$formationAsCArgs<ExtArgs>
@@ -2343,6 +2788,9 @@ export type PlayerSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extens
   lastName?: boolean
   nationality?: boolean
   age?: boolean
+  careerStatus?: boolean
+  retiredAt?: boolean
+  retirementSeasonId?: boolean
   form?: boolean
   morale?: boolean
   experience?: boolean
@@ -2363,6 +2811,7 @@ export type PlayerSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extens
   createdAt?: boolean
   updatedAt?: boolean
   club?: boolean | Prisma.Player$clubArgs<ExtArgs>
+  retirementSeason?: boolean | Prisma.Player$retirementSeasonArgs<ExtArgs>
 }, ExtArgs["result"]["player"]>
 
 export type PlayerSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -2372,6 +2821,9 @@ export type PlayerSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extens
   lastName?: boolean
   nationality?: boolean
   age?: boolean
+  careerStatus?: boolean
+  retiredAt?: boolean
+  retirementSeasonId?: boolean
   form?: boolean
   morale?: boolean
   experience?: boolean
@@ -2392,6 +2844,7 @@ export type PlayerSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extens
   createdAt?: boolean
   updatedAt?: boolean
   club?: boolean | Prisma.Player$clubArgs<ExtArgs>
+  retirementSeason?: boolean | Prisma.Player$retirementSeasonArgs<ExtArgs>
 }, ExtArgs["result"]["player"]>
 
 export type PlayerSelectScalar = {
@@ -2401,6 +2854,9 @@ export type PlayerSelectScalar = {
   lastName?: boolean
   nationality?: boolean
   age?: boolean
+  careerStatus?: boolean
+  retiredAt?: boolean
+  retirementSeasonId?: boolean
   form?: boolean
   morale?: boolean
   experience?: boolean
@@ -2422,9 +2878,10 @@ export type PlayerSelectScalar = {
   updatedAt?: boolean
 }
 
-export type PlayerOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "clubId" | "firstName" | "lastName" | "nationality" | "age" | "form" | "morale" | "experience" | "talent" | "value" | "salary" | "image" | "style" | "precisione" | "diretto" | "sponde" | "tattica" | "mentalita" | "difesa" | "realizzazione" | "creativita" | "misura" | "createdAt" | "updatedAt", ExtArgs["result"]["player"]>
+export type PlayerOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "clubId" | "firstName" | "lastName" | "nationality" | "age" | "careerStatus" | "retiredAt" | "retirementSeasonId" | "form" | "morale" | "experience" | "talent" | "value" | "salary" | "image" | "style" | "precisione" | "diretto" | "sponde" | "tattica" | "mentalita" | "difesa" | "realizzazione" | "creativita" | "misura" | "createdAt" | "updatedAt", ExtArgs["result"]["player"]>
 export type PlayerInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   club?: boolean | Prisma.Player$clubArgs<ExtArgs>
+  retirementSeason?: boolean | Prisma.Player$retirementSeasonArgs<ExtArgs>
   formationAsA?: boolean | Prisma.Player$formationAsAArgs<ExtArgs>
   formationAsB?: boolean | Prisma.Player$formationAsBArgs<ExtArgs>
   formationAsC?: boolean | Prisma.Player$formationAsCArgs<ExtArgs>
@@ -2435,15 +2892,18 @@ export type PlayerInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs 
 }
 export type PlayerIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   club?: boolean | Prisma.Player$clubArgs<ExtArgs>
+  retirementSeason?: boolean | Prisma.Player$retirementSeasonArgs<ExtArgs>
 }
 export type PlayerIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   club?: boolean | Prisma.Player$clubArgs<ExtArgs>
+  retirementSeason?: boolean | Prisma.Player$retirementSeasonArgs<ExtArgs>
 }
 
 export type $PlayerPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Player"
   objects: {
     club: Prisma.$ClubPayload<ExtArgs> | null
+    retirementSeason: Prisma.$SeasonPayload<ExtArgs> | null
     formationAsA: Prisma.$FormationPayload<ExtArgs>[]
     formationAsB: Prisma.$FormationPayload<ExtArgs>[]
     formationAsC: Prisma.$FormationPayload<ExtArgs>[]
@@ -2458,6 +2918,9 @@ export type $PlayerPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     lastName: string
     nationality: string
     age: number
+    careerStatus: string
+    retiredAt: Date | null
+    retirementSeasonId: number | null
     form: number
     morale: number
     experience: number
@@ -2872,6 +3335,7 @@ readonly fields: PlayerFieldRefs;
 export interface Prisma__PlayerClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   club<T extends Prisma.Player$clubArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Player$clubArgs<ExtArgs>>): Prisma.Prisma__ClubClient<runtime.Types.Result.GetResult<Prisma.$ClubPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  retirementSeason<T extends Prisma.Player$retirementSeasonArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Player$retirementSeasonArgs<ExtArgs>>): Prisma.Prisma__SeasonClient<runtime.Types.Result.GetResult<Prisma.$SeasonPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   formationAsA<T extends Prisma.Player$formationAsAArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Player$formationAsAArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FormationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   formationAsB<T extends Prisma.Player$formationAsBArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Player$formationAsBArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FormationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   formationAsC<T extends Prisma.Player$formationAsCArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Player$formationAsCArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FormationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -2913,6 +3377,9 @@ export interface PlayerFieldRefs {
   readonly lastName: Prisma.FieldRef<"Player", 'String'>
   readonly nationality: Prisma.FieldRef<"Player", 'String'>
   readonly age: Prisma.FieldRef<"Player", 'Int'>
+  readonly careerStatus: Prisma.FieldRef<"Player", 'String'>
+  readonly retiredAt: Prisma.FieldRef<"Player", 'DateTime'>
+  readonly retirementSeasonId: Prisma.FieldRef<"Player", 'Int'>
   readonly form: Prisma.FieldRef<"Player", 'Int'>
   readonly morale: Prisma.FieldRef<"Player", 'Int'>
   readonly experience: Prisma.FieldRef<"Player", 'Float'>
@@ -3349,6 +3816,25 @@ export type Player$clubArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
    */
   include?: Prisma.ClubInclude<ExtArgs> | null
   where?: Prisma.ClubWhereInput
+}
+
+/**
+ * Player.retirementSeason
+ */
+export type Player$retirementSeasonArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Season
+   */
+  select?: Prisma.SeasonSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Season
+   */
+  omit?: Prisma.SeasonOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SeasonInclude<ExtArgs> | null
+  where?: Prisma.SeasonWhereInput
 }
 
 /**

@@ -43,6 +43,9 @@ export default async function MarketPage() {
       prisma.transferListing.findMany({
         where: {
           status: "ACTIVE",
+          player: {
+            careerStatus: "ACTIVE",
+          },
           OR: [
             {
               listingType: "FREE_AGENT",

@@ -126,6 +126,7 @@ export async function POST(request: Request) {
               },
               select: {
                 clubId: true,
+                careerStatus: true,
                 firstName: true,
                 lastName: true,
               },
@@ -169,6 +170,13 @@ export async function POST(request: Request) {
           throw new MarketListingError(
             "Puoi mettere all'asta soltanto un tuo giocatore.",
             403
+          );
+        }
+
+        if (player.careerStatus !== "ACTIVE") {
+          throw new MarketListingError(
+            "Un giocatore ritirato non può essere messo all'asta.",
+            409
           );
         }
 

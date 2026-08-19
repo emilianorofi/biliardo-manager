@@ -129,6 +129,7 @@ export async function POST(request: Request) {
                 player: {
                   select: {
                     clubId: true,
+                    careerStatus: true,
                     firstName: true,
                     lastName: true,
                     salary: true,
@@ -167,7 +168,8 @@ export async function POST(request: Request) {
 
         if (
           listing.status !== "ACTIVE" ||
-          listing.listingType !== "AUCTION"
+          listing.listingType !== "AUCTION" ||
+          listing.player.careerStatus !== "ACTIVE"
         ) {
           throw new MarketBidError(
             "Questa inserzione non è un'asta attiva.",

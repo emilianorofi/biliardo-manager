@@ -21,6 +21,10 @@ import {
 
 import { prisma } from "@/lib/prisma";
 
+import {
+  completeSeasonIfReady,
+} from "@/lib/season-completion";
+
 export const dynamic =
   "force-dynamic";
 
@@ -112,6 +116,9 @@ export async function POST(
                 true,
 
               currentRound:
+                true,
+
+              seasonId:
                 true,
             },
           },
@@ -477,6 +484,15 @@ export async function POST(
                 },
               });
 
+          const seasonCompletion =
+            await completeSeasonIfReady(
+              transaction,
+              fixture.league.seasonId,
+              {
+                now: playedAt,
+              }
+            );
+
           await transaction.gameEvent.create({
             data: {
               clubId:
@@ -501,6 +517,7 @@ export async function POST(
             awayEntry,
             updatedLeague,
             completion,
+            seasonCompletion,
           };
         }
       );
@@ -551,6 +568,9 @@ export async function POST(
         isCompleted:
           result.completion.isCompleted,
       },
+
+      season:
+        result.seasonCompletion,
 
       standings: {
         home:
