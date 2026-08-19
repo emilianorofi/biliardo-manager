@@ -4,6 +4,8 @@ import type {
   PlayerCareerGameType,
   PlayerCareerResult,
   PlayerCareerSpecialty,
+  PlayerCareerTransfer,
+  PlayerCareerTransferType,
   PlayerCareerView,
 } from "@/app/types/playerCareer";
 
@@ -57,6 +59,20 @@ export type CareerAppearanceInput = {
   gamePerformances: CareerPerformanceInput[];
 };
 
+export type CareerTransferInput = {
+  id: number;
+  status: string;
+  listingType: string;
+  finalPrice: number | null;
+  completedAt: Date | null;
+  sellerClub: {
+    name: string;
+  } | null;
+  winnerClub: {
+    name: string;
+  } | null;
+};
+
 type NormalizedPerformance = {
   result: PlayerCareerResult;
   performanceRating: number;
@@ -65,11 +81,24 @@ type NormalizedPerformance = {
 };
 
 export function buildPlayerCareerView(
-  appearances: CareerAppearanceInput[]
+  appearances: CareerAppearanceInput[],
+  transferListings: CareerTransferInput[] = []
 ): PlayerCareerView {
   const normalizedAppearances = appearances.map(
     normalizeAppearance
   );
+  const transfers = transferListings
+    .filter(
+      (listing) =>
+        listing.status === "COMPLETED" &&
+        listing.completedAt !== null
+    )
+    .map(normalizeTransfer)
+    .sort(
+      (first, second) =>
+        new Date(second.completedAt).getTime() -
+        new Date(first.completedAt).getTime()
+    );
   const performances = normalizedAppearances.flatMap(
     (appearance) => appearance.games
   );
@@ -84,11 +113,10 @@ export function buildPlayerCareerView(
   return {
     summary: {
       appearances: normalizedAppearances.length,
-      clubs: new Set(
-        normalizedAppearances.map(
-          (appearance) => appearance.clubName
-        )
-      ).size,
+      clubs: countCareerClubs(
+        normalizedAppearances,
+        transfers
+      ),
       ...buildAggregate(normalizedPerformances),
     },
     specialties: SPECIALTIES.map(({ key, label }) => ({
@@ -117,7 +145,50 @@ export function buildPlayerCareerView(
           new Date(first.playedAt).getTime()
       )
       .slice(0, 6),
+    transfers,
   };
+}
+
+function normalizeTransfer(
+  listing: CareerTransferInput
+): PlayerCareerTransfer {
+  if (!listing.completedAt) {
+    throw new Error(
+      "Un trasferimento completato deve avere una data."
+    );
+  }
+
+  return {
+    id: listing.id,
+    completedAt: listing.completedAt.toISOString(),
+    type: assertTransferType(listing.listingType),
+    fromClubName: listing.sellerClub?.name ?? null,
+    toClubName: listing.winnerClub?.name ?? null,
+    amount: listing.finalPrice,
+  };
+}
+
+function countCareerClubs(
+  appearances: PlayerCareerAppearance[],
+  transfers: PlayerCareerTransfer[]
+) {
+  const clubNames = new Set<string>();
+
+  for (const appearance of appearances) {
+    clubNames.add(appearance.clubName);
+  }
+
+  for (const transfer of transfers) {
+    if (transfer.fromClubName) {
+      clubNames.add(transfer.fromClubName);
+    }
+
+    if (transfer.toClubName) {
+      clubNames.add(transfer.toClubName);
+    }
+  }
+
+  return clubNames.size;
 }
 
 function normalizeAppearance(
@@ -248,6 +319,16 @@ function assertResult(value: string): PlayerCareerResult {
   }
 
   throw new Error(`Risultato carriera non valido: ${value}`);
+}
+
+function assertTransferType(
+  value: string
+): PlayerCareerTransferType {
+  if (value === "AUCTION" || value === "FREE_AGENT") {
+    return value;
+  }
+
+  throw new Error(`Tipologia trasferimento non valida: ${value}`);
 }
 
 function assertSide(value: string) {

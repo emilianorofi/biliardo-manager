@@ -2,6 +2,8 @@ import {
   ChartNoAxesColumnIncreasing,
   CircleDot,
   History,
+  MoveRight,
+  Repeat2,
   Trophy,
   Users,
 } from "lucide-react";
@@ -10,6 +12,7 @@ import type {
   PlayerCareerAppearance,
   PlayerCareerBreakdown,
   PlayerCareerGame,
+  PlayerCareerTransfer,
   PlayerCareerView,
 } from "@/app/types/playerCareer";
 
@@ -136,6 +139,8 @@ export default function PlayerCareerSection({
           )}
         </div>
       </div>
+
+      <TransferHistoryCard transfers={career.transfers} />
     </section>
   );
 }
@@ -296,6 +301,101 @@ function AppearanceRow({
   );
 }
 
+function TransferHistoryCard({
+  transfers,
+}: {
+  transfers: PlayerCareerTransfer[];
+}) {
+  const visibleTransfers = transfers.slice(0, 3);
+  const olderTransfers = transfers.slice(3);
+
+  return (
+    <div className="mt-3 rounded-xl border border-emerald-900/50 bg-emerald-950/25 p-2.5">
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-2">
+          <Repeat2 className="text-emerald-400" size={14} />
+          <h3 className="text-sm font-black text-white">
+            Trasferimenti
+          </h3>
+        </div>
+        <span className="text-[10px] font-semibold text-slate-500">
+          {transfers.length} totali
+        </span>
+      </div>
+
+      <div className="mt-2 space-y-1.5">
+        {visibleTransfers.length > 0 ? (
+          visibleTransfers.map((transfer) => (
+            <TransferRow
+              key={transfer.id}
+              transfer={transfer}
+            />
+          ))
+        ) : (
+          <div className="rounded-lg border border-dashed border-emerald-800/60 bg-black/10 px-2.5 py-2">
+            <p className="text-xs font-bold text-white">
+              Nessun trasferimento registrato
+            </p>
+            <p className="mt-0.5 text-[10px] leading-4 text-slate-500">
+              Le future cessioni e acquisizioni compariranno qui.
+            </p>
+          </div>
+        )}
+      </div>
+
+      {olderTransfers.length > 0 && (
+        <details className="mt-2 rounded-lg border border-emerald-900/40 bg-black/10 px-2.5 py-2">
+          <summary className="cursor-pointer text-xs font-bold text-emerald-200">
+            Altri {olderTransfers.length} trasferimenti
+          </summary>
+          <div className="mt-2 space-y-1.5">
+            {olderTransfers.map((transfer) => (
+              <TransferRow
+                key={transfer.id}
+                transfer={transfer}
+              />
+            ))}
+          </div>
+        </details>
+      )}
+    </div>
+  );
+}
+
+function TransferRow({
+  transfer,
+}: {
+  transfer: PlayerCareerTransfer;
+}) {
+  const fromClubName = transfer.fromClubName ?? "Svincolato";
+  const toClubName = transfer.toClubName ?? "Club non disponibile";
+
+  return (
+    <article className="grid gap-2 rounded-lg border border-emerald-900/45 bg-black/15 px-2.5 py-2 sm:grid-cols-[110px_minmax(0,1fr)_auto] sm:items-center">
+      <div>
+        <p className="text-[10px] font-black uppercase tracking-wide text-emerald-300">
+          {transfer.type === "AUCTION" ? "Asta" : "Svincolato"}
+        </p>
+        <p className="text-[9px] text-slate-500">
+          {formatDate(transfer.completedAt)}
+        </p>
+      </div>
+
+      <div className="flex min-w-0 items-center gap-2 text-xs font-bold text-slate-200">
+        <span className="truncate">{fromClubName}</span>
+        <MoveRight className="shrink-0 text-emerald-500" size={13} />
+        <span className="truncate text-white">{toClubName}</span>
+      </div>
+
+      <p className="text-xs font-black text-amber-300 sm:text-right">
+        {transfer.type === "FREE_AGENT" || transfer.amount === null
+          ? "Svincolato"
+          : formatCurrency(transfer.amount)}
+      </p>
+    </article>
+  );
+}
+
 function GameChip({ game }: { game: PlayerCareerGame }) {
   return (
     <span
@@ -341,5 +441,13 @@ function formatDate(value: string) {
 function formatDecimal(value: number) {
   return new Intl.NumberFormat("it-IT", {
     maximumFractionDigits: 1,
+  }).format(value);
+}
+
+function formatCurrency(value: number) {
+  return new Intl.NumberFormat("it-IT", {
+    style: "currency",
+    currency: "EUR",
+    maximumFractionDigits: 0,
   }).format(value);
 }

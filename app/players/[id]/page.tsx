@@ -55,22 +55,27 @@ export default async function PlayerPage({
         },
         include: {
           transferListings: {
-            where: {
-              status: {
-                in: [
-                  "ACTIVE",
-                  "PENDING_TRANSFER",
-                ],
-              },
-            },
             orderBy: {
               createdAt: "desc",
             },
-            take: 1,
             select: {
+              id: true,
               status: true,
+              listingType: true,
               openingPrice: true,
               endsAt: true,
+              finalPrice: true,
+              completedAt: true,
+              sellerClub: {
+                select: {
+                  name: true,
+                },
+              },
+              winnerClub: {
+                select: {
+                  name: true,
+                },
+              },
             },
           },
           fixtureAppearances: {
@@ -127,10 +132,16 @@ export default async function PlayerPage({
       }),
     ]);
 
+  const currentListing =
+    databasePlayer?.transferListings.find(
+      (listing) =>
+        listing.status === "ACTIVE" ||
+        listing.status === "PENDING_TRANSFER"
+    ) ?? null;
   const isVisiblePlayer =
     databasePlayer !== null &&
     (databasePlayer.clubId === clubId ||
-      databasePlayer.transferListings.length > 0);
+      currentListing !== null);
 
   if (!databasePlayer || !isVisiblePlayer) {
     notFound();
@@ -205,13 +216,12 @@ const player: Player = {
     },
   ];
 
-  const currentListing =
-    databasePlayer.transferListings[0] ?? null;
   const canListPlayer =
     rosterCount - activeSales >
     MIN_FIRST_TEAM_PLAYERS;
   const career = buildPlayerCareerView(
-    databasePlayer.fixtureAppearances
+    databasePlayer.fixtureAppearances,
+    databasePlayer.transferListings
   );
   const isOwnPlayer = databasePlayer.clubId === clubId;
 

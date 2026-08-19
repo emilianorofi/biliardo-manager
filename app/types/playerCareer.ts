@@ -9,6 +9,10 @@ export type PlayerCareerGameType =
 
 export type PlayerCareerResult = "WIN" | "LOSS";
 
+export type PlayerCareerTransferType =
+  | "AUCTION"
+  | "FREE_AGENT";
+
 export type PlayerCareerAggregate = {
   played: number;
   wins: number;
@@ -48,6 +52,15 @@ export type PlayerCareerAppearance = {
   games: PlayerCareerGame[];
 };
 
+export type PlayerCareerTransfer = {
+  id: number;
+  completedAt: string;
+  type: PlayerCareerTransferType;
+  fromClubName: string | null;
+  toClubName: string | null;
+  amount: number | null;
+};
+
 export type PlayerCareerView = {
   summary: PlayerCareerAggregate & {
     appearances: number;
@@ -57,4 +70,5 @@ export type PlayerCareerView = {
   gameTypes: PlayerCareerBreakdown[];
   seasons: PlayerCareerBreakdown[];
   recentAppearances: PlayerCareerAppearance[];
+  transfers: PlayerCareerTransfer[];
 };
