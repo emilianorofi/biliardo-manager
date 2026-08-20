@@ -31,6 +31,7 @@ export interface AcademyPlayer {
   revealedAttributes: number;
   totalAttributes: 9;
   nextScoutingAt: string | null;
+  decisionRequired: boolean;
 
   attributes: AcademyAttributes;
 }

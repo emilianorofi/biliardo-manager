@@ -15,12 +15,19 @@ export type SeasonCompletionResult = {
   completed: boolean;
   alreadyCompleted: boolean;
   agedPlayers: number;
+  agedAcademyPlayers: number;
   retiredPlayers: Array<{
     id: number;
     firstName: string;
     lastName: string;
     age: number;
     retirementChance: number;
+  }>;
+  releasedAcademyPlayers: Array<{
+    id: number;
+    firstName: string;
+    lastName: string;
+    age: number;
   }>;
 };
 
@@ -82,21 +89,35 @@ export async function completeSeasonIfReady(
     return createEmptyResult(seasonId, false);
   }
 
-  const players = await transaction.player.findMany({
-    where: {
-      careerStatus: "ACTIVE",
-    },
-    select: {
-      id: true,
-      clubId: true,
-      firstName: true,
-      lastName: true,
-      age: true,
-    },
-    orderBy: {
-      id: "asc",
-    },
-  });
+  const [players, academyPlayers] = await Promise.all([
+    transaction.player.findMany({
+      where: {
+        careerStatus: "ACTIVE",
+      },
+      select: {
+        id: true,
+        clubId: true,
+        firstName: true,
+        lastName: true,
+        age: true,
+      },
+      orderBy: {
+        id: "asc",
+      },
+    }),
+    transaction.academyPlayer.findMany({
+      select: {
+        id: true,
+        clubId: true,
+        firstName: true,
+        lastName: true,
+        age: true,
+      },
+      orderBy: {
+        id: "asc",
+      },
+    }),
+  ]);
   const outcomes = players.map((player) => ({
     player,
     outcome: calculateEndOfSeasonPlayerOutcome(
@@ -110,6 +131,12 @@ export async function completeSeasonIfReady(
   const retiredPlayerIds = retirements.map(
     ({ player }) => player.id
   );
+  const releasedAcademyPlayers = academyPlayers
+    .filter((player) => player.age >= 17)
+    .map((player) => ({
+      ...player,
+      age: player.age + 1,
+    }));
 
   if (players.length > 0) {
     await transaction.player.updateMany({
@@ -124,6 +151,43 @@ export async function completeSeasonIfReady(
           increment: 1,
         },
       },
+    });
+  }
+
+  if (academyPlayers.length > 0) {
+    await transaction.academyPlayer.updateMany({
+      where: {
+        id: {
+          in: academyPlayers.map((player) => player.id),
+        },
+      },
+      data: {
+        age: {
+          increment: 1,
+        },
+      },
+    });
+  }
+
+  if (releasedAcademyPlayers.length > 0) {
+    await transaction.academyPlayer.deleteMany({
+      where: {
+        id: {
+          in: releasedAcademyPlayers.map(
+            (player) => player.id
+          ),
+        },
+      },
+    });
+
+    await transaction.gameEvent.createMany({
+      data: releasedAcademyPlayers.map((player) => ({
+        clubId: player.clubId,
+        type: "ACADEMY_PLAYER_RELEASED",
+        title: `Uscita dall'Accademia: ${player.firstName} ${player.lastName}`,
+        description: `${player.firstName} ${player.lastName} ha compiuto 18 anni senza essere promosso ed è stato rilasciato.`,
+        createdAt: now,
+      })),
     });
   }
 
@@ -189,7 +253,7 @@ export async function completeSeasonIfReady(
       clubId: null,
       type: "Campionato",
       title: "Stagione conclusa",
-      description: `${players.length} giocatori hanno compiuto un anno; ${retirements.length} hanno annunciato il ritiro.`,
+      description: `${players.length} giocatori e ${academyPlayers.length} giovani hanno compiuto un anno; ${retirements.length} giocatori si sono ritirati e ${releasedAcademyPlayers.length} giovani hanno lasciato l'Accademia.`,
       createdAt: now,
     },
   });
@@ -199,6 +263,7 @@ export async function completeSeasonIfReady(
     completed: true,
     alreadyCompleted: false,
     agedPlayers: players.length,
+    agedAcademyPlayers: academyPlayers.length,
     retiredPlayers: retirements.map(
       ({ player, outcome }) => ({
         id: player.id,
@@ -208,6 +273,13 @@ export async function completeSeasonIfReady(
         retirementChance: outcome.retirementChance,
       })
     ),
+    releasedAcademyPlayers:
+      releasedAcademyPlayers.map((player) => ({
+        id: player.id,
+        firstName: player.firstName,
+        lastName: player.lastName,
+        age: player.age,
+      })),
   };
 }
 
@@ -220,7 +292,9 @@ function createEmptyResult(
     completed: false,
     alreadyCompleted,
     agedPlayers: 0,
+    agedAcademyPlayers: 0,
     retiredPlayers: [],
+    releasedAcademyPlayers: [],
   };
 }
 

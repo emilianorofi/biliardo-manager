@@ -1824,6 +1824,7 @@ export const ClubScalarFieldEnum = {
   trainerLevel: 'trainerLevel',
   youthCoachLevel: 'youthCoachLevel',
   academyInitialized: 'academyInitialized',
+  nextAcademyCandidateAt: 'nextAcademyCandidateAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const

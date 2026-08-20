@@ -67,6 +67,7 @@ export type ClubMinAggregateOutputType = {
   trainerLevel: number | null
   youthCoachLevel: number | null
   academyInitialized: boolean | null
+  nextAcademyCandidateAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -90,6 +91,7 @@ export type ClubMaxAggregateOutputType = {
   trainerLevel: number | null
   youthCoachLevel: number | null
   academyInitialized: boolean | null
+  nextAcademyCandidateAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -113,6 +115,7 @@ export type ClubCountAggregateOutputType = {
   trainerLevel: number
   youthCoachLevel: number
   academyInitialized: number
+  nextAcademyCandidateAt: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -160,6 +163,7 @@ export type ClubMinAggregateInputType = {
   trainerLevel?: true
   youthCoachLevel?: true
   academyInitialized?: true
+  nextAcademyCandidateAt?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -183,6 +187,7 @@ export type ClubMaxAggregateInputType = {
   trainerLevel?: true
   youthCoachLevel?: true
   academyInitialized?: true
+  nextAcademyCandidateAt?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -206,6 +211,7 @@ export type ClubCountAggregateInputType = {
   trainerLevel?: true
   youthCoachLevel?: true
   academyInitialized?: true
+  nextAcademyCandidateAt?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -316,6 +322,7 @@ export type ClubGroupByOutputType = {
   trainerLevel: number
   youthCoachLevel: number
   academyInitialized: boolean
+  nextAcademyCandidateAt: Date | null
   createdAt: Date
   updatedAt: Date
   _count: ClubCountAggregateOutputType | null
@@ -362,6 +369,7 @@ export type ClubWhereInput = {
   trainerLevel?: Prisma.IntFilter<"Club"> | number
   youthCoachLevel?: Prisma.IntFilter<"Club"> | number
   academyInitialized?: Prisma.BoolFilter<"Club"> | boolean
+  nextAcademyCandidateAt?: Prisma.DateTimeNullableFilter<"Club"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Club"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Club"> | Date | string
   players?: Prisma.PlayerListRelationFilter
@@ -399,6 +407,7 @@ export type ClubOrderByWithRelationInput = {
   trainerLevel?: Prisma.SortOrder
   youthCoachLevel?: Prisma.SortOrder
   academyInitialized?: Prisma.SortOrder
+  nextAcademyCandidateAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   players?: Prisma.PlayerOrderByRelationAggregateInput
@@ -439,6 +448,7 @@ export type ClubWhereUniqueInput = Prisma.AtLeast<{
   trainerLevel?: Prisma.IntFilter<"Club"> | number
   youthCoachLevel?: Prisma.IntFilter<"Club"> | number
   academyInitialized?: Prisma.BoolFilter<"Club"> | boolean
+  nextAcademyCandidateAt?: Prisma.DateTimeNullableFilter<"Club"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Club"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Club"> | Date | string
   players?: Prisma.PlayerListRelationFilter
@@ -476,6 +486,7 @@ export type ClubOrderByWithAggregationInput = {
   trainerLevel?: Prisma.SortOrder
   youthCoachLevel?: Prisma.SortOrder
   academyInitialized?: Prisma.SortOrder
+  nextAcademyCandidateAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.ClubCountOrderByAggregateInput
@@ -507,6 +518,7 @@ export type ClubScalarWhereWithAggregatesInput = {
   trainerLevel?: Prisma.IntWithAggregatesFilter<"Club"> | number
   youthCoachLevel?: Prisma.IntWithAggregatesFilter<"Club"> | number
   academyInitialized?: Prisma.BoolWithAggregatesFilter<"Club"> | boolean
+  nextAcademyCandidateAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Club"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Club"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Club"> | Date | string
 }
@@ -529,6 +541,7 @@ export type ClubCreateInput = {
   trainerLevel?: number
   youthCoachLevel?: number
   academyInitialized?: boolean
+  nextAcademyCandidateAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   players?: Prisma.PlayerCreateNestedManyWithoutClubInput
@@ -566,6 +579,7 @@ export type ClubUncheckedCreateInput = {
   trainerLevel?: number
   youthCoachLevel?: number
   academyInitialized?: boolean
+  nextAcademyCandidateAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   players?: Prisma.PlayerUncheckedCreateNestedManyWithoutClubInput
@@ -602,6 +616,7 @@ export type ClubUpdateInput = {
   trainerLevel?: Prisma.IntFieldUpdateOperationsInput | number
   youthCoachLevel?: Prisma.IntFieldUpdateOperationsInput | number
   academyInitialized?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  nextAcademyCandidateAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   players?: Prisma.PlayerUpdateManyWithoutClubNestedInput
@@ -639,6 +654,7 @@ export type ClubUncheckedUpdateInput = {
   trainerLevel?: Prisma.IntFieldUpdateOperationsInput | number
   youthCoachLevel?: Prisma.IntFieldUpdateOperationsInput | number
   academyInitialized?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  nextAcademyCandidateAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   players?: Prisma.PlayerUncheckedUpdateManyWithoutClubNestedInput
@@ -676,6 +692,7 @@ export type ClubCreateManyInput = {
   trainerLevel?: number
   youthCoachLevel?: number
   academyInitialized?: boolean
+  nextAcademyCandidateAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -698,6 +715,7 @@ export type ClubUpdateManyMutationInput = {
   trainerLevel?: Prisma.IntFieldUpdateOperationsInput | number
   youthCoachLevel?: Prisma.IntFieldUpdateOperationsInput | number
   academyInitialized?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  nextAcademyCandidateAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -721,6 +739,7 @@ export type ClubUncheckedUpdateManyInput = {
   trainerLevel?: Prisma.IntFieldUpdateOperationsInput | number
   youthCoachLevel?: Prisma.IntFieldUpdateOperationsInput | number
   academyInitialized?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  nextAcademyCandidateAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -744,6 +763,7 @@ export type ClubCountOrderByAggregateInput = {
   trainerLevel?: Prisma.SortOrder
   youthCoachLevel?: Prisma.SortOrder
   academyInitialized?: Prisma.SortOrder
+  nextAcademyCandidateAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -778,6 +798,7 @@ export type ClubMaxOrderByAggregateInput = {
   trainerLevel?: Prisma.SortOrder
   youthCoachLevel?: Prisma.SortOrder
   academyInitialized?: Prisma.SortOrder
+  nextAcademyCandidateAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -801,6 +822,7 @@ export type ClubMinOrderByAggregateInput = {
   trainerLevel?: Prisma.SortOrder
   youthCoachLevel?: Prisma.SortOrder
   academyInitialized?: Prisma.SortOrder
+  nextAcademyCandidateAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -840,6 +862,10 @@ export type IntFieldUpdateOperationsInput = {
 
 export type BoolFieldUpdateOperationsInput = {
   set?: boolean
+}
+
+export type NullableDateTimeFieldUpdateOperationsInput = {
+  set?: Date | string | null
 }
 
 export type DateTimeFieldUpdateOperationsInput = {
@@ -1072,6 +1098,7 @@ export type ClubCreateWithoutManagerInput = {
   trainerLevel?: number
   youthCoachLevel?: number
   academyInitialized?: boolean
+  nextAcademyCandidateAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   players?: Prisma.PlayerCreateNestedManyWithoutClubInput
@@ -1108,6 +1135,7 @@ export type ClubUncheckedCreateWithoutManagerInput = {
   trainerLevel?: number
   youthCoachLevel?: number
   academyInitialized?: boolean
+  nextAcademyCandidateAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   players?: Prisma.PlayerUncheckedCreateNestedManyWithoutClubInput
@@ -1159,6 +1187,7 @@ export type ClubUpdateWithoutManagerInput = {
   trainerLevel?: Prisma.IntFieldUpdateOperationsInput | number
   youthCoachLevel?: Prisma.IntFieldUpdateOperationsInput | number
   academyInitialized?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  nextAcademyCandidateAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   players?: Prisma.PlayerUpdateManyWithoutClubNestedInput
@@ -1195,6 +1224,7 @@ export type ClubUncheckedUpdateWithoutManagerInput = {
   trainerLevel?: Prisma.IntFieldUpdateOperationsInput | number
   youthCoachLevel?: Prisma.IntFieldUpdateOperationsInput | number
   academyInitialized?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  nextAcademyCandidateAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   players?: Prisma.PlayerUncheckedUpdateManyWithoutClubNestedInput
@@ -1230,6 +1260,7 @@ export type ClubCreateWithoutPlayersInput = {
   trainerLevel?: number
   youthCoachLevel?: number
   academyInitialized?: boolean
+  nextAcademyCandidateAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   academyPlayers?: Prisma.AcademyPlayerCreateNestedManyWithoutClubInput
@@ -1266,6 +1297,7 @@ export type ClubUncheckedCreateWithoutPlayersInput = {
   trainerLevel?: number
   youthCoachLevel?: number
   academyInitialized?: boolean
+  nextAcademyCandidateAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   academyPlayers?: Prisma.AcademyPlayerUncheckedCreateNestedManyWithoutClubInput
@@ -1317,6 +1349,7 @@ export type ClubUpdateWithoutPlayersInput = {
   trainerLevel?: Prisma.IntFieldUpdateOperationsInput | number
   youthCoachLevel?: Prisma.IntFieldUpdateOperationsInput | number
   academyInitialized?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  nextAcademyCandidateAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   academyPlayers?: Prisma.AcademyPlayerUpdateManyWithoutClubNestedInput
@@ -1353,6 +1386,7 @@ export type ClubUncheckedUpdateWithoutPlayersInput = {
   trainerLevel?: Prisma.IntFieldUpdateOperationsInput | number
   youthCoachLevel?: Prisma.IntFieldUpdateOperationsInput | number
   academyInitialized?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  nextAcademyCandidateAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   academyPlayers?: Prisma.AcademyPlayerUncheckedUpdateManyWithoutClubNestedInput
@@ -1388,6 +1422,7 @@ export type ClubCreateWithoutTransferListingsInput = {
   trainerLevel?: number
   youthCoachLevel?: number
   academyInitialized?: boolean
+  nextAcademyCandidateAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   players?: Prisma.PlayerCreateNestedManyWithoutClubInput
@@ -1424,6 +1459,7 @@ export type ClubUncheckedCreateWithoutTransferListingsInput = {
   trainerLevel?: number
   youthCoachLevel?: number
   academyInitialized?: boolean
+  nextAcademyCandidateAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   players?: Prisma.PlayerUncheckedCreateNestedManyWithoutClubInput
@@ -1464,6 +1500,7 @@ export type ClubCreateWithoutWonListingsInput = {
   trainerLevel?: number
   youthCoachLevel?: number
   academyInitialized?: boolean
+  nextAcademyCandidateAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   players?: Prisma.PlayerCreateNestedManyWithoutClubInput
@@ -1500,6 +1537,7 @@ export type ClubUncheckedCreateWithoutWonListingsInput = {
   trainerLevel?: number
   youthCoachLevel?: number
   academyInitialized?: boolean
+  nextAcademyCandidateAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   players?: Prisma.PlayerUncheckedCreateNestedManyWithoutClubInput
@@ -1551,6 +1589,7 @@ export type ClubUpdateWithoutTransferListingsInput = {
   trainerLevel?: Prisma.IntFieldUpdateOperationsInput | number
   youthCoachLevel?: Prisma.IntFieldUpdateOperationsInput | number
   academyInitialized?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  nextAcademyCandidateAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   players?: Prisma.PlayerUpdateManyWithoutClubNestedInput
@@ -1587,6 +1626,7 @@ export type ClubUncheckedUpdateWithoutTransferListingsInput = {
   trainerLevel?: Prisma.IntFieldUpdateOperationsInput | number
   youthCoachLevel?: Prisma.IntFieldUpdateOperationsInput | number
   academyInitialized?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  nextAcademyCandidateAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   players?: Prisma.PlayerUncheckedUpdateManyWithoutClubNestedInput
@@ -1633,6 +1673,7 @@ export type ClubUpdateWithoutWonListingsInput = {
   trainerLevel?: Prisma.IntFieldUpdateOperationsInput | number
   youthCoachLevel?: Prisma.IntFieldUpdateOperationsInput | number
   academyInitialized?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  nextAcademyCandidateAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   players?: Prisma.PlayerUpdateManyWithoutClubNestedInput
@@ -1669,6 +1710,7 @@ export type ClubUncheckedUpdateWithoutWonListingsInput = {
   trainerLevel?: Prisma.IntFieldUpdateOperationsInput | number
   youthCoachLevel?: Prisma.IntFieldUpdateOperationsInput | number
   academyInitialized?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  nextAcademyCandidateAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   players?: Prisma.PlayerUncheckedUpdateManyWithoutClubNestedInput
@@ -1704,6 +1746,7 @@ export type ClubCreateWithoutTransferBidsInput = {
   trainerLevel?: number
   youthCoachLevel?: number
   academyInitialized?: boolean
+  nextAcademyCandidateAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   players?: Prisma.PlayerCreateNestedManyWithoutClubInput
@@ -1740,6 +1783,7 @@ export type ClubUncheckedCreateWithoutTransferBidsInput = {
   trainerLevel?: number
   youthCoachLevel?: number
   academyInitialized?: boolean
+  nextAcademyCandidateAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   players?: Prisma.PlayerUncheckedCreateNestedManyWithoutClubInput
@@ -1791,6 +1835,7 @@ export type ClubUpdateWithoutTransferBidsInput = {
   trainerLevel?: Prisma.IntFieldUpdateOperationsInput | number
   youthCoachLevel?: Prisma.IntFieldUpdateOperationsInput | number
   academyInitialized?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  nextAcademyCandidateAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   players?: Prisma.PlayerUpdateManyWithoutClubNestedInput
@@ -1827,6 +1872,7 @@ export type ClubUncheckedUpdateWithoutTransferBidsInput = {
   trainerLevel?: Prisma.IntFieldUpdateOperationsInput | number
   youthCoachLevel?: Prisma.IntFieldUpdateOperationsInput | number
   academyInitialized?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  nextAcademyCandidateAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   players?: Prisma.PlayerUncheckedUpdateManyWithoutClubNestedInput
@@ -1862,6 +1908,7 @@ export type ClubCreateWithoutAcademyPlayersInput = {
   trainerLevel?: number
   youthCoachLevel?: number
   academyInitialized?: boolean
+  nextAcademyCandidateAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   players?: Prisma.PlayerCreateNestedManyWithoutClubInput
@@ -1898,6 +1945,7 @@ export type ClubUncheckedCreateWithoutAcademyPlayersInput = {
   trainerLevel?: number
   youthCoachLevel?: number
   academyInitialized?: boolean
+  nextAcademyCandidateAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   players?: Prisma.PlayerUncheckedCreateNestedManyWithoutClubInput
@@ -1949,6 +1997,7 @@ export type ClubUpdateWithoutAcademyPlayersInput = {
   trainerLevel?: Prisma.IntFieldUpdateOperationsInput | number
   youthCoachLevel?: Prisma.IntFieldUpdateOperationsInput | number
   academyInitialized?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  nextAcademyCandidateAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   players?: Prisma.PlayerUpdateManyWithoutClubNestedInput
@@ -1985,6 +2034,7 @@ export type ClubUncheckedUpdateWithoutAcademyPlayersInput = {
   trainerLevel?: Prisma.IntFieldUpdateOperationsInput | number
   youthCoachLevel?: Prisma.IntFieldUpdateOperationsInput | number
   academyInitialized?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  nextAcademyCandidateAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   players?: Prisma.PlayerUncheckedUpdateManyWithoutClubNestedInput
@@ -2020,6 +2070,7 @@ export type ClubCreateWithoutFormationInput = {
   trainerLevel?: number
   youthCoachLevel?: number
   academyInitialized?: boolean
+  nextAcademyCandidateAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   players?: Prisma.PlayerCreateNestedManyWithoutClubInput
@@ -2056,6 +2107,7 @@ export type ClubUncheckedCreateWithoutFormationInput = {
   trainerLevel?: number
   youthCoachLevel?: number
   academyInitialized?: boolean
+  nextAcademyCandidateAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   players?: Prisma.PlayerUncheckedCreateNestedManyWithoutClubInput
@@ -2107,6 +2159,7 @@ export type ClubUpdateWithoutFormationInput = {
   trainerLevel?: Prisma.IntFieldUpdateOperationsInput | number
   youthCoachLevel?: Prisma.IntFieldUpdateOperationsInput | number
   academyInitialized?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  nextAcademyCandidateAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   players?: Prisma.PlayerUpdateManyWithoutClubNestedInput
@@ -2143,6 +2196,7 @@ export type ClubUncheckedUpdateWithoutFormationInput = {
   trainerLevel?: Prisma.IntFieldUpdateOperationsInput | number
   youthCoachLevel?: Prisma.IntFieldUpdateOperationsInput | number
   academyInitialized?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  nextAcademyCandidateAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   players?: Prisma.PlayerUncheckedUpdateManyWithoutClubNestedInput
@@ -2178,6 +2232,7 @@ export type ClubCreateWithoutTrainingPlanInput = {
   trainerLevel?: number
   youthCoachLevel?: number
   academyInitialized?: boolean
+  nextAcademyCandidateAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   players?: Prisma.PlayerCreateNestedManyWithoutClubInput
@@ -2214,6 +2269,7 @@ export type ClubUncheckedCreateWithoutTrainingPlanInput = {
   trainerLevel?: number
   youthCoachLevel?: number
   academyInitialized?: boolean
+  nextAcademyCandidateAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   players?: Prisma.PlayerUncheckedCreateNestedManyWithoutClubInput
@@ -2265,6 +2321,7 @@ export type ClubUpdateWithoutTrainingPlanInput = {
   trainerLevel?: Prisma.IntFieldUpdateOperationsInput | number
   youthCoachLevel?: Prisma.IntFieldUpdateOperationsInput | number
   academyInitialized?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  nextAcademyCandidateAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   players?: Prisma.PlayerUpdateManyWithoutClubNestedInput
@@ -2301,6 +2358,7 @@ export type ClubUncheckedUpdateWithoutTrainingPlanInput = {
   trainerLevel?: Prisma.IntFieldUpdateOperationsInput | number
   youthCoachLevel?: Prisma.IntFieldUpdateOperationsInput | number
   academyInitialized?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  nextAcademyCandidateAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   players?: Prisma.PlayerUncheckedUpdateManyWithoutClubNestedInput
@@ -2336,6 +2394,7 @@ export type ClubCreateWithoutTrainingSessionsInput = {
   trainerLevel?: number
   youthCoachLevel?: number
   academyInitialized?: boolean
+  nextAcademyCandidateAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   players?: Prisma.PlayerCreateNestedManyWithoutClubInput
@@ -2372,6 +2431,7 @@ export type ClubUncheckedCreateWithoutTrainingSessionsInput = {
   trainerLevel?: number
   youthCoachLevel?: number
   academyInitialized?: boolean
+  nextAcademyCandidateAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   players?: Prisma.PlayerUncheckedCreateNestedManyWithoutClubInput
@@ -2423,6 +2483,7 @@ export type ClubUpdateWithoutTrainingSessionsInput = {
   trainerLevel?: Prisma.IntFieldUpdateOperationsInput | number
   youthCoachLevel?: Prisma.IntFieldUpdateOperationsInput | number
   academyInitialized?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  nextAcademyCandidateAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   players?: Prisma.PlayerUpdateManyWithoutClubNestedInput
@@ -2459,6 +2520,7 @@ export type ClubUncheckedUpdateWithoutTrainingSessionsInput = {
   trainerLevel?: Prisma.IntFieldUpdateOperationsInput | number
   youthCoachLevel?: Prisma.IntFieldUpdateOperationsInput | number
   academyInitialized?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  nextAcademyCandidateAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   players?: Prisma.PlayerUncheckedUpdateManyWithoutClubNestedInput
@@ -2494,6 +2556,7 @@ export type ClubCreateWithoutGameEventsInput = {
   trainerLevel?: number
   youthCoachLevel?: number
   academyInitialized?: boolean
+  nextAcademyCandidateAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   players?: Prisma.PlayerCreateNestedManyWithoutClubInput
@@ -2530,6 +2593,7 @@ export type ClubUncheckedCreateWithoutGameEventsInput = {
   trainerLevel?: number
   youthCoachLevel?: number
   academyInitialized?: boolean
+  nextAcademyCandidateAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   players?: Prisma.PlayerUncheckedCreateNestedManyWithoutClubInput
@@ -2581,6 +2645,7 @@ export type ClubUpdateWithoutGameEventsInput = {
   trainerLevel?: Prisma.IntFieldUpdateOperationsInput | number
   youthCoachLevel?: Prisma.IntFieldUpdateOperationsInput | number
   academyInitialized?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  nextAcademyCandidateAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   players?: Prisma.PlayerUpdateManyWithoutClubNestedInput
@@ -2617,6 +2682,7 @@ export type ClubUncheckedUpdateWithoutGameEventsInput = {
   trainerLevel?: Prisma.IntFieldUpdateOperationsInput | number
   youthCoachLevel?: Prisma.IntFieldUpdateOperationsInput | number
   academyInitialized?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  nextAcademyCandidateAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   players?: Prisma.PlayerUncheckedUpdateManyWithoutClubNestedInput
@@ -2652,6 +2718,7 @@ export type ClubCreateWithoutLeagueEntriesInput = {
   trainerLevel?: number
   youthCoachLevel?: number
   academyInitialized?: boolean
+  nextAcademyCandidateAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   players?: Prisma.PlayerCreateNestedManyWithoutClubInput
@@ -2688,6 +2755,7 @@ export type ClubUncheckedCreateWithoutLeagueEntriesInput = {
   trainerLevel?: number
   youthCoachLevel?: number
   academyInitialized?: boolean
+  nextAcademyCandidateAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   players?: Prisma.PlayerUncheckedCreateNestedManyWithoutClubInput
@@ -2739,6 +2807,7 @@ export type ClubUpdateWithoutLeagueEntriesInput = {
   trainerLevel?: Prisma.IntFieldUpdateOperationsInput | number
   youthCoachLevel?: Prisma.IntFieldUpdateOperationsInput | number
   academyInitialized?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  nextAcademyCandidateAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   players?: Prisma.PlayerUpdateManyWithoutClubNestedInput
@@ -2775,6 +2844,7 @@ export type ClubUncheckedUpdateWithoutLeagueEntriesInput = {
   trainerLevel?: Prisma.IntFieldUpdateOperationsInput | number
   youthCoachLevel?: Prisma.IntFieldUpdateOperationsInput | number
   academyInitialized?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  nextAcademyCandidateAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   players?: Prisma.PlayerUncheckedUpdateManyWithoutClubNestedInput
@@ -2810,6 +2880,7 @@ export type ClubCreateWithoutHomeFixturesInput = {
   trainerLevel?: number
   youthCoachLevel?: number
   academyInitialized?: boolean
+  nextAcademyCandidateAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   players?: Prisma.PlayerCreateNestedManyWithoutClubInput
@@ -2846,6 +2917,7 @@ export type ClubUncheckedCreateWithoutHomeFixturesInput = {
   trainerLevel?: number
   youthCoachLevel?: number
   academyInitialized?: boolean
+  nextAcademyCandidateAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   players?: Prisma.PlayerUncheckedCreateNestedManyWithoutClubInput
@@ -2886,6 +2958,7 @@ export type ClubCreateWithoutAwayFixturesInput = {
   trainerLevel?: number
   youthCoachLevel?: number
   academyInitialized?: boolean
+  nextAcademyCandidateAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   players?: Prisma.PlayerCreateNestedManyWithoutClubInput
@@ -2922,6 +2995,7 @@ export type ClubUncheckedCreateWithoutAwayFixturesInput = {
   trainerLevel?: number
   youthCoachLevel?: number
   academyInitialized?: boolean
+  nextAcademyCandidateAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   players?: Prisma.PlayerUncheckedCreateNestedManyWithoutClubInput
@@ -2973,6 +3047,7 @@ export type ClubUpdateWithoutHomeFixturesInput = {
   trainerLevel?: Prisma.IntFieldUpdateOperationsInput | number
   youthCoachLevel?: Prisma.IntFieldUpdateOperationsInput | number
   academyInitialized?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  nextAcademyCandidateAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   players?: Prisma.PlayerUpdateManyWithoutClubNestedInput
@@ -3009,6 +3084,7 @@ export type ClubUncheckedUpdateWithoutHomeFixturesInput = {
   trainerLevel?: Prisma.IntFieldUpdateOperationsInput | number
   youthCoachLevel?: Prisma.IntFieldUpdateOperationsInput | number
   academyInitialized?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  nextAcademyCandidateAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   players?: Prisma.PlayerUncheckedUpdateManyWithoutClubNestedInput
@@ -3055,6 +3131,7 @@ export type ClubUpdateWithoutAwayFixturesInput = {
   trainerLevel?: Prisma.IntFieldUpdateOperationsInput | number
   youthCoachLevel?: Prisma.IntFieldUpdateOperationsInput | number
   academyInitialized?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  nextAcademyCandidateAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   players?: Prisma.PlayerUpdateManyWithoutClubNestedInput
@@ -3091,6 +3168,7 @@ export type ClubUncheckedUpdateWithoutAwayFixturesInput = {
   trainerLevel?: Prisma.IntFieldUpdateOperationsInput | number
   youthCoachLevel?: Prisma.IntFieldUpdateOperationsInput | number
   academyInitialized?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  nextAcademyCandidateAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   players?: Prisma.PlayerUncheckedUpdateManyWithoutClubNestedInput
@@ -3126,6 +3204,7 @@ export type ClubCreateWithoutPlayerAppearancesInput = {
   trainerLevel?: number
   youthCoachLevel?: number
   academyInitialized?: boolean
+  nextAcademyCandidateAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   players?: Prisma.PlayerCreateNestedManyWithoutClubInput
@@ -3162,6 +3241,7 @@ export type ClubUncheckedCreateWithoutPlayerAppearancesInput = {
   trainerLevel?: number
   youthCoachLevel?: number
   academyInitialized?: boolean
+  nextAcademyCandidateAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   players?: Prisma.PlayerUncheckedCreateNestedManyWithoutClubInput
@@ -3213,6 +3293,7 @@ export type ClubUpdateWithoutPlayerAppearancesInput = {
   trainerLevel?: Prisma.IntFieldUpdateOperationsInput | number
   youthCoachLevel?: Prisma.IntFieldUpdateOperationsInput | number
   academyInitialized?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  nextAcademyCandidateAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   players?: Prisma.PlayerUpdateManyWithoutClubNestedInput
@@ -3249,6 +3330,7 @@ export type ClubUncheckedUpdateWithoutPlayerAppearancesInput = {
   trainerLevel?: Prisma.IntFieldUpdateOperationsInput | number
   youthCoachLevel?: Prisma.IntFieldUpdateOperationsInput | number
   academyInitialized?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  nextAcademyCandidateAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   players?: Prisma.PlayerUncheckedUpdateManyWithoutClubNestedInput
@@ -3406,6 +3488,7 @@ export type ClubSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   trainerLevel?: boolean
   youthCoachLevel?: boolean
   academyInitialized?: boolean
+  nextAcademyCandidateAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   players?: boolean | Prisma.Club$playersArgs<ExtArgs>
@@ -3444,6 +3527,7 @@ export type ClubSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   trainerLevel?: boolean
   youthCoachLevel?: boolean
   academyInitialized?: boolean
+  nextAcademyCandidateAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["club"]>
@@ -3467,6 +3551,7 @@ export type ClubSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   trainerLevel?: boolean
   youthCoachLevel?: boolean
   academyInitialized?: boolean
+  nextAcademyCandidateAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["club"]>
@@ -3490,11 +3575,12 @@ export type ClubSelectScalar = {
   trainerLevel?: boolean
   youthCoachLevel?: boolean
   academyInitialized?: boolean
+  nextAcademyCandidateAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type ClubOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "normalizedName" | "shortName" | "logo" | "primaryColor" | "secondaryColor" | "crestStyle" | "city" | "country" | "reputation" | "fans" | "balance" | "weeklyExpenses" | "weeklyIncome" | "trainerLevel" | "youthCoachLevel" | "academyInitialized" | "createdAt" | "updatedAt", ExtArgs["result"]["club"]>
+export type ClubOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "normalizedName" | "shortName" | "logo" | "primaryColor" | "secondaryColor" | "crestStyle" | "city" | "country" | "reputation" | "fans" | "balance" | "weeklyExpenses" | "weeklyIncome" | "trainerLevel" | "youthCoachLevel" | "academyInitialized" | "nextAcademyCandidateAt" | "createdAt" | "updatedAt", ExtArgs["result"]["club"]>
 export type ClubInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   players?: boolean | Prisma.Club$playersArgs<ExtArgs>
   academyPlayers?: boolean | Prisma.Club$academyPlayersArgs<ExtArgs>
@@ -3552,6 +3638,7 @@ export type $ClubPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     trainerLevel: number
     youthCoachLevel: number
     academyInitialized: boolean
+    nextAcademyCandidateAt: Date | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["club"]>
@@ -4009,6 +4096,7 @@ export interface ClubFieldRefs {
   readonly trainerLevel: Prisma.FieldRef<"Club", 'Int'>
   readonly youthCoachLevel: Prisma.FieldRef<"Club", 'Int'>
   readonly academyInitialized: Prisma.FieldRef<"Club", 'Boolean'>
+  readonly nextAcademyCandidateAt: Prisma.FieldRef<"Club", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"Club", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Club", 'DateTime'>
 }

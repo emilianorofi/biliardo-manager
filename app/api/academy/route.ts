@@ -2,6 +2,10 @@ import { NextResponse } from "next/server";
 
 import { ensureInitialAcademy } from "@/lib/academy-initialization";
 import {
+  advanceAcademyIntake,
+  MAX_ACADEMY_PLAYERS,
+} from "@/lib/academy-intake";
+import {
   advanceAcademyScouting,
   getAcademyEstimatedRange,
   getAcademyRangeWidth,
@@ -34,9 +38,14 @@ export async function GET() {
     }
 
     const { clubId } = access;
-    const { databasePlayers, youthCoachLevel } = await prisma.$transaction(
+    const {
+      databasePlayers,
+      youthCoachLevel,
+      nextAcademyCandidateAt,
+    } = await prisma.$transaction(
       async (transaction) => {
         await ensureInitialAcademy(transaction, clubId);
+        await advanceAcademyIntake(transaction, clubId);
         await advanceAcademyScouting(transaction, clubId);
 
         const [club, players] = await Promise.all([
@@ -46,6 +55,7 @@ export async function GET() {
             },
             select: {
               youthCoachLevel: true,
+              nextAcademyCandidateAt: true,
             },
           }),
           transaction.academyPlayer.findMany({
@@ -66,6 +76,9 @@ export async function GET() {
         return {
           databasePlayers: players,
           youthCoachLevel: club?.youthCoachLevel ?? 1,
+          nextAcademyCandidateAt:
+            club?.nextAcademyCandidateAt ??
+            null,
         };
       }
     );
@@ -119,6 +132,7 @@ export async function GET() {
 
         totalAttributes: player.totalAttributes,
         nextScoutingAt: player.nextScoutingAt?.toISOString() ?? null,
+        decisionRequired: player.age >= 17,
 
         attributes: {
           precisione: getVisibleValue(
@@ -173,6 +187,9 @@ export async function GET() {
       players,
       youthCoachLevel,
       scoutingRangeWidth: getAcademyRangeWidth(youthCoachLevel),
+      academyCapacity: MAX_ACADEMY_PLAYERS,
+      nextAcademyCandidateAt:
+        nextAcademyCandidateAt?.toISOString() ?? null,
     });
   } catch (error) {
     console.error(
@@ -419,4 +436,101 @@ export async function POST(request: Request) {
       }
     );
   }
+}
+
+export async function DELETE(request: Request) {
+  try {
+    const access = await getApiClubAccess();
+
+    if (!access.granted) {
+      return access.response;
+    }
+
+    const { clubId } = access;
+    const body: unknown = await request.json();
+    const playerId = readPlayerId(body);
+
+    if (!Number.isInteger(playerId) || playerId <= 0) {
+      return NextResponse.json(
+        {
+          error: "Identificativo del giovane non valido.",
+        },
+        {
+          status: 400,
+        }
+      );
+    }
+
+    const academyPlayer =
+      await prisma.academyPlayer.findFirst({
+        where: {
+          id: playerId,
+          clubId,
+        },
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+        },
+      });
+
+    if (!academyPlayer) {
+      return NextResponse.json(
+        {
+          error:
+            "Il giovane selezionato non è stato trovato.",
+        },
+        {
+          status: 404,
+        }
+      );
+    }
+
+    const deletion =
+      await prisma.academyPlayer.deleteMany({
+        where: {
+          id: academyPlayer.id,
+          clubId,
+        },
+      });
+
+    if (deletion.count === 0) {
+      return NextResponse.json(
+        {
+          error:
+            "Il giovane non è più presente in Accademia.",
+        },
+        {
+          status: 409,
+        }
+      );
+    }
+
+    return NextResponse.json({
+      message: `${academyPlayer.firstName} ${academyPlayer.lastName} è stato allontanato dall'Accademia.`,
+    });
+  } catch (error) {
+    console.error(
+      "Errore durante l'allontanamento del giovane:",
+      error
+    );
+
+    return NextResponse.json(
+      {
+        error:
+          "Impossibile allontanare il giovane dall'Accademia.",
+      },
+      {
+        status: 500,
+      }
+    );
+  }
+}
+
+function readPlayerId(body: unknown) {
+  return typeof body === "object" &&
+    body !== null &&
+    "playerId" in body
+    ? Number((body as { playerId: unknown }).playerId)
+    : Number.NaN;
 }

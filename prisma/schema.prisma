@@ -32,7 +32,8 @@ model Club {
   trainerLevel    Int @default(1)
   youthCoachLevel Int @default(1)
 
-  academyInitialized Boolean @default(false)
+  academyInitialized     Boolean   @default(false)
+  nextAcademyCandidateAt DateTime?
 
   players           Player[]
   academyPlayers    AcademyPlayer[]

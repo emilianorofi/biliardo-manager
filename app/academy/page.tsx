@@ -23,7 +23,7 @@ const characteristics: {
   { key: "misura", label: "Misura" },
 ];
 
-type PromotionResponse = {
+type AcademyActionResponse = {
   message?: string;
   error?: string;
   player?: {
@@ -49,8 +49,23 @@ export default function AcademyPage() {
   const [promotingPlayerId, setPromotingPlayerId] =
     useState<number | null>(null);
 
+  const [dismissingPlayerId, setDismissingPlayerId] =
+    useState<number | null>(null);
+
   const [youthCoachLevel, setYouthCoachLevel] = useState(1);
   const [scoutingRangeWidth, setScoutingRangeWidth] = useState(16);
+  const [academyCapacity, setAcademyCapacity] = useState(10);
+  const [nextAcademyCandidateAt, setNextAcademyCandidateAt] =
+    useState<string | null>(null);
+  const [currentTime, setCurrentTime] = useState(() => Date.now());
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setCurrentTime(Date.now());
+    }, 30_000);
+
+    return () => window.clearInterval(timer);
+  }, []);
 
   useEffect(() => {
     let isCancelled = false;
@@ -74,12 +89,18 @@ export default function AcademyPage() {
           players: AcademyPlayer[];
           youthCoachLevel: number;
           scoutingRangeWidth: number;
+          academyCapacity: number;
+          nextAcademyCandidateAt: string | null;
         } = await response.json();
 
         if (!isCancelled) {
           setPlayers(data.players);
           setYouthCoachLevel(data.youthCoachLevel);
           setScoutingRangeWidth(data.scoutingRangeWidth);
+          setAcademyCapacity(data.academyCapacity);
+          setNextAcademyCandidateAt(
+            data.nextAcademyCandidateAt
+          );
         }
       } catch (loadError: unknown) {
         if (isCancelled) {
@@ -107,6 +128,9 @@ export default function AcademyPage() {
 
   const promotablePlayers = players.filter(
     (player) => player.age >= 16
+  ).length;
+  const decisionPlayers = players.filter(
+    (player) => player.decisionRequired
   ).length;
 
   const totalScoutingSteps = players.reduce(
@@ -161,7 +185,7 @@ export default function AcademyPage() {
         }),
       });
 
-      const data: PromotionResponse =
+      const data: AcademyActionResponse =
         await response.json();
 
       if (!response.ok) {
@@ -189,6 +213,69 @@ export default function AcademyPage() {
       );
     } finally {
       setPromotingPlayerId(null);
+    }
+  }
+
+  async function dismissPlayer(playerId: number) {
+    const player = players.find(
+      (item) => item.id === playerId
+    );
+
+    if (!player) {
+      return;
+    }
+
+    const confirmed = window.confirm(
+      player.decisionRequired
+        ? `Vuoi allontanare ${player.firstName} ${player.lastName}? A 17 anni devi promuoverlo o liberare il posto prima della fine della prossima stagione.`
+        : `Vuoi allontanare ${player.firstName} ${player.lastName} dall'Accademia?`
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      setDismissingPlayerId(playerId);
+      setActionError(null);
+
+      const response = await fetch("/api/academy", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          playerId,
+        }),
+      });
+      const data: AcademyActionResponse =
+        await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.error ??
+            "Impossibile allontanare il giovane."
+        );
+      }
+
+      setPlayers((currentPlayers) =>
+        currentPlayers.filter(
+          (item) => item.id !== playerId
+        )
+      );
+
+      window.alert(
+        data.message ??
+          `${player.firstName} ${player.lastName} è stato allontanato dall'Accademia.`
+      );
+    } catch (dismissalError: unknown) {
+      setActionError(
+        dismissalError instanceof Error
+          ? dismissalError.message
+          : "Errore durante l'allontanamento."
+      );
+    } finally {
+      setDismissingPlayerId(null);
     }
   }
 
@@ -236,11 +323,15 @@ export default function AcademyPage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-            <HeaderValue label="Giovani" value={players.length.toString()} />
-            <HeaderValue label="Età" value="14–16 anni" />
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
+            <HeaderValue label="Capienza" value={`${players.length}/${academyCapacity}`} />
+            <HeaderValue label="Età ingresso" value="14–16 anni" />
             <HeaderValue label="Promuovibili" value={promotablePlayers.toString()} highlight />
-            <HeaderValue label="Prossima scoperta" value="Mer · 21:00" />
+            <HeaderValue label="Decisioni" value={decisionPlayers.toString()} danger={decisionPlayers > 0} />
+            <HeaderValue
+              label="Nuovo ingresso"
+              value={formatCountdown(nextAcademyCandidateAt, currentTime)}
+            />
           </div>
         </div>
       </header>
@@ -259,6 +350,19 @@ export default function AcademyPage() {
           >
             ×
           </button>
+        </div>
+      )}
+
+      {decisionPlayers > 0 && (
+        <div className="rounded-xl border border-orange-400/30 bg-orange-400/[0.08] p-3">
+          <p className="text-sm font-black text-orange-200">
+            {decisionPlayers === 1
+              ? "1 giovane richiede una decisione"
+              : `${decisionPlayers} giovani richiedono una decisione`}
+          </p>
+          <p className="mt-1 text-xs text-orange-100/70">
+            Promuovili oppure allontanali entro la fine della prossima stagione. A 18 anni saranno rilasciati automaticamente.
+          </p>
         </div>
       )}
 
@@ -297,15 +401,19 @@ export default function AcademyPage() {
                 key={player.id}
                 player={player}
                 isPromoting={promotingPlayerId === player.id}
-                isActionLocked={promotingPlayerId !== null}
+                isDismissing={dismissingPlayerId === player.id}
+                isActionLocked={promotingPlayerId !== null || dismissingPlayerId !== null}
                 onPromote={promotePlayer}
+                onDismiss={dismissPlayer}
               />
             ))}
           </div>
         ) : (
           <div className="mt-3 rounded-xl border border-dashed border-white/10 p-8 text-center">
             <p className="font-semibold text-white">Nessun giovane in Accademia</p>
-            <p className="mt-1 text-sm text-zinc-500">I nuovi talenti appariranno qui.</p>
+            <p className="mt-1 text-sm text-zinc-500">
+              Il prossimo candidato arriverà {formatCountdown(nextAcademyCandidateAt, currentTime)}.
+            </p>
           </div>
         )}
       </section>
@@ -325,11 +433,11 @@ export default function AcademyPage() {
         </summary>
 
         <div className="grid gap-2 border-t border-white/10 p-4 text-xs text-zinc-300 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5">
-          <Rule label="Età" value="I giovani restano in Accademia dai 14 ai 16 anni." />
-          <Rule label="Prime 9 settimane" value="Ogni settimana compare il range di una nuova caratteristica." />
-          <Rule label="Dalla 10ª settimana" value="Ogni settimana un range viene sostituito dal valore reale." />
-          <Rule label="Promozione" value="Dai 16 anni possono entrare nella prima squadra." />
-          <Rule label="Talento" value="Rimane nascosto e influenza soltanto in parte la crescita." />
+          <Rule label="Ingresso" value="Ogni mercoledì alle 21:00 arriva un giovane casuale di 14–16 anni, se c'è posto." />
+          <Rule label="Capienza" value="L'Accademia contiene al massimo 10 giovani. Se è piena, la candidatura della settimana viene persa." />
+          <Rule label="Scouting" value="All'ingresso vedi 3 stime; dopo 105 giorni tutte le 9 caratteristiche sono valori reali." />
+          <Rule label="Promozione" value="Dai 16 anni un giovane può entrare nella prima squadra." />
+          <Rule label="Decisione" value="A 17 anni devi promuoverlo o allontanarlo. A 18 viene rilasciato automaticamente." />
         </div>
       </details>
     </main>
@@ -340,15 +448,17 @@ function HeaderValue({
   label,
   value,
   highlight = false,
+  danger = false,
 }: {
   label: string;
   value: string;
   highlight?: boolean;
+  danger?: boolean;
 }) {
   return (
     <div className="rounded-xl border border-zinc-700 bg-black/15 px-3 py-2">
       <p className="text-[8px] font-bold uppercase tracking-wider text-zinc-500">{label}</p>
-      <p className={`mt-1 text-xs font-black ${highlight ? "text-amber-300" : "text-zinc-200"}`}>
+      <p className={`mt-1 text-xs font-black ${danger ? "text-orange-300" : highlight ? "text-amber-300" : "text-zinc-200"}`}>
         {value}
       </p>
     </div>
@@ -358,13 +468,17 @@ function HeaderValue({
 function AcademyPlayerCard({
   player,
   isPromoting,
+  isDismissing,
   isActionLocked,
   onPromote,
+  onDismiss,
 }: {
   player: AcademyPlayer;
   isPromoting: boolean;
+  isDismissing: boolean;
   isActionLocked: boolean;
   onPromote: (playerId: number) => void;
+  onDismiss: (playerId: number) => void;
 }) {
   const scoutingSteps = player.estimatedAttributes + player.revealedAttributes;
   const progress = Math.round((scoutingSteps / (player.totalAttributes * 2)) * 100);
@@ -377,7 +491,7 @@ function AcademyPlayerCard({
         : "Scouting completo";
 
   return (
-    <article className={`rounded-xl border p-3 ${canPromote ? "border-yellow-400/25 bg-yellow-400/[0.025]" : "border-white/10 bg-[#101010]"}`}>
+    <article className={`rounded-xl border p-3 ${player.decisionRequired ? "border-orange-400/35 bg-orange-400/[0.04]" : canPromote ? "border-yellow-400/25 bg-yellow-400/[0.025]" : "border-white/10 bg-[#101010]"}`}>
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="truncate font-black text-white">
@@ -388,10 +502,21 @@ function AcademyPlayerCard({
           </p>
         </div>
 
-        <span className={`shrink-0 rounded-full border px-2 py-1 text-[9px] font-black uppercase ${canPromote ? "border-yellow-400/30 bg-yellow-400/10 text-yellow-300" : "border-white/10 bg-white/[0.03] text-zinc-500"}`}>
-          {canPromote ? "Promuovibile" : "In crescita"}
+        <span className={`shrink-0 rounded-full border px-2 py-1 text-[9px] font-black uppercase ${player.decisionRequired ? "border-orange-400/40 bg-orange-400/10 text-orange-200" : canPromote ? "border-yellow-400/30 bg-yellow-400/10 text-yellow-300" : "border-white/10 bg-white/[0.03] text-zinc-500"}`}>
+          {player.decisionRequired ? "Decisione" : canPromote ? "Promuovibile" : "In crescita"}
         </span>
       </div>
+
+      {player.decisionRequired && (
+        <div className="mt-3 rounded-lg border border-orange-400/20 bg-orange-400/[0.07] px-2.5 py-2">
+          <p className="text-[10px] font-black uppercase tracking-wider text-orange-200">
+            Scadenza: fine della prossima stagione
+          </p>
+          <p className="mt-0.5 text-[10px] text-orange-100/60">
+            Se resta qui fino ai 18 anni verrà rilasciato automaticamente.
+          </p>
+        </div>
+      )}
 
       <div className="mt-3 grid grid-cols-3 gap-1.5">
         {characteristics.map((characteristic) => {
@@ -423,18 +548,29 @@ function AcademyPlayerCard({
           </div>
         </div>
 
-        {canPromote ? (
+        <div className="flex shrink-0 items-center gap-1.5">
           <button
             type="button"
-            onClick={() => onPromote(player.id)}
+            onClick={() => onDismiss(player.id)}
             disabled={isActionLocked}
-            className="shrink-0 rounded-lg bg-yellow-400 px-3 py-1.5 text-xs font-black text-black transition hover:bg-yellow-300 disabled:cursor-not-allowed disabled:opacity-50"
+            className="rounded-lg border border-red-400/25 px-2.5 py-1.5 text-xs font-black text-red-300 transition hover:border-red-300/50 hover:bg-red-400/10 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {isPromoting ? "Attendi..." : "Promuovi"}
+            {isDismissing ? "Attendi..." : "Allontana"}
           </button>
-        ) : (
-          <span className="shrink-0 pb-0.5 text-[10px] font-semibold text-zinc-600">Dai 16 anni</span>
-        )}
+
+          {canPromote ? (
+            <button
+              type="button"
+              onClick={() => onPromote(player.id)}
+              disabled={isActionLocked}
+              className="rounded-lg bg-yellow-400 px-3 py-1.5 text-xs font-black text-black transition hover:bg-yellow-300 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {isPromoting ? "Attendi..." : "Promuovi"}
+            </button>
+          ) : (
+            <span className="pb-0.5 text-[10px] font-semibold text-zinc-600">Dai 16 anni</span>
+          )}
+        </div>
       </div>
     </article>
   );
@@ -465,4 +601,39 @@ function getAttributeValueColor(value: AcademyAttributeValue) {
   if (value === null) return "text-zinc-600";
   if (typeof value === "number") return getAttributeColor(value);
   return "text-sky-300";
+}
+
+function formatCountdown(
+  value: string | null,
+  currentTime: number
+) {
+  if (!value) {
+    return "da programmare";
+  }
+
+  const remainingMilliseconds =
+    new Date(value).getTime() - currentTime;
+
+  if (remainingMilliseconds <= 0) {
+    return "in arrivo";
+  }
+
+  const totalMinutes = Math.ceil(
+    remainingMilliseconds / 60_000
+  );
+  const days = Math.floor(totalMinutes / (24 * 60));
+  const hours = Math.floor(
+    (totalMinutes % (24 * 60)) / 60
+  );
+  const minutes = totalMinutes % 60;
+
+  if (days > 0) {
+    return `${days}g ${hours}h`;
+  }
+
+  if (hours > 0) {
+    return `${hours}h ${minutes}m`;
+  }
+
+  return `${minutes}m`;
 }

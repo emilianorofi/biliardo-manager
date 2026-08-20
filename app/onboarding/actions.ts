@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 
 import type { Prisma } from "@/generated/prisma/client";
 import type { ClubOnboardingActionState } from "@/app/onboarding/action-state";
+import { getNextAcademyScoutingAt } from "@/lib/academy-scouting";
 import { getAuthenticatedUser } from "@/lib/auth";
 import { getFreeAgentDeadline } from "@/lib/market-rules";
 import {
@@ -376,6 +377,8 @@ async function replaceAiClub({
       trainerLevel: 1,
       youthCoachLevel: 1,
       academyInitialized: true,
+      nextAcademyCandidateAt:
+        getNextAcademyScoutingAt(now),
     },
   });
 

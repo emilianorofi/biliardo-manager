@@ -12,6 +12,7 @@ export const academyPlayers: AcademyPlayer[] = [
     revealedAttributes: 0,
     totalAttributes: 9,
     nextScoutingAt: null,
+    decisionRequired: false,
 
     attributes: {
       precisione: { minimum: 43, maximum: 59 },
@@ -36,6 +37,7 @@ export const academyPlayers: AcademyPlayer[] = [
     revealedAttributes: 0,
     totalAttributes: 9,
     nextScoutingAt: null,
+    decisionRequired: false,
 
     attributes: {
       precisione: { minimum: 38, maximum: 54 },
@@ -60,6 +62,7 @@ export const academyPlayers: AcademyPlayer[] = [
     revealedAttributes: 0,
     totalAttributes: 9,
     nextScoutingAt: null,
+    decisionRequired: false,
 
     attributes: {
       precisione: null,
