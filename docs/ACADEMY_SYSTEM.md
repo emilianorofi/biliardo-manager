@@ -2,12 +2,12 @@
 
 ## Ingresso dei giovani
 
-- Ogni mercoledì alle 21:00 (fuso `Europe/Rome`) arriva un candidato.
+- Ogni martedì alle 21:00 (fuso `Europe/Rome`) arriva un candidato.
 - L'età di ingresso è casuale tra 14 e 16 anni.
 - L'Accademia contiene al massimo 10 giovani.
 - Se al momento dell'ingresso i 10 posti sono occupati, la candidatura viene persa e il controllo riparte dalla settimana successiva.
 
-La prossima scadenza è salvata in `Club.nextAcademyCandidateAt`. L'elaborazione avviene in transazione quando viene caricata l'Accademia e recupera anche eventuali scadenze trascorse.
+La prossima scadenza è salvata in `Club.nextAcademyCandidateAt`. Il motore temporale la elabora automaticamente e recupera in ordine anche eventuali scadenze trascorse.
 
 ## Scouting
 

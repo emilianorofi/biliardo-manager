@@ -3,8 +3,10 @@ import {
   TRAINING_SKILLS,
   type TrainingFocus,
 } from "@/lib/training-engine";
-
-const ROME_TIME_ZONE = "Europe/Rome";
+import {
+  ACADEMY_EVENT,
+  getNextRomeWeeklyDate,
+} from "@/lib/rome-calendar";
 
 const RANGE_WIDTH_BY_COACH_LEVEL: Record<number, number> = {
   1: 16,
@@ -60,35 +62,10 @@ export function getAcademyEstimatedRange({
 }
 
 export function getNextAcademyScoutingAt(from = new Date()) {
-  const local = getZonedParts(from);
-  const localDay = new Date(
-    Date.UTC(local.year, local.month - 1, local.day)
+  return getNextRomeWeeklyDate(
+    from,
+    ACADEMY_EVENT
   );
-  const daysUntilWednesday = (3 - localDay.getUTCDay() + 7) % 7;
-  const candidateDay = new Date(localDay);
-
-  candidateDay.setUTCDate(
-    candidateDay.getUTCDate() + daysUntilWednesday
-  );
-
-  let candidate = zonedDateTimeToUtc({
-    year: candidateDay.getUTCFullYear(),
-    month: candidateDay.getUTCMonth() + 1,
-    day: candidateDay.getUTCDate(),
-    hour: 21,
-  });
-
-  if (candidate.getTime() <= from.getTime()) {
-    candidateDay.setUTCDate(candidateDay.getUTCDate() + 7);
-    candidate = zonedDateTimeToUtc({
-      year: candidateDay.getUTCFullYear(),
-      month: candidateDay.getUTCMonth() + 1,
-      day: candidateDay.getUTCDate(),
-      hour: 21,
-    });
-  }
-
-  return candidate;
 }
 
 export async function advanceAcademyScouting(
@@ -106,7 +83,9 @@ export async function advanceAcademyScouting(
   `;
 
   if (duePlayers.length === 0) {
-    return;
+    return {
+      advancedPlayers: 0,
+    };
   }
 
   const players = await transaction.academyPlayer.findMany({
@@ -173,6 +152,11 @@ export async function advanceAcademyScouting(
       },
     });
   }
+
+  return {
+    advancedPlayers:
+      players.length,
+  };
 }
 
 function normalizeKeys(values: string[]) {
@@ -196,54 +180,4 @@ function stableHash(value: string) {
   }
 
   return hash;
-}
-
-function getZonedParts(value: Date) {
-  const parts = new Intl.DateTimeFormat("en-CA", {
-    timeZone: ROME_TIME_ZONE,
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-    hourCycle: "h23",
-  }).formatToParts(value);
-  const read = (type: Intl.DateTimeFormatPartTypes) =>
-    Number(parts.find((part) => part.type === type)?.value ?? 0);
-
-  return {
-    year: read("year"),
-    month: read("month"),
-    day: read("day"),
-    hour: read("hour"),
-    minute: read("minute"),
-    second: read("second"),
-  };
-}
-
-function zonedDateTimeToUtc({
-  year,
-  month,
-  day,
-  hour,
-}: {
-  year: number;
-  month: number;
-  day: number;
-  hour: number;
-}) {
-  const utcGuess = new Date(Date.UTC(year, month - 1, day, hour));
-  const represented = getZonedParts(utcGuess);
-  const representedTimestamp = Date.UTC(
-    represented.year,
-    represented.month - 1,
-    represented.day,
-    represented.hour,
-    represented.minute,
-    represented.second
-  );
-  const offset = representedTimestamp - utcGuess.getTime();
-
-  return new Date(utcGuess.getTime() - offset);
 }

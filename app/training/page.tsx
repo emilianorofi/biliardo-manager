@@ -468,7 +468,7 @@ export default function TrainingPage() {
             <div className="grid gap-2 sm:grid-cols-3">
               <HeaderValue
                 label="Prossima sessione"
-                value="Mercoledì · 21:00"
+                value="Lunedì · 12:00"
                 highlight
               />
 
@@ -554,7 +554,7 @@ export default function TrainingPage() {
             </h2>
 
             <p className="mt-0.5 text-xs text-zinc-400">
-              Seleziona due caratteristiche diverse entro mercoledì alle 20:59.
+              Seleziona due caratteristiche diverse entro lunedì alle 11:59.
             </p>
             </div>
 

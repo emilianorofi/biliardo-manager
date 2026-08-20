@@ -433,7 +433,7 @@ export default function AcademyPage() {
         </summary>
 
         <div className="grid gap-2 border-t border-white/10 p-4 text-xs text-zinc-300 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5">
-          <Rule label="Ingresso" value="Ogni mercoledì alle 21:00 arriva un giovane casuale di 14–16 anni, se c'è posto." />
+          <Rule label="Ingresso" value="Ogni martedì alle 21:00 arriva un giovane casuale di 14–16 anni, se c'è posto." />
           <Rule label="Capienza" value="L'Accademia contiene al massimo 10 giovani. Se è piena, la candidatura della settimana viene persa." />
           <Rule label="Scouting" value="All'ingresso vedi 3 stime; dopo 105 giorni tutte le 9 caratteristiche sono valori reali." />
           <Rule label="Promozione" value="Dai 16 anni un giovane può entrare nella prima squadra." />

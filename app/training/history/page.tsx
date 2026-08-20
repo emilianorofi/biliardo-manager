@@ -45,6 +45,18 @@ type TrainingResult = {
   overallBefore: number;
   overallDecline: number;
   overallAfter: number;
+
+  experienceBefore: number;
+  experienceGain: number;
+  experienceAfter: number;
+
+  formBefore: number;
+  formChange: number;
+  formAfter: number;
+
+  moraleBefore: number;
+  moraleChange: number;
+  moraleAfter: number;
 };
 
 type TrainingSession = {
@@ -287,7 +299,7 @@ export default function TrainingHistoryPage() {
                   </summary>
 
                   <div className="overflow-x-auto border-t border-white/10">
-                    <table className="w-full min-w-[820px] text-left">
+                    <table className="w-full min-w-[980px] text-left">
                       <thead className="border-b border-white/10 bg-white/[0.02]">
                         <tr className="text-xs uppercase tracking-wider text-zinc-500">
                           <th className="px-4 py-2.5">
@@ -312,6 +324,10 @@ export default function TrainingHistoryPage() {
 
                           <th className="px-4 py-2.5">
                             Overall
+                          </th>
+
+                          <th className="px-4 py-2.5">
+                            Stato
                           </th>
                         </tr>
                       </thead>
@@ -441,6 +457,37 @@ export default function TrainingHistoryPage() {
                                   )}
                                 </p>
                               </td>
+
+                              <td className="px-4 py-2.5 text-[10px] text-zinc-400">
+                                <p>
+                                  Esperienza{" "}
+                                  {formatValue(
+                                    result.experienceBefore
+                                  )}{" "}
+                                  →{" "}
+                                  {formatValue(
+                                    result.experienceAfter
+                                  )}{" "}
+                                  <span className="font-bold text-sky-300">
+                                    +
+                                    {formatValue(
+                                      result.experienceGain
+                                    )}
+                                  </span>
+                                </p>
+
+                                <p className={getChangeTone(result.formChange)}>
+                                  Forma{" "}
+                                  {result.formBefore} → {result.formAfter}{" "}
+                                  ({formatSignedInteger(result.formChange)})
+                                </p>
+
+                                <p className={getChangeTone(result.moraleChange)}>
+                                  Morale{" "}
+                                  {result.moraleBefore} → {result.moraleAfter}{" "}
+                                  ({formatSignedInteger(result.moraleChange)})
+                                </p>
+                              </td>
                             </tr>
                           )
                         )}
@@ -566,4 +613,13 @@ function getChangeTone(
   }
 
   return "text-zinc-400";
+}
+
+function formatSignedInteger(
+  value: number
+) {
+  if (value > 0) return `+${value}`;
+  if (value < 0) return `−${Math.abs(value)}`;
+
+  return "0";
 }

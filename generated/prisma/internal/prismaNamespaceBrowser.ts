@@ -61,6 +61,7 @@ export const ModelName = {
   TrainingPlan: 'TrainingPlan',
   TrainingSession: 'TrainingSession',
   TrainingResult: 'TrainingResult',
+  ClubWeeklyUpdate: 'ClubWeeklyUpdate',
   GameEvent: 'GameEvent',
   Season: 'Season',
   League: 'League',
@@ -107,6 +108,7 @@ export const ClubScalarFieldEnum = {
   youthCoachLevel: 'youthCoachLevel',
   academyInitialized: 'academyInitialized',
   nextAcademyCandidateAt: 'nextAcademyCandidateAt',
+  nextWeeklyUpdateAt: 'nextWeeklyUpdateAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -283,10 +285,38 @@ export const TrainingResultScalarFieldEnum = {
   overallBefore: 'overallBefore',
   overallDecline: 'overallDecline',
   overallAfter: 'overallAfter',
+  experienceBefore: 'experienceBefore',
+  experienceGain: 'experienceGain',
+  experienceAfter: 'experienceAfter',
+  formBefore: 'formBefore',
+  formChange: 'formChange',
+  formAfter: 'formAfter',
+  moraleBefore: 'moraleBefore',
+  moraleChange: 'moraleChange',
+  moraleAfter: 'moraleAfter',
   createdAt: 'createdAt'
 } as const
 
 export type TrainingResultScalarFieldEnum = (typeof TrainingResultScalarFieldEnum)[keyof typeof TrainingResultScalarFieldEnum]
+
+
+export const ClubWeeklyUpdateScalarFieldEnum = {
+  id: 'id',
+  clubId: 'clubId',
+  weekKey: 'weekKey',
+  income: 'income',
+  expenses: 'expenses',
+  netResult: 'netResult',
+  balanceBefore: 'balanceBefore',
+  balanceAfter: 'balanceAfter',
+  scheduledAt: 'scheduledAt',
+  processedAt: 'processedAt',
+  newsScheduledAt: 'newsScheduledAt',
+  newsPublishedAt: 'newsPublishedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type ClubWeeklyUpdateScalarFieldEnum = (typeof ClubWeeklyUpdateScalarFieldEnum)[keyof typeof ClubWeeklyUpdateScalarFieldEnum]
 
 
 export const GameEventScalarFieldEnum = {

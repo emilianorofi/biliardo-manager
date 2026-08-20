@@ -3,6 +3,9 @@ import { NextResponse } from "next/server";
 import { getApiClubAccess } from "@/lib/api-club-access";
 
 import { prisma } from "@/lib/prisma";
+import {
+  processGameClock,
+} from "@/lib/game-clock";
 
 export const dynamic =
   "force-dynamic";
@@ -248,6 +251,55 @@ export async function POST(
     }
 
     const { clubId } = access;
+    const now = new Date();
+
+    await processGameClock(now);
+
+    const nextFixture =
+      await prisma.leagueFixture.findFirst({
+        where: {
+          status: "SCHEDULED",
+          league: {
+            status: "ACTIVE",
+          },
+          OR: [
+            {
+              homeClubId: clubId,
+            },
+            {
+              awayClubId: clubId,
+            },
+          ],
+        },
+        select: {
+          scheduledAt: true,
+        },
+        orderBy: {
+          scheduledAt: "asc",
+        },
+      });
+    const millisecondsToFixture =
+      nextFixture
+        ? nextFixture.scheduledAt.getTime() -
+          now.getTime()
+        : Number.POSITIVE_INFINITY;
+
+    if (
+      millisecondsToFixture > 0 &&
+      millisecondsToFixture <=
+        60 * 1000
+    ) {
+      return NextResponse.json(
+        {
+          error:
+            "La formazione è bloccata nell'ultimo minuto prima della partita.",
+        },
+        {
+          status: 409,
+        }
+      );
+    }
+
     const body: unknown =
       await request.json();
 
@@ -367,8 +419,7 @@ export async function POST(
       );
     }
 
-    const savedAt =
-      new Date();
+    const savedAt = now;
 
     const savedFormation =
       await prisma.formation.upsert({

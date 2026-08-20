@@ -407,6 +407,7 @@ export const ModelName = {
   TrainingPlan: 'TrainingPlan',
   TrainingSession: 'TrainingSession',
   TrainingResult: 'TrainingResult',
+  ClubWeeklyUpdate: 'ClubWeeklyUpdate',
   GameEvent: 'GameEvent',
   Season: 'Season',
   League: 'League',
@@ -430,7 +431,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "club" | "manager" | "player" | "transferListing" | "transferBid" | "academyPlayer" | "formation" | "trainingPlan" | "trainingSession" | "trainingResult" | "gameEvent" | "season" | "league" | "leagueEntry" | "leagueFixture" | "leagueFixtureGame" | "playerFixtureAppearance" | "playerGamePerformance"
+    modelProps: "club" | "manager" | "player" | "transferListing" | "transferBid" | "academyPlayer" | "formation" | "trainingPlan" | "trainingSession" | "trainingResult" | "clubWeeklyUpdate" | "gameEvent" | "season" | "league" | "leagueEntry" | "leagueFixture" | "leagueFixtureGame" | "playerFixtureAppearance" | "playerGamePerformance"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1174,6 +1175,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    ClubWeeklyUpdate: {
+      payload: Prisma.$ClubWeeklyUpdatePayload<ExtArgs>
+      fields: Prisma.ClubWeeklyUpdateFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ClubWeeklyUpdateFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClubWeeklyUpdatePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ClubWeeklyUpdateFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClubWeeklyUpdatePayload>
+        }
+        findFirst: {
+          args: Prisma.ClubWeeklyUpdateFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClubWeeklyUpdatePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ClubWeeklyUpdateFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClubWeeklyUpdatePayload>
+        }
+        findMany: {
+          args: Prisma.ClubWeeklyUpdateFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClubWeeklyUpdatePayload>[]
+        }
+        create: {
+          args: Prisma.ClubWeeklyUpdateCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClubWeeklyUpdatePayload>
+        }
+        createMany: {
+          args: Prisma.ClubWeeklyUpdateCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ClubWeeklyUpdateCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClubWeeklyUpdatePayload>[]
+        }
+        delete: {
+          args: Prisma.ClubWeeklyUpdateDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClubWeeklyUpdatePayload>
+        }
+        update: {
+          args: Prisma.ClubWeeklyUpdateUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClubWeeklyUpdatePayload>
+        }
+        deleteMany: {
+          args: Prisma.ClubWeeklyUpdateDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ClubWeeklyUpdateUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ClubWeeklyUpdateUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClubWeeklyUpdatePayload>[]
+        }
+        upsert: {
+          args: Prisma.ClubWeeklyUpdateUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClubWeeklyUpdatePayload>
+        }
+        aggregate: {
+          args: Prisma.ClubWeeklyUpdateAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateClubWeeklyUpdate>
+        }
+        groupBy: {
+          args: Prisma.ClubWeeklyUpdateGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ClubWeeklyUpdateGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ClubWeeklyUpdateCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ClubWeeklyUpdateCountAggregateOutputType> | number
+        }
+      }
+    }
     GameEvent: {
       payload: Prisma.$GameEventPayload<ExtArgs>
       fields: Prisma.GameEventFieldRefs
@@ -1825,6 +1900,7 @@ export const ClubScalarFieldEnum = {
   youthCoachLevel: 'youthCoachLevel',
   academyInitialized: 'academyInitialized',
   nextAcademyCandidateAt: 'nextAcademyCandidateAt',
+  nextWeeklyUpdateAt: 'nextWeeklyUpdateAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -2001,10 +2077,38 @@ export const TrainingResultScalarFieldEnum = {
   overallBefore: 'overallBefore',
   overallDecline: 'overallDecline',
   overallAfter: 'overallAfter',
+  experienceBefore: 'experienceBefore',
+  experienceGain: 'experienceGain',
+  experienceAfter: 'experienceAfter',
+  formBefore: 'formBefore',
+  formChange: 'formChange',
+  formAfter: 'formAfter',
+  moraleBefore: 'moraleBefore',
+  moraleChange: 'moraleChange',
+  moraleAfter: 'moraleAfter',
   createdAt: 'createdAt'
 } as const
 
 export type TrainingResultScalarFieldEnum = (typeof TrainingResultScalarFieldEnum)[keyof typeof TrainingResultScalarFieldEnum]
+
+
+export const ClubWeeklyUpdateScalarFieldEnum = {
+  id: 'id',
+  clubId: 'clubId',
+  weekKey: 'weekKey',
+  income: 'income',
+  expenses: 'expenses',
+  netResult: 'netResult',
+  balanceBefore: 'balanceBefore',
+  balanceAfter: 'balanceAfter',
+  scheduledAt: 'scheduledAt',
+  processedAt: 'processedAt',
+  newsScheduledAt: 'newsScheduledAt',
+  newsPublishedAt: 'newsPublishedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type ClubWeeklyUpdateScalarFieldEnum = (typeof ClubWeeklyUpdateScalarFieldEnum)[keyof typeof ClubWeeklyUpdateScalarFieldEnum]
 
 
 export const GameEventScalarFieldEnum = {
@@ -2399,6 +2503,7 @@ export type GlobalOmitConfig = {
   trainingPlan?: Prisma.TrainingPlanOmit
   trainingSession?: Prisma.TrainingSessionOmit
   trainingResult?: Prisma.TrainingResultOmit
+  clubWeeklyUpdate?: Prisma.ClubWeeklyUpdateOmit
   gameEvent?: Prisma.GameEventOmit
   season?: Prisma.SeasonOmit
   league?: Prisma.LeagueOmit

@@ -127,6 +127,7 @@ function getEventAppearance(
 
   switch (type) {
     case "Allenamento":
+    case "Aggiornamento":
       return {
         icon: (
           <TrendingUp

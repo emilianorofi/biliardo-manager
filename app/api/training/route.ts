@@ -4,6 +4,9 @@ import { getApiClubAccess } from "@/lib/api-club-access";
 
 import { prisma } from "@/lib/prisma";
 import {
+  processGameClock,
+} from "@/lib/game-clock";
+import {
   calculateLeagueTrainingUsage,
 } from "@/lib/training-usage";
 import {
@@ -96,6 +99,10 @@ export async function GET() {
     }
 
     const { clubId } = access;
+    const now = new Date();
+
+    await processGameClock(now);
+
     const club =
       await prisma.club.findUnique({
         where: {
@@ -242,6 +249,10 @@ export async function GET() {
 
       trainingPlan,
 
+      nextWeeklyUpdateAt:
+        club.nextWeeklyUpdateAt
+          ?.toISOString() ?? null,
+
       formation: {
         slotAPlayerId:
           club.formation
@@ -288,6 +299,10 @@ export async function POST(
     }
 
     const { clubId } = access;
+    const now = new Date();
+
+    await processGameClock(now);
+
     const body: unknown =
       await request.json();
 
@@ -363,6 +378,9 @@ export async function POST(
         select: {
           id:
             true,
+
+          nextWeeklyUpdateAt:
+            true,
         },
       });
 
@@ -378,8 +396,29 @@ export async function POST(
       );
     }
 
-    const savedAt =
-      new Date();
+    const millisecondsToUpdate =
+      clubExists.nextWeeklyUpdateAt
+        ? clubExists.nextWeeklyUpdateAt.getTime() -
+          now.getTime()
+        : Number.POSITIVE_INFINITY;
+
+    if (
+      millisecondsToUpdate > 0 &&
+      millisecondsToUpdate <=
+        60 * 1000
+    ) {
+      return NextResponse.json(
+        {
+          error:
+            "Il programma è bloccato nell'ultimo minuto prima dell'aggiornamento settimanale.",
+        },
+        {
+          status: 409,
+        }
+      );
+    }
+
+    const savedAt = now;
 
     const trainingPlan =
       await prisma.trainingPlan.upsert({

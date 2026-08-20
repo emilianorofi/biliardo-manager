@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import { usePathname } from "next/navigation";
 
 import Sidebar from "@/app/components/Sidebar";
+import GameClockPulse from "@/app/components/GameClockPulse";
 
 const PAGES_WITHOUT_GAME_SHELL = [
   "/",
@@ -28,6 +29,7 @@ export default function AppShell({
 
   return (
     <div className="flex min-h-screen">
+      <GameClockPulse />
       <Sidebar />
       <main className="min-w-0 flex-1 bg-[#0b1712] p-4 lg:p-5">
         {children}

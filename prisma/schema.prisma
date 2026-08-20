@@ -34,12 +34,14 @@ model Club {
 
   academyInitialized     Boolean   @default(false)
   nextAcademyCandidateAt DateTime?
+  nextWeeklyUpdateAt     DateTime?
 
   players           Player[]
   academyPlayers    AcademyPlayer[]
   formation         Formation?
   trainingPlan      TrainingPlan?
   trainingSessions  TrainingSession[]
+  weeklyUpdates     ClubWeeklyUpdate[]
   gameEvents        GameEvent[]
   playerAppearances PlayerFixtureAppearance[]
 
@@ -298,24 +300,63 @@ model TrainingResult {
   usage     String
   intensity Int
 
-  primaryBefore Float
-  primaryGain   Float
+  primaryBefore  Float
+  primaryGain    Float
   primaryDecline Float @default(0)
-  primaryAfter  Float
+  primaryAfter   Float
 
-  secondaryBefore Float
-  secondaryGain   Float
+  secondaryBefore  Float
+  secondaryGain    Float
   secondaryDecline Float @default(0)
-  secondaryAfter  Float
+  secondaryAfter   Float
 
-  overallBefore Float
+  overallBefore  Float
   overallDecline Float @default(0)
-  overallAfter  Float
+  overallAfter   Float
+
+  experienceBefore Float @default(0)
+  experienceGain   Float @default(0)
+  experienceAfter  Float @default(0)
+
+  formBefore Int @default(5)
+  formChange Int @default(0)
+  formAfter  Int @default(5)
+
+  moraleBefore Int @default(5)
+  moraleChange Int @default(0)
+  moraleAfter  Int @default(5)
 
   createdAt DateTime @default(now())
 
   @@index([sessionId])
   @@index([playerId])
+}
+
+model ClubWeeklyUpdate {
+  id Int @id @default(autoincrement())
+
+  clubId Int
+  club   Club @relation(fields: [clubId], references: [id], onDelete: Cascade)
+
+  weekKey String
+
+  income        Int
+  expenses      Int
+  netResult     Int
+  balanceBefore Int
+  balanceAfter  Int
+
+  scheduledAt     DateTime
+  processedAt     DateTime
+  newsScheduledAt DateTime
+  newsPublishedAt DateTime?
+
+  createdAt DateTime @default(now())
+
+  @@unique([clubId, weekKey])
+  @@index([clubId])
+  @@index([scheduledAt])
+  @@index([newsScheduledAt])
 }
 
 model GameEvent {

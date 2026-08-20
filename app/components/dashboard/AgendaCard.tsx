@@ -4,6 +4,7 @@ import {
   CalendarDays,
   Clock3,
   Dumbbell,
+  GraduationCap,
   Trophy,
 } from "lucide-react";
 
@@ -19,7 +20,7 @@ import { prisma } from "@/lib/prisma";
 
 export default async function UpcomingEventsCard() {
   const clubId = await getCurrentClubId();
-  const [trainingPlan, league] =
+  const [trainingPlan, club, league] =
     await Promise.all([
       prisma.trainingPlan.findUnique({
         where: {
@@ -33,6 +34,16 @@ export default async function UpcomingEventsCard() {
 
           secondaryFocus:
             true,
+        },
+      }),
+
+      prisma.club.findUnique({
+        where: {
+          id: clubId,
+        },
+        select: {
+          nextAcademyCandidateAt: true,
+          nextWeeklyUpdateAt: true,
         },
       }),
 
@@ -147,10 +158,49 @@ export default async function UpcomingEventsCard() {
                 )}`
               : "Programma di allenamento da impostare"
           }
-          date="Mercoledì"
-          time="21:00"
+          date={
+            club?.nextWeeklyUpdateAt
+              ? formatFixtureDate(
+                  club.nextWeeklyUpdateAt
+                )
+              : "Lunedì"
+          }
+          time={
+            club?.nextWeeklyUpdateAt
+              ? formatFixtureTime(
+                  club.nextWeeklyUpdateAt
+                )
+              : "12:00"
+          }
           href="/training"
           tone="training"
+        />
+
+        <AgendaItem
+          icon={
+            <GraduationCap
+              size={18}
+            />
+          }
+          type="Accademia"
+          title="Candidato e scouting"
+          description="Ingresso del candidato e avanzamento dei rapporti"
+          date={
+            club?.nextAcademyCandidateAt
+              ? formatFixtureDate(
+                  club.nextAcademyCandidateAt
+                )
+              : "Martedì"
+          }
+          time={
+            club?.nextAcademyCandidateAt
+              ? formatFixtureTime(
+                  club.nextAcademyCandidateAt
+                )
+              : "21:00"
+          }
+          href="/academy"
+          tone="academy"
         />
 
         {fixture ? (
@@ -207,24 +257,30 @@ function AgendaItem({
   href: string;
   tone:
     | "training"
+    | "academy"
     | "league";
 }) {
-  const style =
-    tone === "training"
-      ? {
+  const style = {
+    training: {
           icon:
             "border-emerald-500/20 bg-emerald-500/10 text-emerald-400",
 
           type:
             "text-emerald-400",
-        }
-      : {
+    },
+    academy: {
+      icon:
+        "border-violet-500/20 bg-violet-500/10 text-violet-300",
+      type: "text-violet-300",
+    },
+    league: {
           icon:
             "border-amber-400/20 bg-amber-400/10 text-amber-300",
 
           type:
             "text-amber-300",
-        };
+    },
+  }[tone];
 
   return (
     <Link

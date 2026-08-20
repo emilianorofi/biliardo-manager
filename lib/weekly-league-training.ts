@@ -7,15 +7,17 @@ import {
   type LeagueTrainingUsage,
 } from "@/lib/training-usage";
 import {
-  getTrainingWeekRange,
-} from "@/lib/training-engine";
+  getCurrentRomeWeeklyWindow,
+} from "@/lib/rome-calendar";
 
 export async function loadWeeklyLeagueTrainingUsage(
   clubId: number,
   date = new Date()
 ) {
   const { start, end } =
-    getTrainingWeekRange(date);
+    getCurrentRomeWeeklyWindow(
+      date
+    );
   const appearances =
     await prisma.playerFixtureAppearance.findMany({
       where: {

@@ -35,6 +35,19 @@ export default async function FinancePage() {
 
         weeklyExpenses:
           true,
+
+        weeklyUpdates: {
+          orderBy: {
+            scheduledAt: "desc",
+          },
+          take: 10,
+          select: {
+            id: true,
+            weekKey: true,
+            income: true,
+            expenses: true,
+          },
+        },
       },
     });
 
@@ -60,35 +73,48 @@ export default async function FinancePage() {
     club.balance +
     weeklyBalance;
 
-  const transactions = [
-    {
-      id:
-        "weekly-income",
-
-      description:
-        "Entrate complessive del club",
-
-      category:
-        "Entrate",
-
-      amount:
-        club.weeklyIncome,
-    },
-
-    {
-      id:
-        "weekly-expenses",
-
-      description:
-        "Uscite complessive del club",
-
-      category:
-        "Uscite",
-
-      amount:
-        -club.weeklyExpenses,
-    },
-  ];
+  const transactions =
+    club.weeklyUpdates.length > 0
+      ? club.weeklyUpdates.flatMap(
+          (update) => [
+            {
+              id: `${update.id}-income`,
+              period: update.weekKey,
+              description:
+                "Entrate complessive del club",
+              category: "Entrate",
+              amount: update.income,
+            },
+            {
+              id: `${update.id}-expenses`,
+              period: update.weekKey,
+              description:
+                "Uscite complessive del club",
+              category: "Uscite",
+              amount:
+                -update.expenses,
+            },
+          ]
+        )
+      : [
+          {
+            id: "weekly-income",
+            period: "Prossimo aggiornamento",
+            description:
+              "Entrate complessive del club",
+            category: "Entrate",
+            amount: club.weeklyIncome,
+          },
+          {
+            id: "weekly-expenses",
+            period: "Prossimo aggiornamento",
+            description:
+              "Uscite complessive del club",
+            category: "Uscite",
+            amount:
+              -club.weeklyExpenses,
+          },
+        ];
 
   return (
     <main className="space-y-6">
@@ -231,7 +257,7 @@ export default async function FinancePage() {
                       className="border-b border-emerald-900/40 last:border-0"
                     >
                       <td className="px-5 py-5 text-sm text-slate-400 sm:px-6">
-                        Settimana corrente
+                        {transaction.period}
                       </td>
 
                       <td className="px-4 py-5">

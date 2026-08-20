@@ -156,6 +156,33 @@ export async function GET() {
 
                   overallAfter:
                     result.overallAfter,
+
+                  experienceBefore:
+                    result.experienceBefore,
+
+                  experienceGain:
+                    result.experienceGain,
+
+                  experienceAfter:
+                    result.experienceAfter,
+
+                  formBefore:
+                    result.formBefore,
+
+                  formChange:
+                    result.formChange,
+
+                  formAfter:
+                    result.formAfter,
+
+                  moraleBefore:
+                    result.moraleBefore,
+
+                  moraleChange:
+                    result.moraleChange,
+
+                  moraleAfter:
+                    result.moraleAfter,
                 })
               ),
           })

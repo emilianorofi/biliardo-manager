@@ -43,6 +43,15 @@ export type TrainingResultAvgAggregateOutputType = {
   overallBefore: number | null
   overallDecline: number | null
   overallAfter: number | null
+  experienceBefore: number | null
+  experienceGain: number | null
+  experienceAfter: number | null
+  formBefore: number | null
+  formChange: number | null
+  formAfter: number | null
+  moraleBefore: number | null
+  moraleChange: number | null
+  moraleAfter: number | null
 }
 
 export type TrainingResultSumAggregateOutputType = {
@@ -62,6 +71,15 @@ export type TrainingResultSumAggregateOutputType = {
   overallBefore: number | null
   overallDecline: number | null
   overallAfter: number | null
+  experienceBefore: number | null
+  experienceGain: number | null
+  experienceAfter: number | null
+  formBefore: number | null
+  formChange: number | null
+  formAfter: number | null
+  moraleBefore: number | null
+  moraleChange: number | null
+  moraleAfter: number | null
 }
 
 export type TrainingResultMinAggregateOutputType = {
@@ -84,6 +102,15 @@ export type TrainingResultMinAggregateOutputType = {
   overallBefore: number | null
   overallDecline: number | null
   overallAfter: number | null
+  experienceBefore: number | null
+  experienceGain: number | null
+  experienceAfter: number | null
+  formBefore: number | null
+  formChange: number | null
+  formAfter: number | null
+  moraleBefore: number | null
+  moraleChange: number | null
+  moraleAfter: number | null
   createdAt: Date | null
 }
 
@@ -107,6 +134,15 @@ export type TrainingResultMaxAggregateOutputType = {
   overallBefore: number | null
   overallDecline: number | null
   overallAfter: number | null
+  experienceBefore: number | null
+  experienceGain: number | null
+  experienceAfter: number | null
+  formBefore: number | null
+  formChange: number | null
+  formAfter: number | null
+  moraleBefore: number | null
+  moraleChange: number | null
+  moraleAfter: number | null
   createdAt: Date | null
 }
 
@@ -130,6 +166,15 @@ export type TrainingResultCountAggregateOutputType = {
   overallBefore: number
   overallDecline: number
   overallAfter: number
+  experienceBefore: number
+  experienceGain: number
+  experienceAfter: number
+  formBefore: number
+  formChange: number
+  formAfter: number
+  moraleBefore: number
+  moraleChange: number
+  moraleAfter: number
   createdAt: number
   _all: number
 }
@@ -152,6 +197,15 @@ export type TrainingResultAvgAggregateInputType = {
   overallBefore?: true
   overallDecline?: true
   overallAfter?: true
+  experienceBefore?: true
+  experienceGain?: true
+  experienceAfter?: true
+  formBefore?: true
+  formChange?: true
+  formAfter?: true
+  moraleBefore?: true
+  moraleChange?: true
+  moraleAfter?: true
 }
 
 export type TrainingResultSumAggregateInputType = {
@@ -171,6 +225,15 @@ export type TrainingResultSumAggregateInputType = {
   overallBefore?: true
   overallDecline?: true
   overallAfter?: true
+  experienceBefore?: true
+  experienceGain?: true
+  experienceAfter?: true
+  formBefore?: true
+  formChange?: true
+  formAfter?: true
+  moraleBefore?: true
+  moraleChange?: true
+  moraleAfter?: true
 }
 
 export type TrainingResultMinAggregateInputType = {
@@ -193,6 +256,15 @@ export type TrainingResultMinAggregateInputType = {
   overallBefore?: true
   overallDecline?: true
   overallAfter?: true
+  experienceBefore?: true
+  experienceGain?: true
+  experienceAfter?: true
+  formBefore?: true
+  formChange?: true
+  formAfter?: true
+  moraleBefore?: true
+  moraleChange?: true
+  moraleAfter?: true
   createdAt?: true
 }
 
@@ -216,6 +288,15 @@ export type TrainingResultMaxAggregateInputType = {
   overallBefore?: true
   overallDecline?: true
   overallAfter?: true
+  experienceBefore?: true
+  experienceGain?: true
+  experienceAfter?: true
+  formBefore?: true
+  formChange?: true
+  formAfter?: true
+  moraleBefore?: true
+  moraleChange?: true
+  moraleAfter?: true
   createdAt?: true
 }
 
@@ -239,6 +320,15 @@ export type TrainingResultCountAggregateInputType = {
   overallBefore?: true
   overallDecline?: true
   overallAfter?: true
+  experienceBefore?: true
+  experienceGain?: true
+  experienceAfter?: true
+  formBefore?: true
+  formChange?: true
+  formAfter?: true
+  moraleBefore?: true
+  moraleChange?: true
+  moraleAfter?: true
   createdAt?: true
   _all?: true
 }
@@ -349,6 +439,15 @@ export type TrainingResultGroupByOutputType = {
   overallBefore: number
   overallDecline: number
   overallAfter: number
+  experienceBefore: number
+  experienceGain: number
+  experienceAfter: number
+  formBefore: number
+  formChange: number
+  formAfter: number
+  moraleBefore: number
+  moraleChange: number
+  moraleAfter: number
   createdAt: Date
   _count: TrainingResultCountAggregateOutputType | null
   _avg: TrainingResultAvgAggregateOutputType | null
@@ -395,6 +494,15 @@ export type TrainingResultWhereInput = {
   overallBefore?: Prisma.FloatFilter<"TrainingResult"> | number
   overallDecline?: Prisma.FloatFilter<"TrainingResult"> | number
   overallAfter?: Prisma.FloatFilter<"TrainingResult"> | number
+  experienceBefore?: Prisma.FloatFilter<"TrainingResult"> | number
+  experienceGain?: Prisma.FloatFilter<"TrainingResult"> | number
+  experienceAfter?: Prisma.FloatFilter<"TrainingResult"> | number
+  formBefore?: Prisma.IntFilter<"TrainingResult"> | number
+  formChange?: Prisma.IntFilter<"TrainingResult"> | number
+  formAfter?: Prisma.IntFilter<"TrainingResult"> | number
+  moraleBefore?: Prisma.IntFilter<"TrainingResult"> | number
+  moraleChange?: Prisma.IntFilter<"TrainingResult"> | number
+  moraleAfter?: Prisma.IntFilter<"TrainingResult"> | number
   createdAt?: Prisma.DateTimeFilter<"TrainingResult"> | Date | string
   session?: Prisma.XOR<Prisma.TrainingSessionScalarRelationFilter, Prisma.TrainingSessionWhereInput>
   player?: Prisma.XOR<Prisma.PlayerNullableScalarRelationFilter, Prisma.PlayerWhereInput> | null
@@ -420,6 +528,15 @@ export type TrainingResultOrderByWithRelationInput = {
   overallBefore?: Prisma.SortOrder
   overallDecline?: Prisma.SortOrder
   overallAfter?: Prisma.SortOrder
+  experienceBefore?: Prisma.SortOrder
+  experienceGain?: Prisma.SortOrder
+  experienceAfter?: Prisma.SortOrder
+  formBefore?: Prisma.SortOrder
+  formChange?: Prisma.SortOrder
+  formAfter?: Prisma.SortOrder
+  moraleBefore?: Prisma.SortOrder
+  moraleChange?: Prisma.SortOrder
+  moraleAfter?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   session?: Prisma.TrainingSessionOrderByWithRelationInput
   player?: Prisma.PlayerOrderByWithRelationInput
@@ -448,6 +565,15 @@ export type TrainingResultWhereUniqueInput = Prisma.AtLeast<{
   overallBefore?: Prisma.FloatFilter<"TrainingResult"> | number
   overallDecline?: Prisma.FloatFilter<"TrainingResult"> | number
   overallAfter?: Prisma.FloatFilter<"TrainingResult"> | number
+  experienceBefore?: Prisma.FloatFilter<"TrainingResult"> | number
+  experienceGain?: Prisma.FloatFilter<"TrainingResult"> | number
+  experienceAfter?: Prisma.FloatFilter<"TrainingResult"> | number
+  formBefore?: Prisma.IntFilter<"TrainingResult"> | number
+  formChange?: Prisma.IntFilter<"TrainingResult"> | number
+  formAfter?: Prisma.IntFilter<"TrainingResult"> | number
+  moraleBefore?: Prisma.IntFilter<"TrainingResult"> | number
+  moraleChange?: Prisma.IntFilter<"TrainingResult"> | number
+  moraleAfter?: Prisma.IntFilter<"TrainingResult"> | number
   createdAt?: Prisma.DateTimeFilter<"TrainingResult"> | Date | string
   session?: Prisma.XOR<Prisma.TrainingSessionScalarRelationFilter, Prisma.TrainingSessionWhereInput>
   player?: Prisma.XOR<Prisma.PlayerNullableScalarRelationFilter, Prisma.PlayerWhereInput> | null
@@ -473,6 +599,15 @@ export type TrainingResultOrderByWithAggregationInput = {
   overallBefore?: Prisma.SortOrder
   overallDecline?: Prisma.SortOrder
   overallAfter?: Prisma.SortOrder
+  experienceBefore?: Prisma.SortOrder
+  experienceGain?: Prisma.SortOrder
+  experienceAfter?: Prisma.SortOrder
+  formBefore?: Prisma.SortOrder
+  formChange?: Prisma.SortOrder
+  formAfter?: Prisma.SortOrder
+  moraleBefore?: Prisma.SortOrder
+  moraleChange?: Prisma.SortOrder
+  moraleAfter?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   _count?: Prisma.TrainingResultCountOrderByAggregateInput
   _avg?: Prisma.TrainingResultAvgOrderByAggregateInput
@@ -504,6 +639,15 @@ export type TrainingResultScalarWhereWithAggregatesInput = {
   overallBefore?: Prisma.FloatWithAggregatesFilter<"TrainingResult"> | number
   overallDecline?: Prisma.FloatWithAggregatesFilter<"TrainingResult"> | number
   overallAfter?: Prisma.FloatWithAggregatesFilter<"TrainingResult"> | number
+  experienceBefore?: Prisma.FloatWithAggregatesFilter<"TrainingResult"> | number
+  experienceGain?: Prisma.FloatWithAggregatesFilter<"TrainingResult"> | number
+  experienceAfter?: Prisma.FloatWithAggregatesFilter<"TrainingResult"> | number
+  formBefore?: Prisma.IntWithAggregatesFilter<"TrainingResult"> | number
+  formChange?: Prisma.IntWithAggregatesFilter<"TrainingResult"> | number
+  formAfter?: Prisma.IntWithAggregatesFilter<"TrainingResult"> | number
+  moraleBefore?: Prisma.IntWithAggregatesFilter<"TrainingResult"> | number
+  moraleChange?: Prisma.IntWithAggregatesFilter<"TrainingResult"> | number
+  moraleAfter?: Prisma.IntWithAggregatesFilter<"TrainingResult"> | number
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"TrainingResult"> | Date | string
 }
 
@@ -524,6 +668,15 @@ export type TrainingResultCreateInput = {
   overallBefore: number
   overallDecline?: number
   overallAfter: number
+  experienceBefore?: number
+  experienceGain?: number
+  experienceAfter?: number
+  formBefore?: number
+  formChange?: number
+  formAfter?: number
+  moraleBefore?: number
+  moraleChange?: number
+  moraleAfter?: number
   createdAt?: Date | string
   session: Prisma.TrainingSessionCreateNestedOneWithoutResultsInput
   player?: Prisma.PlayerCreateNestedOneWithoutTrainingResultsInput
@@ -549,6 +702,15 @@ export type TrainingResultUncheckedCreateInput = {
   overallBefore: number
   overallDecline?: number
   overallAfter: number
+  experienceBefore?: number
+  experienceGain?: number
+  experienceAfter?: number
+  formBefore?: number
+  formChange?: number
+  formAfter?: number
+  moraleBefore?: number
+  moraleChange?: number
+  moraleAfter?: number
   createdAt?: Date | string
 }
 
@@ -569,6 +731,15 @@ export type TrainingResultUpdateInput = {
   overallBefore?: Prisma.FloatFieldUpdateOperationsInput | number
   overallDecline?: Prisma.FloatFieldUpdateOperationsInput | number
   overallAfter?: Prisma.FloatFieldUpdateOperationsInput | number
+  experienceBefore?: Prisma.FloatFieldUpdateOperationsInput | number
+  experienceGain?: Prisma.FloatFieldUpdateOperationsInput | number
+  experienceAfter?: Prisma.FloatFieldUpdateOperationsInput | number
+  formBefore?: Prisma.IntFieldUpdateOperationsInput | number
+  formChange?: Prisma.IntFieldUpdateOperationsInput | number
+  formAfter?: Prisma.IntFieldUpdateOperationsInput | number
+  moraleBefore?: Prisma.IntFieldUpdateOperationsInput | number
+  moraleChange?: Prisma.IntFieldUpdateOperationsInput | number
+  moraleAfter?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   session?: Prisma.TrainingSessionUpdateOneRequiredWithoutResultsNestedInput
   player?: Prisma.PlayerUpdateOneWithoutTrainingResultsNestedInput
@@ -594,6 +765,15 @@ export type TrainingResultUncheckedUpdateInput = {
   overallBefore?: Prisma.FloatFieldUpdateOperationsInput | number
   overallDecline?: Prisma.FloatFieldUpdateOperationsInput | number
   overallAfter?: Prisma.FloatFieldUpdateOperationsInput | number
+  experienceBefore?: Prisma.FloatFieldUpdateOperationsInput | number
+  experienceGain?: Prisma.FloatFieldUpdateOperationsInput | number
+  experienceAfter?: Prisma.FloatFieldUpdateOperationsInput | number
+  formBefore?: Prisma.IntFieldUpdateOperationsInput | number
+  formChange?: Prisma.IntFieldUpdateOperationsInput | number
+  formAfter?: Prisma.IntFieldUpdateOperationsInput | number
+  moraleBefore?: Prisma.IntFieldUpdateOperationsInput | number
+  moraleChange?: Prisma.IntFieldUpdateOperationsInput | number
+  moraleAfter?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -617,6 +797,15 @@ export type TrainingResultCreateManyInput = {
   overallBefore: number
   overallDecline?: number
   overallAfter: number
+  experienceBefore?: number
+  experienceGain?: number
+  experienceAfter?: number
+  formBefore?: number
+  formChange?: number
+  formAfter?: number
+  moraleBefore?: number
+  moraleChange?: number
+  moraleAfter?: number
   createdAt?: Date | string
 }
 
@@ -637,6 +826,15 @@ export type TrainingResultUpdateManyMutationInput = {
   overallBefore?: Prisma.FloatFieldUpdateOperationsInput | number
   overallDecline?: Prisma.FloatFieldUpdateOperationsInput | number
   overallAfter?: Prisma.FloatFieldUpdateOperationsInput | number
+  experienceBefore?: Prisma.FloatFieldUpdateOperationsInput | number
+  experienceGain?: Prisma.FloatFieldUpdateOperationsInput | number
+  experienceAfter?: Prisma.FloatFieldUpdateOperationsInput | number
+  formBefore?: Prisma.IntFieldUpdateOperationsInput | number
+  formChange?: Prisma.IntFieldUpdateOperationsInput | number
+  formAfter?: Prisma.IntFieldUpdateOperationsInput | number
+  moraleBefore?: Prisma.IntFieldUpdateOperationsInput | number
+  moraleChange?: Prisma.IntFieldUpdateOperationsInput | number
+  moraleAfter?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -660,6 +858,15 @@ export type TrainingResultUncheckedUpdateManyInput = {
   overallBefore?: Prisma.FloatFieldUpdateOperationsInput | number
   overallDecline?: Prisma.FloatFieldUpdateOperationsInput | number
   overallAfter?: Prisma.FloatFieldUpdateOperationsInput | number
+  experienceBefore?: Prisma.FloatFieldUpdateOperationsInput | number
+  experienceGain?: Prisma.FloatFieldUpdateOperationsInput | number
+  experienceAfter?: Prisma.FloatFieldUpdateOperationsInput | number
+  formBefore?: Prisma.IntFieldUpdateOperationsInput | number
+  formChange?: Prisma.IntFieldUpdateOperationsInput | number
+  formAfter?: Prisma.IntFieldUpdateOperationsInput | number
+  moraleBefore?: Prisma.IntFieldUpdateOperationsInput | number
+  moraleChange?: Prisma.IntFieldUpdateOperationsInput | number
+  moraleAfter?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -693,6 +900,15 @@ export type TrainingResultCountOrderByAggregateInput = {
   overallBefore?: Prisma.SortOrder
   overallDecline?: Prisma.SortOrder
   overallAfter?: Prisma.SortOrder
+  experienceBefore?: Prisma.SortOrder
+  experienceGain?: Prisma.SortOrder
+  experienceAfter?: Prisma.SortOrder
+  formBefore?: Prisma.SortOrder
+  formChange?: Prisma.SortOrder
+  formAfter?: Prisma.SortOrder
+  moraleBefore?: Prisma.SortOrder
+  moraleChange?: Prisma.SortOrder
+  moraleAfter?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -713,6 +929,15 @@ export type TrainingResultAvgOrderByAggregateInput = {
   overallBefore?: Prisma.SortOrder
   overallDecline?: Prisma.SortOrder
   overallAfter?: Prisma.SortOrder
+  experienceBefore?: Prisma.SortOrder
+  experienceGain?: Prisma.SortOrder
+  experienceAfter?: Prisma.SortOrder
+  formBefore?: Prisma.SortOrder
+  formChange?: Prisma.SortOrder
+  formAfter?: Prisma.SortOrder
+  moraleBefore?: Prisma.SortOrder
+  moraleChange?: Prisma.SortOrder
+  moraleAfter?: Prisma.SortOrder
 }
 
 export type TrainingResultMaxOrderByAggregateInput = {
@@ -735,6 +960,15 @@ export type TrainingResultMaxOrderByAggregateInput = {
   overallBefore?: Prisma.SortOrder
   overallDecline?: Prisma.SortOrder
   overallAfter?: Prisma.SortOrder
+  experienceBefore?: Prisma.SortOrder
+  experienceGain?: Prisma.SortOrder
+  experienceAfter?: Prisma.SortOrder
+  formBefore?: Prisma.SortOrder
+  formChange?: Prisma.SortOrder
+  formAfter?: Prisma.SortOrder
+  moraleBefore?: Prisma.SortOrder
+  moraleChange?: Prisma.SortOrder
+  moraleAfter?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -758,6 +992,15 @@ export type TrainingResultMinOrderByAggregateInput = {
   overallBefore?: Prisma.SortOrder
   overallDecline?: Prisma.SortOrder
   overallAfter?: Prisma.SortOrder
+  experienceBefore?: Prisma.SortOrder
+  experienceGain?: Prisma.SortOrder
+  experienceAfter?: Prisma.SortOrder
+  formBefore?: Prisma.SortOrder
+  formChange?: Prisma.SortOrder
+  formAfter?: Prisma.SortOrder
+  moraleBefore?: Prisma.SortOrder
+  moraleChange?: Prisma.SortOrder
+  moraleAfter?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -778,6 +1021,15 @@ export type TrainingResultSumOrderByAggregateInput = {
   overallBefore?: Prisma.SortOrder
   overallDecline?: Prisma.SortOrder
   overallAfter?: Prisma.SortOrder
+  experienceBefore?: Prisma.SortOrder
+  experienceGain?: Prisma.SortOrder
+  experienceAfter?: Prisma.SortOrder
+  formBefore?: Prisma.SortOrder
+  formChange?: Prisma.SortOrder
+  formAfter?: Prisma.SortOrder
+  moraleBefore?: Prisma.SortOrder
+  moraleChange?: Prisma.SortOrder
+  moraleAfter?: Prisma.SortOrder
 }
 
 export type TrainingResultCreateNestedManyWithoutPlayerInput = {
@@ -881,6 +1133,15 @@ export type TrainingResultCreateWithoutPlayerInput = {
   overallBefore: number
   overallDecline?: number
   overallAfter: number
+  experienceBefore?: number
+  experienceGain?: number
+  experienceAfter?: number
+  formBefore?: number
+  formChange?: number
+  formAfter?: number
+  moraleBefore?: number
+  moraleChange?: number
+  moraleAfter?: number
   createdAt?: Date | string
   session: Prisma.TrainingSessionCreateNestedOneWithoutResultsInput
 }
@@ -904,6 +1165,15 @@ export type TrainingResultUncheckedCreateWithoutPlayerInput = {
   overallBefore: number
   overallDecline?: number
   overallAfter: number
+  experienceBefore?: number
+  experienceGain?: number
+  experienceAfter?: number
+  formBefore?: number
+  formChange?: number
+  formAfter?: number
+  moraleBefore?: number
+  moraleChange?: number
+  moraleAfter?: number
   createdAt?: Date | string
 }
 
@@ -956,6 +1226,15 @@ export type TrainingResultScalarWhereInput = {
   overallBefore?: Prisma.FloatFilter<"TrainingResult"> | number
   overallDecline?: Prisma.FloatFilter<"TrainingResult"> | number
   overallAfter?: Prisma.FloatFilter<"TrainingResult"> | number
+  experienceBefore?: Prisma.FloatFilter<"TrainingResult"> | number
+  experienceGain?: Prisma.FloatFilter<"TrainingResult"> | number
+  experienceAfter?: Prisma.FloatFilter<"TrainingResult"> | number
+  formBefore?: Prisma.IntFilter<"TrainingResult"> | number
+  formChange?: Prisma.IntFilter<"TrainingResult"> | number
+  formAfter?: Prisma.IntFilter<"TrainingResult"> | number
+  moraleBefore?: Prisma.IntFilter<"TrainingResult"> | number
+  moraleChange?: Prisma.IntFilter<"TrainingResult"> | number
+  moraleAfter?: Prisma.IntFilter<"TrainingResult"> | number
   createdAt?: Prisma.DateTimeFilter<"TrainingResult"> | Date | string
 }
 
@@ -976,6 +1255,15 @@ export type TrainingResultCreateWithoutSessionInput = {
   overallBefore: number
   overallDecline?: number
   overallAfter: number
+  experienceBefore?: number
+  experienceGain?: number
+  experienceAfter?: number
+  formBefore?: number
+  formChange?: number
+  formAfter?: number
+  moraleBefore?: number
+  moraleChange?: number
+  moraleAfter?: number
   createdAt?: Date | string
   player?: Prisma.PlayerCreateNestedOneWithoutTrainingResultsInput
 }
@@ -999,6 +1287,15 @@ export type TrainingResultUncheckedCreateWithoutSessionInput = {
   overallBefore: number
   overallDecline?: number
   overallAfter: number
+  experienceBefore?: number
+  experienceGain?: number
+  experienceAfter?: number
+  formBefore?: number
+  formChange?: number
+  formAfter?: number
+  moraleBefore?: number
+  moraleChange?: number
+  moraleAfter?: number
   createdAt?: Date | string
 }
 
@@ -1047,6 +1344,15 @@ export type TrainingResultCreateManyPlayerInput = {
   overallBefore: number
   overallDecline?: number
   overallAfter: number
+  experienceBefore?: number
+  experienceGain?: number
+  experienceAfter?: number
+  formBefore?: number
+  formChange?: number
+  formAfter?: number
+  moraleBefore?: number
+  moraleChange?: number
+  moraleAfter?: number
   createdAt?: Date | string
 }
 
@@ -1067,6 +1373,15 @@ export type TrainingResultUpdateWithoutPlayerInput = {
   overallBefore?: Prisma.FloatFieldUpdateOperationsInput | number
   overallDecline?: Prisma.FloatFieldUpdateOperationsInput | number
   overallAfter?: Prisma.FloatFieldUpdateOperationsInput | number
+  experienceBefore?: Prisma.FloatFieldUpdateOperationsInput | number
+  experienceGain?: Prisma.FloatFieldUpdateOperationsInput | number
+  experienceAfter?: Prisma.FloatFieldUpdateOperationsInput | number
+  formBefore?: Prisma.IntFieldUpdateOperationsInput | number
+  formChange?: Prisma.IntFieldUpdateOperationsInput | number
+  formAfter?: Prisma.IntFieldUpdateOperationsInput | number
+  moraleBefore?: Prisma.IntFieldUpdateOperationsInput | number
+  moraleChange?: Prisma.IntFieldUpdateOperationsInput | number
+  moraleAfter?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   session?: Prisma.TrainingSessionUpdateOneRequiredWithoutResultsNestedInput
 }
@@ -1090,6 +1405,15 @@ export type TrainingResultUncheckedUpdateWithoutPlayerInput = {
   overallBefore?: Prisma.FloatFieldUpdateOperationsInput | number
   overallDecline?: Prisma.FloatFieldUpdateOperationsInput | number
   overallAfter?: Prisma.FloatFieldUpdateOperationsInput | number
+  experienceBefore?: Prisma.FloatFieldUpdateOperationsInput | number
+  experienceGain?: Prisma.FloatFieldUpdateOperationsInput | number
+  experienceAfter?: Prisma.FloatFieldUpdateOperationsInput | number
+  formBefore?: Prisma.IntFieldUpdateOperationsInput | number
+  formChange?: Prisma.IntFieldUpdateOperationsInput | number
+  formAfter?: Prisma.IntFieldUpdateOperationsInput | number
+  moraleBefore?: Prisma.IntFieldUpdateOperationsInput | number
+  moraleChange?: Prisma.IntFieldUpdateOperationsInput | number
+  moraleAfter?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -1112,6 +1436,15 @@ export type TrainingResultUncheckedUpdateManyWithoutPlayerInput = {
   overallBefore?: Prisma.FloatFieldUpdateOperationsInput | number
   overallDecline?: Prisma.FloatFieldUpdateOperationsInput | number
   overallAfter?: Prisma.FloatFieldUpdateOperationsInput | number
+  experienceBefore?: Prisma.FloatFieldUpdateOperationsInput | number
+  experienceGain?: Prisma.FloatFieldUpdateOperationsInput | number
+  experienceAfter?: Prisma.FloatFieldUpdateOperationsInput | number
+  formBefore?: Prisma.IntFieldUpdateOperationsInput | number
+  formChange?: Prisma.IntFieldUpdateOperationsInput | number
+  formAfter?: Prisma.IntFieldUpdateOperationsInput | number
+  moraleBefore?: Prisma.IntFieldUpdateOperationsInput | number
+  moraleChange?: Prisma.IntFieldUpdateOperationsInput | number
+  moraleAfter?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -1134,6 +1467,15 @@ export type TrainingResultCreateManySessionInput = {
   overallBefore: number
   overallDecline?: number
   overallAfter: number
+  experienceBefore?: number
+  experienceGain?: number
+  experienceAfter?: number
+  formBefore?: number
+  formChange?: number
+  formAfter?: number
+  moraleBefore?: number
+  moraleChange?: number
+  moraleAfter?: number
   createdAt?: Date | string
 }
 
@@ -1154,6 +1496,15 @@ export type TrainingResultUpdateWithoutSessionInput = {
   overallBefore?: Prisma.FloatFieldUpdateOperationsInput | number
   overallDecline?: Prisma.FloatFieldUpdateOperationsInput | number
   overallAfter?: Prisma.FloatFieldUpdateOperationsInput | number
+  experienceBefore?: Prisma.FloatFieldUpdateOperationsInput | number
+  experienceGain?: Prisma.FloatFieldUpdateOperationsInput | number
+  experienceAfter?: Prisma.FloatFieldUpdateOperationsInput | number
+  formBefore?: Prisma.IntFieldUpdateOperationsInput | number
+  formChange?: Prisma.IntFieldUpdateOperationsInput | number
+  formAfter?: Prisma.IntFieldUpdateOperationsInput | number
+  moraleBefore?: Prisma.IntFieldUpdateOperationsInput | number
+  moraleChange?: Prisma.IntFieldUpdateOperationsInput | number
+  moraleAfter?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   player?: Prisma.PlayerUpdateOneWithoutTrainingResultsNestedInput
 }
@@ -1177,6 +1528,15 @@ export type TrainingResultUncheckedUpdateWithoutSessionInput = {
   overallBefore?: Prisma.FloatFieldUpdateOperationsInput | number
   overallDecline?: Prisma.FloatFieldUpdateOperationsInput | number
   overallAfter?: Prisma.FloatFieldUpdateOperationsInput | number
+  experienceBefore?: Prisma.FloatFieldUpdateOperationsInput | number
+  experienceGain?: Prisma.FloatFieldUpdateOperationsInput | number
+  experienceAfter?: Prisma.FloatFieldUpdateOperationsInput | number
+  formBefore?: Prisma.IntFieldUpdateOperationsInput | number
+  formChange?: Prisma.IntFieldUpdateOperationsInput | number
+  formAfter?: Prisma.IntFieldUpdateOperationsInput | number
+  moraleBefore?: Prisma.IntFieldUpdateOperationsInput | number
+  moraleChange?: Prisma.IntFieldUpdateOperationsInput | number
+  moraleAfter?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -1199,6 +1559,15 @@ export type TrainingResultUncheckedUpdateManyWithoutSessionInput = {
   overallBefore?: Prisma.FloatFieldUpdateOperationsInput | number
   overallDecline?: Prisma.FloatFieldUpdateOperationsInput | number
   overallAfter?: Prisma.FloatFieldUpdateOperationsInput | number
+  experienceBefore?: Prisma.FloatFieldUpdateOperationsInput | number
+  experienceGain?: Prisma.FloatFieldUpdateOperationsInput | number
+  experienceAfter?: Prisma.FloatFieldUpdateOperationsInput | number
+  formBefore?: Prisma.IntFieldUpdateOperationsInput | number
+  formChange?: Prisma.IntFieldUpdateOperationsInput | number
+  formAfter?: Prisma.IntFieldUpdateOperationsInput | number
+  moraleBefore?: Prisma.IntFieldUpdateOperationsInput | number
+  moraleChange?: Prisma.IntFieldUpdateOperationsInput | number
+  moraleAfter?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -1224,6 +1593,15 @@ export type TrainingResultSelect<ExtArgs extends runtime.Types.Extensions.Intern
   overallBefore?: boolean
   overallDecline?: boolean
   overallAfter?: boolean
+  experienceBefore?: boolean
+  experienceGain?: boolean
+  experienceAfter?: boolean
+  formBefore?: boolean
+  formChange?: boolean
+  formAfter?: boolean
+  moraleBefore?: boolean
+  moraleChange?: boolean
+  moraleAfter?: boolean
   createdAt?: boolean
   session?: boolean | Prisma.TrainingSessionDefaultArgs<ExtArgs>
   player?: boolean | Prisma.TrainingResult$playerArgs<ExtArgs>
@@ -1249,6 +1627,15 @@ export type TrainingResultSelectCreateManyAndReturn<ExtArgs extends runtime.Type
   overallBefore?: boolean
   overallDecline?: boolean
   overallAfter?: boolean
+  experienceBefore?: boolean
+  experienceGain?: boolean
+  experienceAfter?: boolean
+  formBefore?: boolean
+  formChange?: boolean
+  formAfter?: boolean
+  moraleBefore?: boolean
+  moraleChange?: boolean
+  moraleAfter?: boolean
   createdAt?: boolean
   session?: boolean | Prisma.TrainingSessionDefaultArgs<ExtArgs>
   player?: boolean | Prisma.TrainingResult$playerArgs<ExtArgs>
@@ -1274,6 +1661,15 @@ export type TrainingResultSelectUpdateManyAndReturn<ExtArgs extends runtime.Type
   overallBefore?: boolean
   overallDecline?: boolean
   overallAfter?: boolean
+  experienceBefore?: boolean
+  experienceGain?: boolean
+  experienceAfter?: boolean
+  formBefore?: boolean
+  formChange?: boolean
+  formAfter?: boolean
+  moraleBefore?: boolean
+  moraleChange?: boolean
+  moraleAfter?: boolean
   createdAt?: boolean
   session?: boolean | Prisma.TrainingSessionDefaultArgs<ExtArgs>
   player?: boolean | Prisma.TrainingResult$playerArgs<ExtArgs>
@@ -1299,10 +1695,19 @@ export type TrainingResultSelectScalar = {
   overallBefore?: boolean
   overallDecline?: boolean
   overallAfter?: boolean
+  experienceBefore?: boolean
+  experienceGain?: boolean
+  experienceAfter?: boolean
+  formBefore?: boolean
+  formChange?: boolean
+  formAfter?: boolean
+  moraleBefore?: boolean
+  moraleChange?: boolean
+  moraleAfter?: boolean
   createdAt?: boolean
 }
 
-export type TrainingResultOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "sessionId" | "playerId" | "playerFirstName" | "playerLastName" | "playerAge" | "usage" | "intensity" | "primaryBefore" | "primaryGain" | "primaryDecline" | "primaryAfter" | "secondaryBefore" | "secondaryGain" | "secondaryDecline" | "secondaryAfter" | "overallBefore" | "overallDecline" | "overallAfter" | "createdAt", ExtArgs["result"]["trainingResult"]>
+export type TrainingResultOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "sessionId" | "playerId" | "playerFirstName" | "playerLastName" | "playerAge" | "usage" | "intensity" | "primaryBefore" | "primaryGain" | "primaryDecline" | "primaryAfter" | "secondaryBefore" | "secondaryGain" | "secondaryDecline" | "secondaryAfter" | "overallBefore" | "overallDecline" | "overallAfter" | "experienceBefore" | "experienceGain" | "experienceAfter" | "formBefore" | "formChange" | "formAfter" | "moraleBefore" | "moraleChange" | "moraleAfter" | "createdAt", ExtArgs["result"]["trainingResult"]>
 export type TrainingResultInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   session?: boolean | Prisma.TrainingSessionDefaultArgs<ExtArgs>
   player?: boolean | Prisma.TrainingResult$playerArgs<ExtArgs>
@@ -1342,6 +1747,15 @@ export type $TrainingResultPayload<ExtArgs extends runtime.Types.Extensions.Inte
     overallBefore: number
     overallDecline: number
     overallAfter: number
+    experienceBefore: number
+    experienceGain: number
+    experienceAfter: number
+    formBefore: number
+    formChange: number
+    formAfter: number
+    moraleBefore: number
+    moraleChange: number
+    moraleAfter: number
     createdAt: Date
   }, ExtArgs["result"]["trainingResult"]>
   composites: {}
@@ -1787,6 +2201,15 @@ export interface TrainingResultFieldRefs {
   readonly overallBefore: Prisma.FieldRef<"TrainingResult", 'Float'>
   readonly overallDecline: Prisma.FieldRef<"TrainingResult", 'Float'>
   readonly overallAfter: Prisma.FieldRef<"TrainingResult", 'Float'>
+  readonly experienceBefore: Prisma.FieldRef<"TrainingResult", 'Float'>
+  readonly experienceGain: Prisma.FieldRef<"TrainingResult", 'Float'>
+  readonly experienceAfter: Prisma.FieldRef<"TrainingResult", 'Float'>
+  readonly formBefore: Prisma.FieldRef<"TrainingResult", 'Int'>
+  readonly formChange: Prisma.FieldRef<"TrainingResult", 'Int'>
+  readonly formAfter: Prisma.FieldRef<"TrainingResult", 'Int'>
+  readonly moraleBefore: Prisma.FieldRef<"TrainingResult", 'Int'>
+  readonly moraleChange: Prisma.FieldRef<"TrainingResult", 'Int'>
+  readonly moraleAfter: Prisma.FieldRef<"TrainingResult", 'Int'>
   readonly createdAt: Prisma.FieldRef<"TrainingResult", 'DateTime'>
 }
 

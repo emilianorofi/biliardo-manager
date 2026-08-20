@@ -92,6 +92,11 @@ export type TrainingSession = Prisma.TrainingSessionModel
  */
 export type TrainingResult = Prisma.TrainingResultModel
 /**
+ * Model ClubWeeklyUpdate
+ *
+ */
+export type ClubWeeklyUpdate = Prisma.ClubWeeklyUpdateModel
+/**
  * Model GameEvent
  *
  */

@@ -16,6 +16,9 @@ import {
 } from "@/lib/game-config";
 import { getMarketCommitments } from "@/lib/market-commitments";
 import { prisma } from "@/lib/prisma";
+import {
+  processGameClock,
+} from "@/lib/game-clock";
 
 export const dynamic = "force-dynamic";
 
@@ -38,6 +41,10 @@ export async function GET() {
     }
 
     const { clubId } = access;
+    const now = new Date();
+
+    await processGameClock(now);
+
     const {
       databasePlayers,
       youthCoachLevel,
@@ -45,8 +52,16 @@ export async function GET() {
     } = await prisma.$transaction(
       async (transaction) => {
         await ensureInitialAcademy(transaction, clubId);
-        await advanceAcademyIntake(transaction, clubId);
-        await advanceAcademyScouting(transaction, clubId);
+        await advanceAcademyIntake(
+          transaction,
+          clubId,
+          now
+        );
+        await advanceAcademyScouting(
+          transaction,
+          clubId,
+          now
+        );
 
         const [club, players] = await Promise.all([
           transaction.club.findUnique({
