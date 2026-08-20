@@ -724,7 +724,7 @@ export default function TrainingPage() {
               </h2>
 
               <p className="mt-0.5 text-xs text-zinc-400">
-                Intensità calcolata in base alla formazione salvata.
+                Intensità calcolata sulle prove di campionato giocate nella settimana.
               </p>
             </div>
 

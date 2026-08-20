@@ -300,13 +300,16 @@ model TrainingResult {
 
   primaryBefore Float
   primaryGain   Float
+  primaryDecline Float @default(0)
   primaryAfter  Float
 
   secondaryBefore Float
   secondaryGain   Float
+  secondaryDecline Float @default(0)
   secondaryAfter  Float
 
   overallBefore Float
+  overallDecline Float @default(0)
   overallAfter  Float
 
   createdAt DateTime @default(now())

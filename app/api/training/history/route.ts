@@ -130,6 +130,9 @@ export async function GET() {
                   primaryGain:
                     result.primaryGain,
 
+                  primaryDecline:
+                    result.primaryDecline,
+
                   primaryAfter:
                     result.primaryAfter,
 
@@ -139,11 +142,17 @@ export async function GET() {
                   secondaryGain:
                     result.secondaryGain,
 
+                  secondaryDecline:
+                    result.secondaryDecline,
+
                   secondaryAfter:
                     result.secondaryAfter,
 
                   overallBefore:
                     result.overallBefore,
+
+                  overallDecline:
+                    result.overallDecline,
 
                   overallAfter:
                     result.overallAfter,

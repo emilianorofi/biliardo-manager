@@ -1,5 +1,6 @@
 import "server-only";
 
+import type { Prisma } from "@/generated/prisma/client";
 import {
   calculateLeagueCompletion,
 } from "@/lib/league-completion";
@@ -7,6 +8,7 @@ import {
   simulateFixtureWithPlayers,
   type FixtureCareerFormation,
   type FixtureCareerPlayer,
+  type SimulatedPlayerFixture,
 } from "@/lib/fixture-player-simulator";
 import {
   calculateCompletedRound,
@@ -25,6 +27,10 @@ import {
 import {
   recordPlayerFixtureCareer,
 } from "@/lib/player-career-recording";
+import {
+  applyExperienceGain,
+  calculateLeagueExperienceGain,
+} from "@/lib/player-experience";
 import { prisma } from "@/lib/prisma";
 import {
   completeSeasonIfReady,
@@ -260,6 +266,15 @@ export async function playLeagueFixture({
             simulation,
           }
         );
+        const experience =
+          await updateLeagueExperience(
+            transaction,
+            [
+              ...fixture.homeClub.players,
+              ...fixture.awayClub.players,
+            ],
+            simulation
+          );
         const leagueFixtures =
           await transaction.leagueFixture.findMany({
             where: {
@@ -315,6 +330,7 @@ export async function playLeagueFixture({
           homeEntry,
           awayEntry,
           history,
+          experience,
           completion,
           updatedLeague,
           seasonCompletion,
@@ -367,6 +383,7 @@ export async function playLeagueFixture({
         ),
       })),
       history: settled.history,
+      experience: settled.experience,
       standings: {
         home: settled.homeEntry,
         away: settled.awayEntry,
@@ -509,4 +526,94 @@ function createStandingsUpdate(delta: {
     pointsAgainst: { increment: delta.pointsAgainst },
     points: { increment: delta.points },
   };
+}
+
+async function updateLeagueExperience(
+  transaction: Prisma.TransactionClient,
+  players: FixtureCareerPlayer[],
+  simulation: SimulatedPlayerFixture
+) {
+  const appearances = new Map<
+    number,
+    {
+      singles: number;
+      doubles: number;
+    }
+  >();
+
+  for (const game of simulation.games) {
+    for (const participant of game.participants) {
+      const counts =
+        appearances.get(
+          participant.player.id
+        ) ?? {
+          singles: 0,
+          doubles: 0,
+        };
+
+      if (game.gameType === "SINGLES") {
+        counts.singles += 1;
+      } else {
+        counts.doubles += 1;
+      }
+
+      appearances.set(
+        participant.player.id,
+        counts
+      );
+    }
+  }
+
+  const updates = [];
+
+  for (const player of players) {
+    const counts =
+      appearances.get(player.id) ?? {
+        singles: 0,
+        doubles: 0,
+      };
+    const gain =
+      calculateLeagueExperienceGain({
+        singles: counts.singles,
+        doubles: counts.doubles,
+        wasOnBench:
+          counts.singles === 0 &&
+          counts.doubles === 0,
+      });
+    const experienceAfter =
+      applyExperienceGain(
+        player.experience,
+        gain
+      );
+
+    if (
+      experienceAfter !==
+      player.experience
+    ) {
+      await transaction.player.update({
+        where: {
+          id: player.id,
+        },
+        data: {
+          experience:
+            experienceAfter,
+        },
+      });
+    }
+
+    updates.push({
+      playerId: player.id,
+      experienceBefore:
+        player.experience,
+      experienceGain: gain,
+      experienceAfter,
+      usage:
+        counts.singles > 0 ||
+        counts.doubles > 0
+          ? "PLAYED"
+          : "BENCH",
+    });
+  }
+
+  return updates;
 }

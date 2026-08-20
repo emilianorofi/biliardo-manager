@@ -1992,11 +1992,14 @@ export const TrainingResultScalarFieldEnum = {
   intensity: 'intensity',
   primaryBefore: 'primaryBefore',
   primaryGain: 'primaryGain',
+  primaryDecline: 'primaryDecline',
   primaryAfter: 'primaryAfter',
   secondaryBefore: 'secondaryBefore',
   secondaryGain: 'secondaryGain',
+  secondaryDecline: 'secondaryDecline',
   secondaryAfter: 'secondaryAfter',
   overallBefore: 'overallBefore',
+  overallDecline: 'overallDecline',
   overallAfter: 'overallAfter',
   createdAt: 'createdAt'
 } as const

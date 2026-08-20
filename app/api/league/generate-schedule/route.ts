@@ -5,15 +5,14 @@ import { prisma } from "@/lib/prisma";
 import {
   generateDoubleRoundRobin,
 } from "@/lib/league-scheduler";
+import {
+  buildWeeklyRoundDates,
+  getNextLeagueDate,
+} from "@/lib/league-calendar";
 
 export const dynamic = "force-dynamic";
 
 const REQUIRED_CLUBS = 8;
-
-const TUESDAY = 2;
-const FRIDAY = 5;
-
-const MATCH_HOUR = 16;
 
 export async function POST() {
   try {
@@ -126,7 +125,7 @@ export async function POST() {
       REQUIRED_CLUBS * 2 - 2;
 
     const roundDates =
-      buildRoundDates(
+      buildWeeklyRoundDates(
         firstRoundDate,
         totalRounds
       );
@@ -341,84 +340,4 @@ export async function POST() {
       }
     );
   }
-}
-
-function getNextLeagueDate(
-  referenceDate: Date
-) {
-  for (
-    let daysToAdd = 0;
-    daysToAdd <= 7;
-    daysToAdd += 1
-  ) {
-    const candidate =
-      new Date(referenceDate);
-
-    candidate.setDate(
-      referenceDate.getDate() +
-        daysToAdd
-    );
-
-    candidate.setHours(
-      MATCH_HOUR,
-      0,
-      0,
-      0
-    );
-
-    const dayOfWeek =
-      candidate.getDay();
-
-    const isLeagueDay =
-      dayOfWeek === TUESDAY ||
-      dayOfWeek === FRIDAY;
-
-    const isFutureDate =
-      candidate.getTime() >
-      referenceDate.getTime();
-
-    if (
-      isLeagueDay &&
-      isFutureDate
-    ) {
-      return candidate;
-    }
-  }
-
-  throw new Error(
-    "Impossibile determinare la prima giornata."
-  );
-}
-
-function buildRoundDates(
-  firstRoundDate: Date,
-  totalRounds: number
-) {
-  const dates: Date[] = [];
-
-  const currentDate =
-    new Date(firstRoundDate);
-
-  for (
-    let roundIndex = 0;
-    roundIndex < totalRounds;
-    roundIndex += 1
-  ) {
-    dates.push(
-      new Date(currentDate)
-    );
-
-    const daysUntilNextRound =
-      currentDate.getDay() ===
-      TUESDAY
-        ? 3
-        : 4;
-
-    currentDate.setDate(
-      currentDate.getDate() +
-        daysUntilNextRound
-    );
-  }
-
-  return dates;
 }

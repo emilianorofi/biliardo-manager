@@ -34,13 +34,16 @@ type TrainingResult = {
 
   primaryBefore: number;
   primaryGain: number;
+  primaryDecline: number;
   primaryAfter: number;
 
   secondaryBefore: number;
   secondaryGain: number;
+  secondaryDecline: number;
   secondaryAfter: number;
 
   overallBefore: number;
+  overallDecline: number;
   overallAfter: number;
 };
 
@@ -367,9 +370,16 @@ export default function TrainingHistoryPage() {
                                 </p>
 
                                 <p className="text-[10px] font-bold text-emerald-400">
-                                  +
-                                  {formatGain(
+                                  Crescita +
+                                  {formatValue(
                                     result.primaryGain
+                                  )}
+                                </p>
+
+                                <p className="text-[10px] font-bold text-red-300">
+                                  Calo −
+                                  {formatValue(
+                                    result.primaryDecline
                                   )}
                                 </p>
                               </td>
@@ -386,9 +396,16 @@ export default function TrainingHistoryPage() {
                                 </p>
 
                                 <p className="text-[10px] font-bold text-emerald-400">
-                                  +
-                                  {formatGain(
+                                  Crescita +
+                                  {formatValue(
                                     result.secondaryGain
+                                  )}
+                                </p>
+
+                                <p className="text-[10px] font-bold text-red-300">
+                                  Calo −
+                                  {formatValue(
+                                    result.secondaryDecline
                                   )}
                                 </p>
                               </td>
@@ -404,11 +421,23 @@ export default function TrainingHistoryPage() {
                                   )}
                                 </p>
 
-                                <p className="text-[10px] font-bold text-emerald-400">
-                                  +
-                                  {formatGain(
+                                <p
+                                  className={`text-[10px] font-bold ${getChangeTone(
                                     result.overallAfter -
                                       result.overallBefore
+                                  )}`}
+                                >
+                                  Netto{" "}
+                                  {formatSignedChange(
+                                    result.overallAfter -
+                                      result.overallBefore
+                                  )}
+                                </p>
+
+                                <p className="text-[10px] font-bold text-red-300">
+                                  Calo età −
+                                  {formatValue(
+                                    result.overallDecline
                                   )}
                                 </p>
                               </td>
@@ -502,16 +531,39 @@ function formatValue(
   ).format(value);
 }
 
-function formatGain(
+function formatSignedChange(
   value: number
 ) {
-  return new Intl.NumberFormat(
+  const formatted =
+    new Intl.NumberFormat(
     "it-IT",
     {
       minimumFractionDigits: 3,
       maximumFractionDigits: 3,
     }
-  ).format(
-    Math.max(0, value)
-  );
+  ).format(Math.abs(value));
+
+  if (value > 0) {
+    return `+${formatted}`;
+  }
+
+  if (value < 0) {
+    return `−${formatted}`;
+  }
+
+  return formatted;
+}
+
+function getChangeTone(
+  value: number
+) {
+  if (value > 0) {
+    return "text-emerald-400";
+  }
+
+  if (value < 0) {
+    return "text-red-300";
+  }
+
+  return "text-zinc-400";
 }

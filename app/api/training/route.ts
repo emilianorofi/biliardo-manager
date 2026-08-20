@@ -3,6 +3,12 @@ import { NextResponse } from "next/server";
 import { getApiClubAccess } from "@/lib/api-club-access";
 
 import { prisma } from "@/lib/prisma";
+import {
+  calculateLeagueTrainingUsage,
+} from "@/lib/training-usage";
+import {
+  loadWeeklyLeagueTrainingUsage,
+} from "@/lib/weekly-league-training";
 
 export const dynamic =
   "force-dynamic";
@@ -131,33 +137,20 @@ export async function GET() {
       );
     }
 
-    const selectedPlayerIds =
-      new Set(
-        [
-          club.formation
-            ?.slotAPlayerId,
-
-          club.formation
-            ?.slotBPlayerId,
-
-          club.formation
-            ?.slotCPlayerId,
-        ].filter(
-          (
-            playerId
-          ): playerId is number =>
-            playerId !== null &&
-            playerId !== undefined
-        )
+    const usageByPlayer =
+      await loadWeeklyLeagueTrainingUsage(
+        clubId
       );
+    const benchUsage =
+      calculateLeagueTrainingUsage([]);
 
     const players =
       club.players.map(
         (player) => {
-          const isSelected =
-            selectedPlayerIds.has(
+          const playerUsage =
+            usageByPlayer.get(
               player.id
-            );
+            ) ?? benchUsage;
 
           return {
             id:
@@ -187,14 +180,10 @@ export async function GET() {
               player.morale,
 
             usage:
-              isSelected
-                ? "Singolo + 2 coppie"
-                : "Panchina",
+              playerUsage.label,
 
             intensity:
-              isSelected
-                ? 100
-                : 15,
+              playerUsage.intensity,
 
             formationSlot:
               club.formation

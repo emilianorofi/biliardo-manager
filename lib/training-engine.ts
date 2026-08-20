@@ -34,7 +34,7 @@ type TrainingGainInput = {
   focusWeight: number;
 };
 
-const BASE_WEEKLY_GAIN = 0.18;
+const BASE_WEEKLY_GAIN = 0.9;
 
 export function isTrainingFocus(
   value: unknown
@@ -176,34 +176,108 @@ export function getTrainingWeekKey(
   ).padStart(2, "0")}`;
 }
 
-function getAgeMultiplier(
+export function getTrainingWeekRange(
+  date = new Date()
+) {
+  const start = new Date(date);
+
+  start.setUTCHours(0, 0, 0, 0);
+
+  const dayNumber =
+    start.getUTCDay() || 7;
+
+  start.setUTCDate(
+    start.getUTCDate() - dayNumber + 1
+  );
+
+  const end = new Date(start);
+
+  end.setUTCDate(
+    end.getUTCDate() + 7
+  );
+
+  return {
+    start,
+    end,
+  };
+}
+
+export function getAgeMultiplier(
   age: number
 ) {
   if (age <= 18) {
-    return 1.35;
+    return 1.45;
   }
 
-  if (age <= 23) {
-    return 1.2;
+  if (age <= 20) {
+    return 1.38;
   }
 
-  if (age <= 29) {
-    return 1;
+  if (age <= 22) {
+    return 1.32;
+  }
+
+  if (age <= 24) {
+    return 1.25;
+  }
+
+  if (age <= 27) {
+    return 1.16;
+  }
+
+  if (age <= 30) {
+    return 1.06;
+  }
+
+  if (age <= 33) {
+    return 0.98;
+  }
+
+  if (age <= 36) {
+    return 0.9;
   }
 
   if (age <= 39) {
     return 0.8;
   }
 
-  if (age <= 49) {
-    return 0.6;
+  if (age <= 42) {
+    return 0.65;
   }
 
-  if (age <= 59) {
-    return 0.4;
+  if (age <= 45) {
+    return 0.55;
   }
 
-  return 0.25;
+  if (age <= 48) {
+    return 0.43;
+  }
+
+  if (age <= 51) {
+    return 0.3;
+  }
+
+  if (age <= 54) {
+    return 0.18;
+  }
+
+  if (age <= 57) {
+    return 0.09;
+  }
+
+  if (age <= 60) {
+    return 0.06;
+  }
+
+  if (age <= 63) {
+    return 0.04;
+  }
+
+  if (age <= 66) {
+    return 0.02;
+  }
+
+  return 0.005;
 }
 
 function getTalentMultiplier(

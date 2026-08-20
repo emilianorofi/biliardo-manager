@@ -5,14 +5,21 @@ import { getApiClubAccess } from "@/lib/api-club-access";
 import { prisma } from "@/lib/prisma";
 
 import {
-  applyTrainingGain,
-  calculateOverall,
   calculateTrainingGain,
   getTrainerEfficiency,
   getTrainingWeekKey,
   isTrainingFocus,
   type TrainingPlayerValues,
 } from "@/lib/training-engine";
+import {
+  applyWeeklyDevelopment,
+} from "@/lib/player-development";
+import {
+  calculateLeagueTrainingUsage,
+} from "@/lib/training-usage";
+import {
+  loadWeeklyLeagueTrainingUsage,
+} from "@/lib/weekly-league-training";
 
 export const dynamic =
   "force-dynamic";
@@ -46,9 +53,6 @@ export async function POST() {
               },
             ],
           },
-
-          formation:
-            true,
 
           trainingPlan:
             true,
@@ -158,25 +162,13 @@ export async function POST() {
       );
     }
 
-    const selectedPlayerIds =
-      new Set<number>(
-        [
-          club.formation
-            ?.slotAPlayerId,
-
-          club.formation
-            ?.slotBPlayerId,
-
-          club.formation
-            ?.slotCPlayerId,
-        ].filter(
-          (
-            playerId
-          ): playerId is number =>
-            playerId !== null &&
-            playerId !== undefined
-        )
+    const usageByPlayer =
+      await loadWeeklyLeagueTrainingUsage(
+        clubId,
+        processedAt
       );
+    const benchUsage =
+      calculateLeagueTrainingUsage([]);
 
     const trainerEfficiency =
       getTrainerEfficiency(
@@ -213,20 +205,14 @@ export async function POST() {
             const player of
               club.players
           ) {
-            const isSelected =
-              selectedPlayerIds.has(
+            const playerUsage =
+              usageByPlayer.get(
                 player.id
-              );
-
+              ) ?? benchUsage;
             const usage =
-              isSelected
-                ? "Singolo + 2 coppie"
-                : "Panchina";
-
+              playerUsage.label;
             const intensity =
-              isSelected
-                ? 100
-                : 15;
+              playerUsage.intensity;
 
             const currentValues: TrainingPlayerValues =
               {
@@ -257,11 +243,6 @@ export async function POST() {
                 misura:
                   player.misura,
               };
-
-            const overallBefore =
-              calculateOverall(
-                currentValues
-              );
 
             const primaryBefore =
               currentValues[
@@ -309,46 +290,46 @@ export async function POST() {
                   0.5,
               });
 
+            const development =
+              applyWeeklyDevelopment({
+                age:
+                  player.age,
+
+                talent:
+                  player.talent,
+
+                currentValues,
+
+                gains: {
+                  [primaryFocus]:
+                    primaryGain,
+
+                  [secondaryFocus]:
+                    secondaryGain,
+                },
+              });
+            const primaryDecline =
+              development.declines[
+                primaryFocus
+              ];
+            const secondaryDecline =
+              development.declines[
+                secondaryFocus
+              ];
             const primaryAfter =
-              applyTrainingGain(
-                primaryBefore,
-                primaryGain
-              );
-
+              development.values[
+                primaryFocus
+              ];
             const secondaryAfter =
-              applyTrainingGain(
-                secondaryBefore,
-                secondaryGain
-              );
-
-            const trainedValues: TrainingPlayerValues =
-              {
-                ...currentValues,
-              };
-
-            trainedValues[
-              primaryFocus
-            ] = primaryAfter;
-
-            trainedValues[
-              secondaryFocus
-            ] = secondaryAfter;
-
+              development.values[
+                secondaryFocus
+              ];
+            const overallBefore =
+              development.overallBefore;
+            const overallDecline =
+              development.overallDecline;
             const overallAfter =
-              calculateOverall(
-                trainedValues
-              );
-
-            const playerUpdate: Partial<TrainingPlayerValues> =
-              {};
-
-            playerUpdate[
-              primaryFocus
-            ] = primaryAfter;
-
-            playerUpdate[
-              secondaryFocus
-            ] = secondaryAfter;
+              development.overallAfter;
 
             await transaction.player.update({
               where: {
@@ -357,7 +338,7 @@ export async function POST() {
               },
 
               data:
-                playerUpdate,
+                development.values,
             });
 
             const savedResult =
@@ -383,13 +364,16 @@ export async function POST() {
 
                   primaryBefore,
                   primaryGain,
+                  primaryDecline,
                   primaryAfter,
 
                   secondaryBefore,
                   secondaryGain,
+                  secondaryDecline,
                   secondaryAfter,
 
                   overallBefore,
+                  overallDecline,
                   overallAfter,
                 },
               });
@@ -412,13 +396,16 @@ export async function POST() {
 
               primaryBefore,
               primaryGain,
+              primaryDecline,
               primaryAfter,
 
               secondaryBefore,
               secondaryGain,
+              secondaryDecline,
               secondaryAfter,
 
               overallBefore,
+              overallDecline,
               overallAfter,
             });
           }
@@ -449,7 +436,7 @@ export async function POST() {
               description:
                 `Focus primario: ${primaryFocus}. ` +
                 `Focus secondario: ${secondaryFocus}. ` +
-                `${results.length} giocatori allenati.`,
+                `${results.length} giocatori aggiornati con crescita e calo settimanali.`,
 
               createdAt:
                 processedAt,
