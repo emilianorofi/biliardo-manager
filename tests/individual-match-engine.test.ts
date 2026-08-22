@@ -362,6 +362,69 @@ test("assegna all'avversario i punti di falli e passaggi della propria", () => {
   assert.equal(adverseShotFound, true);
 });
 
+test("attribuisce i 3 punti dell'Italiana soltanto al pallino", () => {
+  let threePointShots = 0;
+
+  for (let gameId = 900; gameId < 930; gameId += 1) {
+    const chronicle = buildIndividualGameChronicle(
+      withChroniclePlayers({
+        gameId,
+        specialty: "ITALIANA" as const,
+        winnerSide: "PLAYER_ONE" as const,
+        playerOneScore: 80,
+        playerTwoScore: 65,
+      })
+    );
+
+    for (const shot of chronicle.filter((item) => item.points === 3)) {
+      threePointShots += 1;
+      assert.equal(shot.shotName, "Giocata sul pallino");
+      assert.match(shot.commentary, /pallino/);
+      assert.doesNotMatch(shot.commentary, /Raddrizzo|Traversino/);
+    }
+
+    for (const shot of chronicle.filter(
+      (item) => item.points > 0 && item.points % 2 === 1
+    )) {
+      assert.match(shot.commentary, /pallino/);
+    }
+  }
+
+  assert.ok(threePointShots > 0);
+});
+
+test("rispetta il conteggio semplice e doppio della Goriziana", () => {
+  let directOnlyScores = 0;
+  let cushionOnlyScores = 0;
+
+  for (let gameId = 930; gameId < 960; gameId += 1) {
+    const chronicle = buildIndividualGameChronicle(
+      withChroniclePlayers({
+        gameId,
+        specialty: "GORIZIANA" as const,
+        winnerSide: "PLAYER_TWO" as const,
+        playerOneScore: 324,
+        playerTwoScore: 400,
+      })
+    );
+
+    for (const shot of chronicle) {
+      if (shot.points % 4 === 2) {
+        directOnlyScores += 1;
+        assert.equal(shot.shotFamily, "DIRECT");
+      }
+
+      if (shot.points > 56) {
+        cushionOnlyScores += 1;
+        assert.equal(shot.shotFamily, "CUSHION");
+      }
+    }
+  }
+
+  assert.ok(directOnlyScores > 0);
+  assert.ok(cushionOnlyScores > 0);
+});
+
 function createPlayer(id: number, rating: number): IndividualMatchPlayer {
   return {
     id,
