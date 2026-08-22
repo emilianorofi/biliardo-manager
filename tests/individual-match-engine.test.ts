@@ -8,7 +8,10 @@ import {
   simulateIndividualBestOfThree,
   type IndividualMatchPlayer,
 } from "../lib/individual-match-engine";
-import { buildIndividualGameChronicle } from "../lib/individual-game-chronicle";
+import {
+  buildIndividualGameChronicle,
+  buildIndividualGameSummary,
+} from "../lib/individual-game-chronicle";
 import { MATCH_SHOT_SCORES } from "../lib/match-engine";
 
 test("qualifica esattamente i primi 256 giocatori per overall", () => {
@@ -151,14 +154,14 @@ test("costruisce una cronaca alternata con punteggi e totali corretti", () => {
     playerTwoScore: 400,
   });
 
-  assert.equal(chronicle.length, 16);
-  assert.deepEqual(chronicle.at(-1), {
-    order: 16,
-    playerSide: "PLAYER_TWO",
-    points: chronicle.at(-1)!.points,
-    playerOneTotal: 324,
-    playerTwoTotal: 400,
-  });
+  assert.equal(chronicle.length, 32);
+  assert.equal(chronicle.at(-1)!.order, 32);
+  assert.equal(chronicle.at(-1)!.playerSide, "PLAYER_TWO");
+  assert.equal(chronicle.at(-1)!.playerOneTotal, 324);
+  assert.equal(chronicle.at(-1)!.playerTwoTotal, 400);
+  assert.equal(chronicle.at(-1)!.phase, "FINISH");
+  assert.equal(chronicle.at(-1)!.highlight, "WINNER");
+  assert.match(chronicle.at(-1)!.commentary, /chiude la partita/);
 
   for (const [index, shot] of chronicle.entries()) {
     assert.equal(shot.order, index + 1);
@@ -170,6 +173,7 @@ test("costruisce una cronaca alternata con punteggi e totali corretti", () => {
       shot.points === 0 || MATCH_SHOT_SCORES.GORIZIANA.includes(shot.points)
     );
     assert.equal(shot.points % 2, 0);
+    assert.ok(shot.commentary.length > 20);
   }
 });
 
@@ -208,12 +212,65 @@ test("chiude ogni specialità con il tiro del vincitore", () => {
     assert.ok(allowedScores.includes(finalShot.points));
     assert.equal(finalShot.playerOneTotal, game.playerOneScore);
     assert.equal(finalShot.playerTwoTotal, game.playerTwoScore);
+    assert.ok(chronicle.filter((shot) => shot.points === 0).length >= 4);
 
     for (const shot of chronicle) {
       assert.ok(shot.points === 0 || allowedScores.includes(shot.points));
       assert.ok(shot.playerOneTotal <= game.playerOneScore);
       assert.ok(shot.playerTwoTotal <= game.playerTwoScore);
     }
+  }
+});
+
+test("privilegia i punteggi bassi e produce un vero racconto", () => {
+  const games = [
+    {
+      gameId: 11,
+      specialty: "ITALIANA" as const,
+      winnerSide: "PLAYER_ONE" as const,
+      playerOneScore: 80,
+      playerTwoScore: 65,
+      commonScoreMaximum: 10,
+    },
+    {
+      gameId: 510,
+      specialty: "GORIZIANA" as const,
+      winnerSide: "PLAYER_TWO" as const,
+      playerOneScore: 324,
+      playerTwoScore: 400,
+      commonScoreMaximum: 40,
+    },
+    {
+      gameId: 33,
+      specialty: "TUTTI_DOPPI" as const,
+      winnerSide: "PLAYER_ONE" as const,
+      playerOneScore: 600,
+      playerTwoScore: 492,
+      commonScoreMaximum: 48,
+    },
+  ];
+
+  for (const game of games) {
+    const chronicle = buildIndividualGameChronicle(game);
+    const scoringShots = chronicle.filter((shot) => shot.points > 0);
+    const commonShots = scoringShots.filter(
+      (shot) => shot.points <= game.commonScoreMaximum
+    );
+    const summary = buildIndividualGameSummary({
+      chronicle,
+      winnerSide: game.winnerSide,
+      winnerName: "Giocatore vincente",
+      specialty: game.specialty,
+    });
+
+    assert.ok(commonShots.length / scoringShots.length >= 0.75);
+    assert.ok(
+      scoringShots.every(
+        (shot) => MATCH_SHOT_SCORES[game.specialty].includes(shot.points)
+      )
+    );
+    assert.match(summary, /Giocatore vincente/);
+    assert.match(summary, /tiro decisivo/);
   }
 });
 
