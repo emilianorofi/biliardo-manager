@@ -159,50 +159,62 @@ export default async function IndividualMatchDetailPage({
         </div>
 
         {match.games.length > 0 ? (
-          <div className="divide-y divide-zinc-800">
-            {match.games.map((game) => {
-              const playerOneWon = game.winnerSide === "PLAYER_ONE";
+          <div>
+            <div className="grid grid-cols-[minmax(0,1fr)_96px_minmax(0,1fr)] items-center gap-3 border-b border-zinc-800 bg-zinc-950/40 px-4 py-3 sm:grid-cols-[minmax(0,1fr)_130px_minmax(0,1fr)]">
+              <Link
+                href={`/players/${playerOne.id}?${playerReturnQuery}`}
+                className="truncate text-right text-xs font-black text-white transition hover:text-amber-200 sm:text-sm"
+              >
+                {playerOne.firstName} {playerOne.lastName}
+              </Link>
+              <p className="text-center text-[9px] font-black uppercase tracking-wider text-zinc-600">
+                contro
+              </p>
+              <Link
+                href={`/players/${playerTwo.id}?${playerReturnQuery}`}
+                className="truncate text-xs font-black text-white transition hover:text-amber-200 sm:text-sm"
+              >
+                {playerTwo.firstName} {playerTwo.lastName}
+              </Link>
+            </div>
 
-              return (
-                <article
-                  key={game.id}
-                  className="grid gap-4 px-4 py-4 md:grid-cols-[110px_minmax(0,1fr)] md:items-center"
-                >
-                  <div>
-                    <p className="text-[9px] font-black uppercase tracking-wider text-zinc-600">
-                      Partita {game.order}
-                    </p>
-                    <p className="mt-1 text-xs font-black text-amber-300">
-                      {formatSpecialty(game.specialty)}
-                    </p>
-                  </div>
+            <div className="divide-y divide-zinc-800">
+              {match.games.map((game) => {
+                const playerOneWon = game.winnerSide === "PLAYER_ONE";
 
-                  <div className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-3">
-                    <Link
-                      href={`/players/${playerOne.id}?${playerReturnQuery}`}
-                      className={`truncate text-right text-xs font-black transition hover:text-amber-200 sm:text-sm ${
-                        playerOneWon ? "text-emerald-300" : "text-zinc-400"
+                return (
+                  <article
+                    key={game.id}
+                    className="grid grid-cols-[minmax(0,1fr)_96px_minmax(0,1fr)] items-center gap-3 px-4 py-4 sm:grid-cols-[minmax(0,1fr)_130px_minmax(0,1fr)]"
+                  >
+                    <p
+                      className={`text-right text-3xl font-black tabular-nums ${
+                        playerOneWon ? "text-emerald-300" : "text-zinc-500"
                       }`}
                     >
-                      {playerOne.firstName} {playerOne.lastName}
-                    </Link>
-
-                    <p className="min-w-[96px] text-center text-2xl font-black tabular-nums text-white sm:text-3xl">
-                      {game.playerOneScore}–{game.playerTwoScore}
+                      {game.playerOneScore}
                     </p>
 
-                    <Link
-                      href={`/players/${playerTwo.id}?${playerReturnQuery}`}
-                      className={`truncate text-xs font-black transition hover:text-amber-200 sm:text-sm ${
-                        playerOneWon ? "text-zinc-400" : "text-emerald-300"
+                    <div className="text-center">
+                      <p className="text-[10px] font-black uppercase tracking-wider text-zinc-400">
+                        Partita {game.order}
+                      </p>
+                      <p className="mt-1 text-[10px] font-black text-amber-300 sm:text-xs">
+                        {formatSpecialty(game.specialty)}
+                      </p>
+                    </div>
+
+                    <p
+                      className={`text-3xl font-black tabular-nums ${
+                        playerOneWon ? "text-zinc-500" : "text-emerald-300"
                       }`}
                     >
-                      {playerTwo.firstName} {playerTwo.lastName}
-                    </Link>
-                  </div>
-                </article>
-              );
-            })}
+                      {game.playerTwoScore}
+                    </p>
+                  </article>
+                );
+              })}
+            </div>
           </div>
         ) : (
           <div className="px-6 py-12 text-center">
