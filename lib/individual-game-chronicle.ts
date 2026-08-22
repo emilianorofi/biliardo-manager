@@ -775,6 +775,10 @@ function getShotOutcome({
   random: () => number;
 }): IndividualChronicleShotOutcome {
   if (adverseEvent) {
+    if (specialty === "ITALIANA" && points % 2 === 1) {
+      return "OWN_BALL_PINS";
+    }
+
     const foulProbability =
       shot.key === "PARABOLA" ? 0.72 : 0.42 + shot.difficulty * 0.04;
 
@@ -969,9 +973,11 @@ function getOutcomeCommentary(
         ? "steccaccia"
         : "mancato contatto";
     const consequence =
-      shot.points > basePoints
-        ? `ai ${basePoints} punti di fallo si sommano i birilli, per un totale di ${shot.points} assegnati all'avversario`
-        : `sono ${shot.points} punti assegnati all'avversario`;
+      specialty === "ITALIANA"
+        ? getItalianFoulConsequence(shot.points, random)
+        : shot.points > basePoints
+          ? `ai ${basePoints} punti di fallo si sommano i birilli, per un totale di ${shot.points} assegnati all'avversario`
+          : `sono ${shot.points} punti assegnati all'avversario`;
     const placement =
       foul === "mancato contatto"
         ? selectTemplate(
@@ -982,12 +988,9 @@ function getOutcomeCommentary(
             random
           )
         : "";
-    const pallino =
-      specialty === "ITALIANA" && shot.points % 2 === 1
-        ? " Nel totale entrano anche i 3 punti del pallino preso dall'avversaria."
-        : "";
+    const shotReference = getShotReference(shotDefinition);
 
-    return `${capitalize(foul)} sul ${shotDefinition.name.toLowerCase()}: ${consequence}.${pallino}${placement}`;
+    return `${capitalize(foul)} ${shotReference}: ${consequence}.${placement}`;
   }
 
   if (shot.outcome === "OWN_BALL_PINS") {
@@ -1066,6 +1069,65 @@ function getOutcomeCommentary(
         );
 
   return `${shotDefinition.name}: ${measureError}`;
+}
+
+function getItalianFoulConsequence(points: number, random: () => number) {
+  const basePoints = FOUL_BASE_POINTS.ITALIANA;
+  const remainingPoints = points - basePoints;
+  const pallinoOptions = [0, 2].filter((pallinoPoints) =>
+    ITALIAN_PIN_TOTALS.includes(
+      (remainingPoints - pallinoPoints) as (typeof ITALIAN_PIN_TOTALS)[number]
+    )
+  );
+  const pallinoPoints = selectWeighted(
+    pallinoOptions.map((value) => ({
+      value,
+      weight: value === 0 ? 3 : 1,
+    })),
+    random
+  );
+  const pinPoints = remainingPoints - pallinoPoints;
+  const additions: string[] = [];
+
+  if (pinPoints > 0) additions.push(`${pinPoints} punti di birilli`);
+  if (pallinoPoints > 0) {
+    additions.push("2 punti per il pallino colpito durante il fallo");
+  }
+
+  if (additions.length === 0) {
+    return `sono ${points} punti assegnati all'avversario`;
+  }
+
+  return `ai ${basePoints} punti di fallo si aggiungono ${joinItalianList(additions)}, per un totale di ${points} assegnati all'avversario`;
+}
+
+function getShotReference(shot: ShotDefinition) {
+  const feminineShots = new Set([
+    "CANDELA",
+    "SPONDA_BIGLIA",
+    "BRICOLLA",
+    "GARUFFA",
+    "MEZZA_GARUFFA",
+    "PARABOLA",
+  ]);
+  const pluralShots = new Set([
+    "TRE_SPONDE_CALCIO",
+    "CINQUE_SPONDE_CALCIO",
+  ]);
+  const name = shot.name.toLowerCase();
+
+  if (shot.key === "ANGOLO_PRIMA" || shot.key === "ANGOLO_SECONDA") {
+    return `sull'${name}`;
+  }
+
+  if (pluralShots.has(shot.key)) return `sulle ${name}`;
+
+  return `${feminineShots.has(shot.key) ? "sulla" : "sul"} ${name}`;
+}
+
+function joinItalianList(parts: string[]) {
+  if (parts.length <= 1) return parts[0] ?? "";
+  return `${parts.slice(0, -1).join(", ")} e ${parts.at(-1)}`;
 }
 
 function getScoringPhrase(
