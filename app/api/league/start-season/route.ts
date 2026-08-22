@@ -1,271 +1,137 @@
 import { NextResponse } from "next/server";
 
 import { prisma } from "@/lib/prisma";
+import {
+  CLUBS_PER_LEAGUE,
+  TOTAL_WORLD_LEAGUES,
+} from "@/lib/world-structure";
 
 export const dynamic = "force-dynamic";
 
-const REQUIRED_CLUBS = 8;
-const REQUIRED_FIXTURES = 56;
+const REQUIRED_FIXTURES =
+  CLUBS_PER_LEAGUE * (CLUBS_PER_LEAGUE - 1);
 
 export async function POST() {
   try {
-    const league =
-      await prisma.league.findFirst({
+    const season = await prisma.season.findFirst({
+      where: {
+        status: "PREPARATION",
+      },
+      orderBy: {
+        number: "desc",
+      },
+      include: {
+        leagues: {
+          orderBy: [
+            { level: "asc" },
+            { groupCode: "asc" },
+          ],
+          include: {
+            _count: {
+              select: {
+                entries: true,
+                fixtures: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!season) {
+      const activeSeason = await prisma.season.findFirst({
+        where: {
+          status: "ACTIVE",
+        },
         orderBy: {
-          id: "desc",
+          number: "desc",
         },
-
-        include: {
-          season: true,
+        select: {
+          id: true,
         },
       });
 
-    if (!league) {
       return NextResponse.json(
         {
-          error:
-            "Non esiste alcun campionato da avviare.",
+          error: activeSeason
+            ? "La stagione è già attiva."
+            : "Non esiste una stagione in preparazione.",
         },
         {
-          status: 404,
+          status: activeSeason ? 409 : 404,
         }
       );
     }
 
-    if (
-      league.status === "ACTIVE" ||
-      league.season.status ===
-        "ACTIVE"
-    ) {
+    if (season.leagues.length !== TOTAL_WORLD_LEAGUES) {
       return NextResponse.json(
         {
-          error:
-            "La stagione è già attiva.",
-
-          seasonId:
-            league.season.id,
-
-          leagueId:
-            league.id,
+          error: `La piramide deve contenere ${TOTAL_WORLD_LEAGUES} campionati.`,
+          leaguesFound: season.leagues.length,
         },
-        {
-          status: 409,
-        }
+        { status: 400 }
       );
     }
 
-    if (
-      league.status !==
-        "PREPARATION" ||
-      league.season.status !==
-        "PREPARATION"
-    ) {
+    const incompleteLeague = season.leagues.find(
+      (league) =>
+        league._count.entries !== CLUBS_PER_LEAGUE ||
+        league._count.fixtures !== REQUIRED_FIXTURES
+    );
+
+    if (incompleteLeague) {
       return NextResponse.json(
         {
-          error:
-            "La stagione non si trova nello stato corretto per essere avviata.",
-
-          seasonStatus:
-            league.season.status,
-
-          leagueStatus:
-            league.status,
+          error: `${incompleteLeague.name} non è completo.`,
+          clubsFound: incompleteLeague._count.entries,
+          fixturesFound: incompleteLeague._count.fixtures,
         },
-        {
-          status: 400,
-        }
+        { status: 400 }
       );
     }
 
-    const entriesCount =
-      await prisma.leagueEntry.count({
+    await prisma.$transaction(async (transaction) => {
+      await transaction.season.update({
         where: {
-          leagueId: league.id,
+          id: season.id,
+        },
+        data: {
+          status: "ACTIVE",
         },
       });
-
-    if (
-      entriesCount !==
-      REQUIRED_CLUBS
-    ) {
-      return NextResponse.json(
-        {
-          error:
-            `Il campionato deve contenere esattamente ${REQUIRED_CLUBS} club.`,
-
-          clubsFound:
-            entriesCount,
-
-          clubsRequired:
-            REQUIRED_CLUBS,
-        },
-        {
-          status: 400,
-        }
-      );
-    }
-
-    const fixturesCount =
-      await prisma.leagueFixture.count({
+      await transaction.league.updateMany({
         where: {
-          leagueId: league.id,
+          seasonId: season.id,
+        },
+        data: {
+          status: "ACTIVE",
+          currentRound: 0,
         },
       });
-
-    if (
-      fixturesCount !==
-      REQUIRED_FIXTURES
-    ) {
-      return NextResponse.json(
-        {
-          error:
-            `Il calendario deve contenere esattamente ${REQUIRED_FIXTURES} incontri.`,
-
-          fixturesFound:
-            fixturesCount,
-
-          fixturesRequired:
-            REQUIRED_FIXTURES,
-        },
-        {
-          status: 400,
-        }
-      );
-    }
-
-    const scheduledFixturesCount =
-      await prisma.leagueFixture.count({
-        where: {
-          leagueId: league.id,
-
-          status: "SCHEDULED",
-        },
-      });
-
-    if (
-      scheduledFixturesCount !==
-      REQUIRED_FIXTURES
-    ) {
-      return NextResponse.json(
-        {
-          error:
-            "Non tutti gli incontri risultano correttamente programmati.",
-
-          scheduledFixtures:
-            scheduledFixturesCount,
-
-          fixturesRequired:
-            REQUIRED_FIXTURES,
-        },
-        {
-          status: 400,
-        }
-      );
-    }
-
-    const result =
-      await prisma.$transaction(
-        async (transaction) => {
-          const season =
-            await transaction.season.update({
-              where: {
-                id:
-                  league.seasonId,
-              },
-
-              data: {
-                status: "ACTIVE",
-              },
-            });
-
-          const updatedLeague =
-            await transaction.league.update({
-              where: {
-                id: league.id,
-              },
-
-              data: {
-                status: "ACTIVE",
-                currentRound: 0,
-              },
-            });
-
-          return {
-            season,
-            league: updatedLeague,
-          };
-        }
-      );
+    });
 
     return NextResponse.json({
-      message:
-        "Stagione avviata correttamente.",
-
+      message: "Piramide e stagione avviate correttamente.",
       season: {
-        id:
-          result.season.id,
-
-        number:
-          result.season.number,
-
-        name:
-          result.season.name,
-
-        status:
-          result.season.status,
-
-        startsAt:
-          result.season.startsAt
-            ? result.season.startsAt.toISOString()
-            : null,
-
-        endsAt:
-          result.season.endsAt
-            ? result.season.endsAt.toISOString()
-            : null,
+        id: season.id,
+        number: season.number,
+        name: season.name,
+        status: "ACTIVE",
+        startsAt: season.startsAt?.toISOString() ?? null,
+        endsAt: season.endsAt?.toISOString() ?? null,
       },
-
-      league: {
-        id:
-          result.league.id,
-
-        name:
-          result.league.name,
-
-        level:
-          result.league.level,
-
-        groupCode:
-          result.league.groupCode,
-
-        status:
-          result.league.status,
-
-        currentRound:
-          result.league.currentRound,
-      },
-
       summary: {
-        clubs:
-          entriesCount,
-
-        fixtures:
-          fixturesCount,
-
-        scheduledFixtures:
-          scheduledFixturesCount,
+        leagues: season.leagues.length,
+        clubs: season.leagues.length * CLUBS_PER_LEAGUE,
+        fixtures: season.leagues.length * REQUIRED_FIXTURES,
       },
     });
   } catch (error) {
-    console.error(
-      "Errore durante l'avvio della stagione:",
-      error
-    );
+    console.error("Errore durante l'avvio della stagione:", error);
 
     return NextResponse.json(
       {
-        error:
-          "Impossibile avviare la stagione.",
+        error: "Impossibile avviare la stagione.",
       },
       {
         status: 500,

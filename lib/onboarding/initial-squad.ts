@@ -99,13 +99,19 @@ export type InitialPlayer = ReturnType<
   typeof createInitialPlayer
 >;
 
-export function createInitialSquad() {
+export function createInitialSquad(leagueLevel = 1) {
   const firstNames = shuffle([...FIRST_NAMES]);
   const lastNames = shuffle([...LAST_NAMES]);
+  const levelPenalty =
+    Math.max(1, Math.min(4, leagueLevel)) - 1;
 
   return INITIAL_PROFILES.map((profile, index) =>
     createInitialPlayer(
-      profile,
+      {
+        ...profile,
+        overall:
+          profile.overall - levelPenalty * 3,
+      },
       firstNames[index],
       lastNames[index]
     )

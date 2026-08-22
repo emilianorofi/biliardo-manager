@@ -14,8 +14,15 @@ automaticamente: il manager non può anticiparli con pulsanti manuali.
 | Mercoledì | Nessun evento fisso; gestione di squadra e mercato |
 | Giovedì | Nessun evento fisso; preparazione della formazione |
 | Venerdì 21:00 | Giornata di campionato automatica |
-| Sabato | Nessun evento fisso; preparazione ai tornei |
-| Domenica 14:00 | Torneo individuale, Europeo o Mondiale |
+| Sabato 10:00 | Selezione dei 256 giocatori e sorteggio del torneo |
+| Sabato 14:00 | 128esimi di finale |
+| Sabato 16:00 | 64esimi di finale |
+| Sabato 18:00 | 32esimi di finale |
+| Sabato 20:00 | 16esimi di finale |
+| Domenica 10:00 | Ottavi di finale |
+| Domenica 12:00 | Quarti di finale |
+| Domenica 14:00 | Semifinali |
+| Domenica 16:00 | Finale e premiazione |
 | Sempre | Mercato, aste e svincolati |
 
 ## Aggiornamento del lunedì
@@ -78,11 +85,25 @@ nell'aggiornamento del lunedì successivo.
 
 ## Tornei individuali
 
-I tornei individuali, gli Europei e i Mondiali iniziano automaticamente la
-domenica alle 14:00. L'iscrizione o la scelta del giocatore termina alle 13:59.
-Risultati e news vengono pubblicati subito; esperienza e allenamento vengono
-applicati il lunedì successivo in base al turno raggiunto, non per singola
-partita. Le formule dei premi per turno saranno definite separatamente.
+Il sabato alle 10:00 vengono selezionati automaticamente i primi 256 giocatori
+per overall e viene sorteggiato una sola volta l'intero tabellone. Non esistono
+teste di serie o protezioni per club e nazionalità. Il manager non deve iscrivere
+alcun giocatore.
+
+I turni vengono disputati progressivamente fra sabato e domenica secondo gli
+orari del calendario. Il tabellone non cambia dopo il sorteggio e mostra i
+risultati soltanto quando il relativo turno è stato elaborato. Esperienza e
+allenamento individuale vengono applicati il lunedì successivo in base al turno
+raggiunto, non per singola partita.
+
+Nelle giornate 1, 4, 8 e 11 si disputa il torneo di Italiana; nelle giornate 2,
+5, 9 e 12 quello di Goriziana; nelle giornate 3, 6, 10 e 13 quello di Tutti
+Doppi. La giornata 7 ospita l'Europeo e la giornata 14 il Mondiale.
+
+Ogni confronto dei tornei di specialità è al meglio delle tre prove della stessa
+specialità. Europeo e Mondiale sorteggiano per ogni confronto l'ordine delle
+tre specialità: se dopo le prime due prove il risultato è 1-1, viene disputata
+la specialità rimasta.
 
 ## Accademia
 
@@ -100,7 +121,7 @@ Le news seguono gli eventi:
 - lunedì 12:05: riepilogo settimanale sportivo e finanziario;
 - martedì dopo le 21:00: Accademia e scouting;
 - venerdì dopo le 21:00: campionato, cronaca e classifica;
-- domenica dopo le 14:00: percorso e risultati dei tornei;
+- sabato dalle 10:00 e domenica: sorteggio e avanzamento dei tornei;
 - immediatamente: mercato e altri eventi straordinari.
 
 ## Garanzie del motore temporale

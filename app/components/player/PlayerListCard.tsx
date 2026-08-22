@@ -3,6 +3,7 @@ import { ArrowUpRight } from "lucide-react";
 
 import type { Player } from "../../types/player";
 import PlayerPortrait from "./PlayerPortrait";
+import { getNationalityDisplay } from "@/lib/nationalities";
 
 type LatestPerformance = {
   playedAt: string;
@@ -84,7 +85,10 @@ export default function PlayerListCard({
 
               <p className="mt-0.5 flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-[10px] text-slate-400">
                 <span className="inline-flex items-center gap-1.5 font-semibold text-slate-300">
-                  <CountryFlag code={nationality.code} label={nationality.label} />
+                  <CountryFlag
+                    flag={nationality.flag}
+                    label={nationality.label}
+                  />
                   {nationality.label}
                 </span>
                 <span aria-hidden="true">·</span>
@@ -175,36 +179,20 @@ export default function PlayerListCard({
 }
 
 function CountryFlag({
-  code,
+  flag,
   label,
 }: {
-  code: "IT" | "FR" | "ES" | null;
+  flag: string;
   label: string;
 }) {
-  if (!code) {
-    return (
-      <span
-        aria-label={`Bandiera di ${label}`}
-        className="inline-flex h-3 w-5 items-center justify-center rounded-[2px] border border-white/20 bg-slate-700 text-[7px] font-black text-slate-300 shadow-sm"
-      >
-        ?
-      </span>
-    );
-  }
-
-  const backgrounds = {
-    IT: "linear-gradient(90deg, #009246 0 33.33%, #ffffff 33.33% 66.66%, #ce2b37 66.66% 100%)",
-    FR: "linear-gradient(90deg, #0055a4 0 33.33%, #ffffff 33.33% 66.66%, #ef4135 66.66% 100%)",
-    ES: "linear-gradient(180deg, #aa151b 0 25%, #f1bf00 25% 75%, #aa151b 75% 100%)",
-  };
-
   return (
     <span
       role="img"
       aria-label={`Bandiera di ${label}`}
-      className="inline-block h-3 w-5 shrink-0 rounded-[2px] border border-white/25 shadow-sm shadow-black/30"
-      style={{ background: backgrounds[code] }}
-    />
+      className="inline-flex h-3 w-5 shrink-0 items-center justify-center text-sm leading-none"
+    >
+      {flag}
+    </span>
   );
 }
 
@@ -318,40 +306,6 @@ function LatestPerformance({
         {performance.teamScore}-{performance.opponentScore} · Slot {performance.formationSlot}
       </p>
     </div>
-  );
-}
-
-function getNationalityDisplay(value: string) {
-  const normalizedValue = value.trim().toLowerCase();
-  const nationalities: Record<
-    string,
-    { code: "IT" | "FR" | "ES"; label: string }
-  > = {
-    "🇮🇹": { code: "IT", label: "Italia" },
-    it: { code: "IT", label: "Italia" },
-    ita: { code: "IT", label: "Italia" },
-    italia: { code: "IT", label: "Italia" },
-    italy: { code: "IT", label: "Italia" },
-    italiana: { code: "IT", label: "Italia" },
-    "🇫🇷": { code: "FR", label: "Francia" },
-    fr: { code: "FR", label: "Francia" },
-    fra: { code: "FR", label: "Francia" },
-    francia: { code: "FR", label: "Francia" },
-    france: { code: "FR", label: "Francia" },
-    francese: { code: "FR", label: "Francia" },
-    "🇪🇸": { code: "ES", label: "Spagna" },
-    es: { code: "ES", label: "Spagna" },
-    esp: { code: "ES", label: "Spagna" },
-    spagna: { code: "ES", label: "Spagna" },
-    spain: { code: "ES", label: "Spagna" },
-    spagnola: { code: "ES", label: "Spagna" },
-  };
-
-  return (
-    nationalities[normalizedValue] ?? {
-      code: null,
-      label: value || "Nazionalità non disponibile",
-    }
   );
 }
 

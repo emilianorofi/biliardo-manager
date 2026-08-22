@@ -28,6 +28,7 @@ import { prisma } from "@/lib/prisma";
 
 type TakeoverCandidate = {
   clubId: number;
+  leagueLevel: number;
 };
 
 export async function createManagerClub(
@@ -75,7 +76,6 @@ export async function createManagerClub(
 
   const normalizedName = normalizeClubName(clubName);
   const shortName = createClubShortName(clubName);
-  const initialSquad = createInitialSquad();
   const initialAcademy = createInitialAcademy();
 
   try {
@@ -125,7 +125,9 @@ export async function createManagerClub(
         const candidates = await transaction.$queryRaw<
           TakeoverCandidate[]
         >`
-          SELECT club."id" AS "clubId"
+          SELECT
+            club."id" AS "clubId",
+            league."level" AS "leagueLevel"
           FROM "Club" AS club
           INNER JOIN "LeagueEntry" AS entry
             ON entry."clubId" = club."id"
@@ -150,13 +152,16 @@ export async function createManagerClub(
                 selected_season."number" DESC
               LIMIT 1
             )
-            AND league."level" = (
-              SELECT MAX(lowest_league."level")
-              FROM "League" AS lowest_league
-              WHERE lowest_league."seasonId" = season."id"
-            )
           ORDER BY
-            league."level" DESC,
+            league."level" ASC,
+            (
+              SELECT COUNT(*)
+              FROM "LeagueEntry" AS group_entry
+              INNER JOIN "Manager" AS group_manager
+                ON group_manager."clubId" = group_entry."clubId"
+              WHERE group_entry."leagueId" = league."id"
+            ) ASC,
+            league."groupCode" ASC,
             entry."points" ASC,
             (
               entry."pointsFor" -
@@ -172,7 +177,7 @@ export async function createManagerClub(
 
         if (!candidate) {
           throw new ClubCreationError(
-            "Al momento non ci sono club IA disponibili nella categoria più bassa."
+            "Al momento non ci sono club IA disponibili nella piramide."
           );
         }
 
@@ -187,7 +192,9 @@ export async function createManagerClub(
           primaryColor,
           secondaryColor,
           crestStyle,
-          initialSquad,
+          initialSquad: createInitialSquad(
+            candidate.leagueLevel
+          ),
           initialAcademy,
         });
       },
