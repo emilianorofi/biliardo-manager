@@ -8,6 +8,7 @@ import {
   simulateIndividualBestOfThree,
   type IndividualMatchPlayer,
 } from "../lib/individual-match-engine";
+import { buildIndividualGameChronicle } from "../lib/individual-game-chronicle";
 import { MATCH_SHOT_SCORES } from "../lib/match-engine";
 
 test("qualifica esattamente i primi 256 giocatori per overall", () => {
@@ -139,6 +140,81 @@ test("conserva i punteggi ammessi per ogni singolo tiro", () => {
     4, 8, 12, 16, 20, 24, 28, 32, 36, 40, 44, 48, 52, 56, 60, 64, 68, 72,
     76, 80, 84, 88, 92, 96, 100, 104, 108, 112,
   ]);
+});
+
+test("costruisce una cronaca alternata con punteggi e totali corretti", () => {
+  const chronicle = buildIndividualGameChronicle({
+    gameId: 510,
+    specialty: "GORIZIANA",
+    winnerSide: "PLAYER_TWO",
+    playerOneScore: 324,
+    playerTwoScore: 400,
+  });
+
+  assert.equal(chronicle.length, 16);
+  assert.deepEqual(chronicle.at(-1), {
+    order: 16,
+    playerSide: "PLAYER_TWO",
+    points: chronicle.at(-1)!.points,
+    playerOneTotal: 324,
+    playerTwoTotal: 400,
+  });
+
+  for (const [index, shot] of chronicle.entries()) {
+    assert.equal(shot.order, index + 1);
+    assert.equal(
+      shot.playerSide,
+      index % 2 === 0 ? "PLAYER_ONE" : "PLAYER_TWO"
+    );
+    assert.ok(
+      shot.points === 0 || MATCH_SHOT_SCORES.GORIZIANA.includes(shot.points)
+    );
+    assert.equal(shot.points % 2, 0);
+  }
+});
+
+test("chiude ogni specialità con il tiro del vincitore", () => {
+  const cases = [
+    {
+      gameId: 1,
+      specialty: "ITALIANA" as const,
+      winnerSide: "PLAYER_ONE" as const,
+      playerOneScore: 80,
+      playerTwoScore: 65,
+    },
+    {
+      gameId: 2,
+      specialty: "GORIZIANA" as const,
+      winnerSide: "PLAYER_TWO" as const,
+      playerOneScore: 324,
+      playerTwoScore: 400,
+    },
+    {
+      gameId: 3,
+      specialty: "TUTTI_DOPPI" as const,
+      winnerSide: "PLAYER_ONE" as const,
+      playerOneScore: 600,
+      playerTwoScore: 492,
+    },
+  ];
+
+  for (const game of cases) {
+    const chronicle = buildIndividualGameChronicle(game);
+    const finalShot = chronicle.at(-1)!;
+    const allowedScores = MATCH_SHOT_SCORES[game.specialty];
+
+    assert.equal(finalShot.playerSide, game.winnerSide);
+    assert.ok(finalShot.points > 0);
+    assert.ok(allowedScores.includes(finalShot.points));
+    assert.equal(finalShot.playerOneTotal, game.playerOneScore);
+    assert.equal(finalShot.playerTwoTotal, game.playerTwoScore);
+
+    for (const shot of chronicle) {
+      assert.ok(shot.points === 0 || allowedScores.includes(shot.points));
+      assert.ok(shot.playerOneTotal <= game.playerOneScore);
+      assert.ok(shot.playerTwoTotal <= game.playerTwoScore);
+    }
+  }
 });
 
 function createPlayer(id: number, rating: number): IndividualMatchPlayer {
