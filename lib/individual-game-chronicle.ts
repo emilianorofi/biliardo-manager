@@ -273,6 +273,8 @@ export function buildIndividualGameChronicle({
   playerTwoPerformanceRating,
   playerOne,
   playerTwo,
+  playerOneName = "Il primo giocatore",
+  playerTwoName = "Il secondo giocatore",
 }: {
   gameId: number;
   specialty: MatchSpecialty;
@@ -283,6 +285,8 @@ export function buildIndividualGameChronicle({
   playerTwoPerformanceRating: number;
   playerOne: IndividualChroniclePlayerValues;
   playerTwo: IndividualChroniclePlayerValues;
+  playerOneName?: string;
+  playerTwoName?: string;
 }) {
   const allowedScores = MATCH_SHOT_SCORES[specialty];
   const random = createSeededRandom(
@@ -398,6 +402,10 @@ export function buildIndividualGameChronicle({
       ? oppositeSide(rawShot.scoringSide)
       : rawShot.scoringSide;
     const actingPlayer = adverseEvent ? potentialOffender : scoringPlayer;
+    const actingPlayerName =
+      playerSide === "PLAYER_ONE" ? playerOneName : playerTwoName;
+    const scoringPlayerName =
+      rawShot.scoringSide === "PLAYER_ONE" ? playerOneName : playerTwoName;
     const selectedShot = adverseEvent
       ? adverseShot
       : selectShot(specialty, actingPlayer, rawShot.points, narrativeRandom);
@@ -423,6 +431,8 @@ export function buildIndividualGameChronicle({
       previousPlayerOneTotal,
       previousPlayerTwoTotal,
       isFinalShot,
+      actingPlayerName,
+      scoringPlayerName,
       random: narrativeRandom,
     });
 
@@ -881,6 +891,260 @@ export function buildIndividualGameSummary({
   return `${opening} ${middle}${discipline} ${closing}`;
 }
 
+export function selectIndividualChronicleHighlights({
+  chronicle,
+  gameId,
+}: {
+  chronicle: IndividualChronicleShot[];
+  gameId: number;
+}) {
+  const targetCount = Math.min(chronicle.length, 20 + Math.abs(gameId) % 6);
+
+  if (chronicle.length <= targetCount) return chronicle;
+
+  const lastIndex = chronicle.length - 1;
+  const selectedIndexes = new Set([
+    0,
+    1,
+    Math.floor(lastIndex * 0.25),
+    Math.floor(lastIndex * 0.5),
+    Math.floor(lastIndex * 0.75),
+    lastIndex - 1,
+    lastIndex,
+  ]);
+  const rankedShots = chronicle
+    .map((shot, index) => ({
+      index,
+      importance: getChronicleShotImportance(shot, index, lastIndex),
+    }))
+    .sort(
+      (left, right) =>
+        right.importance - left.importance || left.index - right.index
+    );
+
+  for (const candidate of rankedShots) {
+    if (selectedIndexes.size >= targetCount) break;
+    selectedIndexes.add(candidate.index);
+  }
+
+  return [...selectedIndexes]
+    .sort((left, right) => left - right)
+    .map((index) => chronicle[index]);
+}
+
+export function buildIndividualGameIntroduction({
+  venue,
+  tournamentName,
+  stageLabel,
+  specialty,
+  playerOneName,
+  playerTwoName,
+  playerOneRanking,
+  playerTwoRanking,
+  playerOneOverall,
+  playerTwoOverall,
+}: {
+  venue: string;
+  tournamentName: string;
+  stageLabel: string;
+  specialty: MatchSpecialty;
+  playerOneName: string;
+  playerTwoName: string;
+  playerOneRanking?: number | null;
+  playerTwoRanking?: number | null;
+  playerOneOverall?: number | null;
+  playerTwoOverall?: number | null;
+}) {
+  const targetPoints = MATCH_TARGET_POINTS[specialty];
+  const rankingLine = getRankingIntroduction(
+    playerOneName,
+    playerTwoName,
+    playerOneRanking,
+    playerTwoRanking
+  );
+  const overallLine = getOverallIntroduction(
+    playerOneName,
+    playerTwoName,
+    playerOneOverall,
+    playerTwoOverall
+  );
+
+  return [
+    `${venue} ospita una delle sfide più attese di ${stageLabel.toLowerCase()} del ${tournamentName}.`,
+    `${playerOneName}${formatRankingSuffix(playerOneRanking)} affronta ${playerTwoName}${formatRankingSuffix(playerTwoRanking)}.`,
+    rankingLine,
+    overallLine,
+    `Si gioca a ${formatSpecialtyName(specialty)}, con traguardo fissato a ${targetPoints} punti: realizzazione e misura avranno lo stesso peso.`,
+    "Le prime battute serviranno a leggere il tavolo, ma ogni errore può cambiare subito l'inerzia della partita.",
+  ];
+}
+
+export function buildIndividualGameClosing({
+  chronicle,
+  specialty,
+  winnerSide,
+  playerOneName,
+  playerTwoName,
+  gameOrder,
+}: {
+  chronicle: IndividualChronicleShot[];
+  specialty: MatchSpecialty;
+  winnerSide: IndividualChroniclePlayerSide;
+  playerOneName: string;
+  playerTwoName: string;
+  gameOrder: number;
+}) {
+  const finalShot = chronicle.at(-1);
+
+  if (!finalShot) return ["La partita non dispone ancora di un epilogo."];
+
+  const winnerName =
+    winnerSide === "PLAYER_ONE" ? playerOneName : playerTwoName;
+  const loserName =
+    winnerSide === "PLAYER_ONE" ? playerTwoName : playerOneName;
+  const targetPoints = MATCH_TARGET_POINTS[specialty];
+  let currentLeader: IndividualChroniclePlayerSide | null = null;
+  let leadChanges = 0;
+  let winnerMaximumDeficit = 0;
+
+  for (const shot of chronicle) {
+    const leader = getLeader(shot.playerOneTotal, shot.playerTwoTotal);
+
+    if (leader && currentLeader && leader !== currentLeader) leadChanges += 1;
+    if (leader) currentLeader = leader;
+
+    const deficit =
+      winnerSide === "PLAYER_ONE"
+        ? shot.playerTwoTotal - shot.playerOneTotal
+        : shot.playerOneTotal - shot.playerTwoTotal;
+    winnerMaximumDeficit = Math.max(winnerMaximumDeficit, deficit);
+  }
+
+  const biggestShot = chronicle
+    .filter((shot) => shot.playerSide === shot.scoringSide)
+    .reduce<IndividualChronicleShot | null>(
+      (best, shot) => (!best || shot.points > best.points ? shot : best),
+      null
+    );
+  const biggestShotPlayer =
+    biggestShot?.playerSide === "PLAYER_TWO" ? playerTwoName : playerOneName;
+  const adverseEvents = chronicle.filter(
+    (shot) => shot.outcome === "FOUL" || shot.outcome === "OWN_BALL_PINS"
+  ).length;
+  const finalScore = `${finalShot.playerOneTotal}–${finalShot.playerTwoTotal}`;
+  const matchFlow =
+    winnerMaximumDeficit >= targetPoints * 0.15
+      ? `${winnerName} completa una rimonta costruita senza perdere lucidità nei momenti più delicati.`
+      : leadChanges >= 3
+        ? `Il comando cambia ${leadChanges} volte, prima che ${winnerName} trovi l'allungo definitivo.`
+        : `${winnerName} prende progressivamente il controllo e non concede il rientro decisivo.`;
+  const decisiveLine =
+    finalShot.playerSide === finalShot.scoringSide
+      ? `${winnerName} riconosce il tiro della chiusura e lo realizza: il tabellone si ferma sul ${finalScore}.`
+      : `L'ultimo errore di ${loserName} assegna i punti decisivi e fissa il ${finalScore}.`;
+  const biggestLine = biggestShot
+    ? `Il colpo più pesante è il ${biggestShot.shotName.toLowerCase()} da ${biggestShot.points} punti firmato da ${biggestShotPlayer}.`
+    : "La partita si decide più sulla continuità che su una singola grande realizzazione.";
+  const disciplineLine =
+    adverseEvents > 0
+      ? `${adverseEvents} episodi tra falli e passaggi della propria sui birilli incidono sull'andamento del punteggio.`
+      : "Nessuno dei due regala punti con falli: la differenza nasce interamente dalle realizzazioni.";
+
+  return [
+    decisiveLine,
+    matchFlow,
+    biggestLine,
+    disciplineLine,
+    `${loserName} resta in partita fino alla fase conclusiva, ma non trova l'ultima risposta utile.`,
+    `${winnerName} conquista così la partita ${gameOrder} dell'incontro.`,
+  ];
+}
+
+function getChronicleShotImportance(
+  shot: IndividualChronicleShot,
+  index: number,
+  lastIndex: number
+) {
+  const highlightScores: Record<IndividualChronicleShot["highlight"], number> = {
+    NONE: 0,
+    MISS: 8,
+    FOUL: 75,
+    LEAD_CHANGE: 95,
+    BIG_SHOT: 85,
+    WINNER: 1_000,
+  };
+  const outcomeScores: Record<IndividualChronicleShotOutcome, number> = {
+    COMPLETE: 28,
+    PARTIAL_POINTS: 18,
+    PARTIAL_DEFENSE: 14,
+    ERROR: 4,
+    FOUL: 45,
+    OWN_BALL_PINS: 42,
+  };
+  const finishWeight = lastIndex > 0 ? (index / lastIndex) * 18 : 0;
+
+  return (
+    highlightScores[shot.highlight] +
+    outcomeScores[shot.outcome] +
+    shot.points * 2 +
+    finishWeight
+  );
+}
+
+function getRankingIntroduction(
+  playerOneName: string,
+  playerTwoName: string,
+  playerOneRanking?: number | null,
+  playerTwoRanking?: number | null
+) {
+  if (!playerOneRanking || !playerTwoRanking) {
+    return "Il ranking non assegna un favorito netto e lascia al tavolo il compito di stabilire i rapporti di forza.";
+  }
+
+  const difference = Math.abs(playerOneRanking - playerTwoRanking);
+
+  if (difference <= 8) {
+    return `Nel ranking individuale li separano appena ${difference} posizioni: l'equilibrio annunciato è quasi totale.`;
+  }
+
+  const favoriteName =
+    playerOneRanking < playerTwoRanking ? playerOneName : playerTwoName;
+  const outsiderName =
+    playerOneRanking < playerTwoRanking ? playerTwoName : playerOneName;
+
+  return `${favoriteName} parte avanti nel ranking, mentre ${outsiderName} cerca una vittoria capace di sovvertire il pronostico.`;
+}
+
+function getOverallIntroduction(
+  playerOneName: string,
+  playerTwoName: string,
+  playerOneOverall?: number | null,
+  playerTwoOverall?: number | null
+) {
+  if (playerOneOverall == null || playerTwoOverall == null) {
+    return "Le caratteristiche dei due giocatori promettono una sfida tra realizzazione, difesa e controllo della misura.";
+  }
+
+  const roundedOne = Math.round(playerOneOverall);
+  const roundedTwo = Math.round(playerTwoOverall);
+
+  if (Math.abs(roundedOne - roundedTwo) <= 2) {
+    return `Anche i valori sono vicini: ${roundedOne} contro ${roundedTwo}, senza un vantaggio tecnico evidente.`;
+  }
+
+  const strongerName = roundedOne > roundedTwo ? playerOneName : playerTwoName;
+  return `I valori alla vigilia sono ${roundedOne} contro ${roundedTwo}: ${strongerName} ha qualcosa in più sulla carta, non ancora sul biliardo.`;
+}
+
+function formatRankingSuffix(ranking?: number | null) {
+  return ranking ? `, numero ${ranking} del ranking` : "";
+}
+
+function formatSpecialtyName(specialty: MatchSpecialty) {
+  if (specialty === "TUTTI_DOPPI") return "Tutti Doppi";
+  return specialty.charAt(0) + specialty.slice(1).toLowerCase();
+}
+
 function buildShotNarrative({
   specialty,
   shot,
@@ -888,6 +1152,8 @@ function buildShotNarrative({
   previousPlayerOneTotal,
   previousPlayerTwoTotal,
   isFinalShot,
+  actingPlayerName,
+  scoringPlayerName,
   random,
 }: {
   specialty: MatchSpecialty;
@@ -896,6 +1162,8 @@ function buildShotNarrative({
   previousPlayerOneTotal: number;
   previousPlayerTwoTotal: number;
   isFinalShot: boolean;
+  actingPlayerName: string;
+  scoringPlayerName: string;
   random: () => number;
 }) {
   const previousLeader = getLeader(
@@ -923,6 +1191,8 @@ function buildShotNarrative({
     specialty,
     shot,
     shotDefinition,
+    isFinalShot,
+    actingPlayerName,
     random
   );
   let highlight: IndividualChronicleShot["highlight"] = "NONE";
@@ -934,10 +1204,10 @@ function buildShotNarrative({
     highlight = "BIG_SHOT";
   }
 
-  if (tied) {
+  if (!isFinalShot && tied) {
     commentary += " Il tabellone torna in parità.";
     highlight = "LEAD_CHANGE";
-  } else if (leadChanged) {
+  } else if (!isFinalShot && leadChanged) {
     commentary += selectTemplate(
       [
         " È sorpasso: cambia il comando della partita.",
@@ -948,6 +1218,7 @@ function buildShotNarrative({
     );
     highlight = "LEAD_CHANGE";
   } else if (
+    !isFinalShot &&
     previousDeficit > MATCH_TARGET_POINTS[specialty] * 0.12 &&
     currentDeficit > 0 &&
     currentDeficit <= previousDeficit * 0.65
@@ -956,10 +1227,9 @@ function buildShotNarrative({
   }
 
   if (isFinalShot) {
-    commentary +=
-      shot.playerSide === shot.scoringSide
-        ? " È il tiro che chiude la partita."
-        : " Sono i punti assegnati che chiudono la partita.";
+    if (shot.playerSide !== shot.scoringSide) {
+      commentary += ` ${scoringPlayerName} incassa i punti decisivi: la partita finisce qui.`;
+    }
     highlight = "WINNER";
   }
 
@@ -970,8 +1240,25 @@ function getOutcomeCommentary(
   specialty: MatchSpecialty,
   shot: Omit<IndividualChronicleShot, "phase" | "commentary" | "highlight">,
   shotDefinition: ShotDefinition,
+  isFinalShot: boolean,
+  actingPlayerName: string,
   random: () => number
 ) {
+  if (
+    isFinalShot &&
+    shot.playerSide === shot.scoringSide &&
+    shot.points > 0
+  ) {
+    const scoringPhrase = getScoringPhrase(
+      specialty,
+      shotDefinition,
+      shot.points,
+      random
+    );
+
+    return `${actingPlayerName} si prende il tavolo e cerca il tiro della chiusura. ${shotDefinition.name}: ${scoringPhrase}. L'esecuzione riesce e la partita termina qui.`;
+  }
+
   if (shot.outcome === "FOUL") {
     const basePoints = FOUL_BASE_POINTS[specialty];
     const foul =
@@ -1183,7 +1470,7 @@ function getItalianScoringPhrase(
   random: () => number
 ) {
   if (points === 3) {
-    return "l'avversaria prende il pallino e realizza gli unici 3 punti possibili";
+    return "l'avversaria trova il pallino: 3 punti realizzati";
   }
 
   const scoreOptions = getItalianScoreOptions(shot, points);
