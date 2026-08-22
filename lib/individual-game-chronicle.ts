@@ -76,11 +76,18 @@ const SHOT_DEFINITIONS: ShotDefinition[] = [
     weights: { ITALIANA: 15, GORIZIANA: 11, TUTTI_DOPPI: 17 },
   },
   {
-    key: "TRAVERSINO",
-    name: "Traversino",
+    key: "TRAVERSINO_PIANO",
+    name: "Traversino piano",
     family: "DIRECT",
     difficulty: 3,
-    weights: { ITALIANA: 12, GORIZIANA: 4, TUTTI_DOPPI: 7 },
+    weights: { ITALIANA: 7, GORIZIANA: 2, TUTTI_DOPPI: 3 },
+  },
+  {
+    key: "TRAVERSINO_PASSATE",
+    name: "Traversino a più passate",
+    family: "DIRECT",
+    difficulty: 4,
+    weights: { ITALIANA: 5, GORIZIANA: 2, TUTTI_DOPPI: 4 },
   },
   {
     key: "GIRO",
@@ -189,6 +196,64 @@ const PALLINO_SHOT: ShotDefinition = {
   difficulty: 3,
   weights: { ITALIANA: 0, GORIZIANA: 0, TUTTI_DOPPI: 0 },
 };
+
+type ItalianShotScoreProfile = {
+  plain: readonly number[];
+  withPallino: readonly number[];
+};
+
+const ITALIAN_SHOT_SCORE_PROFILES: Record<
+  string,
+  ItalianShotScoreProfile
+> = {
+  RADDRIZZO: { plain: [8, 10], withPallino: [11, 12, 13, 14] },
+  ROVESCIO: { plain: [8, 10], withPallino: [11, 12, 13, 14] },
+  TRAVERSINO_PIANO: { plain: [2, 8], withPallino: [5, 6, 11, 12] },
+  TRAVERSINO_PASSATE: { plain: [4, 8, 10], withPallino: [7, 11, 12] },
+  GIRO: { plain: [4, 6, 8, 10], withPallino: [7, 8, 9, 10, 11] },
+  GIRONE: { plain: [4, 6, 8, 10], withPallino: [7, 8, 9, 10, 11] },
+  ANGOLO_PRIMA: { plain: [2, 4, 6], withPallino: [5, 6, 7, 8, 9, 10] },
+  ANGOLO_SECONDA: {
+    plain: [2, 4, 6],
+    withPallino: [5, 6, 7, 8, 9, 10],
+  },
+  STRISCIO: { plain: [2, 4, 6], withPallino: [5, 6, 7, 8, 9] },
+  CANDELA: { plain: [2, 8], withPallino: [5, 11] },
+  SPONDA_BIGLIA: {
+    plain: [2, 4, 6],
+    withPallino: [5, 6, 7, 8, 9, 10],
+  },
+  BRICOLLA: {
+    plain: [2, 4, 6, 8, 10],
+    withPallino: [5, 6, 7, 8, 9, 10, 11, 13],
+  },
+  GARUFFA: { plain: [2, 6, 8], withPallino: [5, 6, 9, 11] },
+  MEZZA_GARUFFA: { plain: [2, 6, 8], withPallino: [5, 6, 9, 11] },
+  GANCIO: { plain: [2, 4, 6], withPallino: [5, 6, 7, 8, 9, 10] },
+  PARABOLA: { plain: [2, 4, 6], withPallino: [5, 6, 7, 8, 9, 10] },
+  TRE_SPONDE_CALCIO: {
+    plain: [2, 4, 6, 8],
+    withPallino: [5, 6, 7, 8, 9, 10, 11],
+  },
+  CINQUE_SPONDE_CALCIO: {
+    plain: [2, 4, 6, 8],
+    withPallino: [5, 6, 7, 8, 9, 10, 11],
+  },
+};
+
+const GORIZIANA_DIRECT_PREFERRED = [
+  18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50,
+  52,
+] as const;
+const GORIZIANA_CUSHION_PREFERRED = [
+  20, 24, 28, 32, 36, 40, 44, 48, 52,
+] as const;
+const TUTTI_DOPPI_DIRECT_PREFERRED = [
+  40, 44, 48, 52, 80, 84, 88, 92,
+] as const;
+const TUTTI_DOPPI_CUSHION_PREFERRED = [
+  16, 20, 24, 28, 32, 36, 40, 44, 48, 52, 56,
+] as const;
 
 const FOUL_BASE_POINTS: Record<MatchSpecialty, number> = {
   ITALIANA: 2,
@@ -614,6 +679,7 @@ function selectShot(
       value: shot,
       weight:
         shot.weights[specialty] *
+        getShotScoreAffinity(specialty, shot, points) *
         (0.7 + clamp(familyRating, 0, 100) / 170) *
         creativityFactor *
         tacticalFactor *
@@ -622,6 +688,39 @@ function selectShot(
   }).filter((candidate) => candidate.weight > 0);
 
   return selectWeighted(candidates, random);
+}
+
+function getShotScoreAffinity(
+  specialty: MatchSpecialty,
+  shot: ShotDefinition,
+  points: number
+) {
+  if (points === 0) return 1;
+
+  if (specialty === "ITALIANA") {
+    const profile = ITALIAN_SHOT_SCORE_PROFILES[shot.key];
+
+    if (!profile) return 0.65;
+    return profile.plain.includes(points) || profile.withPallino.includes(points)
+      ? 7
+      : 0.18;
+  }
+
+  if (specialty === "GORIZIANA") {
+    const preferred =
+      shot.family === "DIRECT"
+        ? GORIZIANA_DIRECT_PREFERRED
+        : GORIZIANA_CUSHION_PREFERRED;
+
+    return (preferred as readonly number[]).includes(points) ? 3.4 : 0.7;
+  }
+
+  const preferred =
+    shot.family === "DIRECT"
+      ? TUTTI_DOPPI_DIRECT_PREFERRED
+      : TUTTI_DOPPI_CUSHION_PREFERRED;
+
+  return (preferred as readonly number[]).includes(points) ? 3.4 : 0.7;
 }
 
 function isShotScoreCompatible(
@@ -757,8 +856,8 @@ export function buildIndividualGameSummary({
   }
 
   const middle = isBigShot(specialty, biggestShot)
-    ? `Il colpo più pesante vale ${biggestShot} punti; ${partialShots} giocate riescono invece soltanto a metà.`
-    : `${partialShots} giocate riescono soltanto a metà: non sempre punti e difesa arrivano insieme.`;
+    ? `Il colpo più pesante vale ${biggestShot} punti; in ${partialShots} occasioni arrivano soltanto i punti o soltanto la copertura.`
+    : `In ${partialShots} occasioni punti e copertura non arrivano insieme.`;
   const discipline =
     adverseEvents > 0
       ? ` Gli errori che assegnano punti all'avversario sono ${adverseEvents}.`
@@ -906,15 +1005,45 @@ function getOutcomeCommentary(
       : "i birilli non si muovono";
 
   if (shot.outcome === "COMPLETE") {
-    return `${shotDefinition.name}: ${scoringPhrase} e la rimanenza è coperta. Tiro completo.`;
+    const label = random() < 0.12 ? " Tiro completo." : "";
+    const ending = selectTemplate(
+      [
+        "e lascia una rimanenza coperta",
+        "poi porta le bilie al riparo dietro il castello",
+        "e chiude bene anche la traiettoria difensiva",
+      ],
+      random
+    );
+
+    return `${shotDefinition.name}: ${scoringPhrase}, ${ending}.${label}`;
   }
 
   if (shot.outcome === "PARTIAL_POINTS") {
-    return `${shotDefinition.name}: ${scoringPhrase}, ma la difesa non riesce. Tiro preso per metà e replica possibile.`;
+    const label = random() < 0.12 ? " Tiro preso per metà." : "";
+    const ending = selectTemplate(
+      [
+        "ma la difesa non riesce e resta una replica possibile",
+        "però la rimanenza rimane leggibile",
+        "senza riuscire a nascondere il tiro successivo",
+      ],
+      random
+    );
+
+    return `${shotDefinition.name}: ${scoringPhrase}, ${ending}.${label}`;
   }
 
   if (shot.outcome === "PARTIAL_DEFENSE") {
-    return `${shotDefinition.name}: ${scoringPhrase}, però la misura salva il turno. Tiro preso per metà, con il castello a protezione.`;
+    const label = random() < 0.12 ? " Tiro preso per metà." : "";
+    const ending = selectTemplate(
+      [
+        "ma la misura è precisa e il castello resta a protezione",
+        "però la rimanenza costringe l'avversario a cercare la sponda",
+        "ma almeno porta le bilie in una posizione difensiva",
+      ],
+      random
+    );
+
+    return `${shotDefinition.name}: ${scoringPhrase}, ${ending}.${label}`;
   }
 
   const measureError =
@@ -972,13 +1101,28 @@ function getItalianScoringPhrase(
       (points - pallinoPoints) as (typeof ITALIAN_PIN_TOTALS)[number]
     )
   );
+  const scoreProfile = ITALIAN_SHOT_SCORE_PROFILES[shot.key];
+  const prefersPlain = scoreProfile?.plain.includes(points) ?? false;
+  const prefersPallino =
+    scoreProfile?.withPallino.includes(points) ?? false;
   const pallinoPoints =
     points % 2 === 1
       ? 3
       : selectWeighted(
           pallinoOptions.map((value) => ({
             value,
-            weight: value === 0 ? 4 : 1,
+            weight:
+              value === 0
+                ? prefersPlain
+                  ? 6
+                  : prefersPallino
+                    ? 0.8
+                    : 4
+                : prefersPallino
+                  ? 6
+                  : prefersPlain
+                    ? 0.8
+                    : 1,
           })),
           random
         );
