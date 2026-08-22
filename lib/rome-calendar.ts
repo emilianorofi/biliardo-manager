@@ -106,6 +106,35 @@ export function addRomeWeeks(
   });
 }
 
+export function addRomeDaysAtTime(
+  value: Date,
+  days: number,
+  hour: number,
+  minute = 0
+) {
+  const local = getRomeParts(value);
+  const localDate = new Date(
+    Date.UTC(
+      local.year,
+      local.month - 1,
+      local.day
+    )
+  );
+
+  localDate.setUTCDate(
+    localDate.getUTCDate() + days
+  );
+
+  return zonedDateTimeToUtc({
+    year: localDate.getUTCFullYear(),
+    month: localDate.getUTCMonth() + 1,
+    day: localDate.getUTCDate(),
+    hour,
+    minute,
+    second: 0,
+  });
+}
+
 export function formatRomeDateKey(
   value: Date
 ) {

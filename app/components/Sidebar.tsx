@@ -7,6 +7,7 @@ import {
   Users,
   User,
   Trophy,
+  Medal,
   ArrowRightLeft,
   Euro,
   Dumbbell,
@@ -40,6 +41,11 @@ const menu = [
     label: "Lega",
     href: "/campionato",
     icon: Trophy,
+  },
+  {
+    label: "Individuale",
+    href: "/individuale",
+    icon: Medal,
   },
   {
     label: "Mercato",
