@@ -324,6 +324,8 @@ export async function playIndividualTournamentStage(
               game.playerOnePerformanceRating,
             playerTwoPerformanceRating:
               game.playerTwoPerformanceRating,
+            playerOneScore: game.playerOneScore,
+            playerTwoScore: game.playerTwoScore,
           }))
         ),
       });

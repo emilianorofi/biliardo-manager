@@ -8,6 +8,12 @@ export type MatchSpecialty =
   | "GORIZIANA"
   | "TUTTI_DOPPI";
 
+export const MATCH_TARGET_POINTS: Record<MatchSpecialty, number> = {
+  ITALIANA: 80,
+  GORIZIANA: 400,
+  TUTTI_DOPPI: 600,
+};
+
 export type MatchPlayerValues = {
   precisione: number;
   diretto: number;
@@ -64,7 +70,7 @@ export const LEAGUE_MATCH_DEFINITIONS:
     specialty:
       "ITALIANA",
 
-    targetPoints: 80,
+    targetPoints: MATCH_TARGET_POINTS.ITALIANA,
 
     homeSlots: [
       "A",
@@ -81,7 +87,7 @@ export const LEAGUE_MATCH_DEFINITIONS:
     specialty:
       "ITALIANA",
 
-    targetPoints: 80,
+    targetPoints: MATCH_TARGET_POINTS.ITALIANA,
 
     homeSlots: [
       "B",
@@ -100,7 +106,7 @@ export const LEAGUE_MATCH_DEFINITIONS:
     specialty:
       "GORIZIANA",
 
-    targetPoints: 400,
+    targetPoints: MATCH_TARGET_POINTS.GORIZIANA,
 
     homeSlots: [
       "B",
@@ -117,7 +123,7 @@ export const LEAGUE_MATCH_DEFINITIONS:
     specialty:
       "GORIZIANA",
 
-    targetPoints: 400,
+    targetPoints: MATCH_TARGET_POINTS.GORIZIANA,
 
     homeSlots: [
       "A",
@@ -136,7 +142,7 @@ export const LEAGUE_MATCH_DEFINITIONS:
     specialty:
       "TUTTI_DOPPI",
 
-    targetPoints: 600,
+    targetPoints: MATCH_TARGET_POINTS.TUTTI_DOPPI,
 
     homeSlots: [
       "C",
@@ -153,7 +159,7 @@ export const LEAGUE_MATCH_DEFINITIONS:
     specialty:
       "TUTTI_DOPPI",
 
-    targetPoints: 600,
+    targetPoints: MATCH_TARGET_POINTS.TUTTI_DOPPI,
 
     homeSlots: [
       "A",

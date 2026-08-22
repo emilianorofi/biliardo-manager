@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import {
+  calculateIndividualGameScore,
   rankIndividualTournamentPlayers,
   shuffleIndividualDraw,
   simulateIndividualBestOfThree,
@@ -80,7 +81,48 @@ test("un incontro individuale termina appena un giocatore vince due prove", () =
       [70, 70],
     ]
   );
+  assert.deepEqual(
+    result.games.map((game) => [game.playerOneScore, game.playerTwoScore]),
+    [
+      [80, 62],
+      [75, 80],
+      [80, 62],
+    ]
+  );
   assert.equal(randomIndex, 3);
+});
+
+test("usa il traguardo punti previsto da ogni specialità", () => {
+  assert.deepEqual(
+    calculateIndividualGameScore({
+      specialty: "ITALIANA",
+      winnerSide: "PLAYER_ONE",
+      playerOnePerformanceRating: 80,
+      playerTwoPerformanceRating: 70,
+      randomValue: 0.5,
+    }),
+    { playerOneScore: 80, playerTwoScore: 66 }
+  );
+  assert.deepEqual(
+    calculateIndividualGameScore({
+      specialty: "GORIZIANA",
+      winnerSide: "PLAYER_TWO",
+      playerOnePerformanceRating: 70,
+      playerTwoPerformanceRating: 80,
+      randomValue: 0.5,
+    }),
+    { playerOneScore: 329, playerTwoScore: 400 }
+  );
+  assert.deepEqual(
+    calculateIndividualGameScore({
+      specialty: "TUTTI_DOPPI",
+      winnerSide: "PLAYER_ONE",
+      playerOnePerformanceRating: 80,
+      playerTwoPerformanceRating: 70,
+      randomValue: 0.5,
+    }),
+    { playerOneScore: 600, playerTwoScore: 493 }
+  );
 });
 
 function createPlayer(id: number, rating: number): IndividualMatchPlayer {

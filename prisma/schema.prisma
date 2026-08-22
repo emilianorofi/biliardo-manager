@@ -515,6 +515,9 @@ model IndividualTournamentGame {
   playerOnePerformanceRating Float
   playerTwoPerformanceRating Float
 
+  playerOneScore Int
+  playerTwoScore Int
+
   reconstructed Boolean @default(false)
 
   createdAt DateTime @default(now())

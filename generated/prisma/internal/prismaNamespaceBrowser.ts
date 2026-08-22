@@ -413,6 +413,8 @@ export const IndividualTournamentGameScalarFieldEnum = {
   winnerSide: 'winnerSide',
   playerOnePerformanceRating: 'playerOnePerformanceRating',
   playerTwoPerformanceRating: 'playerTwoPerformanceRating',
+  playerOneScore: 'playerOneScore',
+  playerTwoScore: 'playerTwoScore',
   reconstructed: 'reconstructed',
   createdAt: 'createdAt'
 } as const

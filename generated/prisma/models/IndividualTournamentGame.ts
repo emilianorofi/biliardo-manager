@@ -32,6 +32,8 @@ export type IndividualTournamentGameAvgAggregateOutputType = {
   order: number | null
   playerOnePerformanceRating: number | null
   playerTwoPerformanceRating: number | null
+  playerOneScore: number | null
+  playerTwoScore: number | null
 }
 
 export type IndividualTournamentGameSumAggregateOutputType = {
@@ -40,6 +42,8 @@ export type IndividualTournamentGameSumAggregateOutputType = {
   order: number | null
   playerOnePerformanceRating: number | null
   playerTwoPerformanceRating: number | null
+  playerOneScore: number | null
+  playerTwoScore: number | null
 }
 
 export type IndividualTournamentGameMinAggregateOutputType = {
@@ -50,6 +54,8 @@ export type IndividualTournamentGameMinAggregateOutputType = {
   winnerSide: string | null
   playerOnePerformanceRating: number | null
   playerTwoPerformanceRating: number | null
+  playerOneScore: number | null
+  playerTwoScore: number | null
   reconstructed: boolean | null
   createdAt: Date | null
 }
@@ -62,6 +68,8 @@ export type IndividualTournamentGameMaxAggregateOutputType = {
   winnerSide: string | null
   playerOnePerformanceRating: number | null
   playerTwoPerformanceRating: number | null
+  playerOneScore: number | null
+  playerTwoScore: number | null
   reconstructed: boolean | null
   createdAt: Date | null
 }
@@ -74,6 +82,8 @@ export type IndividualTournamentGameCountAggregateOutputType = {
   winnerSide: number
   playerOnePerformanceRating: number
   playerTwoPerformanceRating: number
+  playerOneScore: number
+  playerTwoScore: number
   reconstructed: number
   createdAt: number
   _all: number
@@ -86,6 +96,8 @@ export type IndividualTournamentGameAvgAggregateInputType = {
   order?: true
   playerOnePerformanceRating?: true
   playerTwoPerformanceRating?: true
+  playerOneScore?: true
+  playerTwoScore?: true
 }
 
 export type IndividualTournamentGameSumAggregateInputType = {
@@ -94,6 +106,8 @@ export type IndividualTournamentGameSumAggregateInputType = {
   order?: true
   playerOnePerformanceRating?: true
   playerTwoPerformanceRating?: true
+  playerOneScore?: true
+  playerTwoScore?: true
 }
 
 export type IndividualTournamentGameMinAggregateInputType = {
@@ -104,6 +118,8 @@ export type IndividualTournamentGameMinAggregateInputType = {
   winnerSide?: true
   playerOnePerformanceRating?: true
   playerTwoPerformanceRating?: true
+  playerOneScore?: true
+  playerTwoScore?: true
   reconstructed?: true
   createdAt?: true
 }
@@ -116,6 +132,8 @@ export type IndividualTournamentGameMaxAggregateInputType = {
   winnerSide?: true
   playerOnePerformanceRating?: true
   playerTwoPerformanceRating?: true
+  playerOneScore?: true
+  playerTwoScore?: true
   reconstructed?: true
   createdAt?: true
 }
@@ -128,6 +146,8 @@ export type IndividualTournamentGameCountAggregateInputType = {
   winnerSide?: true
   playerOnePerformanceRating?: true
   playerTwoPerformanceRating?: true
+  playerOneScore?: true
+  playerTwoScore?: true
   reconstructed?: true
   createdAt?: true
   _all?: true
@@ -227,6 +247,8 @@ export type IndividualTournamentGameGroupByOutputType = {
   winnerSide: string
   playerOnePerformanceRating: number
   playerTwoPerformanceRating: number
+  playerOneScore: number
+  playerTwoScore: number
   reconstructed: boolean
   createdAt: Date
   _count: IndividualTournamentGameCountAggregateOutputType | null
@@ -262,6 +284,8 @@ export type IndividualTournamentGameWhereInput = {
   winnerSide?: Prisma.StringFilter<"IndividualTournamentGame"> | string
   playerOnePerformanceRating?: Prisma.FloatFilter<"IndividualTournamentGame"> | number
   playerTwoPerformanceRating?: Prisma.FloatFilter<"IndividualTournamentGame"> | number
+  playerOneScore?: Prisma.IntFilter<"IndividualTournamentGame"> | number
+  playerTwoScore?: Prisma.IntFilter<"IndividualTournamentGame"> | number
   reconstructed?: Prisma.BoolFilter<"IndividualTournamentGame"> | boolean
   createdAt?: Prisma.DateTimeFilter<"IndividualTournamentGame"> | Date | string
   match?: Prisma.XOR<Prisma.IndividualTournamentMatchScalarRelationFilter, Prisma.IndividualTournamentMatchWhereInput>
@@ -275,6 +299,8 @@ export type IndividualTournamentGameOrderByWithRelationInput = {
   winnerSide?: Prisma.SortOrder
   playerOnePerformanceRating?: Prisma.SortOrder
   playerTwoPerformanceRating?: Prisma.SortOrder
+  playerOneScore?: Prisma.SortOrder
+  playerTwoScore?: Prisma.SortOrder
   reconstructed?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   match?: Prisma.IndividualTournamentMatchOrderByWithRelationInput
@@ -292,6 +318,8 @@ export type IndividualTournamentGameWhereUniqueInput = Prisma.AtLeast<{
   winnerSide?: Prisma.StringFilter<"IndividualTournamentGame"> | string
   playerOnePerformanceRating?: Prisma.FloatFilter<"IndividualTournamentGame"> | number
   playerTwoPerformanceRating?: Prisma.FloatFilter<"IndividualTournamentGame"> | number
+  playerOneScore?: Prisma.IntFilter<"IndividualTournamentGame"> | number
+  playerTwoScore?: Prisma.IntFilter<"IndividualTournamentGame"> | number
   reconstructed?: Prisma.BoolFilter<"IndividualTournamentGame"> | boolean
   createdAt?: Prisma.DateTimeFilter<"IndividualTournamentGame"> | Date | string
   match?: Prisma.XOR<Prisma.IndividualTournamentMatchScalarRelationFilter, Prisma.IndividualTournamentMatchWhereInput>
@@ -305,6 +333,8 @@ export type IndividualTournamentGameOrderByWithAggregationInput = {
   winnerSide?: Prisma.SortOrder
   playerOnePerformanceRating?: Prisma.SortOrder
   playerTwoPerformanceRating?: Prisma.SortOrder
+  playerOneScore?: Prisma.SortOrder
+  playerTwoScore?: Prisma.SortOrder
   reconstructed?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   _count?: Prisma.IndividualTournamentGameCountOrderByAggregateInput
@@ -325,6 +355,8 @@ export type IndividualTournamentGameScalarWhereWithAggregatesInput = {
   winnerSide?: Prisma.StringWithAggregatesFilter<"IndividualTournamentGame"> | string
   playerOnePerformanceRating?: Prisma.FloatWithAggregatesFilter<"IndividualTournamentGame"> | number
   playerTwoPerformanceRating?: Prisma.FloatWithAggregatesFilter<"IndividualTournamentGame"> | number
+  playerOneScore?: Prisma.IntWithAggregatesFilter<"IndividualTournamentGame"> | number
+  playerTwoScore?: Prisma.IntWithAggregatesFilter<"IndividualTournamentGame"> | number
   reconstructed?: Prisma.BoolWithAggregatesFilter<"IndividualTournamentGame"> | boolean
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"IndividualTournamentGame"> | Date | string
 }
@@ -335,6 +367,8 @@ export type IndividualTournamentGameCreateInput = {
   winnerSide: string
   playerOnePerformanceRating: number
   playerTwoPerformanceRating: number
+  playerOneScore: number
+  playerTwoScore: number
   reconstructed?: boolean
   createdAt?: Date | string
   match: Prisma.IndividualTournamentMatchCreateNestedOneWithoutGamesInput
@@ -348,6 +382,8 @@ export type IndividualTournamentGameUncheckedCreateInput = {
   winnerSide: string
   playerOnePerformanceRating: number
   playerTwoPerformanceRating: number
+  playerOneScore: number
+  playerTwoScore: number
   reconstructed?: boolean
   createdAt?: Date | string
 }
@@ -358,6 +394,8 @@ export type IndividualTournamentGameUpdateInput = {
   winnerSide?: Prisma.StringFieldUpdateOperationsInput | string
   playerOnePerformanceRating?: Prisma.FloatFieldUpdateOperationsInput | number
   playerTwoPerformanceRating?: Prisma.FloatFieldUpdateOperationsInput | number
+  playerOneScore?: Prisma.IntFieldUpdateOperationsInput | number
+  playerTwoScore?: Prisma.IntFieldUpdateOperationsInput | number
   reconstructed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   match?: Prisma.IndividualTournamentMatchUpdateOneRequiredWithoutGamesNestedInput
@@ -371,6 +409,8 @@ export type IndividualTournamentGameUncheckedUpdateInput = {
   winnerSide?: Prisma.StringFieldUpdateOperationsInput | string
   playerOnePerformanceRating?: Prisma.FloatFieldUpdateOperationsInput | number
   playerTwoPerformanceRating?: Prisma.FloatFieldUpdateOperationsInput | number
+  playerOneScore?: Prisma.IntFieldUpdateOperationsInput | number
+  playerTwoScore?: Prisma.IntFieldUpdateOperationsInput | number
   reconstructed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -383,6 +423,8 @@ export type IndividualTournamentGameCreateManyInput = {
   winnerSide: string
   playerOnePerformanceRating: number
   playerTwoPerformanceRating: number
+  playerOneScore: number
+  playerTwoScore: number
   reconstructed?: boolean
   createdAt?: Date | string
 }
@@ -393,6 +435,8 @@ export type IndividualTournamentGameUpdateManyMutationInput = {
   winnerSide?: Prisma.StringFieldUpdateOperationsInput | string
   playerOnePerformanceRating?: Prisma.FloatFieldUpdateOperationsInput | number
   playerTwoPerformanceRating?: Prisma.FloatFieldUpdateOperationsInput | number
+  playerOneScore?: Prisma.IntFieldUpdateOperationsInput | number
+  playerTwoScore?: Prisma.IntFieldUpdateOperationsInput | number
   reconstructed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -405,6 +449,8 @@ export type IndividualTournamentGameUncheckedUpdateManyInput = {
   winnerSide?: Prisma.StringFieldUpdateOperationsInput | string
   playerOnePerformanceRating?: Prisma.FloatFieldUpdateOperationsInput | number
   playerTwoPerformanceRating?: Prisma.FloatFieldUpdateOperationsInput | number
+  playerOneScore?: Prisma.IntFieldUpdateOperationsInput | number
+  playerTwoScore?: Prisma.IntFieldUpdateOperationsInput | number
   reconstructed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -432,6 +478,8 @@ export type IndividualTournamentGameCountOrderByAggregateInput = {
   winnerSide?: Prisma.SortOrder
   playerOnePerformanceRating?: Prisma.SortOrder
   playerTwoPerformanceRating?: Prisma.SortOrder
+  playerOneScore?: Prisma.SortOrder
+  playerTwoScore?: Prisma.SortOrder
   reconstructed?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
@@ -442,6 +490,8 @@ export type IndividualTournamentGameAvgOrderByAggregateInput = {
   order?: Prisma.SortOrder
   playerOnePerformanceRating?: Prisma.SortOrder
   playerTwoPerformanceRating?: Prisma.SortOrder
+  playerOneScore?: Prisma.SortOrder
+  playerTwoScore?: Prisma.SortOrder
 }
 
 export type IndividualTournamentGameMaxOrderByAggregateInput = {
@@ -452,6 +502,8 @@ export type IndividualTournamentGameMaxOrderByAggregateInput = {
   winnerSide?: Prisma.SortOrder
   playerOnePerformanceRating?: Prisma.SortOrder
   playerTwoPerformanceRating?: Prisma.SortOrder
+  playerOneScore?: Prisma.SortOrder
+  playerTwoScore?: Prisma.SortOrder
   reconstructed?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
@@ -464,6 +516,8 @@ export type IndividualTournamentGameMinOrderByAggregateInput = {
   winnerSide?: Prisma.SortOrder
   playerOnePerformanceRating?: Prisma.SortOrder
   playerTwoPerformanceRating?: Prisma.SortOrder
+  playerOneScore?: Prisma.SortOrder
+  playerTwoScore?: Prisma.SortOrder
   reconstructed?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
@@ -474,6 +528,8 @@ export type IndividualTournamentGameSumOrderByAggregateInput = {
   order?: Prisma.SortOrder
   playerOnePerformanceRating?: Prisma.SortOrder
   playerTwoPerformanceRating?: Prisma.SortOrder
+  playerOneScore?: Prisma.SortOrder
+  playerTwoScore?: Prisma.SortOrder
 }
 
 export type IndividualTournamentGameCreateNestedManyWithoutMatchInput = {
@@ -524,6 +580,8 @@ export type IndividualTournamentGameCreateWithoutMatchInput = {
   winnerSide: string
   playerOnePerformanceRating: number
   playerTwoPerformanceRating: number
+  playerOneScore: number
+  playerTwoScore: number
   reconstructed?: boolean
   createdAt?: Date | string
 }
@@ -535,6 +593,8 @@ export type IndividualTournamentGameUncheckedCreateWithoutMatchInput = {
   winnerSide: string
   playerOnePerformanceRating: number
   playerTwoPerformanceRating: number
+  playerOneScore: number
+  playerTwoScore: number
   reconstructed?: boolean
   createdAt?: Date | string
 }
@@ -576,6 +636,8 @@ export type IndividualTournamentGameScalarWhereInput = {
   winnerSide?: Prisma.StringFilter<"IndividualTournamentGame"> | string
   playerOnePerformanceRating?: Prisma.FloatFilter<"IndividualTournamentGame"> | number
   playerTwoPerformanceRating?: Prisma.FloatFilter<"IndividualTournamentGame"> | number
+  playerOneScore?: Prisma.IntFilter<"IndividualTournamentGame"> | number
+  playerTwoScore?: Prisma.IntFilter<"IndividualTournamentGame"> | number
   reconstructed?: Prisma.BoolFilter<"IndividualTournamentGame"> | boolean
   createdAt?: Prisma.DateTimeFilter<"IndividualTournamentGame"> | Date | string
 }
@@ -587,6 +649,8 @@ export type IndividualTournamentGameCreateManyMatchInput = {
   winnerSide: string
   playerOnePerformanceRating: number
   playerTwoPerformanceRating: number
+  playerOneScore: number
+  playerTwoScore: number
   reconstructed?: boolean
   createdAt?: Date | string
 }
@@ -597,6 +661,8 @@ export type IndividualTournamentGameUpdateWithoutMatchInput = {
   winnerSide?: Prisma.StringFieldUpdateOperationsInput | string
   playerOnePerformanceRating?: Prisma.FloatFieldUpdateOperationsInput | number
   playerTwoPerformanceRating?: Prisma.FloatFieldUpdateOperationsInput | number
+  playerOneScore?: Prisma.IntFieldUpdateOperationsInput | number
+  playerTwoScore?: Prisma.IntFieldUpdateOperationsInput | number
   reconstructed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -608,6 +674,8 @@ export type IndividualTournamentGameUncheckedUpdateWithoutMatchInput = {
   winnerSide?: Prisma.StringFieldUpdateOperationsInput | string
   playerOnePerformanceRating?: Prisma.FloatFieldUpdateOperationsInput | number
   playerTwoPerformanceRating?: Prisma.FloatFieldUpdateOperationsInput | number
+  playerOneScore?: Prisma.IntFieldUpdateOperationsInput | number
+  playerTwoScore?: Prisma.IntFieldUpdateOperationsInput | number
   reconstructed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -619,6 +687,8 @@ export type IndividualTournamentGameUncheckedUpdateManyWithoutMatchInput = {
   winnerSide?: Prisma.StringFieldUpdateOperationsInput | string
   playerOnePerformanceRating?: Prisma.FloatFieldUpdateOperationsInput | number
   playerTwoPerformanceRating?: Prisma.FloatFieldUpdateOperationsInput | number
+  playerOneScore?: Prisma.IntFieldUpdateOperationsInput | number
+  playerTwoScore?: Prisma.IntFieldUpdateOperationsInput | number
   reconstructed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -633,6 +703,8 @@ export type IndividualTournamentGameSelect<ExtArgs extends runtime.Types.Extensi
   winnerSide?: boolean
   playerOnePerformanceRating?: boolean
   playerTwoPerformanceRating?: boolean
+  playerOneScore?: boolean
+  playerTwoScore?: boolean
   reconstructed?: boolean
   createdAt?: boolean
   match?: boolean | Prisma.IndividualTournamentMatchDefaultArgs<ExtArgs>
@@ -646,6 +718,8 @@ export type IndividualTournamentGameSelectCreateManyAndReturn<ExtArgs extends ru
   winnerSide?: boolean
   playerOnePerformanceRating?: boolean
   playerTwoPerformanceRating?: boolean
+  playerOneScore?: boolean
+  playerTwoScore?: boolean
   reconstructed?: boolean
   createdAt?: boolean
   match?: boolean | Prisma.IndividualTournamentMatchDefaultArgs<ExtArgs>
@@ -659,6 +733,8 @@ export type IndividualTournamentGameSelectUpdateManyAndReturn<ExtArgs extends ru
   winnerSide?: boolean
   playerOnePerformanceRating?: boolean
   playerTwoPerformanceRating?: boolean
+  playerOneScore?: boolean
+  playerTwoScore?: boolean
   reconstructed?: boolean
   createdAt?: boolean
   match?: boolean | Prisma.IndividualTournamentMatchDefaultArgs<ExtArgs>
@@ -672,11 +748,13 @@ export type IndividualTournamentGameSelectScalar = {
   winnerSide?: boolean
   playerOnePerformanceRating?: boolean
   playerTwoPerformanceRating?: boolean
+  playerOneScore?: boolean
+  playerTwoScore?: boolean
   reconstructed?: boolean
   createdAt?: boolean
 }
 
-export type IndividualTournamentGameOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "matchId" | "order" | "specialty" | "winnerSide" | "playerOnePerformanceRating" | "playerTwoPerformanceRating" | "reconstructed" | "createdAt", ExtArgs["result"]["individualTournamentGame"]>
+export type IndividualTournamentGameOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "matchId" | "order" | "specialty" | "winnerSide" | "playerOnePerformanceRating" | "playerTwoPerformanceRating" | "playerOneScore" | "playerTwoScore" | "reconstructed" | "createdAt", ExtArgs["result"]["individualTournamentGame"]>
 export type IndividualTournamentGameInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   match?: boolean | Prisma.IndividualTournamentMatchDefaultArgs<ExtArgs>
 }
@@ -700,6 +778,8 @@ export type $IndividualTournamentGamePayload<ExtArgs extends runtime.Types.Exten
     winnerSide: string
     playerOnePerformanceRating: number
     playerTwoPerformanceRating: number
+    playerOneScore: number
+    playerTwoScore: number
     reconstructed: boolean
     createdAt: Date
   }, ExtArgs["result"]["individualTournamentGame"]>
@@ -1133,6 +1213,8 @@ export interface IndividualTournamentGameFieldRefs {
   readonly winnerSide: Prisma.FieldRef<"IndividualTournamentGame", 'String'>
   readonly playerOnePerformanceRating: Prisma.FieldRef<"IndividualTournamentGame", 'Float'>
   readonly playerTwoPerformanceRating: Prisma.FieldRef<"IndividualTournamentGame", 'Float'>
+  readonly playerOneScore: Prisma.FieldRef<"IndividualTournamentGame", 'Int'>
+  readonly playerTwoScore: Prisma.FieldRef<"IndividualTournamentGame", 'Int'>
   readonly reconstructed: Prisma.FieldRef<"IndividualTournamentGame", 'Boolean'>
   readonly createdAt: Prisma.FieldRef<"IndividualTournamentGame", 'DateTime'>
 }

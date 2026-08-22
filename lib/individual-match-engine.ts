@@ -1,5 +1,6 @@
 import {
   calculatePlayerPerformance,
+  MATCH_TARGET_POINTS,
   type MatchPerformancePlayerValues,
   type MatchSpecialty,
 } from "@/lib/match-engine";
@@ -88,6 +89,15 @@ export function simulateIndividualBestOfThree(
       playerTwoPerformance.performanceRating,
       random()
     );
+    const score = calculateIndividualGameScore({
+      specialty,
+      winnerSide: result.winner === "HOME" ? "PLAYER_ONE" : "PLAYER_TWO",
+      playerOnePerformanceRating:
+        playerOnePerformance.performanceRating,
+      playerTwoPerformanceRating:
+        playerTwoPerformance.performanceRating,
+      randomValue: result.randomValue,
+    });
 
     if (result.winner === "HOME") {
       playerOneWins += 1;
@@ -105,6 +115,8 @@ export function simulateIndividualBestOfThree(
         playerOnePerformance.performanceRating,
       playerTwoPerformanceRating:
         playerTwoPerformance.performanceRating,
+      playerOneScore: score.playerOneScore,
+      playerTwoScore: score.playerTwoScore,
     });
   }
 
@@ -117,6 +129,55 @@ export function simulateIndividualBestOfThree(
     playerTwoWins,
     games,
   };
+}
+
+export function calculateIndividualGameScore({
+  specialty,
+  winnerSide,
+  playerOnePerformanceRating,
+  playerTwoPerformanceRating,
+  randomValue,
+}: {
+  specialty: MatchSpecialty;
+  winnerSide: "PLAYER_ONE" | "PLAYER_TWO";
+  playerOnePerformanceRating: number;
+  playerTwoPerformanceRating: number;
+  randomValue: number;
+}) {
+  const targetPoints = MATCH_TARGET_POINTS[specialty];
+  const winnerRating =
+    winnerSide === "PLAYER_ONE"
+      ? playerOnePerformanceRating
+      : playerTwoPerformanceRating;
+  const loserRating =
+    winnerSide === "PLAYER_ONE"
+      ? playerTwoPerformanceRating
+      : playerOnePerformanceRating;
+  const ratingRatio = clamp(loserRating / Math.max(1, winnerRating), 0.4, 1.2);
+  const losingShare = clamp(
+    0.48 + ratingRatio * 0.3 + clamp(randomValue, 0, 1) * 0.16,
+    0.42,
+    0.96
+  );
+  const loserScore = clamp(
+    Math.round(targetPoints * losingShare),
+    1,
+    targetPoints - 1
+  );
+
+  return winnerSide === "PLAYER_ONE"
+    ? {
+        playerOneScore: targetPoints,
+        playerTwoScore: loserScore,
+      }
+    : {
+        playerOneScore: loserScore,
+        playerTwoScore: targetPoints,
+      };
+}
+
+function clamp(value: number, minimum: number, maximum: number) {
+  return Math.min(maximum, Math.max(minimum, value));
 }
 
 function getMatchSpecialties(
