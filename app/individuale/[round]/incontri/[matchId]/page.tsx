@@ -1,8 +1,11 @@
-import { ArrowLeft, ChevronDown, CircleDot } from "lucide-react";
+import { ArrowLeft, ChevronDown, CircleDot, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import { buildIndividualGameChronicle } from "@/lib/individual-game-chronicle";
+import {
+  buildIndividualGameChronicle,
+  buildIndividualGameSummary,
+} from "@/lib/individual-game-chronicle";
 import { INDIVIDUAL_MATCH_STAGES } from "@/lib/individual-tournament-calendar";
 import type { MatchSpecialty } from "@/lib/match-engine";
 import { prisma } from "@/lib/prisma";
@@ -190,6 +193,18 @@ export default async function IndividualMatchDetailPage({
                   playerOneScore: game.playerOneScore,
                   playerTwoScore: game.playerTwoScore,
                 });
+                const winnerSide = playerOneWon
+                  ? "PLAYER_ONE"
+                  : "PLAYER_TWO";
+                const winnerName = playerOneWon
+                  ? `${playerOne.firstName} ${playerOne.lastName}`
+                  : `${playerTwo.firstName} ${playerTwo.lastName}`;
+                const gameSummary = buildIndividualGameSummary({
+                  chronicle,
+                  winnerSide,
+                  winnerName,
+                  specialty: game.specialty as MatchSpecialty,
+                });
 
                 return (
                   <details key={game.id} className="group">
@@ -228,9 +243,19 @@ export default async function IndividualMatchDetailPage({
                     </summary>
 
                     <div className="border-t border-zinc-800 bg-zinc-950/35 px-3 pb-4 pt-3 sm:px-4">
+                      <div className="mb-4 rounded-xl border border-amber-400/15 bg-amber-300/[0.04] px-4 py-3">
+                        <div className="flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.16em] text-amber-300">
+                          <Sparkles size={14} />
+                          La partita in breve
+                        </div>
+                        <p className="mt-2 text-sm font-medium leading-relaxed text-zinc-300">
+                          {gameSummary}
+                        </p>
+                      </div>
+
                       <div className="grid grid-cols-[52px_minmax(0,1fr)_48px_72px] gap-2 border-b border-zinc-800 px-2 pb-2 text-[9px] font-black uppercase tracking-wider text-zinc-600 sm:grid-cols-[70px_minmax(0,1fr)_70px_96px] sm:gap-3">
                         <span>Tiro</span>
-                        <span>Giocatore</span>
+                        <span>Cronaca</span>
                         <span className="text-right">Punti</span>
                         <span className="text-right">Parziale</span>
                       </div>
@@ -245,39 +270,57 @@ export default async function IndividualMatchDetailPage({
                             ? `${playerOne.firstName} ${playerOne.lastName}`
                             : `${playerTwo.firstName} ${playerTwo.lastName}`;
 
+                          const previousPhase =
+                            chronicle[shotIndex - 1]?.phase;
+                          const startsNewPhase =
+                            previousPhase !== shot.phase;
+
                           return (
-                            <li
-                              key={shot.order}
-                              className="grid grid-cols-[52px_minmax(0,1fr)_48px_72px] items-center gap-2 px-2 py-2.5 text-xs sm:grid-cols-[70px_minmax(0,1fr)_70px_96px] sm:gap-3 sm:text-sm"
-                            >
-                              <span className="font-bold text-zinc-600">
-                                {shot.order}
-                              </span>
-                              <span
-                                className={`truncate font-bold ${
-                                  isFinalShot
-                                    ? "text-emerald-300"
-                                    : "text-zinc-300"
-                                }`}
-                              >
-                                {playerName}
-                              </span>
-                              <span
-                                className={`text-right font-black tabular-nums ${
-                                  shot.points > 0
-                                    ? "text-amber-300"
-                                    : "text-zinc-600"
-                                }`}
-                              >
-                                {shot.points > 0 ? `+${shot.points}` : "0"}
-                              </span>
-                              <span
-                                className={`text-right font-black tabular-nums ${
-                                  isFinalShot ? "text-white" : "text-zinc-400"
-                                }`}
-                              >
-                                {shot.playerOneTotal}–{shot.playerTwoTotal}
-                              </span>
+                            <li key={shot.order}>
+                              {startsNewPhase ? (
+                                <div className="border-b border-zinc-800/70 bg-zinc-900/60 px-2 py-2 text-[9px] font-black uppercase tracking-[0.18em] text-emerald-400/70">
+                                  {formatChroniclePhase(shot.phase)}
+                                </div>
+                              ) : null}
+
+                              <div className="grid grid-cols-[52px_minmax(0,1fr)_48px_72px] items-start gap-2 px-2 py-3 text-xs sm:grid-cols-[70px_minmax(0,1fr)_70px_96px] sm:gap-3 sm:text-sm">
+                                <span className="pt-0.5 font-bold text-zinc-600">
+                                  {shot.order}
+                                </span>
+                                <div className="min-w-0">
+                                  <p
+                                    className={`font-black ${
+                                      isFinalShot
+                                        ? "text-emerald-300"
+                                        : shot.highlight === "LEAD_CHANGE" ||
+                                            shot.highlight === "BIG_SHOT"
+                                          ? "text-amber-200"
+                                          : "text-zinc-300"
+                                    }`}
+                                  >
+                                    {playerName}
+                                  </p>
+                                  <p className="mt-1 text-[11px] font-medium leading-relaxed text-zinc-500 sm:text-xs">
+                                    {shot.commentary}
+                                  </p>
+                                </div>
+                                <span
+                                  className={`pt-0.5 text-right font-black tabular-nums ${
+                                    shot.points > 0
+                                      ? "text-amber-300"
+                                      : "text-zinc-600"
+                                  }`}
+                                >
+                                  {shot.points > 0 ? `+${shot.points}` : "0"}
+                                </span>
+                                <span
+                                  className={`pt-0.5 text-right font-black tabular-nums ${
+                                    isFinalShot ? "text-white" : "text-zinc-400"
+                                  }`}
+                                >
+                                  {shot.playerOneTotal}–{shot.playerTwoTotal}
+                                </span>
+                              </div>
                             </li>
                           );
                         })}
@@ -314,6 +357,12 @@ function formatStage(value: string) {
 function formatSpecialty(value: string) {
   if (value === "TUTTI_DOPPI") return "Tutti Doppi";
   return value.charAt(0) + value.slice(1).toLowerCase();
+}
+
+function formatChroniclePhase(value: "OPENING" | "MIDDLE" | "FINISH") {
+  if (value === "OPENING") return "Avvio";
+  if (value === "MIDDLE") return "Fase centrale";
+  return "Finale";
 }
 
 function formatDateTime(value: Date) {
