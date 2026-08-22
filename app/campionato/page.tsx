@@ -12,6 +12,11 @@ export default async function CampionatoPage() {
       status: {
         in: ["PREPARATION", "ACTIVE", "COMPLETED"],
       },
+      entries: {
+        some: {
+          clubId,
+        },
+      },
     },
     orderBy: {
       id: "desc",

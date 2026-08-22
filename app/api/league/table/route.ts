@@ -6,6 +6,7 @@ import {
   createLeagueTable,
 } from "@/lib/league-table";
 
+import { getCurrentClubId } from "@/lib/current-club";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic =
@@ -13,6 +14,7 @@ export const dynamic =
 
 export async function GET() {
   try {
+    const clubId = await getCurrentClubId();
     const league =
       await prisma.league.findFirst({
         where: {
@@ -22,6 +24,11 @@ export async function GET() {
               "ACTIVE",
               "COMPLETED",
             ],
+          },
+          entries: {
+            some: {
+              clubId,
+            },
           },
         },
 

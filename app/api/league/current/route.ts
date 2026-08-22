@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
+import { getCurrentClubId } from "@/lib/current-club";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
@@ -33,6 +34,7 @@ type RoundResponse = {
 
 export async function GET() {
   try {
+    const clubId = await getCurrentClubId();
     const league =
       await prisma.league.findFirst({
         where: {
@@ -41,6 +43,11 @@ export async function GET() {
               "PREPARATION",
               "ACTIVE",
             ],
+          },
+          entries: {
+            some: {
+              clubId,
+            },
           },
         },
 
