@@ -64,6 +64,9 @@ export const ModelName = {
   ClubWeeklyUpdate: 'ClubWeeklyUpdate',
   GameEvent: 'GameEvent',
   Season: 'Season',
+  IndividualTournament: 'IndividualTournament',
+  IndividualTournamentEntry: 'IndividualTournamentEntry',
+  IndividualTournamentMatch: 'IndividualTournamentMatch',
   League: 'League',
   LeagueEntry: 'LeagueEntry',
   LeagueFixture: 'LeagueFixture',
@@ -343,6 +346,62 @@ export const SeasonScalarFieldEnum = {
 } as const
 
 export type SeasonScalarFieldEnum = (typeof SeasonScalarFieldEnum)[keyof typeof SeasonScalarFieldEnum]
+
+
+export const IndividualTournamentScalarFieldEnum = {
+  id: 'id',
+  seasonId: 'seasonId',
+  leagueRound: 'leagueRound',
+  type: 'type',
+  name: 'name',
+  specialty: 'specialty',
+  status: 'status',
+  currentStage: 'currentStage',
+  drawAt: 'drawAt',
+  finalAt: 'finalAt',
+  championPlayerId: 'championPlayerId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type IndividualTournamentScalarFieldEnum = (typeof IndividualTournamentScalarFieldEnum)[keyof typeof IndividualTournamentScalarFieldEnum]
+
+
+export const IndividualTournamentEntryScalarFieldEnum = {
+  id: 'id',
+  tournamentId: 'tournamentId',
+  playerId: 'playerId',
+  rankingAtDraw: 'rankingAtDraw',
+  overallAtDraw: 'overallAtDraw',
+  drawPosition: 'drawPosition',
+  status: 'status',
+  eliminatedStage: 'eliminatedStage',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type IndividualTournamentEntryScalarFieldEnum = (typeof IndividualTournamentEntryScalarFieldEnum)[keyof typeof IndividualTournamentEntryScalarFieldEnum]
+
+
+export const IndividualTournamentMatchScalarFieldEnum = {
+  id: 'id',
+  tournamentId: 'tournamentId',
+  stage: 'stage',
+  stageOrder: 'stageOrder',
+  position: 'position',
+  scheduledAt: 'scheduledAt',
+  playerOneId: 'playerOneId',
+  playerTwoId: 'playerTwoId',
+  winnerPlayerId: 'winnerPlayerId',
+  playerOneWins: 'playerOneWins',
+  playerTwoWins: 'playerTwoWins',
+  status: 'status',
+  playedAt: 'playedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type IndividualTournamentMatchScalarFieldEnum = (typeof IndividualTournamentMatchScalarFieldEnum)[keyof typeof IndividualTournamentMatchScalarFieldEnum]
 
 
 export const LeagueScalarFieldEnum = {

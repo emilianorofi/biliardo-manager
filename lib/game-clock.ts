@@ -7,6 +7,11 @@ import {
   advanceAcademyScouting,
 } from "@/lib/academy-scouting";
 import {
+  drawIndividualTournament,
+  initializeIndividualTournaments,
+  playIndividualTournamentStage,
+} from "@/lib/individual-tournament-service";
+import {
   playLeagueFixture,
   PlayLeagueFixtureError,
 } from "@/lib/play-league-fixture";
@@ -24,6 +29,8 @@ const MAX_EVENTS_PER_RUN = 256;
 type ClockCandidate = {
   type:
     | "LEAGUE"
+    | "TOURNAMENT_DRAW"
+    | "TOURNAMENT_STAGE"
     | "WEEKLY_UPDATE"
     | "ACADEMY"
     | "WEEKLY_NEWS";
@@ -35,7 +42,10 @@ type ClockCandidate = {
 export async function processGameClock(
   now = new Date()
 ) {
-  await initializeWeeklyUpdates(now);
+  await Promise.all([
+    initializeWeeklyUpdates(now),
+    initializeIndividualTournaments(),
+  ]);
 
   const events = [];
 
@@ -102,6 +112,8 @@ async function findNextDueEvent(
     club,
     academyClub,
     weeklyNews,
+    tournamentDraw,
+    tournamentMatch,
   ] = await Promise.all([
     prisma.leagueFixture.findFirst({
       where: {
@@ -175,6 +187,49 @@ async function findNextDueEvent(
         newsScheduledAt: "asc",
       },
     }),
+    prisma.individualTournament.findFirst({
+      where: {
+        status: "SCHEDULED",
+        drawAt: {
+          lte: now,
+        },
+      },
+      select: {
+        id: true,
+        drawAt: true,
+      },
+      orderBy: [
+        { drawAt: "asc" },
+        { id: "asc" },
+      ],
+    }),
+    prisma.individualTournamentMatch.findFirst({
+      where: {
+        status: "SCHEDULED",
+        scheduledAt: {
+          lte: now,
+        },
+        playerOneId: {
+          not: null,
+        },
+        playerTwoId: {
+          not: null,
+        },
+        tournament: {
+          status: {
+            in: ["DRAWN", "IN_PROGRESS"],
+          },
+        },
+      },
+      select: {
+        id: true,
+        scheduledAt: true,
+      },
+      orderBy: [
+        { scheduledAt: "asc" },
+        { id: "asc" },
+      ],
+    }),
   ]);
   const candidates: ClockCandidate[] = [];
 
@@ -217,6 +272,22 @@ async function findNextDueEvent(
     });
   }
 
+  if (tournamentDraw) {
+    candidates.push({
+      type: "TOURNAMENT_DRAW",
+      id: tournamentDraw.id,
+      scheduledAt: tournamentDraw.drawAt,
+    });
+  }
+
+  if (tournamentMatch) {
+    candidates.push({
+      type: "TOURNAMENT_STAGE",
+      id: tournamentMatch.id,
+      scheduledAt: tournamentMatch.scheduledAt,
+    });
+  }
+
   candidates.sort(
     (first, second) =>
       first.scheduledAt.getTime() -
@@ -237,6 +308,34 @@ async function processCandidate(
   switch (candidate.type) {
     case "LEAGUE":
       return processLeagueRound(candidate);
+
+    case "TOURNAMENT_DRAW": {
+      const result = await drawIndividualTournament(
+        candidate.id,
+        candidate.scheduledAt
+      );
+
+      return {
+        type: candidate.type,
+        id: candidate.id,
+        scheduledAt: candidate.scheduledAt,
+        ...result,
+      };
+    }
+
+    case "TOURNAMENT_STAGE": {
+      const result = await playIndividualTournamentStage(
+        candidate.id,
+        candidate.scheduledAt
+      );
+
+      return {
+        type: candidate.type,
+        id: candidate.id,
+        scheduledAt: candidate.scheduledAt,
+        ...result,
+      };
+    }
 
     case "WEEKLY_UPDATE": {
       const result =

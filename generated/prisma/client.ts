@@ -107,6 +107,21 @@ export type GameEvent = Prisma.GameEventModel
  */
 export type Season = Prisma.SeasonModel
 /**
+ * Model IndividualTournament
+ *
+ */
+export type IndividualTournament = Prisma.IndividualTournamentModel
+/**
+ * Model IndividualTournamentEntry
+ *
+ */
+export type IndividualTournamentEntry = Prisma.IndividualTournamentEntryModel
+/**
+ * Model IndividualTournamentMatch
+ *
+ */
+export type IndividualTournamentMatch = Prisma.IndividualTournamentMatchModel
+/**
  * Model League
  *
  */

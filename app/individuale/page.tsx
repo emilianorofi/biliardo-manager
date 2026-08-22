@@ -1,5 +1,6 @@
 import {
   CalendarDays,
+  ChevronRight,
   Clock3,
   Globe2,
   Medal,
@@ -8,6 +9,7 @@ import {
   Trophy,
   Users,
 } from "lucide-react";
+import Link from "next/link";
 import type { ReactNode } from "react";
 
 import {
@@ -245,6 +247,9 @@ export default async function IndividualePage() {
               featured={
                 tournament.leagueRound === featuredTournament.leagueRound
               }
+              accessible={
+                tournament.leagueRound <= referenceLeague.currentRound
+              }
             />
           ))}
         </div>
@@ -388,10 +393,12 @@ function TournamentCard({
   tournament,
   now,
   featured,
+  accessible,
 }: {
   tournament: ReturnType<typeof buildIndividualTournamentCalendar>[number];
   now: Date;
   featured: boolean;
+  accessible: boolean;
 }) {
   const status = getWeekendStatus(
     tournament.drawAt,
@@ -399,12 +406,16 @@ function TournamentCard({
     now
   );
 
-  return (
+  const card = (
     <article
       className={`rounded-xl border p-3 transition ${
         featured
           ? "border-amber-400/40 bg-amber-400/5"
           : "border-zinc-800 bg-zinc-950/20"
+      } ${
+        accessible
+          ? "hover:border-emerald-500/40 hover:bg-emerald-500/5"
+          : "opacity-75"
       }`}
     >
       <div className="flex items-start justify-between gap-3">
@@ -430,19 +441,28 @@ function TournamentCard({
           </p>
         </div>
 
-        <span
-          className={`text-[10px] font-black ${
-            status === "In corso"
-              ? "text-emerald-400"
-              : status === "Concluso"
-                ? "text-zinc-600"
-                : "text-amber-300"
-          }`}
-        >
-          {status}
-        </span>
+        <div className="flex items-center gap-1.5">
+          <span
+            className={`text-[10px] font-black ${
+              status === "In corso"
+                ? "text-emerald-400"
+                : status === "Concluso"
+                  ? "text-zinc-600"
+                  : "text-amber-300"
+            }`}
+          >
+            {accessible ? "Apri tabellone" : status}
+          </span>
+          {accessible && <ChevronRight size={14} className="text-emerald-400" />}
+        </div>
       </div>
     </article>
+  );
+
+  return accessible ? (
+    <Link href={`/individuale/${tournament.leagueRound}`}>{card}</Link>
+  ) : (
+    card
   );
 }
 

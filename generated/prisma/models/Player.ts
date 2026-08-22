@@ -476,6 +476,11 @@ export type PlayerWhereInput = {
   trainingResults?: Prisma.TrainingResultListRelationFilter
   fixtureAppearances?: Prisma.PlayerFixtureAppearanceListRelationFilter
   transferListings?: Prisma.TransferListingListRelationFilter
+  individualTournamentEntries?: Prisma.IndividualTournamentEntryListRelationFilter
+  individualMatchesAsPlayerOne?: Prisma.IndividualTournamentMatchListRelationFilter
+  individualMatchesAsPlayerTwo?: Prisma.IndividualTournamentMatchListRelationFilter
+  individualMatchesWon?: Prisma.IndividualTournamentMatchListRelationFilter
+  individualTournamentsWon?: Prisma.IndividualTournamentListRelationFilter
 }
 
 export type PlayerOrderByWithRelationInput = {
@@ -515,6 +520,11 @@ export type PlayerOrderByWithRelationInput = {
   trainingResults?: Prisma.TrainingResultOrderByRelationAggregateInput
   fixtureAppearances?: Prisma.PlayerFixtureAppearanceOrderByRelationAggregateInput
   transferListings?: Prisma.TransferListingOrderByRelationAggregateInput
+  individualTournamentEntries?: Prisma.IndividualTournamentEntryOrderByRelationAggregateInput
+  individualMatchesAsPlayerOne?: Prisma.IndividualTournamentMatchOrderByRelationAggregateInput
+  individualMatchesAsPlayerTwo?: Prisma.IndividualTournamentMatchOrderByRelationAggregateInput
+  individualMatchesWon?: Prisma.IndividualTournamentMatchOrderByRelationAggregateInput
+  individualTournamentsWon?: Prisma.IndividualTournamentOrderByRelationAggregateInput
 }
 
 export type PlayerWhereUniqueInput = Prisma.AtLeast<{
@@ -557,6 +567,11 @@ export type PlayerWhereUniqueInput = Prisma.AtLeast<{
   trainingResults?: Prisma.TrainingResultListRelationFilter
   fixtureAppearances?: Prisma.PlayerFixtureAppearanceListRelationFilter
   transferListings?: Prisma.TransferListingListRelationFilter
+  individualTournamentEntries?: Prisma.IndividualTournamentEntryListRelationFilter
+  individualMatchesAsPlayerOne?: Prisma.IndividualTournamentMatchListRelationFilter
+  individualMatchesAsPlayerTwo?: Prisma.IndividualTournamentMatchListRelationFilter
+  individualMatchesWon?: Prisma.IndividualTournamentMatchListRelationFilter
+  individualTournamentsWon?: Prisma.IndividualTournamentListRelationFilter
 }, "id">
 
 export type PlayerOrderByWithAggregationInput = {
@@ -663,6 +678,11 @@ export type PlayerCreateInput = {
   trainingResults?: Prisma.TrainingResultCreateNestedManyWithoutPlayerInput
   fixtureAppearances?: Prisma.PlayerFixtureAppearanceCreateNestedManyWithoutPlayerInput
   transferListings?: Prisma.TransferListingCreateNestedManyWithoutPlayerInput
+  individualTournamentEntries?: Prisma.IndividualTournamentEntryCreateNestedManyWithoutPlayerInput
+  individualMatchesAsPlayerOne?: Prisma.IndividualTournamentMatchCreateNestedManyWithoutPlayerOneInput
+  individualMatchesAsPlayerTwo?: Prisma.IndividualTournamentMatchCreateNestedManyWithoutPlayerTwoInput
+  individualMatchesWon?: Prisma.IndividualTournamentMatchCreateNestedManyWithoutWinnerPlayerInput
+  individualTournamentsWon?: Prisma.IndividualTournamentCreateNestedManyWithoutChampionPlayerInput
 }
 
 export type PlayerUncheckedCreateInput = {
@@ -700,6 +720,11 @@ export type PlayerUncheckedCreateInput = {
   trainingResults?: Prisma.TrainingResultUncheckedCreateNestedManyWithoutPlayerInput
   fixtureAppearances?: Prisma.PlayerFixtureAppearanceUncheckedCreateNestedManyWithoutPlayerInput
   transferListings?: Prisma.TransferListingUncheckedCreateNestedManyWithoutPlayerInput
+  individualTournamentEntries?: Prisma.IndividualTournamentEntryUncheckedCreateNestedManyWithoutPlayerInput
+  individualMatchesAsPlayerOne?: Prisma.IndividualTournamentMatchUncheckedCreateNestedManyWithoutPlayerOneInput
+  individualMatchesAsPlayerTwo?: Prisma.IndividualTournamentMatchUncheckedCreateNestedManyWithoutPlayerTwoInput
+  individualMatchesWon?: Prisma.IndividualTournamentMatchUncheckedCreateNestedManyWithoutWinnerPlayerInput
+  individualTournamentsWon?: Prisma.IndividualTournamentUncheckedCreateNestedManyWithoutChampionPlayerInput
 }
 
 export type PlayerUpdateInput = {
@@ -736,6 +761,11 @@ export type PlayerUpdateInput = {
   trainingResults?: Prisma.TrainingResultUpdateManyWithoutPlayerNestedInput
   fixtureAppearances?: Prisma.PlayerFixtureAppearanceUpdateManyWithoutPlayerNestedInput
   transferListings?: Prisma.TransferListingUpdateManyWithoutPlayerNestedInput
+  individualTournamentEntries?: Prisma.IndividualTournamentEntryUpdateManyWithoutPlayerNestedInput
+  individualMatchesAsPlayerOne?: Prisma.IndividualTournamentMatchUpdateManyWithoutPlayerOneNestedInput
+  individualMatchesAsPlayerTwo?: Prisma.IndividualTournamentMatchUpdateManyWithoutPlayerTwoNestedInput
+  individualMatchesWon?: Prisma.IndividualTournamentMatchUpdateManyWithoutWinnerPlayerNestedInput
+  individualTournamentsWon?: Prisma.IndividualTournamentUpdateManyWithoutChampionPlayerNestedInput
 }
 
 export type PlayerUncheckedUpdateInput = {
@@ -773,6 +803,11 @@ export type PlayerUncheckedUpdateInput = {
   trainingResults?: Prisma.TrainingResultUncheckedUpdateManyWithoutPlayerNestedInput
   fixtureAppearances?: Prisma.PlayerFixtureAppearanceUncheckedUpdateManyWithoutPlayerNestedInput
   transferListings?: Prisma.TransferListingUncheckedUpdateManyWithoutPlayerNestedInput
+  individualTournamentEntries?: Prisma.IndividualTournamentEntryUncheckedUpdateManyWithoutPlayerNestedInput
+  individualMatchesAsPlayerOne?: Prisma.IndividualTournamentMatchUncheckedUpdateManyWithoutPlayerOneNestedInput
+  individualMatchesAsPlayerTwo?: Prisma.IndividualTournamentMatchUncheckedUpdateManyWithoutPlayerTwoNestedInput
+  individualMatchesWon?: Prisma.IndividualTournamentMatchUncheckedUpdateManyWithoutWinnerPlayerNestedInput
+  individualTournamentsWon?: Prisma.IndividualTournamentUncheckedUpdateManyWithoutChampionPlayerNestedInput
 }
 
 export type PlayerCreateManyInput = {
@@ -1207,6 +1242,84 @@ export type PlayerUncheckedUpdateManyWithoutRetirementSeasonNestedInput = {
   deleteMany?: Prisma.PlayerScalarWhereInput | Prisma.PlayerScalarWhereInput[]
 }
 
+export type PlayerCreateNestedOneWithoutIndividualTournamentsWonInput = {
+  create?: Prisma.XOR<Prisma.PlayerCreateWithoutIndividualTournamentsWonInput, Prisma.PlayerUncheckedCreateWithoutIndividualTournamentsWonInput>
+  connectOrCreate?: Prisma.PlayerCreateOrConnectWithoutIndividualTournamentsWonInput
+  connect?: Prisma.PlayerWhereUniqueInput
+}
+
+export type PlayerUpdateOneWithoutIndividualTournamentsWonNestedInput = {
+  create?: Prisma.XOR<Prisma.PlayerCreateWithoutIndividualTournamentsWonInput, Prisma.PlayerUncheckedCreateWithoutIndividualTournamentsWonInput>
+  connectOrCreate?: Prisma.PlayerCreateOrConnectWithoutIndividualTournamentsWonInput
+  upsert?: Prisma.PlayerUpsertWithoutIndividualTournamentsWonInput
+  disconnect?: Prisma.PlayerWhereInput | boolean
+  delete?: Prisma.PlayerWhereInput | boolean
+  connect?: Prisma.PlayerWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PlayerUpdateToOneWithWhereWithoutIndividualTournamentsWonInput, Prisma.PlayerUpdateWithoutIndividualTournamentsWonInput>, Prisma.PlayerUncheckedUpdateWithoutIndividualTournamentsWonInput>
+}
+
+export type PlayerCreateNestedOneWithoutIndividualTournamentEntriesInput = {
+  create?: Prisma.XOR<Prisma.PlayerCreateWithoutIndividualTournamentEntriesInput, Prisma.PlayerUncheckedCreateWithoutIndividualTournamentEntriesInput>
+  connectOrCreate?: Prisma.PlayerCreateOrConnectWithoutIndividualTournamentEntriesInput
+  connect?: Prisma.PlayerWhereUniqueInput
+}
+
+export type PlayerUpdateOneRequiredWithoutIndividualTournamentEntriesNestedInput = {
+  create?: Prisma.XOR<Prisma.PlayerCreateWithoutIndividualTournamentEntriesInput, Prisma.PlayerUncheckedCreateWithoutIndividualTournamentEntriesInput>
+  connectOrCreate?: Prisma.PlayerCreateOrConnectWithoutIndividualTournamentEntriesInput
+  upsert?: Prisma.PlayerUpsertWithoutIndividualTournamentEntriesInput
+  connect?: Prisma.PlayerWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PlayerUpdateToOneWithWhereWithoutIndividualTournamentEntriesInput, Prisma.PlayerUpdateWithoutIndividualTournamentEntriesInput>, Prisma.PlayerUncheckedUpdateWithoutIndividualTournamentEntriesInput>
+}
+
+export type PlayerCreateNestedOneWithoutIndividualMatchesAsPlayerOneInput = {
+  create?: Prisma.XOR<Prisma.PlayerCreateWithoutIndividualMatchesAsPlayerOneInput, Prisma.PlayerUncheckedCreateWithoutIndividualMatchesAsPlayerOneInput>
+  connectOrCreate?: Prisma.PlayerCreateOrConnectWithoutIndividualMatchesAsPlayerOneInput
+  connect?: Prisma.PlayerWhereUniqueInput
+}
+
+export type PlayerCreateNestedOneWithoutIndividualMatchesAsPlayerTwoInput = {
+  create?: Prisma.XOR<Prisma.PlayerCreateWithoutIndividualMatchesAsPlayerTwoInput, Prisma.PlayerUncheckedCreateWithoutIndividualMatchesAsPlayerTwoInput>
+  connectOrCreate?: Prisma.PlayerCreateOrConnectWithoutIndividualMatchesAsPlayerTwoInput
+  connect?: Prisma.PlayerWhereUniqueInput
+}
+
+export type PlayerCreateNestedOneWithoutIndividualMatchesWonInput = {
+  create?: Prisma.XOR<Prisma.PlayerCreateWithoutIndividualMatchesWonInput, Prisma.PlayerUncheckedCreateWithoutIndividualMatchesWonInput>
+  connectOrCreate?: Prisma.PlayerCreateOrConnectWithoutIndividualMatchesWonInput
+  connect?: Prisma.PlayerWhereUniqueInput
+}
+
+export type PlayerUpdateOneWithoutIndividualMatchesAsPlayerOneNestedInput = {
+  create?: Prisma.XOR<Prisma.PlayerCreateWithoutIndividualMatchesAsPlayerOneInput, Prisma.PlayerUncheckedCreateWithoutIndividualMatchesAsPlayerOneInput>
+  connectOrCreate?: Prisma.PlayerCreateOrConnectWithoutIndividualMatchesAsPlayerOneInput
+  upsert?: Prisma.PlayerUpsertWithoutIndividualMatchesAsPlayerOneInput
+  disconnect?: Prisma.PlayerWhereInput | boolean
+  delete?: Prisma.PlayerWhereInput | boolean
+  connect?: Prisma.PlayerWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PlayerUpdateToOneWithWhereWithoutIndividualMatchesAsPlayerOneInput, Prisma.PlayerUpdateWithoutIndividualMatchesAsPlayerOneInput>, Prisma.PlayerUncheckedUpdateWithoutIndividualMatchesAsPlayerOneInput>
+}
+
+export type PlayerUpdateOneWithoutIndividualMatchesAsPlayerTwoNestedInput = {
+  create?: Prisma.XOR<Prisma.PlayerCreateWithoutIndividualMatchesAsPlayerTwoInput, Prisma.PlayerUncheckedCreateWithoutIndividualMatchesAsPlayerTwoInput>
+  connectOrCreate?: Prisma.PlayerCreateOrConnectWithoutIndividualMatchesAsPlayerTwoInput
+  upsert?: Prisma.PlayerUpsertWithoutIndividualMatchesAsPlayerTwoInput
+  disconnect?: Prisma.PlayerWhereInput | boolean
+  delete?: Prisma.PlayerWhereInput | boolean
+  connect?: Prisma.PlayerWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PlayerUpdateToOneWithWhereWithoutIndividualMatchesAsPlayerTwoInput, Prisma.PlayerUpdateWithoutIndividualMatchesAsPlayerTwoInput>, Prisma.PlayerUncheckedUpdateWithoutIndividualMatchesAsPlayerTwoInput>
+}
+
+export type PlayerUpdateOneWithoutIndividualMatchesWonNestedInput = {
+  create?: Prisma.XOR<Prisma.PlayerCreateWithoutIndividualMatchesWonInput, Prisma.PlayerUncheckedCreateWithoutIndividualMatchesWonInput>
+  connectOrCreate?: Prisma.PlayerCreateOrConnectWithoutIndividualMatchesWonInput
+  upsert?: Prisma.PlayerUpsertWithoutIndividualMatchesWonInput
+  disconnect?: Prisma.PlayerWhereInput | boolean
+  delete?: Prisma.PlayerWhereInput | boolean
+  connect?: Prisma.PlayerWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PlayerUpdateToOneWithWhereWithoutIndividualMatchesWonInput, Prisma.PlayerUpdateWithoutIndividualMatchesWonInput>, Prisma.PlayerUncheckedUpdateWithoutIndividualMatchesWonInput>
+}
+
 export type PlayerCreateNestedOneWithoutFixtureAppearancesInput = {
   create?: Prisma.XOR<Prisma.PlayerCreateWithoutFixtureAppearancesInput, Prisma.PlayerUncheckedCreateWithoutFixtureAppearancesInput>
   connectOrCreate?: Prisma.PlayerCreateOrConnectWithoutFixtureAppearancesInput
@@ -1256,6 +1369,11 @@ export type PlayerCreateWithoutClubInput = {
   trainingResults?: Prisma.TrainingResultCreateNestedManyWithoutPlayerInput
   fixtureAppearances?: Prisma.PlayerFixtureAppearanceCreateNestedManyWithoutPlayerInput
   transferListings?: Prisma.TransferListingCreateNestedManyWithoutPlayerInput
+  individualTournamentEntries?: Prisma.IndividualTournamentEntryCreateNestedManyWithoutPlayerInput
+  individualMatchesAsPlayerOne?: Prisma.IndividualTournamentMatchCreateNestedManyWithoutPlayerOneInput
+  individualMatchesAsPlayerTwo?: Prisma.IndividualTournamentMatchCreateNestedManyWithoutPlayerTwoInput
+  individualMatchesWon?: Prisma.IndividualTournamentMatchCreateNestedManyWithoutWinnerPlayerInput
+  individualTournamentsWon?: Prisma.IndividualTournamentCreateNestedManyWithoutChampionPlayerInput
 }
 
 export type PlayerUncheckedCreateWithoutClubInput = {
@@ -1292,6 +1410,11 @@ export type PlayerUncheckedCreateWithoutClubInput = {
   trainingResults?: Prisma.TrainingResultUncheckedCreateNestedManyWithoutPlayerInput
   fixtureAppearances?: Prisma.PlayerFixtureAppearanceUncheckedCreateNestedManyWithoutPlayerInput
   transferListings?: Prisma.TransferListingUncheckedCreateNestedManyWithoutPlayerInput
+  individualTournamentEntries?: Prisma.IndividualTournamentEntryUncheckedCreateNestedManyWithoutPlayerInput
+  individualMatchesAsPlayerOne?: Prisma.IndividualTournamentMatchUncheckedCreateNestedManyWithoutPlayerOneInput
+  individualMatchesAsPlayerTwo?: Prisma.IndividualTournamentMatchUncheckedCreateNestedManyWithoutPlayerTwoInput
+  individualMatchesWon?: Prisma.IndividualTournamentMatchUncheckedCreateNestedManyWithoutWinnerPlayerInput
+  individualTournamentsWon?: Prisma.IndividualTournamentUncheckedCreateNestedManyWithoutChampionPlayerInput
 }
 
 export type PlayerCreateOrConnectWithoutClubInput = {
@@ -1387,6 +1510,11 @@ export type PlayerCreateWithoutTransferListingsInput = {
   formationAsC?: Prisma.FormationCreateNestedManyWithoutSlotCPlayerInput
   trainingResults?: Prisma.TrainingResultCreateNestedManyWithoutPlayerInput
   fixtureAppearances?: Prisma.PlayerFixtureAppearanceCreateNestedManyWithoutPlayerInput
+  individualTournamentEntries?: Prisma.IndividualTournamentEntryCreateNestedManyWithoutPlayerInput
+  individualMatchesAsPlayerOne?: Prisma.IndividualTournamentMatchCreateNestedManyWithoutPlayerOneInput
+  individualMatchesAsPlayerTwo?: Prisma.IndividualTournamentMatchCreateNestedManyWithoutPlayerTwoInput
+  individualMatchesWon?: Prisma.IndividualTournamentMatchCreateNestedManyWithoutWinnerPlayerInput
+  individualTournamentsWon?: Prisma.IndividualTournamentCreateNestedManyWithoutChampionPlayerInput
 }
 
 export type PlayerUncheckedCreateWithoutTransferListingsInput = {
@@ -1423,6 +1551,11 @@ export type PlayerUncheckedCreateWithoutTransferListingsInput = {
   formationAsC?: Prisma.FormationUncheckedCreateNestedManyWithoutSlotCPlayerInput
   trainingResults?: Prisma.TrainingResultUncheckedCreateNestedManyWithoutPlayerInput
   fixtureAppearances?: Prisma.PlayerFixtureAppearanceUncheckedCreateNestedManyWithoutPlayerInput
+  individualTournamentEntries?: Prisma.IndividualTournamentEntryUncheckedCreateNestedManyWithoutPlayerInput
+  individualMatchesAsPlayerOne?: Prisma.IndividualTournamentMatchUncheckedCreateNestedManyWithoutPlayerOneInput
+  individualMatchesAsPlayerTwo?: Prisma.IndividualTournamentMatchUncheckedCreateNestedManyWithoutPlayerTwoInput
+  individualMatchesWon?: Prisma.IndividualTournamentMatchUncheckedCreateNestedManyWithoutWinnerPlayerInput
+  individualTournamentsWon?: Prisma.IndividualTournamentUncheckedCreateNestedManyWithoutChampionPlayerInput
 }
 
 export type PlayerCreateOrConnectWithoutTransferListingsInput = {
@@ -1474,6 +1607,11 @@ export type PlayerUpdateWithoutTransferListingsInput = {
   formationAsC?: Prisma.FormationUpdateManyWithoutSlotCPlayerNestedInput
   trainingResults?: Prisma.TrainingResultUpdateManyWithoutPlayerNestedInput
   fixtureAppearances?: Prisma.PlayerFixtureAppearanceUpdateManyWithoutPlayerNestedInput
+  individualTournamentEntries?: Prisma.IndividualTournamentEntryUpdateManyWithoutPlayerNestedInput
+  individualMatchesAsPlayerOne?: Prisma.IndividualTournamentMatchUpdateManyWithoutPlayerOneNestedInput
+  individualMatchesAsPlayerTwo?: Prisma.IndividualTournamentMatchUpdateManyWithoutPlayerTwoNestedInput
+  individualMatchesWon?: Prisma.IndividualTournamentMatchUpdateManyWithoutWinnerPlayerNestedInput
+  individualTournamentsWon?: Prisma.IndividualTournamentUpdateManyWithoutChampionPlayerNestedInput
 }
 
 export type PlayerUncheckedUpdateWithoutTransferListingsInput = {
@@ -1510,6 +1648,11 @@ export type PlayerUncheckedUpdateWithoutTransferListingsInput = {
   formationAsC?: Prisma.FormationUncheckedUpdateManyWithoutSlotCPlayerNestedInput
   trainingResults?: Prisma.TrainingResultUncheckedUpdateManyWithoutPlayerNestedInput
   fixtureAppearances?: Prisma.PlayerFixtureAppearanceUncheckedUpdateManyWithoutPlayerNestedInput
+  individualTournamentEntries?: Prisma.IndividualTournamentEntryUncheckedUpdateManyWithoutPlayerNestedInput
+  individualMatchesAsPlayerOne?: Prisma.IndividualTournamentMatchUncheckedUpdateManyWithoutPlayerOneNestedInput
+  individualMatchesAsPlayerTwo?: Prisma.IndividualTournamentMatchUncheckedUpdateManyWithoutPlayerTwoNestedInput
+  individualMatchesWon?: Prisma.IndividualTournamentMatchUncheckedUpdateManyWithoutWinnerPlayerNestedInput
+  individualTournamentsWon?: Prisma.IndividualTournamentUncheckedUpdateManyWithoutChampionPlayerNestedInput
 }
 
 export type PlayerCreateWithoutFormationAsAInput = {
@@ -1545,6 +1688,11 @@ export type PlayerCreateWithoutFormationAsAInput = {
   trainingResults?: Prisma.TrainingResultCreateNestedManyWithoutPlayerInput
   fixtureAppearances?: Prisma.PlayerFixtureAppearanceCreateNestedManyWithoutPlayerInput
   transferListings?: Prisma.TransferListingCreateNestedManyWithoutPlayerInput
+  individualTournamentEntries?: Prisma.IndividualTournamentEntryCreateNestedManyWithoutPlayerInput
+  individualMatchesAsPlayerOne?: Prisma.IndividualTournamentMatchCreateNestedManyWithoutPlayerOneInput
+  individualMatchesAsPlayerTwo?: Prisma.IndividualTournamentMatchCreateNestedManyWithoutPlayerTwoInput
+  individualMatchesWon?: Prisma.IndividualTournamentMatchCreateNestedManyWithoutWinnerPlayerInput
+  individualTournamentsWon?: Prisma.IndividualTournamentCreateNestedManyWithoutChampionPlayerInput
 }
 
 export type PlayerUncheckedCreateWithoutFormationAsAInput = {
@@ -1581,6 +1729,11 @@ export type PlayerUncheckedCreateWithoutFormationAsAInput = {
   trainingResults?: Prisma.TrainingResultUncheckedCreateNestedManyWithoutPlayerInput
   fixtureAppearances?: Prisma.PlayerFixtureAppearanceUncheckedCreateNestedManyWithoutPlayerInput
   transferListings?: Prisma.TransferListingUncheckedCreateNestedManyWithoutPlayerInput
+  individualTournamentEntries?: Prisma.IndividualTournamentEntryUncheckedCreateNestedManyWithoutPlayerInput
+  individualMatchesAsPlayerOne?: Prisma.IndividualTournamentMatchUncheckedCreateNestedManyWithoutPlayerOneInput
+  individualMatchesAsPlayerTwo?: Prisma.IndividualTournamentMatchUncheckedCreateNestedManyWithoutPlayerTwoInput
+  individualMatchesWon?: Prisma.IndividualTournamentMatchUncheckedCreateNestedManyWithoutWinnerPlayerInput
+  individualTournamentsWon?: Prisma.IndividualTournamentUncheckedCreateNestedManyWithoutChampionPlayerInput
 }
 
 export type PlayerCreateOrConnectWithoutFormationAsAInput = {
@@ -1621,6 +1774,11 @@ export type PlayerCreateWithoutFormationAsBInput = {
   trainingResults?: Prisma.TrainingResultCreateNestedManyWithoutPlayerInput
   fixtureAppearances?: Prisma.PlayerFixtureAppearanceCreateNestedManyWithoutPlayerInput
   transferListings?: Prisma.TransferListingCreateNestedManyWithoutPlayerInput
+  individualTournamentEntries?: Prisma.IndividualTournamentEntryCreateNestedManyWithoutPlayerInput
+  individualMatchesAsPlayerOne?: Prisma.IndividualTournamentMatchCreateNestedManyWithoutPlayerOneInput
+  individualMatchesAsPlayerTwo?: Prisma.IndividualTournamentMatchCreateNestedManyWithoutPlayerTwoInput
+  individualMatchesWon?: Prisma.IndividualTournamentMatchCreateNestedManyWithoutWinnerPlayerInput
+  individualTournamentsWon?: Prisma.IndividualTournamentCreateNestedManyWithoutChampionPlayerInput
 }
 
 export type PlayerUncheckedCreateWithoutFormationAsBInput = {
@@ -1657,6 +1815,11 @@ export type PlayerUncheckedCreateWithoutFormationAsBInput = {
   trainingResults?: Prisma.TrainingResultUncheckedCreateNestedManyWithoutPlayerInput
   fixtureAppearances?: Prisma.PlayerFixtureAppearanceUncheckedCreateNestedManyWithoutPlayerInput
   transferListings?: Prisma.TransferListingUncheckedCreateNestedManyWithoutPlayerInput
+  individualTournamentEntries?: Prisma.IndividualTournamentEntryUncheckedCreateNestedManyWithoutPlayerInput
+  individualMatchesAsPlayerOne?: Prisma.IndividualTournamentMatchUncheckedCreateNestedManyWithoutPlayerOneInput
+  individualMatchesAsPlayerTwo?: Prisma.IndividualTournamentMatchUncheckedCreateNestedManyWithoutPlayerTwoInput
+  individualMatchesWon?: Prisma.IndividualTournamentMatchUncheckedCreateNestedManyWithoutWinnerPlayerInput
+  individualTournamentsWon?: Prisma.IndividualTournamentUncheckedCreateNestedManyWithoutChampionPlayerInput
 }
 
 export type PlayerCreateOrConnectWithoutFormationAsBInput = {
@@ -1697,6 +1860,11 @@ export type PlayerCreateWithoutFormationAsCInput = {
   trainingResults?: Prisma.TrainingResultCreateNestedManyWithoutPlayerInput
   fixtureAppearances?: Prisma.PlayerFixtureAppearanceCreateNestedManyWithoutPlayerInput
   transferListings?: Prisma.TransferListingCreateNestedManyWithoutPlayerInput
+  individualTournamentEntries?: Prisma.IndividualTournamentEntryCreateNestedManyWithoutPlayerInput
+  individualMatchesAsPlayerOne?: Prisma.IndividualTournamentMatchCreateNestedManyWithoutPlayerOneInput
+  individualMatchesAsPlayerTwo?: Prisma.IndividualTournamentMatchCreateNestedManyWithoutPlayerTwoInput
+  individualMatchesWon?: Prisma.IndividualTournamentMatchCreateNestedManyWithoutWinnerPlayerInput
+  individualTournamentsWon?: Prisma.IndividualTournamentCreateNestedManyWithoutChampionPlayerInput
 }
 
 export type PlayerUncheckedCreateWithoutFormationAsCInput = {
@@ -1733,6 +1901,11 @@ export type PlayerUncheckedCreateWithoutFormationAsCInput = {
   trainingResults?: Prisma.TrainingResultUncheckedCreateNestedManyWithoutPlayerInput
   fixtureAppearances?: Prisma.PlayerFixtureAppearanceUncheckedCreateNestedManyWithoutPlayerInput
   transferListings?: Prisma.TransferListingUncheckedCreateNestedManyWithoutPlayerInput
+  individualTournamentEntries?: Prisma.IndividualTournamentEntryUncheckedCreateNestedManyWithoutPlayerInput
+  individualMatchesAsPlayerOne?: Prisma.IndividualTournamentMatchUncheckedCreateNestedManyWithoutPlayerOneInput
+  individualMatchesAsPlayerTwo?: Prisma.IndividualTournamentMatchUncheckedCreateNestedManyWithoutPlayerTwoInput
+  individualMatchesWon?: Prisma.IndividualTournamentMatchUncheckedCreateNestedManyWithoutWinnerPlayerInput
+  individualTournamentsWon?: Prisma.IndividualTournamentUncheckedCreateNestedManyWithoutChampionPlayerInput
 }
 
 export type PlayerCreateOrConnectWithoutFormationAsCInput = {
@@ -1784,6 +1957,11 @@ export type PlayerUpdateWithoutFormationAsAInput = {
   trainingResults?: Prisma.TrainingResultUpdateManyWithoutPlayerNestedInput
   fixtureAppearances?: Prisma.PlayerFixtureAppearanceUpdateManyWithoutPlayerNestedInput
   transferListings?: Prisma.TransferListingUpdateManyWithoutPlayerNestedInput
+  individualTournamentEntries?: Prisma.IndividualTournamentEntryUpdateManyWithoutPlayerNestedInput
+  individualMatchesAsPlayerOne?: Prisma.IndividualTournamentMatchUpdateManyWithoutPlayerOneNestedInput
+  individualMatchesAsPlayerTwo?: Prisma.IndividualTournamentMatchUpdateManyWithoutPlayerTwoNestedInput
+  individualMatchesWon?: Prisma.IndividualTournamentMatchUpdateManyWithoutWinnerPlayerNestedInput
+  individualTournamentsWon?: Prisma.IndividualTournamentUpdateManyWithoutChampionPlayerNestedInput
 }
 
 export type PlayerUncheckedUpdateWithoutFormationAsAInput = {
@@ -1820,6 +1998,11 @@ export type PlayerUncheckedUpdateWithoutFormationAsAInput = {
   trainingResults?: Prisma.TrainingResultUncheckedUpdateManyWithoutPlayerNestedInput
   fixtureAppearances?: Prisma.PlayerFixtureAppearanceUncheckedUpdateManyWithoutPlayerNestedInput
   transferListings?: Prisma.TransferListingUncheckedUpdateManyWithoutPlayerNestedInput
+  individualTournamentEntries?: Prisma.IndividualTournamentEntryUncheckedUpdateManyWithoutPlayerNestedInput
+  individualMatchesAsPlayerOne?: Prisma.IndividualTournamentMatchUncheckedUpdateManyWithoutPlayerOneNestedInput
+  individualMatchesAsPlayerTwo?: Prisma.IndividualTournamentMatchUncheckedUpdateManyWithoutPlayerTwoNestedInput
+  individualMatchesWon?: Prisma.IndividualTournamentMatchUncheckedUpdateManyWithoutWinnerPlayerNestedInput
+  individualTournamentsWon?: Prisma.IndividualTournamentUncheckedUpdateManyWithoutChampionPlayerNestedInput
 }
 
 export type PlayerUpsertWithoutFormationAsBInput = {
@@ -1866,6 +2049,11 @@ export type PlayerUpdateWithoutFormationAsBInput = {
   trainingResults?: Prisma.TrainingResultUpdateManyWithoutPlayerNestedInput
   fixtureAppearances?: Prisma.PlayerFixtureAppearanceUpdateManyWithoutPlayerNestedInput
   transferListings?: Prisma.TransferListingUpdateManyWithoutPlayerNestedInput
+  individualTournamentEntries?: Prisma.IndividualTournamentEntryUpdateManyWithoutPlayerNestedInput
+  individualMatchesAsPlayerOne?: Prisma.IndividualTournamentMatchUpdateManyWithoutPlayerOneNestedInput
+  individualMatchesAsPlayerTwo?: Prisma.IndividualTournamentMatchUpdateManyWithoutPlayerTwoNestedInput
+  individualMatchesWon?: Prisma.IndividualTournamentMatchUpdateManyWithoutWinnerPlayerNestedInput
+  individualTournamentsWon?: Prisma.IndividualTournamentUpdateManyWithoutChampionPlayerNestedInput
 }
 
 export type PlayerUncheckedUpdateWithoutFormationAsBInput = {
@@ -1902,6 +2090,11 @@ export type PlayerUncheckedUpdateWithoutFormationAsBInput = {
   trainingResults?: Prisma.TrainingResultUncheckedUpdateManyWithoutPlayerNestedInput
   fixtureAppearances?: Prisma.PlayerFixtureAppearanceUncheckedUpdateManyWithoutPlayerNestedInput
   transferListings?: Prisma.TransferListingUncheckedUpdateManyWithoutPlayerNestedInput
+  individualTournamentEntries?: Prisma.IndividualTournamentEntryUncheckedUpdateManyWithoutPlayerNestedInput
+  individualMatchesAsPlayerOne?: Prisma.IndividualTournamentMatchUncheckedUpdateManyWithoutPlayerOneNestedInput
+  individualMatchesAsPlayerTwo?: Prisma.IndividualTournamentMatchUncheckedUpdateManyWithoutPlayerTwoNestedInput
+  individualMatchesWon?: Prisma.IndividualTournamentMatchUncheckedUpdateManyWithoutWinnerPlayerNestedInput
+  individualTournamentsWon?: Prisma.IndividualTournamentUncheckedUpdateManyWithoutChampionPlayerNestedInput
 }
 
 export type PlayerUpsertWithoutFormationAsCInput = {
@@ -1948,6 +2141,11 @@ export type PlayerUpdateWithoutFormationAsCInput = {
   trainingResults?: Prisma.TrainingResultUpdateManyWithoutPlayerNestedInput
   fixtureAppearances?: Prisma.PlayerFixtureAppearanceUpdateManyWithoutPlayerNestedInput
   transferListings?: Prisma.TransferListingUpdateManyWithoutPlayerNestedInput
+  individualTournamentEntries?: Prisma.IndividualTournamentEntryUpdateManyWithoutPlayerNestedInput
+  individualMatchesAsPlayerOne?: Prisma.IndividualTournamentMatchUpdateManyWithoutPlayerOneNestedInput
+  individualMatchesAsPlayerTwo?: Prisma.IndividualTournamentMatchUpdateManyWithoutPlayerTwoNestedInput
+  individualMatchesWon?: Prisma.IndividualTournamentMatchUpdateManyWithoutWinnerPlayerNestedInput
+  individualTournamentsWon?: Prisma.IndividualTournamentUpdateManyWithoutChampionPlayerNestedInput
 }
 
 export type PlayerUncheckedUpdateWithoutFormationAsCInput = {
@@ -1984,6 +2182,11 @@ export type PlayerUncheckedUpdateWithoutFormationAsCInput = {
   trainingResults?: Prisma.TrainingResultUncheckedUpdateManyWithoutPlayerNestedInput
   fixtureAppearances?: Prisma.PlayerFixtureAppearanceUncheckedUpdateManyWithoutPlayerNestedInput
   transferListings?: Prisma.TransferListingUncheckedUpdateManyWithoutPlayerNestedInput
+  individualTournamentEntries?: Prisma.IndividualTournamentEntryUncheckedUpdateManyWithoutPlayerNestedInput
+  individualMatchesAsPlayerOne?: Prisma.IndividualTournamentMatchUncheckedUpdateManyWithoutPlayerOneNestedInput
+  individualMatchesAsPlayerTwo?: Prisma.IndividualTournamentMatchUncheckedUpdateManyWithoutPlayerTwoNestedInput
+  individualMatchesWon?: Prisma.IndividualTournamentMatchUncheckedUpdateManyWithoutWinnerPlayerNestedInput
+  individualTournamentsWon?: Prisma.IndividualTournamentUncheckedUpdateManyWithoutChampionPlayerNestedInput
 }
 
 export type PlayerCreateWithoutTrainingResultsInput = {
@@ -2019,6 +2222,11 @@ export type PlayerCreateWithoutTrainingResultsInput = {
   formationAsC?: Prisma.FormationCreateNestedManyWithoutSlotCPlayerInput
   fixtureAppearances?: Prisma.PlayerFixtureAppearanceCreateNestedManyWithoutPlayerInput
   transferListings?: Prisma.TransferListingCreateNestedManyWithoutPlayerInput
+  individualTournamentEntries?: Prisma.IndividualTournamentEntryCreateNestedManyWithoutPlayerInput
+  individualMatchesAsPlayerOne?: Prisma.IndividualTournamentMatchCreateNestedManyWithoutPlayerOneInput
+  individualMatchesAsPlayerTwo?: Prisma.IndividualTournamentMatchCreateNestedManyWithoutPlayerTwoInput
+  individualMatchesWon?: Prisma.IndividualTournamentMatchCreateNestedManyWithoutWinnerPlayerInput
+  individualTournamentsWon?: Prisma.IndividualTournamentCreateNestedManyWithoutChampionPlayerInput
 }
 
 export type PlayerUncheckedCreateWithoutTrainingResultsInput = {
@@ -2055,6 +2263,11 @@ export type PlayerUncheckedCreateWithoutTrainingResultsInput = {
   formationAsC?: Prisma.FormationUncheckedCreateNestedManyWithoutSlotCPlayerInput
   fixtureAppearances?: Prisma.PlayerFixtureAppearanceUncheckedCreateNestedManyWithoutPlayerInput
   transferListings?: Prisma.TransferListingUncheckedCreateNestedManyWithoutPlayerInput
+  individualTournamentEntries?: Prisma.IndividualTournamentEntryUncheckedCreateNestedManyWithoutPlayerInput
+  individualMatchesAsPlayerOne?: Prisma.IndividualTournamentMatchUncheckedCreateNestedManyWithoutPlayerOneInput
+  individualMatchesAsPlayerTwo?: Prisma.IndividualTournamentMatchUncheckedCreateNestedManyWithoutPlayerTwoInput
+  individualMatchesWon?: Prisma.IndividualTournamentMatchUncheckedCreateNestedManyWithoutWinnerPlayerInput
+  individualTournamentsWon?: Prisma.IndividualTournamentUncheckedCreateNestedManyWithoutChampionPlayerInput
 }
 
 export type PlayerCreateOrConnectWithoutTrainingResultsInput = {
@@ -2106,6 +2319,11 @@ export type PlayerUpdateWithoutTrainingResultsInput = {
   formationAsC?: Prisma.FormationUpdateManyWithoutSlotCPlayerNestedInput
   fixtureAppearances?: Prisma.PlayerFixtureAppearanceUpdateManyWithoutPlayerNestedInput
   transferListings?: Prisma.TransferListingUpdateManyWithoutPlayerNestedInput
+  individualTournamentEntries?: Prisma.IndividualTournamentEntryUpdateManyWithoutPlayerNestedInput
+  individualMatchesAsPlayerOne?: Prisma.IndividualTournamentMatchUpdateManyWithoutPlayerOneNestedInput
+  individualMatchesAsPlayerTwo?: Prisma.IndividualTournamentMatchUpdateManyWithoutPlayerTwoNestedInput
+  individualMatchesWon?: Prisma.IndividualTournamentMatchUpdateManyWithoutWinnerPlayerNestedInput
+  individualTournamentsWon?: Prisma.IndividualTournamentUpdateManyWithoutChampionPlayerNestedInput
 }
 
 export type PlayerUncheckedUpdateWithoutTrainingResultsInput = {
@@ -2142,6 +2360,11 @@ export type PlayerUncheckedUpdateWithoutTrainingResultsInput = {
   formationAsC?: Prisma.FormationUncheckedUpdateManyWithoutSlotCPlayerNestedInput
   fixtureAppearances?: Prisma.PlayerFixtureAppearanceUncheckedUpdateManyWithoutPlayerNestedInput
   transferListings?: Prisma.TransferListingUncheckedUpdateManyWithoutPlayerNestedInput
+  individualTournamentEntries?: Prisma.IndividualTournamentEntryUncheckedUpdateManyWithoutPlayerNestedInput
+  individualMatchesAsPlayerOne?: Prisma.IndividualTournamentMatchUncheckedUpdateManyWithoutPlayerOneNestedInput
+  individualMatchesAsPlayerTwo?: Prisma.IndividualTournamentMatchUncheckedUpdateManyWithoutPlayerTwoNestedInput
+  individualMatchesWon?: Prisma.IndividualTournamentMatchUncheckedUpdateManyWithoutWinnerPlayerNestedInput
+  individualTournamentsWon?: Prisma.IndividualTournamentUncheckedUpdateManyWithoutChampionPlayerNestedInput
 }
 
 export type PlayerCreateWithoutRetirementSeasonInput = {
@@ -2177,6 +2400,11 @@ export type PlayerCreateWithoutRetirementSeasonInput = {
   trainingResults?: Prisma.TrainingResultCreateNestedManyWithoutPlayerInput
   fixtureAppearances?: Prisma.PlayerFixtureAppearanceCreateNestedManyWithoutPlayerInput
   transferListings?: Prisma.TransferListingCreateNestedManyWithoutPlayerInput
+  individualTournamentEntries?: Prisma.IndividualTournamentEntryCreateNestedManyWithoutPlayerInput
+  individualMatchesAsPlayerOne?: Prisma.IndividualTournamentMatchCreateNestedManyWithoutPlayerOneInput
+  individualMatchesAsPlayerTwo?: Prisma.IndividualTournamentMatchCreateNestedManyWithoutPlayerTwoInput
+  individualMatchesWon?: Prisma.IndividualTournamentMatchCreateNestedManyWithoutWinnerPlayerInput
+  individualTournamentsWon?: Prisma.IndividualTournamentCreateNestedManyWithoutChampionPlayerInput
 }
 
 export type PlayerUncheckedCreateWithoutRetirementSeasonInput = {
@@ -2213,6 +2441,11 @@ export type PlayerUncheckedCreateWithoutRetirementSeasonInput = {
   trainingResults?: Prisma.TrainingResultUncheckedCreateNestedManyWithoutPlayerInput
   fixtureAppearances?: Prisma.PlayerFixtureAppearanceUncheckedCreateNestedManyWithoutPlayerInput
   transferListings?: Prisma.TransferListingUncheckedCreateNestedManyWithoutPlayerInput
+  individualTournamentEntries?: Prisma.IndividualTournamentEntryUncheckedCreateNestedManyWithoutPlayerInput
+  individualMatchesAsPlayerOne?: Prisma.IndividualTournamentMatchUncheckedCreateNestedManyWithoutPlayerOneInput
+  individualMatchesAsPlayerTwo?: Prisma.IndividualTournamentMatchUncheckedCreateNestedManyWithoutPlayerTwoInput
+  individualMatchesWon?: Prisma.IndividualTournamentMatchUncheckedCreateNestedManyWithoutWinnerPlayerInput
+  individualTournamentsWon?: Prisma.IndividualTournamentUncheckedCreateNestedManyWithoutChampionPlayerInput
 }
 
 export type PlayerCreateOrConnectWithoutRetirementSeasonInput = {
@@ -2239,6 +2472,896 @@ export type PlayerUpdateWithWhereUniqueWithoutRetirementSeasonInput = {
 export type PlayerUpdateManyWithWhereWithoutRetirementSeasonInput = {
   where: Prisma.PlayerScalarWhereInput
   data: Prisma.XOR<Prisma.PlayerUpdateManyMutationInput, Prisma.PlayerUncheckedUpdateManyWithoutRetirementSeasonInput>
+}
+
+export type PlayerCreateWithoutIndividualTournamentsWonInput = {
+  firstName: string
+  lastName: string
+  nationality: string
+  age: number
+  careerStatus?: string
+  retiredAt?: Date | string | null
+  form?: number
+  morale?: number
+  experience?: number
+  talent: number
+  value?: number
+  salary?: number
+  image?: string
+  style?: Prisma.PlayerCreatestyleInput | string[]
+  precisione: number
+  diretto: number
+  sponde: number
+  tattica: number
+  mentalita: number
+  difesa: number
+  realizzazione: number
+  creativita: number
+  misura: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  club?: Prisma.ClubCreateNestedOneWithoutPlayersInput
+  retirementSeason?: Prisma.SeasonCreateNestedOneWithoutRetiredPlayersInput
+  formationAsA?: Prisma.FormationCreateNestedManyWithoutSlotAPlayerInput
+  formationAsB?: Prisma.FormationCreateNestedManyWithoutSlotBPlayerInput
+  formationAsC?: Prisma.FormationCreateNestedManyWithoutSlotCPlayerInput
+  trainingResults?: Prisma.TrainingResultCreateNestedManyWithoutPlayerInput
+  fixtureAppearances?: Prisma.PlayerFixtureAppearanceCreateNestedManyWithoutPlayerInput
+  transferListings?: Prisma.TransferListingCreateNestedManyWithoutPlayerInput
+  individualTournamentEntries?: Prisma.IndividualTournamentEntryCreateNestedManyWithoutPlayerInput
+  individualMatchesAsPlayerOne?: Prisma.IndividualTournamentMatchCreateNestedManyWithoutPlayerOneInput
+  individualMatchesAsPlayerTwo?: Prisma.IndividualTournamentMatchCreateNestedManyWithoutPlayerTwoInput
+  individualMatchesWon?: Prisma.IndividualTournamentMatchCreateNestedManyWithoutWinnerPlayerInput
+}
+
+export type PlayerUncheckedCreateWithoutIndividualTournamentsWonInput = {
+  id?: number
+  clubId?: number | null
+  firstName: string
+  lastName: string
+  nationality: string
+  age: number
+  careerStatus?: string
+  retiredAt?: Date | string | null
+  retirementSeasonId?: number | null
+  form?: number
+  morale?: number
+  experience?: number
+  talent: number
+  value?: number
+  salary?: number
+  image?: string
+  style?: Prisma.PlayerCreatestyleInput | string[]
+  precisione: number
+  diretto: number
+  sponde: number
+  tattica: number
+  mentalita: number
+  difesa: number
+  realizzazione: number
+  creativita: number
+  misura: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  formationAsA?: Prisma.FormationUncheckedCreateNestedManyWithoutSlotAPlayerInput
+  formationAsB?: Prisma.FormationUncheckedCreateNestedManyWithoutSlotBPlayerInput
+  formationAsC?: Prisma.FormationUncheckedCreateNestedManyWithoutSlotCPlayerInput
+  trainingResults?: Prisma.TrainingResultUncheckedCreateNestedManyWithoutPlayerInput
+  fixtureAppearances?: Prisma.PlayerFixtureAppearanceUncheckedCreateNestedManyWithoutPlayerInput
+  transferListings?: Prisma.TransferListingUncheckedCreateNestedManyWithoutPlayerInput
+  individualTournamentEntries?: Prisma.IndividualTournamentEntryUncheckedCreateNestedManyWithoutPlayerInput
+  individualMatchesAsPlayerOne?: Prisma.IndividualTournamentMatchUncheckedCreateNestedManyWithoutPlayerOneInput
+  individualMatchesAsPlayerTwo?: Prisma.IndividualTournamentMatchUncheckedCreateNestedManyWithoutPlayerTwoInput
+  individualMatchesWon?: Prisma.IndividualTournamentMatchUncheckedCreateNestedManyWithoutWinnerPlayerInput
+}
+
+export type PlayerCreateOrConnectWithoutIndividualTournamentsWonInput = {
+  where: Prisma.PlayerWhereUniqueInput
+  create: Prisma.XOR<Prisma.PlayerCreateWithoutIndividualTournamentsWonInput, Prisma.PlayerUncheckedCreateWithoutIndividualTournamentsWonInput>
+}
+
+export type PlayerUpsertWithoutIndividualTournamentsWonInput = {
+  update: Prisma.XOR<Prisma.PlayerUpdateWithoutIndividualTournamentsWonInput, Prisma.PlayerUncheckedUpdateWithoutIndividualTournamentsWonInput>
+  create: Prisma.XOR<Prisma.PlayerCreateWithoutIndividualTournamentsWonInput, Prisma.PlayerUncheckedCreateWithoutIndividualTournamentsWonInput>
+  where?: Prisma.PlayerWhereInput
+}
+
+export type PlayerUpdateToOneWithWhereWithoutIndividualTournamentsWonInput = {
+  where?: Prisma.PlayerWhereInput
+  data: Prisma.XOR<Prisma.PlayerUpdateWithoutIndividualTournamentsWonInput, Prisma.PlayerUncheckedUpdateWithoutIndividualTournamentsWonInput>
+}
+
+export type PlayerUpdateWithoutIndividualTournamentsWonInput = {
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  nationality?: Prisma.StringFieldUpdateOperationsInput | string
+  age?: Prisma.IntFieldUpdateOperationsInput | number
+  careerStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  retiredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  form?: Prisma.IntFieldUpdateOperationsInput | number
+  morale?: Prisma.IntFieldUpdateOperationsInput | number
+  experience?: Prisma.FloatFieldUpdateOperationsInput | number
+  talent?: Prisma.FloatFieldUpdateOperationsInput | number
+  value?: Prisma.IntFieldUpdateOperationsInput | number
+  salary?: Prisma.IntFieldUpdateOperationsInput | number
+  image?: Prisma.StringFieldUpdateOperationsInput | string
+  style?: Prisma.PlayerUpdatestyleInput | string[]
+  precisione?: Prisma.FloatFieldUpdateOperationsInput | number
+  diretto?: Prisma.FloatFieldUpdateOperationsInput | number
+  sponde?: Prisma.FloatFieldUpdateOperationsInput | number
+  tattica?: Prisma.FloatFieldUpdateOperationsInput | number
+  mentalita?: Prisma.FloatFieldUpdateOperationsInput | number
+  difesa?: Prisma.FloatFieldUpdateOperationsInput | number
+  realizzazione?: Prisma.FloatFieldUpdateOperationsInput | number
+  creativita?: Prisma.FloatFieldUpdateOperationsInput | number
+  misura?: Prisma.FloatFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  club?: Prisma.ClubUpdateOneWithoutPlayersNestedInput
+  retirementSeason?: Prisma.SeasonUpdateOneWithoutRetiredPlayersNestedInput
+  formationAsA?: Prisma.FormationUpdateManyWithoutSlotAPlayerNestedInput
+  formationAsB?: Prisma.FormationUpdateManyWithoutSlotBPlayerNestedInput
+  formationAsC?: Prisma.FormationUpdateManyWithoutSlotCPlayerNestedInput
+  trainingResults?: Prisma.TrainingResultUpdateManyWithoutPlayerNestedInput
+  fixtureAppearances?: Prisma.PlayerFixtureAppearanceUpdateManyWithoutPlayerNestedInput
+  transferListings?: Prisma.TransferListingUpdateManyWithoutPlayerNestedInput
+  individualTournamentEntries?: Prisma.IndividualTournamentEntryUpdateManyWithoutPlayerNestedInput
+  individualMatchesAsPlayerOne?: Prisma.IndividualTournamentMatchUpdateManyWithoutPlayerOneNestedInput
+  individualMatchesAsPlayerTwo?: Prisma.IndividualTournamentMatchUpdateManyWithoutPlayerTwoNestedInput
+  individualMatchesWon?: Prisma.IndividualTournamentMatchUpdateManyWithoutWinnerPlayerNestedInput
+}
+
+export type PlayerUncheckedUpdateWithoutIndividualTournamentsWonInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  clubId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  nationality?: Prisma.StringFieldUpdateOperationsInput | string
+  age?: Prisma.IntFieldUpdateOperationsInput | number
+  careerStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  retiredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  retirementSeasonId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  form?: Prisma.IntFieldUpdateOperationsInput | number
+  morale?: Prisma.IntFieldUpdateOperationsInput | number
+  experience?: Prisma.FloatFieldUpdateOperationsInput | number
+  talent?: Prisma.FloatFieldUpdateOperationsInput | number
+  value?: Prisma.IntFieldUpdateOperationsInput | number
+  salary?: Prisma.IntFieldUpdateOperationsInput | number
+  image?: Prisma.StringFieldUpdateOperationsInput | string
+  style?: Prisma.PlayerUpdatestyleInput | string[]
+  precisione?: Prisma.FloatFieldUpdateOperationsInput | number
+  diretto?: Prisma.FloatFieldUpdateOperationsInput | number
+  sponde?: Prisma.FloatFieldUpdateOperationsInput | number
+  tattica?: Prisma.FloatFieldUpdateOperationsInput | number
+  mentalita?: Prisma.FloatFieldUpdateOperationsInput | number
+  difesa?: Prisma.FloatFieldUpdateOperationsInput | number
+  realizzazione?: Prisma.FloatFieldUpdateOperationsInput | number
+  creativita?: Prisma.FloatFieldUpdateOperationsInput | number
+  misura?: Prisma.FloatFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  formationAsA?: Prisma.FormationUncheckedUpdateManyWithoutSlotAPlayerNestedInput
+  formationAsB?: Prisma.FormationUncheckedUpdateManyWithoutSlotBPlayerNestedInput
+  formationAsC?: Prisma.FormationUncheckedUpdateManyWithoutSlotCPlayerNestedInput
+  trainingResults?: Prisma.TrainingResultUncheckedUpdateManyWithoutPlayerNestedInput
+  fixtureAppearances?: Prisma.PlayerFixtureAppearanceUncheckedUpdateManyWithoutPlayerNestedInput
+  transferListings?: Prisma.TransferListingUncheckedUpdateManyWithoutPlayerNestedInput
+  individualTournamentEntries?: Prisma.IndividualTournamentEntryUncheckedUpdateManyWithoutPlayerNestedInput
+  individualMatchesAsPlayerOne?: Prisma.IndividualTournamentMatchUncheckedUpdateManyWithoutPlayerOneNestedInput
+  individualMatchesAsPlayerTwo?: Prisma.IndividualTournamentMatchUncheckedUpdateManyWithoutPlayerTwoNestedInput
+  individualMatchesWon?: Prisma.IndividualTournamentMatchUncheckedUpdateManyWithoutWinnerPlayerNestedInput
+}
+
+export type PlayerCreateWithoutIndividualTournamentEntriesInput = {
+  firstName: string
+  lastName: string
+  nationality: string
+  age: number
+  careerStatus?: string
+  retiredAt?: Date | string | null
+  form?: number
+  morale?: number
+  experience?: number
+  talent: number
+  value?: number
+  salary?: number
+  image?: string
+  style?: Prisma.PlayerCreatestyleInput | string[]
+  precisione: number
+  diretto: number
+  sponde: number
+  tattica: number
+  mentalita: number
+  difesa: number
+  realizzazione: number
+  creativita: number
+  misura: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  club?: Prisma.ClubCreateNestedOneWithoutPlayersInput
+  retirementSeason?: Prisma.SeasonCreateNestedOneWithoutRetiredPlayersInput
+  formationAsA?: Prisma.FormationCreateNestedManyWithoutSlotAPlayerInput
+  formationAsB?: Prisma.FormationCreateNestedManyWithoutSlotBPlayerInput
+  formationAsC?: Prisma.FormationCreateNestedManyWithoutSlotCPlayerInput
+  trainingResults?: Prisma.TrainingResultCreateNestedManyWithoutPlayerInput
+  fixtureAppearances?: Prisma.PlayerFixtureAppearanceCreateNestedManyWithoutPlayerInput
+  transferListings?: Prisma.TransferListingCreateNestedManyWithoutPlayerInput
+  individualMatchesAsPlayerOne?: Prisma.IndividualTournamentMatchCreateNestedManyWithoutPlayerOneInput
+  individualMatchesAsPlayerTwo?: Prisma.IndividualTournamentMatchCreateNestedManyWithoutPlayerTwoInput
+  individualMatchesWon?: Prisma.IndividualTournamentMatchCreateNestedManyWithoutWinnerPlayerInput
+  individualTournamentsWon?: Prisma.IndividualTournamentCreateNestedManyWithoutChampionPlayerInput
+}
+
+export type PlayerUncheckedCreateWithoutIndividualTournamentEntriesInput = {
+  id?: number
+  clubId?: number | null
+  firstName: string
+  lastName: string
+  nationality: string
+  age: number
+  careerStatus?: string
+  retiredAt?: Date | string | null
+  retirementSeasonId?: number | null
+  form?: number
+  morale?: number
+  experience?: number
+  talent: number
+  value?: number
+  salary?: number
+  image?: string
+  style?: Prisma.PlayerCreatestyleInput | string[]
+  precisione: number
+  diretto: number
+  sponde: number
+  tattica: number
+  mentalita: number
+  difesa: number
+  realizzazione: number
+  creativita: number
+  misura: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  formationAsA?: Prisma.FormationUncheckedCreateNestedManyWithoutSlotAPlayerInput
+  formationAsB?: Prisma.FormationUncheckedCreateNestedManyWithoutSlotBPlayerInput
+  formationAsC?: Prisma.FormationUncheckedCreateNestedManyWithoutSlotCPlayerInput
+  trainingResults?: Prisma.TrainingResultUncheckedCreateNestedManyWithoutPlayerInput
+  fixtureAppearances?: Prisma.PlayerFixtureAppearanceUncheckedCreateNestedManyWithoutPlayerInput
+  transferListings?: Prisma.TransferListingUncheckedCreateNestedManyWithoutPlayerInput
+  individualMatchesAsPlayerOne?: Prisma.IndividualTournamentMatchUncheckedCreateNestedManyWithoutPlayerOneInput
+  individualMatchesAsPlayerTwo?: Prisma.IndividualTournamentMatchUncheckedCreateNestedManyWithoutPlayerTwoInput
+  individualMatchesWon?: Prisma.IndividualTournamentMatchUncheckedCreateNestedManyWithoutWinnerPlayerInput
+  individualTournamentsWon?: Prisma.IndividualTournamentUncheckedCreateNestedManyWithoutChampionPlayerInput
+}
+
+export type PlayerCreateOrConnectWithoutIndividualTournamentEntriesInput = {
+  where: Prisma.PlayerWhereUniqueInput
+  create: Prisma.XOR<Prisma.PlayerCreateWithoutIndividualTournamentEntriesInput, Prisma.PlayerUncheckedCreateWithoutIndividualTournamentEntriesInput>
+}
+
+export type PlayerUpsertWithoutIndividualTournamentEntriesInput = {
+  update: Prisma.XOR<Prisma.PlayerUpdateWithoutIndividualTournamentEntriesInput, Prisma.PlayerUncheckedUpdateWithoutIndividualTournamentEntriesInput>
+  create: Prisma.XOR<Prisma.PlayerCreateWithoutIndividualTournamentEntriesInput, Prisma.PlayerUncheckedCreateWithoutIndividualTournamentEntriesInput>
+  where?: Prisma.PlayerWhereInput
+}
+
+export type PlayerUpdateToOneWithWhereWithoutIndividualTournamentEntriesInput = {
+  where?: Prisma.PlayerWhereInput
+  data: Prisma.XOR<Prisma.PlayerUpdateWithoutIndividualTournamentEntriesInput, Prisma.PlayerUncheckedUpdateWithoutIndividualTournamentEntriesInput>
+}
+
+export type PlayerUpdateWithoutIndividualTournamentEntriesInput = {
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  nationality?: Prisma.StringFieldUpdateOperationsInput | string
+  age?: Prisma.IntFieldUpdateOperationsInput | number
+  careerStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  retiredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  form?: Prisma.IntFieldUpdateOperationsInput | number
+  morale?: Prisma.IntFieldUpdateOperationsInput | number
+  experience?: Prisma.FloatFieldUpdateOperationsInput | number
+  talent?: Prisma.FloatFieldUpdateOperationsInput | number
+  value?: Prisma.IntFieldUpdateOperationsInput | number
+  salary?: Prisma.IntFieldUpdateOperationsInput | number
+  image?: Prisma.StringFieldUpdateOperationsInput | string
+  style?: Prisma.PlayerUpdatestyleInput | string[]
+  precisione?: Prisma.FloatFieldUpdateOperationsInput | number
+  diretto?: Prisma.FloatFieldUpdateOperationsInput | number
+  sponde?: Prisma.FloatFieldUpdateOperationsInput | number
+  tattica?: Prisma.FloatFieldUpdateOperationsInput | number
+  mentalita?: Prisma.FloatFieldUpdateOperationsInput | number
+  difesa?: Prisma.FloatFieldUpdateOperationsInput | number
+  realizzazione?: Prisma.FloatFieldUpdateOperationsInput | number
+  creativita?: Prisma.FloatFieldUpdateOperationsInput | number
+  misura?: Prisma.FloatFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  club?: Prisma.ClubUpdateOneWithoutPlayersNestedInput
+  retirementSeason?: Prisma.SeasonUpdateOneWithoutRetiredPlayersNestedInput
+  formationAsA?: Prisma.FormationUpdateManyWithoutSlotAPlayerNestedInput
+  formationAsB?: Prisma.FormationUpdateManyWithoutSlotBPlayerNestedInput
+  formationAsC?: Prisma.FormationUpdateManyWithoutSlotCPlayerNestedInput
+  trainingResults?: Prisma.TrainingResultUpdateManyWithoutPlayerNestedInput
+  fixtureAppearances?: Prisma.PlayerFixtureAppearanceUpdateManyWithoutPlayerNestedInput
+  transferListings?: Prisma.TransferListingUpdateManyWithoutPlayerNestedInput
+  individualMatchesAsPlayerOne?: Prisma.IndividualTournamentMatchUpdateManyWithoutPlayerOneNestedInput
+  individualMatchesAsPlayerTwo?: Prisma.IndividualTournamentMatchUpdateManyWithoutPlayerTwoNestedInput
+  individualMatchesWon?: Prisma.IndividualTournamentMatchUpdateManyWithoutWinnerPlayerNestedInput
+  individualTournamentsWon?: Prisma.IndividualTournamentUpdateManyWithoutChampionPlayerNestedInput
+}
+
+export type PlayerUncheckedUpdateWithoutIndividualTournamentEntriesInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  clubId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  nationality?: Prisma.StringFieldUpdateOperationsInput | string
+  age?: Prisma.IntFieldUpdateOperationsInput | number
+  careerStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  retiredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  retirementSeasonId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  form?: Prisma.IntFieldUpdateOperationsInput | number
+  morale?: Prisma.IntFieldUpdateOperationsInput | number
+  experience?: Prisma.FloatFieldUpdateOperationsInput | number
+  talent?: Prisma.FloatFieldUpdateOperationsInput | number
+  value?: Prisma.IntFieldUpdateOperationsInput | number
+  salary?: Prisma.IntFieldUpdateOperationsInput | number
+  image?: Prisma.StringFieldUpdateOperationsInput | string
+  style?: Prisma.PlayerUpdatestyleInput | string[]
+  precisione?: Prisma.FloatFieldUpdateOperationsInput | number
+  diretto?: Prisma.FloatFieldUpdateOperationsInput | number
+  sponde?: Prisma.FloatFieldUpdateOperationsInput | number
+  tattica?: Prisma.FloatFieldUpdateOperationsInput | number
+  mentalita?: Prisma.FloatFieldUpdateOperationsInput | number
+  difesa?: Prisma.FloatFieldUpdateOperationsInput | number
+  realizzazione?: Prisma.FloatFieldUpdateOperationsInput | number
+  creativita?: Prisma.FloatFieldUpdateOperationsInput | number
+  misura?: Prisma.FloatFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  formationAsA?: Prisma.FormationUncheckedUpdateManyWithoutSlotAPlayerNestedInput
+  formationAsB?: Prisma.FormationUncheckedUpdateManyWithoutSlotBPlayerNestedInput
+  formationAsC?: Prisma.FormationUncheckedUpdateManyWithoutSlotCPlayerNestedInput
+  trainingResults?: Prisma.TrainingResultUncheckedUpdateManyWithoutPlayerNestedInput
+  fixtureAppearances?: Prisma.PlayerFixtureAppearanceUncheckedUpdateManyWithoutPlayerNestedInput
+  transferListings?: Prisma.TransferListingUncheckedUpdateManyWithoutPlayerNestedInput
+  individualMatchesAsPlayerOne?: Prisma.IndividualTournamentMatchUncheckedUpdateManyWithoutPlayerOneNestedInput
+  individualMatchesAsPlayerTwo?: Prisma.IndividualTournamentMatchUncheckedUpdateManyWithoutPlayerTwoNestedInput
+  individualMatchesWon?: Prisma.IndividualTournamentMatchUncheckedUpdateManyWithoutWinnerPlayerNestedInput
+  individualTournamentsWon?: Prisma.IndividualTournamentUncheckedUpdateManyWithoutChampionPlayerNestedInput
+}
+
+export type PlayerCreateWithoutIndividualMatchesAsPlayerOneInput = {
+  firstName: string
+  lastName: string
+  nationality: string
+  age: number
+  careerStatus?: string
+  retiredAt?: Date | string | null
+  form?: number
+  morale?: number
+  experience?: number
+  talent: number
+  value?: number
+  salary?: number
+  image?: string
+  style?: Prisma.PlayerCreatestyleInput | string[]
+  precisione: number
+  diretto: number
+  sponde: number
+  tattica: number
+  mentalita: number
+  difesa: number
+  realizzazione: number
+  creativita: number
+  misura: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  club?: Prisma.ClubCreateNestedOneWithoutPlayersInput
+  retirementSeason?: Prisma.SeasonCreateNestedOneWithoutRetiredPlayersInput
+  formationAsA?: Prisma.FormationCreateNestedManyWithoutSlotAPlayerInput
+  formationAsB?: Prisma.FormationCreateNestedManyWithoutSlotBPlayerInput
+  formationAsC?: Prisma.FormationCreateNestedManyWithoutSlotCPlayerInput
+  trainingResults?: Prisma.TrainingResultCreateNestedManyWithoutPlayerInput
+  fixtureAppearances?: Prisma.PlayerFixtureAppearanceCreateNestedManyWithoutPlayerInput
+  transferListings?: Prisma.TransferListingCreateNestedManyWithoutPlayerInput
+  individualTournamentEntries?: Prisma.IndividualTournamentEntryCreateNestedManyWithoutPlayerInput
+  individualMatchesAsPlayerTwo?: Prisma.IndividualTournamentMatchCreateNestedManyWithoutPlayerTwoInput
+  individualMatchesWon?: Prisma.IndividualTournamentMatchCreateNestedManyWithoutWinnerPlayerInput
+  individualTournamentsWon?: Prisma.IndividualTournamentCreateNestedManyWithoutChampionPlayerInput
+}
+
+export type PlayerUncheckedCreateWithoutIndividualMatchesAsPlayerOneInput = {
+  id?: number
+  clubId?: number | null
+  firstName: string
+  lastName: string
+  nationality: string
+  age: number
+  careerStatus?: string
+  retiredAt?: Date | string | null
+  retirementSeasonId?: number | null
+  form?: number
+  morale?: number
+  experience?: number
+  talent: number
+  value?: number
+  salary?: number
+  image?: string
+  style?: Prisma.PlayerCreatestyleInput | string[]
+  precisione: number
+  diretto: number
+  sponde: number
+  tattica: number
+  mentalita: number
+  difesa: number
+  realizzazione: number
+  creativita: number
+  misura: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  formationAsA?: Prisma.FormationUncheckedCreateNestedManyWithoutSlotAPlayerInput
+  formationAsB?: Prisma.FormationUncheckedCreateNestedManyWithoutSlotBPlayerInput
+  formationAsC?: Prisma.FormationUncheckedCreateNestedManyWithoutSlotCPlayerInput
+  trainingResults?: Prisma.TrainingResultUncheckedCreateNestedManyWithoutPlayerInput
+  fixtureAppearances?: Prisma.PlayerFixtureAppearanceUncheckedCreateNestedManyWithoutPlayerInput
+  transferListings?: Prisma.TransferListingUncheckedCreateNestedManyWithoutPlayerInput
+  individualTournamentEntries?: Prisma.IndividualTournamentEntryUncheckedCreateNestedManyWithoutPlayerInput
+  individualMatchesAsPlayerTwo?: Prisma.IndividualTournamentMatchUncheckedCreateNestedManyWithoutPlayerTwoInput
+  individualMatchesWon?: Prisma.IndividualTournamentMatchUncheckedCreateNestedManyWithoutWinnerPlayerInput
+  individualTournamentsWon?: Prisma.IndividualTournamentUncheckedCreateNestedManyWithoutChampionPlayerInput
+}
+
+export type PlayerCreateOrConnectWithoutIndividualMatchesAsPlayerOneInput = {
+  where: Prisma.PlayerWhereUniqueInput
+  create: Prisma.XOR<Prisma.PlayerCreateWithoutIndividualMatchesAsPlayerOneInput, Prisma.PlayerUncheckedCreateWithoutIndividualMatchesAsPlayerOneInput>
+}
+
+export type PlayerCreateWithoutIndividualMatchesAsPlayerTwoInput = {
+  firstName: string
+  lastName: string
+  nationality: string
+  age: number
+  careerStatus?: string
+  retiredAt?: Date | string | null
+  form?: number
+  morale?: number
+  experience?: number
+  talent: number
+  value?: number
+  salary?: number
+  image?: string
+  style?: Prisma.PlayerCreatestyleInput | string[]
+  precisione: number
+  diretto: number
+  sponde: number
+  tattica: number
+  mentalita: number
+  difesa: number
+  realizzazione: number
+  creativita: number
+  misura: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  club?: Prisma.ClubCreateNestedOneWithoutPlayersInput
+  retirementSeason?: Prisma.SeasonCreateNestedOneWithoutRetiredPlayersInput
+  formationAsA?: Prisma.FormationCreateNestedManyWithoutSlotAPlayerInput
+  formationAsB?: Prisma.FormationCreateNestedManyWithoutSlotBPlayerInput
+  formationAsC?: Prisma.FormationCreateNestedManyWithoutSlotCPlayerInput
+  trainingResults?: Prisma.TrainingResultCreateNestedManyWithoutPlayerInput
+  fixtureAppearances?: Prisma.PlayerFixtureAppearanceCreateNestedManyWithoutPlayerInput
+  transferListings?: Prisma.TransferListingCreateNestedManyWithoutPlayerInput
+  individualTournamentEntries?: Prisma.IndividualTournamentEntryCreateNestedManyWithoutPlayerInput
+  individualMatchesAsPlayerOne?: Prisma.IndividualTournamentMatchCreateNestedManyWithoutPlayerOneInput
+  individualMatchesWon?: Prisma.IndividualTournamentMatchCreateNestedManyWithoutWinnerPlayerInput
+  individualTournamentsWon?: Prisma.IndividualTournamentCreateNestedManyWithoutChampionPlayerInput
+}
+
+export type PlayerUncheckedCreateWithoutIndividualMatchesAsPlayerTwoInput = {
+  id?: number
+  clubId?: number | null
+  firstName: string
+  lastName: string
+  nationality: string
+  age: number
+  careerStatus?: string
+  retiredAt?: Date | string | null
+  retirementSeasonId?: number | null
+  form?: number
+  morale?: number
+  experience?: number
+  talent: number
+  value?: number
+  salary?: number
+  image?: string
+  style?: Prisma.PlayerCreatestyleInput | string[]
+  precisione: number
+  diretto: number
+  sponde: number
+  tattica: number
+  mentalita: number
+  difesa: number
+  realizzazione: number
+  creativita: number
+  misura: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  formationAsA?: Prisma.FormationUncheckedCreateNestedManyWithoutSlotAPlayerInput
+  formationAsB?: Prisma.FormationUncheckedCreateNestedManyWithoutSlotBPlayerInput
+  formationAsC?: Prisma.FormationUncheckedCreateNestedManyWithoutSlotCPlayerInput
+  trainingResults?: Prisma.TrainingResultUncheckedCreateNestedManyWithoutPlayerInput
+  fixtureAppearances?: Prisma.PlayerFixtureAppearanceUncheckedCreateNestedManyWithoutPlayerInput
+  transferListings?: Prisma.TransferListingUncheckedCreateNestedManyWithoutPlayerInput
+  individualTournamentEntries?: Prisma.IndividualTournamentEntryUncheckedCreateNestedManyWithoutPlayerInput
+  individualMatchesAsPlayerOne?: Prisma.IndividualTournamentMatchUncheckedCreateNestedManyWithoutPlayerOneInput
+  individualMatchesWon?: Prisma.IndividualTournamentMatchUncheckedCreateNestedManyWithoutWinnerPlayerInput
+  individualTournamentsWon?: Prisma.IndividualTournamentUncheckedCreateNestedManyWithoutChampionPlayerInput
+}
+
+export type PlayerCreateOrConnectWithoutIndividualMatchesAsPlayerTwoInput = {
+  where: Prisma.PlayerWhereUniqueInput
+  create: Prisma.XOR<Prisma.PlayerCreateWithoutIndividualMatchesAsPlayerTwoInput, Prisma.PlayerUncheckedCreateWithoutIndividualMatchesAsPlayerTwoInput>
+}
+
+export type PlayerCreateWithoutIndividualMatchesWonInput = {
+  firstName: string
+  lastName: string
+  nationality: string
+  age: number
+  careerStatus?: string
+  retiredAt?: Date | string | null
+  form?: number
+  morale?: number
+  experience?: number
+  talent: number
+  value?: number
+  salary?: number
+  image?: string
+  style?: Prisma.PlayerCreatestyleInput | string[]
+  precisione: number
+  diretto: number
+  sponde: number
+  tattica: number
+  mentalita: number
+  difesa: number
+  realizzazione: number
+  creativita: number
+  misura: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  club?: Prisma.ClubCreateNestedOneWithoutPlayersInput
+  retirementSeason?: Prisma.SeasonCreateNestedOneWithoutRetiredPlayersInput
+  formationAsA?: Prisma.FormationCreateNestedManyWithoutSlotAPlayerInput
+  formationAsB?: Prisma.FormationCreateNestedManyWithoutSlotBPlayerInput
+  formationAsC?: Prisma.FormationCreateNestedManyWithoutSlotCPlayerInput
+  trainingResults?: Prisma.TrainingResultCreateNestedManyWithoutPlayerInput
+  fixtureAppearances?: Prisma.PlayerFixtureAppearanceCreateNestedManyWithoutPlayerInput
+  transferListings?: Prisma.TransferListingCreateNestedManyWithoutPlayerInput
+  individualTournamentEntries?: Prisma.IndividualTournamentEntryCreateNestedManyWithoutPlayerInput
+  individualMatchesAsPlayerOne?: Prisma.IndividualTournamentMatchCreateNestedManyWithoutPlayerOneInput
+  individualMatchesAsPlayerTwo?: Prisma.IndividualTournamentMatchCreateNestedManyWithoutPlayerTwoInput
+  individualTournamentsWon?: Prisma.IndividualTournamentCreateNestedManyWithoutChampionPlayerInput
+}
+
+export type PlayerUncheckedCreateWithoutIndividualMatchesWonInput = {
+  id?: number
+  clubId?: number | null
+  firstName: string
+  lastName: string
+  nationality: string
+  age: number
+  careerStatus?: string
+  retiredAt?: Date | string | null
+  retirementSeasonId?: number | null
+  form?: number
+  morale?: number
+  experience?: number
+  talent: number
+  value?: number
+  salary?: number
+  image?: string
+  style?: Prisma.PlayerCreatestyleInput | string[]
+  precisione: number
+  diretto: number
+  sponde: number
+  tattica: number
+  mentalita: number
+  difesa: number
+  realizzazione: number
+  creativita: number
+  misura: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  formationAsA?: Prisma.FormationUncheckedCreateNestedManyWithoutSlotAPlayerInput
+  formationAsB?: Prisma.FormationUncheckedCreateNestedManyWithoutSlotBPlayerInput
+  formationAsC?: Prisma.FormationUncheckedCreateNestedManyWithoutSlotCPlayerInput
+  trainingResults?: Prisma.TrainingResultUncheckedCreateNestedManyWithoutPlayerInput
+  fixtureAppearances?: Prisma.PlayerFixtureAppearanceUncheckedCreateNestedManyWithoutPlayerInput
+  transferListings?: Prisma.TransferListingUncheckedCreateNestedManyWithoutPlayerInput
+  individualTournamentEntries?: Prisma.IndividualTournamentEntryUncheckedCreateNestedManyWithoutPlayerInput
+  individualMatchesAsPlayerOne?: Prisma.IndividualTournamentMatchUncheckedCreateNestedManyWithoutPlayerOneInput
+  individualMatchesAsPlayerTwo?: Prisma.IndividualTournamentMatchUncheckedCreateNestedManyWithoutPlayerTwoInput
+  individualTournamentsWon?: Prisma.IndividualTournamentUncheckedCreateNestedManyWithoutChampionPlayerInput
+}
+
+export type PlayerCreateOrConnectWithoutIndividualMatchesWonInput = {
+  where: Prisma.PlayerWhereUniqueInput
+  create: Prisma.XOR<Prisma.PlayerCreateWithoutIndividualMatchesWonInput, Prisma.PlayerUncheckedCreateWithoutIndividualMatchesWonInput>
+}
+
+export type PlayerUpsertWithoutIndividualMatchesAsPlayerOneInput = {
+  update: Prisma.XOR<Prisma.PlayerUpdateWithoutIndividualMatchesAsPlayerOneInput, Prisma.PlayerUncheckedUpdateWithoutIndividualMatchesAsPlayerOneInput>
+  create: Prisma.XOR<Prisma.PlayerCreateWithoutIndividualMatchesAsPlayerOneInput, Prisma.PlayerUncheckedCreateWithoutIndividualMatchesAsPlayerOneInput>
+  where?: Prisma.PlayerWhereInput
+}
+
+export type PlayerUpdateToOneWithWhereWithoutIndividualMatchesAsPlayerOneInput = {
+  where?: Prisma.PlayerWhereInput
+  data: Prisma.XOR<Prisma.PlayerUpdateWithoutIndividualMatchesAsPlayerOneInput, Prisma.PlayerUncheckedUpdateWithoutIndividualMatchesAsPlayerOneInput>
+}
+
+export type PlayerUpdateWithoutIndividualMatchesAsPlayerOneInput = {
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  nationality?: Prisma.StringFieldUpdateOperationsInput | string
+  age?: Prisma.IntFieldUpdateOperationsInput | number
+  careerStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  retiredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  form?: Prisma.IntFieldUpdateOperationsInput | number
+  morale?: Prisma.IntFieldUpdateOperationsInput | number
+  experience?: Prisma.FloatFieldUpdateOperationsInput | number
+  talent?: Prisma.FloatFieldUpdateOperationsInput | number
+  value?: Prisma.IntFieldUpdateOperationsInput | number
+  salary?: Prisma.IntFieldUpdateOperationsInput | number
+  image?: Prisma.StringFieldUpdateOperationsInput | string
+  style?: Prisma.PlayerUpdatestyleInput | string[]
+  precisione?: Prisma.FloatFieldUpdateOperationsInput | number
+  diretto?: Prisma.FloatFieldUpdateOperationsInput | number
+  sponde?: Prisma.FloatFieldUpdateOperationsInput | number
+  tattica?: Prisma.FloatFieldUpdateOperationsInput | number
+  mentalita?: Prisma.FloatFieldUpdateOperationsInput | number
+  difesa?: Prisma.FloatFieldUpdateOperationsInput | number
+  realizzazione?: Prisma.FloatFieldUpdateOperationsInput | number
+  creativita?: Prisma.FloatFieldUpdateOperationsInput | number
+  misura?: Prisma.FloatFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  club?: Prisma.ClubUpdateOneWithoutPlayersNestedInput
+  retirementSeason?: Prisma.SeasonUpdateOneWithoutRetiredPlayersNestedInput
+  formationAsA?: Prisma.FormationUpdateManyWithoutSlotAPlayerNestedInput
+  formationAsB?: Prisma.FormationUpdateManyWithoutSlotBPlayerNestedInput
+  formationAsC?: Prisma.FormationUpdateManyWithoutSlotCPlayerNestedInput
+  trainingResults?: Prisma.TrainingResultUpdateManyWithoutPlayerNestedInput
+  fixtureAppearances?: Prisma.PlayerFixtureAppearanceUpdateManyWithoutPlayerNestedInput
+  transferListings?: Prisma.TransferListingUpdateManyWithoutPlayerNestedInput
+  individualTournamentEntries?: Prisma.IndividualTournamentEntryUpdateManyWithoutPlayerNestedInput
+  individualMatchesAsPlayerTwo?: Prisma.IndividualTournamentMatchUpdateManyWithoutPlayerTwoNestedInput
+  individualMatchesWon?: Prisma.IndividualTournamentMatchUpdateManyWithoutWinnerPlayerNestedInput
+  individualTournamentsWon?: Prisma.IndividualTournamentUpdateManyWithoutChampionPlayerNestedInput
+}
+
+export type PlayerUncheckedUpdateWithoutIndividualMatchesAsPlayerOneInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  clubId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  nationality?: Prisma.StringFieldUpdateOperationsInput | string
+  age?: Prisma.IntFieldUpdateOperationsInput | number
+  careerStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  retiredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  retirementSeasonId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  form?: Prisma.IntFieldUpdateOperationsInput | number
+  morale?: Prisma.IntFieldUpdateOperationsInput | number
+  experience?: Prisma.FloatFieldUpdateOperationsInput | number
+  talent?: Prisma.FloatFieldUpdateOperationsInput | number
+  value?: Prisma.IntFieldUpdateOperationsInput | number
+  salary?: Prisma.IntFieldUpdateOperationsInput | number
+  image?: Prisma.StringFieldUpdateOperationsInput | string
+  style?: Prisma.PlayerUpdatestyleInput | string[]
+  precisione?: Prisma.FloatFieldUpdateOperationsInput | number
+  diretto?: Prisma.FloatFieldUpdateOperationsInput | number
+  sponde?: Prisma.FloatFieldUpdateOperationsInput | number
+  tattica?: Prisma.FloatFieldUpdateOperationsInput | number
+  mentalita?: Prisma.FloatFieldUpdateOperationsInput | number
+  difesa?: Prisma.FloatFieldUpdateOperationsInput | number
+  realizzazione?: Prisma.FloatFieldUpdateOperationsInput | number
+  creativita?: Prisma.FloatFieldUpdateOperationsInput | number
+  misura?: Prisma.FloatFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  formationAsA?: Prisma.FormationUncheckedUpdateManyWithoutSlotAPlayerNestedInput
+  formationAsB?: Prisma.FormationUncheckedUpdateManyWithoutSlotBPlayerNestedInput
+  formationAsC?: Prisma.FormationUncheckedUpdateManyWithoutSlotCPlayerNestedInput
+  trainingResults?: Prisma.TrainingResultUncheckedUpdateManyWithoutPlayerNestedInput
+  fixtureAppearances?: Prisma.PlayerFixtureAppearanceUncheckedUpdateManyWithoutPlayerNestedInput
+  transferListings?: Prisma.TransferListingUncheckedUpdateManyWithoutPlayerNestedInput
+  individualTournamentEntries?: Prisma.IndividualTournamentEntryUncheckedUpdateManyWithoutPlayerNestedInput
+  individualMatchesAsPlayerTwo?: Prisma.IndividualTournamentMatchUncheckedUpdateManyWithoutPlayerTwoNestedInput
+  individualMatchesWon?: Prisma.IndividualTournamentMatchUncheckedUpdateManyWithoutWinnerPlayerNestedInput
+  individualTournamentsWon?: Prisma.IndividualTournamentUncheckedUpdateManyWithoutChampionPlayerNestedInput
+}
+
+export type PlayerUpsertWithoutIndividualMatchesAsPlayerTwoInput = {
+  update: Prisma.XOR<Prisma.PlayerUpdateWithoutIndividualMatchesAsPlayerTwoInput, Prisma.PlayerUncheckedUpdateWithoutIndividualMatchesAsPlayerTwoInput>
+  create: Prisma.XOR<Prisma.PlayerCreateWithoutIndividualMatchesAsPlayerTwoInput, Prisma.PlayerUncheckedCreateWithoutIndividualMatchesAsPlayerTwoInput>
+  where?: Prisma.PlayerWhereInput
+}
+
+export type PlayerUpdateToOneWithWhereWithoutIndividualMatchesAsPlayerTwoInput = {
+  where?: Prisma.PlayerWhereInput
+  data: Prisma.XOR<Prisma.PlayerUpdateWithoutIndividualMatchesAsPlayerTwoInput, Prisma.PlayerUncheckedUpdateWithoutIndividualMatchesAsPlayerTwoInput>
+}
+
+export type PlayerUpdateWithoutIndividualMatchesAsPlayerTwoInput = {
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  nationality?: Prisma.StringFieldUpdateOperationsInput | string
+  age?: Prisma.IntFieldUpdateOperationsInput | number
+  careerStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  retiredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  form?: Prisma.IntFieldUpdateOperationsInput | number
+  morale?: Prisma.IntFieldUpdateOperationsInput | number
+  experience?: Prisma.FloatFieldUpdateOperationsInput | number
+  talent?: Prisma.FloatFieldUpdateOperationsInput | number
+  value?: Prisma.IntFieldUpdateOperationsInput | number
+  salary?: Prisma.IntFieldUpdateOperationsInput | number
+  image?: Prisma.StringFieldUpdateOperationsInput | string
+  style?: Prisma.PlayerUpdatestyleInput | string[]
+  precisione?: Prisma.FloatFieldUpdateOperationsInput | number
+  diretto?: Prisma.FloatFieldUpdateOperationsInput | number
+  sponde?: Prisma.FloatFieldUpdateOperationsInput | number
+  tattica?: Prisma.FloatFieldUpdateOperationsInput | number
+  mentalita?: Prisma.FloatFieldUpdateOperationsInput | number
+  difesa?: Prisma.FloatFieldUpdateOperationsInput | number
+  realizzazione?: Prisma.FloatFieldUpdateOperationsInput | number
+  creativita?: Prisma.FloatFieldUpdateOperationsInput | number
+  misura?: Prisma.FloatFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  club?: Prisma.ClubUpdateOneWithoutPlayersNestedInput
+  retirementSeason?: Prisma.SeasonUpdateOneWithoutRetiredPlayersNestedInput
+  formationAsA?: Prisma.FormationUpdateManyWithoutSlotAPlayerNestedInput
+  formationAsB?: Prisma.FormationUpdateManyWithoutSlotBPlayerNestedInput
+  formationAsC?: Prisma.FormationUpdateManyWithoutSlotCPlayerNestedInput
+  trainingResults?: Prisma.TrainingResultUpdateManyWithoutPlayerNestedInput
+  fixtureAppearances?: Prisma.PlayerFixtureAppearanceUpdateManyWithoutPlayerNestedInput
+  transferListings?: Prisma.TransferListingUpdateManyWithoutPlayerNestedInput
+  individualTournamentEntries?: Prisma.IndividualTournamentEntryUpdateManyWithoutPlayerNestedInput
+  individualMatchesAsPlayerOne?: Prisma.IndividualTournamentMatchUpdateManyWithoutPlayerOneNestedInput
+  individualMatchesWon?: Prisma.IndividualTournamentMatchUpdateManyWithoutWinnerPlayerNestedInput
+  individualTournamentsWon?: Prisma.IndividualTournamentUpdateManyWithoutChampionPlayerNestedInput
+}
+
+export type PlayerUncheckedUpdateWithoutIndividualMatchesAsPlayerTwoInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  clubId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  nationality?: Prisma.StringFieldUpdateOperationsInput | string
+  age?: Prisma.IntFieldUpdateOperationsInput | number
+  careerStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  retiredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  retirementSeasonId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  form?: Prisma.IntFieldUpdateOperationsInput | number
+  morale?: Prisma.IntFieldUpdateOperationsInput | number
+  experience?: Prisma.FloatFieldUpdateOperationsInput | number
+  talent?: Prisma.FloatFieldUpdateOperationsInput | number
+  value?: Prisma.IntFieldUpdateOperationsInput | number
+  salary?: Prisma.IntFieldUpdateOperationsInput | number
+  image?: Prisma.StringFieldUpdateOperationsInput | string
+  style?: Prisma.PlayerUpdatestyleInput | string[]
+  precisione?: Prisma.FloatFieldUpdateOperationsInput | number
+  diretto?: Prisma.FloatFieldUpdateOperationsInput | number
+  sponde?: Prisma.FloatFieldUpdateOperationsInput | number
+  tattica?: Prisma.FloatFieldUpdateOperationsInput | number
+  mentalita?: Prisma.FloatFieldUpdateOperationsInput | number
+  difesa?: Prisma.FloatFieldUpdateOperationsInput | number
+  realizzazione?: Prisma.FloatFieldUpdateOperationsInput | number
+  creativita?: Prisma.FloatFieldUpdateOperationsInput | number
+  misura?: Prisma.FloatFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  formationAsA?: Prisma.FormationUncheckedUpdateManyWithoutSlotAPlayerNestedInput
+  formationAsB?: Prisma.FormationUncheckedUpdateManyWithoutSlotBPlayerNestedInput
+  formationAsC?: Prisma.FormationUncheckedUpdateManyWithoutSlotCPlayerNestedInput
+  trainingResults?: Prisma.TrainingResultUncheckedUpdateManyWithoutPlayerNestedInput
+  fixtureAppearances?: Prisma.PlayerFixtureAppearanceUncheckedUpdateManyWithoutPlayerNestedInput
+  transferListings?: Prisma.TransferListingUncheckedUpdateManyWithoutPlayerNestedInput
+  individualTournamentEntries?: Prisma.IndividualTournamentEntryUncheckedUpdateManyWithoutPlayerNestedInput
+  individualMatchesAsPlayerOne?: Prisma.IndividualTournamentMatchUncheckedUpdateManyWithoutPlayerOneNestedInput
+  individualMatchesWon?: Prisma.IndividualTournamentMatchUncheckedUpdateManyWithoutWinnerPlayerNestedInput
+  individualTournamentsWon?: Prisma.IndividualTournamentUncheckedUpdateManyWithoutChampionPlayerNestedInput
+}
+
+export type PlayerUpsertWithoutIndividualMatchesWonInput = {
+  update: Prisma.XOR<Prisma.PlayerUpdateWithoutIndividualMatchesWonInput, Prisma.PlayerUncheckedUpdateWithoutIndividualMatchesWonInput>
+  create: Prisma.XOR<Prisma.PlayerCreateWithoutIndividualMatchesWonInput, Prisma.PlayerUncheckedCreateWithoutIndividualMatchesWonInput>
+  where?: Prisma.PlayerWhereInput
+}
+
+export type PlayerUpdateToOneWithWhereWithoutIndividualMatchesWonInput = {
+  where?: Prisma.PlayerWhereInput
+  data: Prisma.XOR<Prisma.PlayerUpdateWithoutIndividualMatchesWonInput, Prisma.PlayerUncheckedUpdateWithoutIndividualMatchesWonInput>
+}
+
+export type PlayerUpdateWithoutIndividualMatchesWonInput = {
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  nationality?: Prisma.StringFieldUpdateOperationsInput | string
+  age?: Prisma.IntFieldUpdateOperationsInput | number
+  careerStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  retiredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  form?: Prisma.IntFieldUpdateOperationsInput | number
+  morale?: Prisma.IntFieldUpdateOperationsInput | number
+  experience?: Prisma.FloatFieldUpdateOperationsInput | number
+  talent?: Prisma.FloatFieldUpdateOperationsInput | number
+  value?: Prisma.IntFieldUpdateOperationsInput | number
+  salary?: Prisma.IntFieldUpdateOperationsInput | number
+  image?: Prisma.StringFieldUpdateOperationsInput | string
+  style?: Prisma.PlayerUpdatestyleInput | string[]
+  precisione?: Prisma.FloatFieldUpdateOperationsInput | number
+  diretto?: Prisma.FloatFieldUpdateOperationsInput | number
+  sponde?: Prisma.FloatFieldUpdateOperationsInput | number
+  tattica?: Prisma.FloatFieldUpdateOperationsInput | number
+  mentalita?: Prisma.FloatFieldUpdateOperationsInput | number
+  difesa?: Prisma.FloatFieldUpdateOperationsInput | number
+  realizzazione?: Prisma.FloatFieldUpdateOperationsInput | number
+  creativita?: Prisma.FloatFieldUpdateOperationsInput | number
+  misura?: Prisma.FloatFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  club?: Prisma.ClubUpdateOneWithoutPlayersNestedInput
+  retirementSeason?: Prisma.SeasonUpdateOneWithoutRetiredPlayersNestedInput
+  formationAsA?: Prisma.FormationUpdateManyWithoutSlotAPlayerNestedInput
+  formationAsB?: Prisma.FormationUpdateManyWithoutSlotBPlayerNestedInput
+  formationAsC?: Prisma.FormationUpdateManyWithoutSlotCPlayerNestedInput
+  trainingResults?: Prisma.TrainingResultUpdateManyWithoutPlayerNestedInput
+  fixtureAppearances?: Prisma.PlayerFixtureAppearanceUpdateManyWithoutPlayerNestedInput
+  transferListings?: Prisma.TransferListingUpdateManyWithoutPlayerNestedInput
+  individualTournamentEntries?: Prisma.IndividualTournamentEntryUpdateManyWithoutPlayerNestedInput
+  individualMatchesAsPlayerOne?: Prisma.IndividualTournamentMatchUpdateManyWithoutPlayerOneNestedInput
+  individualMatchesAsPlayerTwo?: Prisma.IndividualTournamentMatchUpdateManyWithoutPlayerTwoNestedInput
+  individualTournamentsWon?: Prisma.IndividualTournamentUpdateManyWithoutChampionPlayerNestedInput
+}
+
+export type PlayerUncheckedUpdateWithoutIndividualMatchesWonInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  clubId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  nationality?: Prisma.StringFieldUpdateOperationsInput | string
+  age?: Prisma.IntFieldUpdateOperationsInput | number
+  careerStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  retiredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  retirementSeasonId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  form?: Prisma.IntFieldUpdateOperationsInput | number
+  morale?: Prisma.IntFieldUpdateOperationsInput | number
+  experience?: Prisma.FloatFieldUpdateOperationsInput | number
+  talent?: Prisma.FloatFieldUpdateOperationsInput | number
+  value?: Prisma.IntFieldUpdateOperationsInput | number
+  salary?: Prisma.IntFieldUpdateOperationsInput | number
+  image?: Prisma.StringFieldUpdateOperationsInput | string
+  style?: Prisma.PlayerUpdatestyleInput | string[]
+  precisione?: Prisma.FloatFieldUpdateOperationsInput | number
+  diretto?: Prisma.FloatFieldUpdateOperationsInput | number
+  sponde?: Prisma.FloatFieldUpdateOperationsInput | number
+  tattica?: Prisma.FloatFieldUpdateOperationsInput | number
+  mentalita?: Prisma.FloatFieldUpdateOperationsInput | number
+  difesa?: Prisma.FloatFieldUpdateOperationsInput | number
+  realizzazione?: Prisma.FloatFieldUpdateOperationsInput | number
+  creativita?: Prisma.FloatFieldUpdateOperationsInput | number
+  misura?: Prisma.FloatFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  formationAsA?: Prisma.FormationUncheckedUpdateManyWithoutSlotAPlayerNestedInput
+  formationAsB?: Prisma.FormationUncheckedUpdateManyWithoutSlotBPlayerNestedInput
+  formationAsC?: Prisma.FormationUncheckedUpdateManyWithoutSlotCPlayerNestedInput
+  trainingResults?: Prisma.TrainingResultUncheckedUpdateManyWithoutPlayerNestedInput
+  fixtureAppearances?: Prisma.PlayerFixtureAppearanceUncheckedUpdateManyWithoutPlayerNestedInput
+  transferListings?: Prisma.TransferListingUncheckedUpdateManyWithoutPlayerNestedInput
+  individualTournamentEntries?: Prisma.IndividualTournamentEntryUncheckedUpdateManyWithoutPlayerNestedInput
+  individualMatchesAsPlayerOne?: Prisma.IndividualTournamentMatchUncheckedUpdateManyWithoutPlayerOneNestedInput
+  individualMatchesAsPlayerTwo?: Prisma.IndividualTournamentMatchUncheckedUpdateManyWithoutPlayerTwoNestedInput
+  individualTournamentsWon?: Prisma.IndividualTournamentUncheckedUpdateManyWithoutChampionPlayerNestedInput
 }
 
 export type PlayerCreateWithoutFixtureAppearancesInput = {
@@ -2274,6 +3397,11 @@ export type PlayerCreateWithoutFixtureAppearancesInput = {
   formationAsC?: Prisma.FormationCreateNestedManyWithoutSlotCPlayerInput
   trainingResults?: Prisma.TrainingResultCreateNestedManyWithoutPlayerInput
   transferListings?: Prisma.TransferListingCreateNestedManyWithoutPlayerInput
+  individualTournamentEntries?: Prisma.IndividualTournamentEntryCreateNestedManyWithoutPlayerInput
+  individualMatchesAsPlayerOne?: Prisma.IndividualTournamentMatchCreateNestedManyWithoutPlayerOneInput
+  individualMatchesAsPlayerTwo?: Prisma.IndividualTournamentMatchCreateNestedManyWithoutPlayerTwoInput
+  individualMatchesWon?: Prisma.IndividualTournamentMatchCreateNestedManyWithoutWinnerPlayerInput
+  individualTournamentsWon?: Prisma.IndividualTournamentCreateNestedManyWithoutChampionPlayerInput
 }
 
 export type PlayerUncheckedCreateWithoutFixtureAppearancesInput = {
@@ -2310,6 +3438,11 @@ export type PlayerUncheckedCreateWithoutFixtureAppearancesInput = {
   formationAsC?: Prisma.FormationUncheckedCreateNestedManyWithoutSlotCPlayerInput
   trainingResults?: Prisma.TrainingResultUncheckedCreateNestedManyWithoutPlayerInput
   transferListings?: Prisma.TransferListingUncheckedCreateNestedManyWithoutPlayerInput
+  individualTournamentEntries?: Prisma.IndividualTournamentEntryUncheckedCreateNestedManyWithoutPlayerInput
+  individualMatchesAsPlayerOne?: Prisma.IndividualTournamentMatchUncheckedCreateNestedManyWithoutPlayerOneInput
+  individualMatchesAsPlayerTwo?: Prisma.IndividualTournamentMatchUncheckedCreateNestedManyWithoutPlayerTwoInput
+  individualMatchesWon?: Prisma.IndividualTournamentMatchUncheckedCreateNestedManyWithoutWinnerPlayerInput
+  individualTournamentsWon?: Prisma.IndividualTournamentUncheckedCreateNestedManyWithoutChampionPlayerInput
 }
 
 export type PlayerCreateOrConnectWithoutFixtureAppearancesInput = {
@@ -2361,6 +3494,11 @@ export type PlayerUpdateWithoutFixtureAppearancesInput = {
   formationAsC?: Prisma.FormationUpdateManyWithoutSlotCPlayerNestedInput
   trainingResults?: Prisma.TrainingResultUpdateManyWithoutPlayerNestedInput
   transferListings?: Prisma.TransferListingUpdateManyWithoutPlayerNestedInput
+  individualTournamentEntries?: Prisma.IndividualTournamentEntryUpdateManyWithoutPlayerNestedInput
+  individualMatchesAsPlayerOne?: Prisma.IndividualTournamentMatchUpdateManyWithoutPlayerOneNestedInput
+  individualMatchesAsPlayerTwo?: Prisma.IndividualTournamentMatchUpdateManyWithoutPlayerTwoNestedInput
+  individualMatchesWon?: Prisma.IndividualTournamentMatchUpdateManyWithoutWinnerPlayerNestedInput
+  individualTournamentsWon?: Prisma.IndividualTournamentUpdateManyWithoutChampionPlayerNestedInput
 }
 
 export type PlayerUncheckedUpdateWithoutFixtureAppearancesInput = {
@@ -2397,6 +3535,11 @@ export type PlayerUncheckedUpdateWithoutFixtureAppearancesInput = {
   formationAsC?: Prisma.FormationUncheckedUpdateManyWithoutSlotCPlayerNestedInput
   trainingResults?: Prisma.TrainingResultUncheckedUpdateManyWithoutPlayerNestedInput
   transferListings?: Prisma.TransferListingUncheckedUpdateManyWithoutPlayerNestedInput
+  individualTournamentEntries?: Prisma.IndividualTournamentEntryUncheckedUpdateManyWithoutPlayerNestedInput
+  individualMatchesAsPlayerOne?: Prisma.IndividualTournamentMatchUncheckedUpdateManyWithoutPlayerOneNestedInput
+  individualMatchesAsPlayerTwo?: Prisma.IndividualTournamentMatchUncheckedUpdateManyWithoutPlayerTwoNestedInput
+  individualMatchesWon?: Prisma.IndividualTournamentMatchUncheckedUpdateManyWithoutWinnerPlayerNestedInput
+  individualTournamentsWon?: Prisma.IndividualTournamentUncheckedUpdateManyWithoutChampionPlayerNestedInput
 }
 
 export type PlayerCreateManyClubInput = {
@@ -2462,6 +3605,11 @@ export type PlayerUpdateWithoutClubInput = {
   trainingResults?: Prisma.TrainingResultUpdateManyWithoutPlayerNestedInput
   fixtureAppearances?: Prisma.PlayerFixtureAppearanceUpdateManyWithoutPlayerNestedInput
   transferListings?: Prisma.TransferListingUpdateManyWithoutPlayerNestedInput
+  individualTournamentEntries?: Prisma.IndividualTournamentEntryUpdateManyWithoutPlayerNestedInput
+  individualMatchesAsPlayerOne?: Prisma.IndividualTournamentMatchUpdateManyWithoutPlayerOneNestedInput
+  individualMatchesAsPlayerTwo?: Prisma.IndividualTournamentMatchUpdateManyWithoutPlayerTwoNestedInput
+  individualMatchesWon?: Prisma.IndividualTournamentMatchUpdateManyWithoutWinnerPlayerNestedInput
+  individualTournamentsWon?: Prisma.IndividualTournamentUpdateManyWithoutChampionPlayerNestedInput
 }
 
 export type PlayerUncheckedUpdateWithoutClubInput = {
@@ -2498,6 +3646,11 @@ export type PlayerUncheckedUpdateWithoutClubInput = {
   trainingResults?: Prisma.TrainingResultUncheckedUpdateManyWithoutPlayerNestedInput
   fixtureAppearances?: Prisma.PlayerFixtureAppearanceUncheckedUpdateManyWithoutPlayerNestedInput
   transferListings?: Prisma.TransferListingUncheckedUpdateManyWithoutPlayerNestedInput
+  individualTournamentEntries?: Prisma.IndividualTournamentEntryUncheckedUpdateManyWithoutPlayerNestedInput
+  individualMatchesAsPlayerOne?: Prisma.IndividualTournamentMatchUncheckedUpdateManyWithoutPlayerOneNestedInput
+  individualMatchesAsPlayerTwo?: Prisma.IndividualTournamentMatchUncheckedUpdateManyWithoutPlayerTwoNestedInput
+  individualMatchesWon?: Prisma.IndividualTournamentMatchUncheckedUpdateManyWithoutWinnerPlayerNestedInput
+  individualTournamentsWon?: Prisma.IndividualTournamentUncheckedUpdateManyWithoutChampionPlayerNestedInput
 }
 
 export type PlayerUncheckedUpdateManyWithoutClubInput = {
@@ -2593,6 +3746,11 @@ export type PlayerUpdateWithoutRetirementSeasonInput = {
   trainingResults?: Prisma.TrainingResultUpdateManyWithoutPlayerNestedInput
   fixtureAppearances?: Prisma.PlayerFixtureAppearanceUpdateManyWithoutPlayerNestedInput
   transferListings?: Prisma.TransferListingUpdateManyWithoutPlayerNestedInput
+  individualTournamentEntries?: Prisma.IndividualTournamentEntryUpdateManyWithoutPlayerNestedInput
+  individualMatchesAsPlayerOne?: Prisma.IndividualTournamentMatchUpdateManyWithoutPlayerOneNestedInput
+  individualMatchesAsPlayerTwo?: Prisma.IndividualTournamentMatchUpdateManyWithoutPlayerTwoNestedInput
+  individualMatchesWon?: Prisma.IndividualTournamentMatchUpdateManyWithoutWinnerPlayerNestedInput
+  individualTournamentsWon?: Prisma.IndividualTournamentUpdateManyWithoutChampionPlayerNestedInput
 }
 
 export type PlayerUncheckedUpdateWithoutRetirementSeasonInput = {
@@ -2629,6 +3787,11 @@ export type PlayerUncheckedUpdateWithoutRetirementSeasonInput = {
   trainingResults?: Prisma.TrainingResultUncheckedUpdateManyWithoutPlayerNestedInput
   fixtureAppearances?: Prisma.PlayerFixtureAppearanceUncheckedUpdateManyWithoutPlayerNestedInput
   transferListings?: Prisma.TransferListingUncheckedUpdateManyWithoutPlayerNestedInput
+  individualTournamentEntries?: Prisma.IndividualTournamentEntryUncheckedUpdateManyWithoutPlayerNestedInput
+  individualMatchesAsPlayerOne?: Prisma.IndividualTournamentMatchUncheckedUpdateManyWithoutPlayerOneNestedInput
+  individualMatchesAsPlayerTwo?: Prisma.IndividualTournamentMatchUncheckedUpdateManyWithoutPlayerTwoNestedInput
+  individualMatchesWon?: Prisma.IndividualTournamentMatchUncheckedUpdateManyWithoutWinnerPlayerNestedInput
+  individualTournamentsWon?: Prisma.IndividualTournamentUncheckedUpdateManyWithoutChampionPlayerNestedInput
 }
 
 export type PlayerUncheckedUpdateManyWithoutRetirementSeasonInput = {
@@ -2673,6 +3836,11 @@ export type PlayerCountOutputType = {
   trainingResults: number
   fixtureAppearances: number
   transferListings: number
+  individualTournamentEntries: number
+  individualMatchesAsPlayerOne: number
+  individualMatchesAsPlayerTwo: number
+  individualMatchesWon: number
+  individualTournamentsWon: number
 }
 
 export type PlayerCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2682,6 +3850,11 @@ export type PlayerCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions
   trainingResults?: boolean | PlayerCountOutputTypeCountTrainingResultsArgs
   fixtureAppearances?: boolean | PlayerCountOutputTypeCountFixtureAppearancesArgs
   transferListings?: boolean | PlayerCountOutputTypeCountTransferListingsArgs
+  individualTournamentEntries?: boolean | PlayerCountOutputTypeCountIndividualTournamentEntriesArgs
+  individualMatchesAsPlayerOne?: boolean | PlayerCountOutputTypeCountIndividualMatchesAsPlayerOneArgs
+  individualMatchesAsPlayerTwo?: boolean | PlayerCountOutputTypeCountIndividualMatchesAsPlayerTwoArgs
+  individualMatchesWon?: boolean | PlayerCountOutputTypeCountIndividualMatchesWonArgs
+  individualTournamentsWon?: boolean | PlayerCountOutputTypeCountIndividualTournamentsWonArgs
 }
 
 /**
@@ -2736,6 +3909,41 @@ export type PlayerCountOutputTypeCountTransferListingsArgs<ExtArgs extends runti
   where?: Prisma.TransferListingWhereInput
 }
 
+/**
+ * PlayerCountOutputType without action
+ */
+export type PlayerCountOutputTypeCountIndividualTournamentEntriesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.IndividualTournamentEntryWhereInput
+}
+
+/**
+ * PlayerCountOutputType without action
+ */
+export type PlayerCountOutputTypeCountIndividualMatchesAsPlayerOneArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.IndividualTournamentMatchWhereInput
+}
+
+/**
+ * PlayerCountOutputType without action
+ */
+export type PlayerCountOutputTypeCountIndividualMatchesAsPlayerTwoArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.IndividualTournamentMatchWhereInput
+}
+
+/**
+ * PlayerCountOutputType without action
+ */
+export type PlayerCountOutputTypeCountIndividualMatchesWonArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.IndividualTournamentMatchWhereInput
+}
+
+/**
+ * PlayerCountOutputType without action
+ */
+export type PlayerCountOutputTypeCountIndividualTournamentsWonArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.IndividualTournamentWhereInput
+}
+
 
 export type PlayerSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -2774,6 +3982,11 @@ export type PlayerSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   trainingResults?: boolean | Prisma.Player$trainingResultsArgs<ExtArgs>
   fixtureAppearances?: boolean | Prisma.Player$fixtureAppearancesArgs<ExtArgs>
   transferListings?: boolean | Prisma.Player$transferListingsArgs<ExtArgs>
+  individualTournamentEntries?: boolean | Prisma.Player$individualTournamentEntriesArgs<ExtArgs>
+  individualMatchesAsPlayerOne?: boolean | Prisma.Player$individualMatchesAsPlayerOneArgs<ExtArgs>
+  individualMatchesAsPlayerTwo?: boolean | Prisma.Player$individualMatchesAsPlayerTwoArgs<ExtArgs>
+  individualMatchesWon?: boolean | Prisma.Player$individualMatchesWonArgs<ExtArgs>
+  individualTournamentsWon?: boolean | Prisma.Player$individualTournamentsWonArgs<ExtArgs>
   _count?: boolean | Prisma.PlayerCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["player"]>
 
@@ -2884,6 +4097,11 @@ export type PlayerInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   trainingResults?: boolean | Prisma.Player$trainingResultsArgs<ExtArgs>
   fixtureAppearances?: boolean | Prisma.Player$fixtureAppearancesArgs<ExtArgs>
   transferListings?: boolean | Prisma.Player$transferListingsArgs<ExtArgs>
+  individualTournamentEntries?: boolean | Prisma.Player$individualTournamentEntriesArgs<ExtArgs>
+  individualMatchesAsPlayerOne?: boolean | Prisma.Player$individualMatchesAsPlayerOneArgs<ExtArgs>
+  individualMatchesAsPlayerTwo?: boolean | Prisma.Player$individualMatchesAsPlayerTwoArgs<ExtArgs>
+  individualMatchesWon?: boolean | Prisma.Player$individualMatchesWonArgs<ExtArgs>
+  individualTournamentsWon?: boolean | Prisma.Player$individualTournamentsWonArgs<ExtArgs>
   _count?: boolean | Prisma.PlayerCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type PlayerIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2906,6 +4124,11 @@ export type $PlayerPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     trainingResults: Prisma.$TrainingResultPayload<ExtArgs>[]
     fixtureAppearances: Prisma.$PlayerFixtureAppearancePayload<ExtArgs>[]
     transferListings: Prisma.$TransferListingPayload<ExtArgs>[]
+    individualTournamentEntries: Prisma.$IndividualTournamentEntryPayload<ExtArgs>[]
+    individualMatchesAsPlayerOne: Prisma.$IndividualTournamentMatchPayload<ExtArgs>[]
+    individualMatchesAsPlayerTwo: Prisma.$IndividualTournamentMatchPayload<ExtArgs>[]
+    individualMatchesWon: Prisma.$IndividualTournamentMatchPayload<ExtArgs>[]
+    individualTournamentsWon: Prisma.$IndividualTournamentPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -3338,6 +4561,11 @@ export interface Prisma__PlayerClient<T, Null = never, ExtArgs extends runtime.T
   trainingResults<T extends Prisma.Player$trainingResultsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Player$trainingResultsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TrainingResultPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   fixtureAppearances<T extends Prisma.Player$fixtureAppearancesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Player$fixtureAppearancesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PlayerFixtureAppearancePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   transferListings<T extends Prisma.Player$transferListingsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Player$transferListingsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TransferListingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  individualTournamentEntries<T extends Prisma.Player$individualTournamentEntriesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Player$individualTournamentEntriesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$IndividualTournamentEntryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  individualMatchesAsPlayerOne<T extends Prisma.Player$individualMatchesAsPlayerOneArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Player$individualMatchesAsPlayerOneArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$IndividualTournamentMatchPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  individualMatchesAsPlayerTwo<T extends Prisma.Player$individualMatchesAsPlayerTwoArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Player$individualMatchesAsPlayerTwoArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$IndividualTournamentMatchPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  individualMatchesWon<T extends Prisma.Player$individualMatchesWonArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Player$individualMatchesWonArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$IndividualTournamentMatchPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  individualTournamentsWon<T extends Prisma.Player$individualTournamentsWonArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Player$individualTournamentsWonArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$IndividualTournamentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -3975,6 +5203,126 @@ export type Player$transferListingsArgs<ExtArgs extends runtime.Types.Extensions
   take?: number
   skip?: number
   distinct?: Prisma.TransferListingScalarFieldEnum | Prisma.TransferListingScalarFieldEnum[]
+}
+
+/**
+ * Player.individualTournamentEntries
+ */
+export type Player$individualTournamentEntriesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the IndividualTournamentEntry
+   */
+  select?: Prisma.IndividualTournamentEntrySelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the IndividualTournamentEntry
+   */
+  omit?: Prisma.IndividualTournamentEntryOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.IndividualTournamentEntryInclude<ExtArgs> | null
+  where?: Prisma.IndividualTournamentEntryWhereInput
+  orderBy?: Prisma.IndividualTournamentEntryOrderByWithRelationInput | Prisma.IndividualTournamentEntryOrderByWithRelationInput[]
+  cursor?: Prisma.IndividualTournamentEntryWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.IndividualTournamentEntryScalarFieldEnum | Prisma.IndividualTournamentEntryScalarFieldEnum[]
+}
+
+/**
+ * Player.individualMatchesAsPlayerOne
+ */
+export type Player$individualMatchesAsPlayerOneArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the IndividualTournamentMatch
+   */
+  select?: Prisma.IndividualTournamentMatchSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the IndividualTournamentMatch
+   */
+  omit?: Prisma.IndividualTournamentMatchOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.IndividualTournamentMatchInclude<ExtArgs> | null
+  where?: Prisma.IndividualTournamentMatchWhereInput
+  orderBy?: Prisma.IndividualTournamentMatchOrderByWithRelationInput | Prisma.IndividualTournamentMatchOrderByWithRelationInput[]
+  cursor?: Prisma.IndividualTournamentMatchWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.IndividualTournamentMatchScalarFieldEnum | Prisma.IndividualTournamentMatchScalarFieldEnum[]
+}
+
+/**
+ * Player.individualMatchesAsPlayerTwo
+ */
+export type Player$individualMatchesAsPlayerTwoArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the IndividualTournamentMatch
+   */
+  select?: Prisma.IndividualTournamentMatchSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the IndividualTournamentMatch
+   */
+  omit?: Prisma.IndividualTournamentMatchOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.IndividualTournamentMatchInclude<ExtArgs> | null
+  where?: Prisma.IndividualTournamentMatchWhereInput
+  orderBy?: Prisma.IndividualTournamentMatchOrderByWithRelationInput | Prisma.IndividualTournamentMatchOrderByWithRelationInput[]
+  cursor?: Prisma.IndividualTournamentMatchWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.IndividualTournamentMatchScalarFieldEnum | Prisma.IndividualTournamentMatchScalarFieldEnum[]
+}
+
+/**
+ * Player.individualMatchesWon
+ */
+export type Player$individualMatchesWonArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the IndividualTournamentMatch
+   */
+  select?: Prisma.IndividualTournamentMatchSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the IndividualTournamentMatch
+   */
+  omit?: Prisma.IndividualTournamentMatchOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.IndividualTournamentMatchInclude<ExtArgs> | null
+  where?: Prisma.IndividualTournamentMatchWhereInput
+  orderBy?: Prisma.IndividualTournamentMatchOrderByWithRelationInput | Prisma.IndividualTournamentMatchOrderByWithRelationInput[]
+  cursor?: Prisma.IndividualTournamentMatchWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.IndividualTournamentMatchScalarFieldEnum | Prisma.IndividualTournamentMatchScalarFieldEnum[]
+}
+
+/**
+ * Player.individualTournamentsWon
+ */
+export type Player$individualTournamentsWonArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the IndividualTournament
+   */
+  select?: Prisma.IndividualTournamentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the IndividualTournament
+   */
+  omit?: Prisma.IndividualTournamentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.IndividualTournamentInclude<ExtArgs> | null
+  where?: Prisma.IndividualTournamentWhereInput
+  orderBy?: Prisma.IndividualTournamentOrderByWithRelationInput | Prisma.IndividualTournamentOrderByWithRelationInput[]
+  cursor?: Prisma.IndividualTournamentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.IndividualTournamentScalarFieldEnum | Prisma.IndividualTournamentScalarFieldEnum[]
 }
 
 /**

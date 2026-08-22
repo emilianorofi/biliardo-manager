@@ -18,6 +18,11 @@ export type IndividualTournamentStageKey =
   | "SEMI_FINAL"
   | "FINAL";
 
+export type IndividualMatchStageKey = Exclude<
+  IndividualTournamentStageKey,
+  "DRAW"
+>;
+
 export type IndividualTournamentDefinition = {
   leagueRound: number;
   type: IndividualTournamentType;
@@ -64,6 +69,16 @@ export const INDIVIDUAL_TOURNAMENT_STAGES = [
   createStage("SEMI_FINAL", "Semifinali", "Domenica", 2, 14),
   createStage("FINAL", "Finale", "Domenica", 2, 16),
 ] satisfies IndividualTournamentStageDefinition[];
+
+export const INDIVIDUAL_MATCH_STAGES =
+  INDIVIDUAL_TOURNAMENT_STAGES.filter(
+    (stage): stage is IndividualTournamentStageDefinition & {
+      key: IndividualMatchStageKey;
+    } => stage.key !== "DRAW"
+  ).map((stage, index) => ({
+    ...stage,
+    order: index + 1,
+  }));
 
 export function buildIndividualTournamentCalendar(
   roundDates: ReadonlyMap<number, Date>

@@ -122,6 +122,12 @@ model Player {
 
   transferListings TransferListing[]
 
+  individualTournamentEntries  IndividualTournamentEntry[]
+  individualMatchesAsPlayerOne IndividualTournamentMatch[] @relation("IndividualMatchPlayerOne")
+  individualMatchesAsPlayerTwo IndividualTournamentMatch[] @relation("IndividualMatchPlayerTwo")
+  individualMatchesWon         IndividualTournamentMatch[] @relation("IndividualMatchWinner")
+  individualTournamentsWon     IndividualTournament[]      @relation("IndividualTournamentChampion")
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -387,11 +393,111 @@ model Season {
   startsAt DateTime?
   endsAt   DateTime?
 
-  leagues        League[]
-  retiredPlayers Player[]
+  leagues               League[]
+  retiredPlayers        Player[]
+  individualTournaments IndividualTournament[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model IndividualTournament {
+  id Int @id @default(autoincrement())
+
+  seasonId Int
+  season   Season @relation(fields: [seasonId], references: [id], onDelete: Cascade)
+
+  leagueRound Int
+  type        String
+  name        String
+  specialty   String
+
+  status       String  @default("SCHEDULED")
+  currentStage String?
+
+  drawAt  DateTime
+  finalAt DateTime
+
+  championPlayerId Int?
+  championPlayer   Player? @relation("IndividualTournamentChampion", fields: [championPlayerId], references: [id], onDelete: SetNull)
+
+  entries IndividualTournamentEntry[]
+  matches IndividualTournamentMatch[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([seasonId, leagueRound])
+  @@index([seasonId])
+  @@index([status])
+  @@index([drawAt])
+  @@index([finalAt])
+  @@index([championPlayerId])
+}
+
+model IndividualTournamentEntry {
+  id Int @id @default(autoincrement())
+
+  tournamentId Int
+  tournament   IndividualTournament @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+
+  playerId Int
+  player   Player @relation(fields: [playerId], references: [id], onDelete: Restrict)
+
+  rankingAtDraw Int
+  overallAtDraw Float
+  drawPosition  Int
+
+  status          String  @default("ACTIVE")
+  eliminatedStage String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([tournamentId, playerId])
+  @@unique([tournamentId, drawPosition])
+  @@index([tournamentId])
+  @@index([playerId])
+  @@index([status])
+}
+
+model IndividualTournamentMatch {
+  id Int @id @default(autoincrement())
+
+  tournamentId Int
+  tournament   IndividualTournament @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+
+  stage       String
+  stageOrder  Int
+  position    Int
+  scheduledAt DateTime
+
+  playerOneId Int?
+  playerOne   Player? @relation("IndividualMatchPlayerOne", fields: [playerOneId], references: [id], onDelete: SetNull)
+
+  playerTwoId Int?
+  playerTwo   Player? @relation("IndividualMatchPlayerTwo", fields: [playerTwoId], references: [id], onDelete: SetNull)
+
+  winnerPlayerId Int?
+  winnerPlayer   Player? @relation("IndividualMatchWinner", fields: [winnerPlayerId], references: [id], onDelete: SetNull)
+
+  playerOneWins Int @default(0)
+  playerTwoWins Int @default(0)
+
+  status   String    @default("SCHEDULED")
+  playedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([tournamentId, stageOrder, position])
+  @@index([tournamentId])
+  @@index([stageOrder])
+  @@index([scheduledAt])
+  @@index([status])
+  @@index([playerOneId])
+  @@index([playerTwoId])
+  @@index([winnerPlayerId])
 }
 
 model League {
