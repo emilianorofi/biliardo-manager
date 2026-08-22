@@ -14,8 +14,8 @@ async function main() {
 
   console.log(`Giornata di riferimento: ${result.targetRound}`);
   console.log(`Campionati allineati: ${result.synchronizedLeagues}`);
-  console.log(`Partite successive annullate: ${result.resetFixtures}`);
-  console.log(`Risultati iniziali completati: ${result.playedFixtures}`);
+  console.log(`Partite IA azzerate: ${result.resetFixtures}`);
+  console.log(`Risultati IA ricreati: ${result.playedFixtures}`);
   console.log(
     result.alreadySynchronized
       ? "I campionati erano già sincronizzati."
