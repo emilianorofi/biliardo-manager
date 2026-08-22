@@ -28,6 +28,7 @@ type ShotDefinition = {
   name: string;
   family: ShotFamily;
   difficulty: number;
+  italianPasses?: "MULTIPLE";
   weights: Record<MatchSpecialty, number>;
 };
 
@@ -87,6 +88,7 @@ const SHOT_DEFINITIONS: ShotDefinition[] = [
     name: "Traversino a più passate",
     family: "DIRECT",
     difficulty: 4,
+    italianPasses: "MULTIPLE",
     weights: { ITALIANA: 5, GORIZIANA: 2, TUTTI_DOPPI: 4 },
   },
   {
@@ -730,6 +732,10 @@ function isShotScoreCompatible(
 ) {
   if (points === 0) return true;
 
+  if (specialty === "ITALIANA") {
+    return getItalianScoreOptions(shot, points).length > 0;
+  }
+
   if (specialty === "GORIZIANA") {
     if (shot.family === "DIRECT") return points <= 56;
     return points % 4 === 0;
@@ -1149,6 +1155,28 @@ function getScoringPhrase(
 
 const ITALIAN_PIN_TOTALS = [0, 2, 4, 6, 8, 10, 12] as const;
 
+function getItalianAllowedPinTotals(shot: ShotDefinition) {
+  if (shot.key === "GARUFFA" || shot.key === "MEZZA_GARUFFA") {
+    return [0, 2, 4, 6, 8] as const;
+  }
+
+  if (shot.italianPasses === "MULTIPLE") return ITALIAN_PIN_TOTALS;
+  return [0, 2, 4, 6, 8, 10] as const;
+}
+
+function getItalianScoreOptions(shot: ShotDefinition, points: number) {
+  const allowedPinTotals = getItalianAllowedPinTotals(shot);
+
+  return [0, 3, 4]
+    .map((pallinoPoints) => ({
+      pallinoPoints,
+      pinPoints: points - pallinoPoints,
+    }))
+    .filter(({ pinPoints }) =>
+      (allowedPinTotals as readonly number[]).includes(pinPoints)
+    );
+}
+
 function getItalianScoringPhrase(
   shot: ShotDefinition,
   points: number,
@@ -1158,11 +1186,7 @@ function getItalianScoringPhrase(
     return "l'avversaria prende il pallino e realizza gli unici 3 punti possibili";
   }
 
-  const pallinoOptions = [0, 3, 4].filter((pallinoPoints) =>
-    ITALIAN_PIN_TOTALS.includes(
-      (points - pallinoPoints) as (typeof ITALIAN_PIN_TOTALS)[number]
-    )
-  );
+  const scoreOptions = getItalianScoreOptions(shot, points);
   const scoreProfile = ITALIAN_SHOT_SCORE_PROFILES[shot.key];
   const prefersPlain = scoreProfile?.plain.includes(points) ?? false;
   const prefersPallino =
@@ -1171,10 +1195,10 @@ function getItalianScoringPhrase(
     points % 2 === 1
       ? 3
       : selectWeighted(
-          pallinoOptions.map((value) => ({
-            value,
+          scoreOptions.map(({ pallinoPoints }) => ({
+            value: pallinoPoints,
             weight:
-              value === 0
+              pallinoPoints === 0
                 ? prefersPlain
                   ? 6
                   : prefersPallino
@@ -1211,6 +1235,10 @@ function getItalianPinPhrase(
   if (points === 2) return "cade un birillo laterale";
   if (points === 4) return "cadono due birilli laterali";
   if (points === 6) {
+    if (shot.italianPasses !== "MULTIPLE") {
+      return "il rosso cade insieme a un birillo laterale";
+    }
+
     return selectTemplate(
       [
         "cadono tre laterali",
@@ -1220,11 +1248,21 @@ function getItalianPinPhrase(
     );
   }
   if (points === 8) {
+    if (shot.italianPasses !== "MULTIPLE") {
+      return shot.family === "DIRECT"
+        ? "trova il filotto da 8"
+        : "il rosso cade insieme a due birilli laterali";
+    }
+
     return shot.family === "DIRECT"
       ? "trova il filotto da 8"
       : "cadono quattro laterali";
   }
   if (points === 10) {
+    if (shot.italianPasses !== "MULTIPLE") {
+      return "trova la ciliegia con il rosso abbattuto da solo";
+    }
+
     return selectTemplate(
       [
         "trova la ciliegia con il rosso abbattuto da solo",
