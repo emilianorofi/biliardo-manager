@@ -501,6 +501,39 @@ test("usa completo e preso per metà soltanto ogni tanto", () => {
   assert.ok(labeledShots / totalShots < 0.15);
 });
 
+test("calcola falli e pallino dell'Italiana soltanto con valori pari", () => {
+  const weakPlayer = createPlayer(1, 5);
+  let fouls = 0;
+  let foulsWithPallino = 0;
+
+  for (let gameId = 1080; gameId < 1180; gameId += 1) {
+    const chronicle = buildIndividualGameChronicle({
+      ...withChroniclePlayers({
+        gameId,
+        specialty: "ITALIANA" as const,
+        winnerSide: "PLAYER_ONE" as const,
+        playerOneScore: 80,
+        playerTwoScore: 65,
+      }),
+      playerTwo: weakPlayer,
+    });
+
+    for (const shot of chronicle.filter((item) => item.outcome === "FOUL")) {
+      fouls += 1;
+      assert.equal(shot.points % 2, 0);
+      assert.doesNotMatch(shot.commentary, /3 punti del pallino/);
+
+      if (shot.commentary.includes("pallino")) {
+        foulsWithPallino += 1;
+        assert.match(shot.commentary, /2 punti per il pallino/);
+      }
+    }
+  }
+
+  assert.ok(fouls > 20);
+  assert.ok(foulsWithPallino > 0);
+});
+
 function createPlayer(id: number, rating: number): IndividualMatchPlayer {
   return {
     id,
