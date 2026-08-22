@@ -73,6 +73,18 @@ export default async function IndividualMatchDetailPage({
           id: true,
           firstName: true,
           lastName: true,
+          precisione: true,
+          diretto: true,
+          sponde: true,
+          tattica: true,
+          mentalita: true,
+          difesa: true,
+          realizzazione: true,
+          creativita: true,
+          misura: true,
+          form: true,
+          morale: true,
+          experience: true,
         },
       },
       playerTwo: {
@@ -80,6 +92,18 @@ export default async function IndividualMatchDetailPage({
           id: true,
           firstName: true,
           lastName: true,
+          precisione: true,
+          diretto: true,
+          sponde: true,
+          tattica: true,
+          mentalita: true,
+          difesa: true,
+          realizzazione: true,
+          creativita: true,
+          misura: true,
+          form: true,
+          morale: true,
+          experience: true,
         },
       },
       games: {
@@ -192,6 +216,12 @@ export default async function IndividualMatchDetailPage({
                   winnerSide: playerOneWon ? "PLAYER_ONE" : "PLAYER_TWO",
                   playerOneScore: game.playerOneScore,
                   playerTwoScore: game.playerTwoScore,
+                  playerOnePerformanceRating:
+                    game.playerOnePerformanceRating,
+                  playerTwoPerformanceRating:
+                    game.playerTwoPerformanceRating,
+                  playerOne,
+                  playerTwo,
                 });
                 const winnerSide = playerOneWon
                   ? "PLAYER_ONE"
@@ -269,6 +299,12 @@ export default async function IndividualMatchDetailPage({
                           const playerName = isPlayerOne
                             ? `${playerOne.firstName} ${playerOne.lastName}`
                             : `${playerTwo.firstName} ${playerTwo.lastName}`;
+                          const pointsAwardedToOpponent =
+                            shot.playerSide !== shot.scoringSide;
+                          const scoringPlayerName =
+                            shot.scoringSide === "PLAYER_ONE"
+                              ? `${playerOne.firstName} ${playerOne.lastName}`
+                              : `${playerTwo.firstName} ${playerTwo.lastName}`;
 
                           const previousPhase =
                             chronicle[shotIndex - 1]?.phase;
@@ -300,6 +336,9 @@ export default async function IndividualMatchDetailPage({
                                   >
                                     {playerName}
                                   </p>
+                                  <p className="mt-0.5 text-[9px] font-black uppercase tracking-wider text-emerald-400/70">
+                                    {shot.shotName}
+                                  </p>
                                   <p className="mt-1 text-[11px] font-medium leading-relaxed text-zinc-500 sm:text-xs">
                                     {shot.commentary}
                                   </p>
@@ -311,7 +350,18 @@ export default async function IndividualMatchDetailPage({
                                       : "text-zinc-600"
                                   }`}
                                 >
-                                  {shot.points > 0 ? `+${shot.points}` : "0"}
+                                  {shot.points > 0 ? (
+                                    <>
+                                      +{shot.points}
+                                      {pointsAwardedToOpponent ? (
+                                        <span className="mt-0.5 block text-[8px] leading-tight text-rose-300/80">
+                                          a {scoringPlayerName}
+                                        </span>
+                                      ) : null}
+                                    </>
+                                  ) : (
+                                    "0"
+                                  )}
                                 </span>
                                 <span
                                   className={`pt-0.5 text-right font-black tabular-nums ${
