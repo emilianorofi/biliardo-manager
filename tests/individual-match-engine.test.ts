@@ -9,8 +9,11 @@ import {
   type IndividualMatchPlayer,
 } from "../lib/individual-match-engine";
 import {
+  buildIndividualGameClosing,
   buildIndividualGameChronicle,
+  buildIndividualGameIntroduction,
   buildIndividualGameSummary,
+  selectIndividualChronicleHighlights,
 } from "../lib/individual-game-chronicle";
 import { MATCH_SHOT_SCORES } from "../lib/match-engine";
 
@@ -163,7 +166,10 @@ test("costruisce una cronaca alternata con punteggi e totali corretti", () => {
   assert.equal(chronicle.at(-1)!.playerTwoTotal, 400);
   assert.equal(chronicle.at(-1)!.phase, "FINISH");
   assert.equal(chronicle.at(-1)!.highlight, "WINNER");
-  assert.match(chronicle.at(-1)!.commentary, /chiude la partita/);
+  assert.match(
+    chronicle.at(-1)!.commentary,
+    /tiro della chiusura|chiude la partita/
+  );
 
   for (const [index, shot] of chronicle.entries()) {
     assert.equal(shot.order, index + 1);
@@ -380,6 +386,7 @@ test("attribuisce i 3 punti dell'Italiana soltanto al pallino", () => {
       threePointShots += 1;
       assert.equal(shot.shotName, "Giocata sul pallino");
       assert.match(shot.commentary, /pallino/);
+      assert.doesNotMatch(shot.commentary, /unici 3 punti/);
       assert.doesNotMatch(shot.commentary, /Raddrizzo|Traversino/);
     }
 
@@ -602,6 +609,97 @@ test("limita i realizzi dei tiri dell'Italiana a una sola passata", () => {
 
   assert.ok(sixPointSinglePasses > 0);
   assert.ok(garuffaShots > 50);
+});
+
+test("racconta il tiro decisivo senza lasciare aperta la partita", () => {
+  const chronicle = buildIndividualGameChronicle({
+    ...withChroniclePlayers({
+      gameId: 1300,
+      specialty: "ITALIANA" as const,
+      winnerSide: "PLAYER_ONE" as const,
+      playerOneScore: 80,
+      playerTwoScore: 72,
+    }),
+    playerOneName: "Mario Rossi",
+    playerTwoName: "Luca Bianchi",
+  });
+  const finalShot = chronicle.at(-1)!;
+
+  assert.equal(finalShot.highlight, "WINNER");
+  assert.match(finalShot.commentary, /Mario Rossi/);
+  assert.match(finalShot.commentary, /tiro della chiusura/);
+  assert.match(finalShot.commentary, /partita termina qui/);
+  assert.doesNotMatch(
+    finalShot.commentary,
+    /replica possibile|partita ancora apertissima|cambio al comando/
+  );
+});
+
+test("seleziona da venti a venticinque momenti chiave", () => {
+  const chronicle = buildIndividualGameChronicle(
+    withChroniclePlayers({
+      gameId: 1301,
+      specialty: "GORIZIANA" as const,
+      winnerSide: "PLAYER_TWO" as const,
+      playerOneScore: 336,
+      playerTwoScore: 400,
+    })
+  );
+  const highlights = selectIndividualChronicleHighlights({
+    chronicle,
+    gameId: 1301,
+  });
+
+  assert.ok(highlights.length >= 20);
+  assert.ok(highlights.length <= 25);
+  assert.equal(highlights.at(-1)!.order, chronicle.at(-1)!.order);
+  assert.equal(highlights.at(-1)!.highlight, "WINNER");
+
+  for (let index = 1; index < highlights.length; index += 1) {
+    assert.ok(highlights[index - 1].order < highlights[index].order);
+  }
+});
+
+test("costruisce presentazione ed epilogo in più righe", () => {
+  const chronicle = buildIndividualGameChronicle({
+    ...withChroniclePlayers({
+      gameId: 1302,
+      specialty: "TUTTI_DOPPI" as const,
+      winnerSide: "PLAYER_ONE" as const,
+      playerOneScore: 600,
+      playerTwoScore: 488,
+    }),
+    playerOneName: "Mario Rossi",
+    playerTwoName: "Luca Bianchi",
+  });
+  const introduction = buildIndividualGameIntroduction({
+    venue: "La Sala Centrale · Tavolo 1",
+    tournamentName: "Torneo Tutti Doppi",
+    stageLabel: "Semifinale",
+    specialty: "TUTTI_DOPPI",
+    playerOneName: "Mario Rossi",
+    playerTwoName: "Luca Bianchi",
+    playerOneRanking: 4,
+    playerTwoRanking: 11,
+    playerOneOverall: 88,
+    playerTwoOverall: 85,
+  });
+  const closing = buildIndividualGameClosing({
+    chronicle,
+    specialty: "TUTTI_DOPPI",
+    winnerSide: "PLAYER_ONE",
+    playerOneName: "Mario Rossi",
+    playerTwoName: "Luca Bianchi",
+    gameOrder: 1,
+  });
+
+  assert.equal(introduction.length, 6);
+  assert.equal(closing.length, 6);
+  assert.match(introduction.join(" "), /Mario Rossi/);
+  assert.match(introduction.join(" "), /numero 4 del ranking/);
+  assert.match(introduction.join(" "), /Sala Centrale/);
+  assert.match(closing.join(" "), /Mario Rossi/);
+  assert.match(closing.join(" "), /600–488/);
 });
 
 function createPlayer(id: number, rating: number): IndividualMatchPlayer {
