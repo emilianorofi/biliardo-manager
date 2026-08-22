@@ -4,9 +4,9 @@ import { notFound } from "next/navigation";
 
 import {
   buildIndividualGameClosing,
+  buildIndividualGameBroadcast,
   buildIndividualGameChronicle,
   buildIndividualGameIntroduction,
-  selectIndividualChronicleHighlights,
 } from "@/lib/individual-game-chronicle";
 import { INDIVIDUAL_MATCH_STAGES } from "@/lib/individual-tournament-calendar";
 import type { MatchSpecialty } from "@/lib/match-engine";
@@ -248,6 +248,7 @@ export default async function IndividualMatchDetailPage({
                   ? "PLAYER_ONE"
                   : "PLAYER_TWO";
                 const introduction = buildIndividualGameIntroduction({
+                  gameId: game.id,
                   venue,
                   tournamentName: match.tournament.name,
                   stageLabel: formatStage(match.stage),
@@ -258,12 +259,16 @@ export default async function IndividualMatchDetailPage({
                   playerTwoRanking: playerTwoEntry?.rankingAtDraw,
                   playerOneOverall: playerOneEntry?.overallAtDraw,
                   playerTwoOverall: playerTwoEntry?.overallAtDraw,
+                  playerOne,
+                  playerTwo,
                 });
-                const featuredChronicle =
-                  selectIndividualChronicleHighlights({
-                    chronicle,
-                    gameId: game.id,
-                  });
+                const featuredChronicle = buildIndividualGameBroadcast({
+                  chronicle,
+                  gameId: game.id,
+                  specialty: game.specialty as MatchSpecialty,
+                  playerOneName,
+                  playerTwoName,
+                });
                 const closing = buildIndividualGameClosing({
                   chronicle,
                   specialty: game.specialty as MatchSpecialty,
@@ -322,14 +327,21 @@ export default async function IndividualMatchDetailPage({
                         </div>
                       </div>
 
-                      <div className="grid grid-cols-[52px_minmax(0,1fr)_48px_72px] gap-2 border-b border-zinc-800 px-2 pb-2 text-[9px] font-black uppercase tracking-wider text-zinc-600 sm:grid-cols-[70px_minmax(0,1fr)_70px_96px] sm:gap-3">
-                        <span>Momento</span>
-                        <span>Momenti chiave</span>
-                        <span className="text-right">Punti</span>
-                        <span className="text-right">Parziale</span>
+                      <div className="mb-3 flex items-end justify-between gap-3 px-1">
+                        <div>
+                          <p className="text-[9px] font-black uppercase tracking-[0.18em] text-emerald-300">
+                            Il racconto
+                          </p>
+                          <p className="mt-1 text-sm font-black text-white">
+                            La partita, momento dopo momento
+                          </p>
+                        </div>
+                        <p className="text-right text-[10px] font-bold text-zinc-600">
+                          {featuredChronicle.length} passaggi scelti
+                        </p>
                       </div>
 
-                      <ol className="divide-y divide-zinc-800/70">
+                      <ol className="space-y-3">
                         {featuredChronicle.map((shot, shotIndex) => {
                           const isPlayerOne =
                             shot.playerSide === "PLAYER_ONE";
@@ -352,18 +364,44 @@ export default async function IndividualMatchDetailPage({
                           return (
                             <li key={shot.order}>
                               {startsNewPhase ? (
-                                <div className="border-b border-zinc-800/70 bg-zinc-900/60 px-2 py-2 text-[9px] font-black uppercase tracking-[0.18em] text-emerald-400/70">
+                                <div className="mb-3 flex items-center gap-3 px-1 pt-2">
+                                  <span className="h-px flex-1 bg-zinc-800" />
+                                  <span className="text-[9px] font-black uppercase tracking-[0.2em] text-emerald-400/70">
                                   {formatChroniclePhase(shot.phase)}
+                                  </span>
+                                  <span className="h-px flex-1 bg-zinc-800" />
                                 </div>
                               ) : null}
 
-                              <div className="grid grid-cols-[52px_minmax(0,1fr)_48px_72px] items-start gap-2 px-2 py-3 text-xs sm:grid-cols-[70px_minmax(0,1fr)_70px_96px] sm:gap-3 sm:text-sm">
-                                <span className="pt-0.5 font-bold text-zinc-600">
-                                  {shot.order}
-                                </span>
-                                <div className="min-w-0">
+                              <article
+                                className={`rounded-xl border px-4 py-4 ${
+                                  isFinalShot
+                                    ? "border-emerald-400/30 bg-emerald-300/[0.07]"
+                                    : shot.highlight === "LEAD_CHANGE" ||
+                                        shot.highlight === "BIG_SHOT"
+                                      ? "border-amber-400/20 bg-amber-300/[0.04]"
+                                      : "border-zinc-800 bg-zinc-900/35"
+                                }`}
+                              >
+                                <div className="flex items-center justify-between gap-3 text-[9px] font-black uppercase tracking-[0.14em]">
+                                  <span className="text-zinc-600">
+                                    Momento {shot.order}
+                                  </span>
+                                  <span
+                                    className={
+                                      isFinalShot
+                                        ? "text-emerald-200"
+                                        : "text-zinc-500"
+                                    }
+                                  >
+                                    {shot.playerOneTotal}–{shot.playerTwoTotal}
+                                  </span>
+                                </div>
+
+                                <div className="mt-2 flex items-start justify-between gap-3">
+                                  <div className="min-w-0">
                                   <p
-                                    className={`font-black ${
+                                      className={`text-sm font-black sm:text-base ${
                                       isFinalShot
                                         ? "text-emerald-300"
                                         : shot.highlight === "LEAD_CHANGE" ||
@@ -374,25 +412,22 @@ export default async function IndividualMatchDetailPage({
                                   >
                                     {playerName}
                                   </p>
-                                  <p className="mt-0.5 text-[9px] font-black uppercase tracking-wider text-emerald-400/70">
+                                    <p className="mt-0.5 text-[9px] font-black uppercase tracking-wider text-emerald-400/70">
                                     {shot.shotName}
                                   </p>
-                                  <p className="mt-1 text-[11px] font-medium leading-relaxed text-zinc-500 sm:text-xs">
-                                    {shot.commentary}
-                                  </p>
-                                </div>
-                                <span
-                                  className={`pt-0.5 text-right font-black tabular-nums ${
+                                  </div>
+                                  <span
+                                    className={`shrink-0 rounded-full border px-2.5 py-1 text-xs font-black tabular-nums ${
                                     shot.points > 0
-                                      ? "text-amber-300"
-                                      : "text-zinc-600"
+                                        ? "border-amber-400/20 bg-amber-300/[0.06] text-amber-300"
+                                        : "border-zinc-800 text-zinc-600"
                                   }`}
                                 >
                                   {shot.points > 0 ? (
                                     <>
                                       +{shot.points}
                                       {pointsAwardedToOpponent ? (
-                                        <span className="mt-0.5 block text-[8px] leading-tight text-rose-300/80">
+                                          <span className="ml-1 text-[8px] leading-tight text-rose-300/80">
                                           a {scoringPlayerName}
                                         </span>
                                       ) : null}
@@ -401,14 +436,12 @@ export default async function IndividualMatchDetailPage({
                                     "0"
                                   )}
                                 </span>
-                                <span
-                                  className={`pt-0.5 text-right font-black tabular-nums ${
-                                    isFinalShot ? "text-white" : "text-zinc-400"
-                                  }`}
-                                >
-                                  {shot.playerOneTotal}–{shot.playerTwoTotal}
-                                </span>
-                              </div>
+                                </div>
+
+                                <p className="mt-3 text-sm font-medium leading-7 text-zinc-300">
+                                  {shot.commentary}
+                                </p>
+                              </article>
                             </li>
                           );
                         })}
@@ -460,9 +493,9 @@ function formatSpecialty(value: string) {
 }
 
 function formatChroniclePhase(value: "OPENING" | "MIDDLE" | "FINISH") {
-  if (value === "OPENING") return "Avvio";
-  if (value === "MIDDLE") return "Fase centrale";
-  return "Finale";
+  if (value === "OPENING") return "Le prime geometrie";
+  if (value === "MIDDLE") return "La partita cambia voce";
+  return "Ogni punto pesa";
 }
 
 function formatDateTime(value: Date) {
