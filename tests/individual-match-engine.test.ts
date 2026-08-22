@@ -425,6 +425,82 @@ test("rispetta il conteggio semplice e doppio della Goriziana", () => {
   assert.ok(cushionOnlyScores > 0);
 });
 
+test("associa i tiri dell'Italiana alle realizzazioni più frequenti", () => {
+  const preferredScores: Record<string, readonly number[]> = {
+    Raddrizzo: [8, 10, 11, 12, 13, 14],
+    Rovescio: [8, 10, 11, 12, 13, 14],
+    "Traversino piano": [2, 5, 6, 8, 11, 12],
+    "Traversino a più passate": [4, 7, 8, 10, 11, 12],
+    Giro: [4, 6, 7, 8, 9, 10, 11],
+    Girone: [4, 6, 7, 8, 9, 10, 11],
+    "Angolo di prima": [2, 4, 5, 6, 7, 8, 9, 10],
+    "Angolo di seconda": [2, 4, 5, 6, 7, 8, 9, 10],
+    Striscio: [2, 4, 5, 6, 7, 8, 9],
+    Candela: [2, 5, 8, 11],
+    "Sponda-biglia": [2, 4, 5, 6, 7, 8, 9, 10],
+    Bricolla: [2, 4, 5, 6, 7, 8, 9, 10, 11, 13],
+    Garuffa: [2, 5, 6, 8, 9, 11],
+    "Mezza garuffa": [2, 5, 6, 8, 9, 11],
+    Gancio: [2, 4, 5, 6, 7, 8, 9, 10],
+    Parabola: [2, 4, 5, 6, 7, 8, 9, 10],
+    "Tre sponde di calcio": [2, 4, 5, 6, 7, 8, 9, 10, 11],
+    "Cinque sponde di calcio": [2, 4, 5, 6, 7, 8, 9, 10, 11],
+  };
+  let associatedShots = 0;
+  let preferredRealizations = 0;
+
+  for (let gameId = 1000; gameId < 1040; gameId += 1) {
+    const chronicle = buildIndividualGameChronicle(
+      withChroniclePlayers({
+        gameId,
+        specialty: "ITALIANA" as const,
+        winnerSide: "PLAYER_ONE" as const,
+        playerOneScore: 80,
+        playerTwoScore: 65,
+      })
+    );
+
+    for (const shot of chronicle) {
+      const scores = preferredScores[shot.shotName];
+
+      if (shot.points === 0 || shot.playerSide !== shot.scoringSide || !scores) {
+        continue;
+      }
+
+      associatedShots += 1;
+      if (scores.includes(shot.points)) preferredRealizations += 1;
+    }
+  }
+
+  assert.ok(associatedShots > 500);
+  assert.ok(preferredRealizations / associatedShots >= 0.9);
+});
+
+test("usa completo e preso per metà soltanto ogni tanto", () => {
+  let labeledShots = 0;
+  let totalShots = 0;
+
+  for (let gameId = 1040; gameId < 1080; gameId += 1) {
+    const chronicle = buildIndividualGameChronicle(
+      withChroniclePlayers({
+        gameId,
+        specialty: "ITALIANA" as const,
+        winnerSide: "PLAYER_TWO" as const,
+        playerOneScore: 68,
+        playerTwoScore: 80,
+      })
+    );
+
+    totalShots += chronicle.length;
+    labeledShots += chronicle.filter((shot) =>
+      /Tiro completo|Tiro preso per metà/.test(shot.commentary)
+    ).length;
+  }
+
+  assert.ok(labeledShots > 0);
+  assert.ok(labeledShots / totalShots < 0.15);
+});
+
 function createPlayer(id: number, rating: number): IndividualMatchPlayer {
   return {
     id,
