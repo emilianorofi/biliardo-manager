@@ -5,6 +5,8 @@ import {
 } from "@/lib/world-structure";
 
 const WORLD_SYNCHRONIZATION_LOCK = 202608222;
+const SYNCHRONIZATION_STATEMENT_TIMEOUT_MS = 60000;
+const FIXTURE_UPDATE_BATCH_SIZE = 8;
 const FIXTURES_PER_LEAGUE =
   CLUBS_PER_LEAGUE * (CLUBS_PER_LEAGUE - 1);
 
@@ -21,6 +23,9 @@ export type WorldLeagueSynchronizationResult = {
 export async function synchronizeWorldLeagueProgress(): Promise<WorldLeagueSynchronizationResult> {
   return prisma.$transaction(
     async (transaction) => {
+      await transaction.$executeRawUnsafe(
+        `SET LOCAL statement_timeout = ${SYNCHRONIZATION_STATEMENT_TIMEOUT_MS}`
+      );
       await transaction.$executeRaw`
         SELECT pg_advisory_xact_lock(${WORLD_SYNCHRONIZATION_LOCK})
       `;
@@ -225,25 +230,32 @@ export async function synchronizeWorldLeagueProgress(): Promise<WorldLeagueSynch
       }
 
       if (fixturesToSimulate.length > 0) {
-        const values = fixturesToSimulate
-          .map(
-            (fixture) =>
-              `(${fixture.id}, ${fixture.score.homeScore}, ${fixture.score.awayScore})`
-          )
-          .join(", ");
+        for (
+          let offset = 0;
+          offset < fixturesToSimulate.length;
+          offset += FIXTURE_UPDATE_BATCH_SIZE
+        ) {
+          const values = fixturesToSimulate
+            .slice(offset, offset + FIXTURE_UPDATE_BATCH_SIZE)
+            .map(
+              (fixture) =>
+                `(${fixture.id}, ${fixture.score.homeScore}, ${fixture.score.awayScore})`
+            )
+            .join(", ");
 
-        await transaction.$executeRawUnsafe(`
-          UPDATE "LeagueFixture" AS fixture
-          SET
-            status = 'PLAYED',
-            "homeScore" = result."homeScore",
-            "awayScore" = result."awayScore",
-            "playedAt" = fixture."scheduledAt"
-          FROM (
-            VALUES ${values}
-          ) AS result(id, "homeScore", "awayScore")
-          WHERE fixture.id = result.id
-        `);
+          await transaction.$executeRawUnsafe(`
+            UPDATE "LeagueFixture" AS fixture
+            SET
+              status = 'PLAYED',
+              "homeScore" = result."homeScore",
+              "awayScore" = result."awayScore",
+              "playedAt" = fixture."scheduledAt"
+            FROM (
+              VALUES ${values}
+            ) AS result(id, "homeScore", "awayScore")
+            WHERE fixture.id = result.id
+          `);
+        }
 
         await transaction.gameEvent.createMany({
           data: fixturesToSimulate.map((fixture) => ({
