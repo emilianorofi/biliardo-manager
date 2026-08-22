@@ -1,5 +1,3 @@
-import { generateDoubleRoundRobin } from "@/lib/league-scheduler";
-import { playLeagueFixture } from "@/lib/play-league-fixture";
 import { prisma } from "@/lib/prisma";
 import {
   CLUBS_PER_LEAGUE,
@@ -21,7 +19,7 @@ export type WorldLeagueSynchronizationResult = {
 };
 
 export async function synchronizeWorldLeagueProgress(): Promise<WorldLeagueSynchronizationResult> {
-  const preparation = await prisma.$transaction(
+  return prisma.$transaction(
     async (transaction) => {
       await transaction.$executeRaw`
         SELECT pg_advisory_xact_lock(${WORLD_SYNCHRONIZATION_LOCK})
@@ -44,9 +42,6 @@ export async function synchronizeWorldLeagueProgress(): Promise<WorldLeagueSynch
             ],
             include: {
               entries: {
-                orderBy: {
-                  clubId: "asc",
-                },
                 select: {
                   clubId: true,
                   played: true,
@@ -58,9 +53,24 @@ export async function synchronizeWorldLeagueProgress(): Promise<WorldLeagueSynch
                   { id: "asc" },
                 ],
                 select: {
+                  id: true,
                   round: true,
                   status: true,
+                  homeClubId: true,
+                  awayClubId: true,
+                  homeScore: true,
+                  awayScore: true,
                   scheduledAt: true,
+                  homeClub: {
+                    select: {
+                      name: true,
+                    },
+                  },
+                  awayClub: {
+                    select: {
+                      name: true,
+                    },
+                  },
                 },
               },
             },
@@ -101,8 +111,9 @@ export async function synchronizeWorldLeagueProgress(): Promise<WorldLeagueSynch
         return {
           seasonId: season.id,
           targetRound,
-          lowerLeagueIds,
+          synchronizedLeagues: lowerLeagues.length,
           resetFixtures: 0,
+          playedFixtures: 0,
           deletedEvents: 0,
           alreadySynchronized: true,
         };
@@ -126,35 +137,126 @@ export async function synchronizeWorldLeagueProgress(): Promise<WorldLeagueSynch
         throw new Error("WORLD_LOWER_LEAGUES_HAVE_MANAGERS");
       }
 
-      const roundDates = new Map<number, Date>();
+      const fixturesToReset = lowerLeagues.flatMap((league) =>
+        league.fixtures.filter(
+          (fixture) =>
+            fixture.round > targetRound && fixture.status !== "SCHEDULED"
+        )
+      );
+      const fixturesToSimulate = lowerLeagues.flatMap((league) =>
+        league.fixtures
+          .filter(
+            (fixture) =>
+              fixture.round <= targetRound &&
+              (fixture.status !== "PLAYED" ||
+                fixture.homeScore === null ||
+                fixture.awayScore === null)
+          )
+          .map((fixture) => ({
+            ...fixture,
+            leagueName: league.name,
+            score: simulateInitialFixture(fixture),
+          }))
+      );
+      const fixtureIdsToClear = Array.from(
+        new Set([
+          ...fixturesToReset.map((fixture) => fixture.id),
+          ...fixturesToSimulate.map((fixture) => fixture.id),
+        ])
+      );
+      const eventFilters = lowerLeagues.flatMap((league) =>
+        Array.from(
+          { length: CLUBS_PER_LEAGUE * 2 - 2 - targetRound },
+          (_, index) => ({
+            description: `Giornata ${targetRound + index + 1} di ${league.name}.`,
+          })
+        )
+      );
+      const deletedEvents =
+        eventFilters.length === 0
+          ? { count: 0 }
+          : await transaction.gameEvent.deleteMany({
+              where: {
+                type: "Campionato",
+                OR: eventFilters,
+              },
+            });
 
-      for (const fixture of referenceLeague.fixtures) {
-        if (!roundDates.has(fixture.round)) {
-          roundDates.set(fixture.round, fixture.scheduledAt);
-        }
-      }
-
-      if (roundDates.size !== CLUBS_PER_LEAGUE * 2 - 2) {
-        throw new Error("WORLD_REFERENCE_DATES_INCOMPLETE");
-      }
-
-      const deletedEvents = await transaction.gameEvent.deleteMany({
-        where: {
-          type: "Campionato",
-          OR: lowerLeagues.map((league) => ({
-            description: {
-              contains: `di ${league.name}.`,
+      if (fixtureIdsToClear.length > 0) {
+        await transaction.playerGamePerformance.deleteMany({
+          where: {
+            fixtureGame: {
+              fixtureId: {
+                in: fixtureIdsToClear,
+              },
             },
-          })),
-        },
-      });
-      const deletedFixtures = await transaction.leagueFixture.deleteMany({
-        where: {
-          leagueId: {
-            in: lowerLeagueIds,
           },
-        },
-      });
+        });
+        await transaction.leagueFixtureGame.deleteMany({
+          where: {
+            fixtureId: {
+              in: fixtureIdsToClear,
+            },
+          },
+        });
+        await transaction.playerFixtureAppearance.deleteMany({
+          where: {
+            fixtureId: {
+              in: fixtureIdsToClear,
+            },
+          },
+        });
+      }
+
+      if (fixturesToReset.length > 0) {
+        await transaction.leagueFixture.updateMany({
+          where: {
+            id: {
+              in: fixturesToReset.map((fixture) => fixture.id),
+            },
+          },
+          data: {
+            status: "SCHEDULED",
+            homeScore: null,
+            awayScore: null,
+            playedAt: null,
+          },
+        });
+      }
+
+      if (fixturesToSimulate.length > 0) {
+        const values = fixturesToSimulate
+          .map(
+            (fixture) =>
+              `(${fixture.id}, ${fixture.score.homeScore}, ${fixture.score.awayScore})`
+          )
+          .join(", ");
+
+        await transaction.$executeRawUnsafe(`
+          UPDATE "LeagueFixture" AS fixture
+          SET
+            status = 'PLAYED',
+            "homeScore" = result."homeScore",
+            "awayScore" = result."awayScore",
+            "playedAt" = fixture."scheduledAt"
+          FROM (
+            VALUES ${values}
+          ) AS result(id, "homeScore", "awayScore")
+          WHERE fixture.id = result.id
+        `);
+
+        await transaction.gameEvent.createMany({
+          data: fixturesToSimulate.map((fixture) => ({
+            clubId: null,
+            type: "Campionato",
+            title:
+              `${fixture.homeClub.name} ${fixture.score.homeScore}-` +
+              `${fixture.score.awayScore} ${fixture.awayClub.name}`,
+            description: `Giornata ${fixture.round} di ${fixture.leagueName}.`,
+            createdAt: fixture.scheduledAt,
+          })),
+        });
+      }
 
       await transaction.leagueEntry.updateMany({
         where: {
@@ -172,6 +274,62 @@ export async function synchronizeWorldLeagueProgress(): Promise<WorldLeagueSynch
           points: 0,
         },
       });
+
+      if (targetRound > 0) {
+        const leagueIds = lowerLeagueIds.join(", ");
+
+        await transaction.$executeRawUnsafe(`
+          WITH club_results AS (
+            SELECT
+              fixture."leagueId",
+              fixture."homeClubId" AS "clubId",
+              fixture."homeScore" AS scored,
+              fixture."awayScore" AS conceded
+            FROM "LeagueFixture" AS fixture
+            WHERE fixture."leagueId" IN (${leagueIds})
+              AND fixture.round <= ${targetRound}
+              AND fixture.status = 'PLAYED'
+
+            UNION ALL
+
+            SELECT
+              fixture."leagueId",
+              fixture."awayClubId" AS "clubId",
+              fixture."awayScore" AS scored,
+              fixture."homeScore" AS conceded
+            FROM "LeagueFixture" AS fixture
+            WHERE fixture."leagueId" IN (${leagueIds})
+              AND fixture.round <= ${targetRound}
+              AND fixture.status = 'PLAYED'
+          ),
+          totals AS (
+            SELECT
+              "leagueId",
+              "clubId",
+              COUNT(*)::int AS played,
+              COUNT(*) FILTER (WHERE scored > conceded)::int AS won,
+              COUNT(*) FILTER (WHERE scored = conceded)::int AS drawn,
+              COUNT(*) FILTER (WHERE scored < conceded)::int AS lost,
+              SUM(scored)::int AS "pointsFor",
+              SUM(conceded)::int AS "pointsAgainst"
+            FROM club_results
+            GROUP BY "leagueId", "clubId"
+          )
+          UPDATE "LeagueEntry" AS entry
+          SET
+            played = totals.played,
+            won = totals.won,
+            drawn = totals.drawn,
+            lost = totals.lost,
+            "pointsFor" = totals."pointsFor",
+            "pointsAgainst" = totals."pointsAgainst",
+            points = totals."pointsFor"
+          FROM totals
+          WHERE entry."leagueId" = totals."leagueId"
+            AND entry."clubId" = totals."clubId"
+        `);
+      }
+
       await transaction.league.updateMany({
         where: {
           id: {
@@ -180,41 +338,21 @@ export async function synchronizeWorldLeagueProgress(): Promise<WorldLeagueSynch
         },
         data: {
           status:
-            season.status === "ACTIVE" ? "ACTIVE" : "PREPARATION",
-          currentRound: 0,
+            targetRound === CLUBS_PER_LEAGUE * 2 - 2
+              ? "COMPLETED"
+              : season.status === "ACTIVE"
+                ? "ACTIVE"
+                : "PREPARATION",
+          currentRound: targetRound,
         },
       });
-
-      for (const league of lowerLeagues) {
-        const fixtures = generateDoubleRoundRobin(
-          league.entries.map((entry) => entry.clubId)
-        );
-
-        await transaction.leagueFixture.createMany({
-          data: fixtures.map((fixture) => {
-            const scheduledAt = roundDates.get(fixture.round);
-
-            if (!scheduledAt) {
-              throw new Error("WORLD_REFERENCE_DATE_MISSING");
-            }
-
-            return {
-              leagueId: league.id,
-              round: fixture.round,
-              homeClubId: fixture.homeClubId,
-              awayClubId: fixture.awayClubId,
-              scheduledAt,
-              status: "SCHEDULED",
-            };
-          }),
-        });
-      }
 
       return {
         seasonId: season.id,
         targetRound,
-        lowerLeagueIds,
-        resetFixtures: deletedFixtures.count,
+        synchronizedLeagues: lowerLeagues.length,
+        resetFixtures: fixturesToReset.length,
+        playedFixtures: fixturesToSimulate.length,
         deletedEvents: deletedEvents.count,
         alreadySynchronized: false,
       };
@@ -224,68 +362,38 @@ export async function synchronizeWorldLeagueProgress(): Promise<WorldLeagueSynch
       timeout: 120000,
     }
   );
+}
 
-  let playedFixtures = 0;
+function simulateInitialFixture(fixture: {
+  id: number;
+  homeClubId: number;
+  awayClubId: number;
+}) {
+  const random = createSeededRandom(
+    fixture.id * 31 + fixture.homeClubId * 17 + fixture.awayClubId * 13
+  );
+  let homeScore = 0;
 
-  for (let round = 1; round <= preparation.targetRound; round += 1) {
-    const fixtures = await prisma.leagueFixture.findMany({
-      where: {
-        leagueId: {
-          in: preparation.lowerLeagueIds,
-        },
-        round,
-        status: "SCHEDULED",
-      },
-      orderBy: {
-        id: "asc",
-      },
-      select: {
-        id: true,
-        scheduledAt: true,
-      },
-    });
-
-    for (const fixture of fixtures) {
-      await playLeagueFixture({
-        fixtureId: fixture.id,
-        now: fixture.scheduledAt,
-      });
-      playedFixtures += 1;
+  for (let game = 0; game < 6; game += 1) {
+    if (random() < 0.52) {
+      homeScore += 1;
     }
   }
 
-  const unsynchronizedEntries = await prisma.leagueEntry.count({
-    where: {
-      leagueId: {
-        in: preparation.lowerLeagueIds,
-      },
-      NOT: {
-        played: preparation.targetRound,
-      },
-    },
-  });
-  const unsynchronizedLeagues = await prisma.league.count({
-    where: {
-      id: {
-        in: preparation.lowerLeagueIds,
-      },
-      NOT: {
-        currentRound: preparation.targetRound,
-      },
-    },
-  });
-
-  if (unsynchronizedEntries > 0 || unsynchronizedLeagues > 0) {
-    throw new Error("WORLD_LEAGUE_SYNCHRONIZATION_INCOMPLETE");
-  }
-
   return {
-    seasonId: preparation.seasonId,
-    targetRound: preparation.targetRound,
-    synchronizedLeagues: preparation.lowerLeagueIds.length,
-    resetFixtures: preparation.resetFixtures,
-    playedFixtures,
-    deletedEvents: preparation.deletedEvents,
-    alreadySynchronized: preparation.alreadySynchronized,
+    homeScore,
+    awayScore: 6 - homeScore,
+  };
+}
+
+function createSeededRandom(seed: number) {
+  let state = seed >>> 0;
+
+  return () => {
+    state += 0x6d2b79f5;
+    let value = state;
+    value = Math.imul(value ^ (value >>> 15), value | 1);
+    value ^= value + Math.imul(value ^ (value >>> 7), value | 61);
+    return ((value ^ (value >>> 14)) >>> 0) / 4294967296;
   };
 }
