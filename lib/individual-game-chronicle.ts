@@ -182,16 +182,18 @@ const SHOT_DEFINITIONS: ShotDefinition[] = [
   },
 ];
 
+const PALLINO_SHOT: ShotDefinition = {
+  key: "PALLINO",
+  name: "Giocata sul pallino",
+  family: "DIRECT",
+  difficulty: 3,
+  weights: { ITALIANA: 0, GORIZIANA: 0, TUTTI_DOPPI: 0 },
+};
+
 const FOUL_BASE_POINTS: Record<MatchSpecialty, number> = {
   ITALIANA: 2,
   GORIZIANA: 2,
   TUTTI_DOPPI: 4,
-};
-
-const FILOTTO_POINTS: Record<MatchSpecialty, number> = {
-  ITALIANA: 8,
-  GORIZIANA: 30,
-  TUTTI_DOPPI: 60,
 };
 
 export function buildIndividualGameChronicle({
@@ -322,6 +324,7 @@ export function buildIndividualGameChronicle({
     );
     const adverseEvent =
       rawShot.points > 0 &&
+      canBeAdverseEvent(specialty, rawShot.points) &&
       narrativeRandom() <
         getAdverseEventProbability(potentialOffender, adverseShot);
     const playerSide = adverseEvent
@@ -342,7 +345,7 @@ export function buildIndividualGameChronicle({
     const enrichedShot = {
       ...rawShot,
       playerSide,
-      shotName: getShotName(specialty, selectedShot, rawShot.points),
+      shotName: getShotName(selectedShot),
       shotFamily: selectedShot.family,
       outcome,
     };
@@ -586,7 +589,13 @@ function selectShot(
   points: number,
   random: () => number
 ) {
-  const candidates = SHOT_DEFINITIONS.map((shot) => {
+  if (specialty === "ITALIANA" && points === 3) {
+    return PALLINO_SHOT;
+  }
+
+  const candidates = SHOT_DEFINITIONS.filter((shot) =>
+    isShotScoreCompatible(specialty, shot, points)
+  ).map((shot) => {
     const familyRating =
       shot.family === "DIRECT" ? player.diretto : player.sponde;
     const creativityFactor =
@@ -615,6 +624,21 @@ function selectShot(
   return selectWeighted(candidates, random);
 }
 
+function isShotScoreCompatible(
+  specialty: MatchSpecialty,
+  shot: ShotDefinition,
+  points: number
+) {
+  if (points === 0) return true;
+
+  if (specialty === "GORIZIANA") {
+    if (shot.family === "DIRECT") return points <= 56;
+    return points % 4 === 0;
+  }
+
+  return true;
+}
+
 function getAdverseEventProbability(
   player: IndividualChroniclePlayerValues,
   shot: ShotDefinition
@@ -630,6 +654,10 @@ function getAdverseEventProbability(
     0.025,
     0.13
   );
+}
+
+function canBeAdverseEvent(specialty: MatchSpecialty, points: number) {
+  return specialty !== "ITALIANA" || points !== 3;
 }
 
 function getShotOutcome({
@@ -669,14 +697,8 @@ function getShotOutcome({
 }
 
 function getShotName(
-  specialty: MatchSpecialty,
   shot: ShotDefinition,
-  points: number
 ) {
-  if (shot.family === "DIRECT" && points === FILOTTO_POINTS[specialty]) {
-    return `${shot.name} · filotto`;
-  }
-
   return shot.name;
 }
 
@@ -861,12 +883,21 @@ function getOutcomeCommentary(
             random
           )
         : "";
+    const pallino =
+      specialty === "ITALIANA" && shot.points % 2 === 1
+        ? " Nel totale entrano anche i 3 punti del pallino preso dall'avversaria."
+        : "";
 
-    return `${capitalize(foul)} sul ${shotDefinition.name.toLowerCase()}: ${consequence}.${placement}`;
+    return `${capitalize(foul)} sul ${shotDefinition.name.toLowerCase()}: ${consequence}.${pallino}${placement}`;
   }
 
   if (shot.outcome === "OWN_BALL_PINS") {
-    return `${shotDefinition.name}: sui birilli passa la propria. I ${shot.points} punti vanno all'avversario e il gioco prosegue.`;
+    const pallino =
+      specialty === "ITALIANA" && shot.points % 2 === 1
+        ? " L'avversaria prende anche il pallino da 3."
+        : "";
+
+    return `${shotDefinition.name}: sui birilli passa la propria.${pallino} I ${shot.points} punti vanno all'avversario e il gioco prosegue.`;
   }
 
   const scoringPhrase =
@@ -914,35 +945,159 @@ function getScoringPhrase(
   points: number,
   random: () => number
 ) {
-  if (shot.family === "DIRECT" && points === FILOTTO_POINTS[specialty]) {
-    return `trova il filotto da ${points} punti`;
+  if (specialty === "ITALIANA") {
+    return getItalianScoringPhrase(shot, points, random);
   }
 
-  if (specialty === "GORIZIANA" && shot.family === "CUSHION") {
+  if (specialty === "GORIZIANA") {
+    return getGorizianaScoringPhrase(shot, points, random);
+  }
+
+  return getTuttiDoppiScoringPhrase(shot, points, random);
+}
+
+const ITALIAN_PIN_TOTALS = [0, 2, 4, 6, 8, 10, 12] as const;
+
+function getItalianScoringPhrase(
+  shot: ShotDefinition,
+  points: number,
+  random: () => number
+) {
+  if (points === 3) {
+    return "l'avversaria prende il pallino e realizza gli unici 3 punti possibili";
+  }
+
+  const pallinoOptions = [0, 3, 4].filter((pallinoPoints) =>
+    ITALIAN_PIN_TOTALS.includes(
+      (points - pallinoPoints) as (typeof ITALIAN_PIN_TOTALS)[number]
+    )
+  );
+  const pallinoPoints =
+    points % 2 === 1
+      ? 3
+      : selectWeighted(
+          pallinoOptions.map((value) => ({
+            value,
+            weight: value === 0 ? 4 : 1,
+          })),
+          random
+        );
+  const pinPoints = points - pallinoPoints;
+  const pinPhrase = getItalianPinPhrase(shot, pinPoints, random);
+
+  if (pallinoPoints === 0) return `${pinPhrase} per ${points} punti`;
+
+  const pallinoPhrase =
+    pallinoPoints === 3
+      ? "l'avversaria prende anche il pallino da 3"
+      : "dopo il primo contatto la battente prende anche il pallino da 4";
+
+  if (pinPoints === 0) return `${pallinoPhrase} e realizza ${points} punti`;
+  return `${pinPhrase}; ${pallinoPhrase}, totale ${points}`;
+}
+
+function getItalianPinPhrase(
+  shot: ShotDefinition,
+  points: number,
+  random: () => number
+) {
+  if (points === 0) return "non abbatte birilli";
+  if (points === 2) return "cade un birillo laterale";
+  if (points === 4) return "cadono due birilli laterali";
+  if (points === 6) {
     return selectTemplate(
       [
-        `il conteggio di sponda raddoppia i birilli e porta ${points} punti`,
-        `l'arrivo di sponda vale doppio e produce ${points} punti`,
+        "cadono tre laterali",
+        "il rosso cade insieme a un laterale",
       ],
       random
     );
   }
+  if (points === 8) {
+    return shot.family === "DIRECT"
+      ? "trova il filotto da 8"
+      : "cadono quattro laterali";
+  }
+  if (points === 10) {
+    return selectTemplate(
+      [
+        "trova la ciliegia con il rosso abbattuto da solo",
+        "il rosso cade insieme a tre laterali",
+      ],
+      random
+    );
+  }
+  return "attraversa tutto il castello";
+}
 
-  if (
-    (shot.key === "GIRO" || shot.key === "GIRONE") &&
-    points <= MATCH_SHOT_SCORES[specialty][2]
-  ) {
-    return `cerca la ciliegia e raccoglie ${points} punti`;
+function getGorizianaScoringPhrase(
+  shot: ShotDefinition,
+  points: number,
+  random: () => number
+) {
+  const multiplier = shot.family === "CUSHION" ? 2 : 1;
+  const basePoints = points / multiplier;
+  const forceFilotto = shot.family === "DIRECT" && points === 30;
+  const pallinoPossible = basePoints >= 6 && basePoints <= 56;
+  const pallinoPoints =
+    basePoints > 50
+      ? 6
+      : !forceFilotto && pallinoPossible && random() < 0.18
+        ? 6
+        : 0;
+  const pinPoints = basePoints - pallinoPoints;
+  let action: string;
+
+  if (forceFilotto) {
+    action = "trova il filotto da 30";
+  } else if (pinPoints === 0) {
+    action = "trova soltanto il pallino";
+  } else if (pinPoints === 50) {
+    action = "porta giù l'intero castello";
+  } else {
+    action = `realizza ${pinPoints} punti di birilli`;
   }
 
-  return selectTemplate(
-    [
-      `l'arrivo sul castello produce ${points} punti`,
-      `la quantità è buona e arrivano ${points} punti`,
-      `il passaggio sui birilli vale ${points} punti`,
-    ],
-    random
-  );
+  if (pallinoPoints > 0 && pinPoints > 0) {
+    action += " e aggiunge i 6 punti del pallino";
+  }
+
+  return multiplier === 2
+    ? `${action}; il tiro di sponda raddoppia il conteggio fino a ${points}`
+    : `${action} per un totale di ${points} punti`;
+}
+
+function getTuttiDoppiScoringPhrase(
+  shot: ShotDefinition,
+  points: number,
+  random: () => number
+) {
+  const forceFilotto = shot.family === "DIRECT" && points === 60;
+  const pallinoPossible = points >= 12;
+  const pallinoPoints =
+    points > 100
+      ? 12
+      : !forceFilotto && pallinoPossible && random() < 0.16
+        ? 12
+        : 0;
+  const pinPoints = points - pallinoPoints;
+  let action: string;
+
+  if (forceFilotto) {
+    action = "trova il filotto da 60";
+  } else if (pinPoints === 0) {
+    action = "trova soltanto il pallino da 12";
+  } else if (pinPoints === 100) {
+    action = "porta giù l'intero castello da 100";
+  } else {
+    action = `realizza ${pinPoints} punti di birilli`;
+  }
+
+  if (pallinoPoints > 0 && pinPoints > 0) {
+    action += " e aggiunge i 12 punti del pallino";
+  }
+
+  return `${action}, totale ${points}`;
 }
 
 function getChroniclePhase(index: number, totalShots: number) {
