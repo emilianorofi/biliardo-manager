@@ -534,6 +534,76 @@ test("calcola falli e pallino dell'Italiana soltanto con valori pari", () => {
   assert.ok(foulsWithPallino > 0);
 });
 
+test("limita i realizzi dei tiri dell'Italiana a una sola passata", () => {
+  const onePassShots = new Set([
+    "Raddrizzo",
+    "Rovescio",
+    "Traversino piano",
+    "Giro",
+    "Girone",
+    "Angolo di prima",
+    "Angolo di seconda",
+    "Striscio",
+    "Candela",
+    "Sponda-biglia",
+    "Bricolla",
+    "Garuffa",
+    "Mezza garuffa",
+    "Gancio",
+    "Parabola",
+    "Tre sponde di calcio",
+    "Cinque sponde di calcio",
+  ]);
+  let sixPointSinglePasses = 0;
+  let garuffaShots = 0;
+
+  for (let gameId = 1180; gameId < 1280; gameId += 1) {
+    const chronicle = buildIndividualGameChronicle(
+      withChroniclePlayers({
+        gameId,
+        specialty: "ITALIANA" as const,
+        winnerSide: "PLAYER_ONE" as const,
+        playerOneScore: 80,
+        playerTwoScore: 67,
+      })
+    );
+
+    for (const shot of chronicle) {
+      if (onePassShots.has(shot.shotName)) {
+        assert.notEqual(shot.points, 15);
+        assert.notEqual(shot.points, 16);
+        assert.doesNotMatch(shot.commentary, /cadono tre laterali/);
+        assert.doesNotMatch(shot.commentary, /attraversa tutto il castello/);
+        assert.doesNotMatch(shot.commentary, /punti per \d+ punti/);
+      }
+
+      if (
+        (shot.shotName === "Gancio" ||
+          shot.shotName === "Tre sponde di calcio") &&
+        shot.points === 6 &&
+        shot.playerSide === shot.scoringSide
+      ) {
+        sixPointSinglePasses += 1;
+        assert.match(
+          shot.commentary,
+          /rosso cade insieme a un birillo laterale|pallino/
+        );
+      }
+
+      if (
+        shot.shotName === "Garuffa" ||
+        shot.shotName === "Mezza garuffa"
+      ) {
+        garuffaShots += 1;
+        assert.ok(shot.points <= 12);
+      }
+    }
+  }
+
+  assert.ok(sixPointSinglePasses > 0);
+  assert.ok(garuffaShots > 50);
+});
+
 function createPlayer(id: number, rating: number): IndividualMatchPlayer {
   return {
     id,
