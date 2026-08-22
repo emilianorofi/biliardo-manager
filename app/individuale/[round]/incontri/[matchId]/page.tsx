@@ -3,8 +3,10 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import {
+  buildIndividualGameClosing,
   buildIndividualGameChronicle,
-  buildIndividualGameSummary,
+  buildIndividualGameIntroduction,
+  selectIndividualChronicleHighlights,
 } from "@/lib/individual-game-chronicle";
 import { INDIVIDUAL_MATCH_STAGES } from "@/lib/individual-tournament-calendar";
 import type { MatchSpecialty } from "@/lib/match-engine";
@@ -66,6 +68,13 @@ export default async function IndividualMatchDetailPage({
               name: true,
             },
           },
+          entries: {
+            select: {
+              playerId: true,
+              rankingAtDraw: true,
+              overallAtDraw: true,
+            },
+          },
         },
       },
       playerOne: {
@@ -120,6 +129,15 @@ export default async function IndividualMatchDetailPage({
 
   const playerOne = match.playerOne;
   const playerTwo = match.playerTwo;
+  const playerOneName = `${playerOne.firstName} ${playerOne.lastName}`;
+  const playerTwoName = `${playerTwo.firstName} ${playerTwo.lastName}`;
+  const playerOneEntry = match.tournament.entries.find(
+    (entry) => entry.playerId === playerOne.id
+  );
+  const playerTwoEntry = match.tournament.entries.find(
+    (entry) => entry.playerId === playerTwo.id
+  );
+  const venue = getIndividualVenue(match.id);
 
   return (
     <main className="space-y-4 text-zinc-100">
@@ -182,7 +200,8 @@ export default async function IndividualMatchDetailPage({
               <h2 className="text-lg font-black text-white">Partite</h2>
             </div>
             <p className="mt-1 text-xs text-zinc-500">
-              Seleziona una partita per leggere la cronaca tiro per tiro.
+              Seleziona una partita per leggere presentazione, momenti chiave ed
+              epilogo.
             </p>
           </div>
         </div>
@@ -222,18 +241,36 @@ export default async function IndividualMatchDetailPage({
                     game.playerTwoPerformanceRating,
                   playerOne,
                   playerTwo,
+                  playerOneName,
+                  playerTwoName,
                 });
                 const winnerSide = playerOneWon
                   ? "PLAYER_ONE"
                   : "PLAYER_TWO";
-                const winnerName = playerOneWon
-                  ? `${playerOne.firstName} ${playerOne.lastName}`
-                  : `${playerTwo.firstName} ${playerTwo.lastName}`;
-                const gameSummary = buildIndividualGameSummary({
-                  chronicle,
-                  winnerSide,
-                  winnerName,
+                const introduction = buildIndividualGameIntroduction({
+                  venue,
+                  tournamentName: match.tournament.name,
+                  stageLabel: formatStage(match.stage),
                   specialty: game.specialty as MatchSpecialty,
+                  playerOneName,
+                  playerTwoName,
+                  playerOneRanking: playerOneEntry?.rankingAtDraw,
+                  playerTwoRanking: playerTwoEntry?.rankingAtDraw,
+                  playerOneOverall: playerOneEntry?.overallAtDraw,
+                  playerTwoOverall: playerTwoEntry?.overallAtDraw,
+                });
+                const featuredChronicle =
+                  selectIndividualChronicleHighlights({
+                    chronicle,
+                    gameId: game.id,
+                  });
+                const closing = buildIndividualGameClosing({
+                  chronicle,
+                  specialty: game.specialty as MatchSpecialty,
+                  winnerSide,
+                  playerOneName,
+                  playerTwoName,
+                  gameOrder: game.order,
                 });
 
                 return (
@@ -276,26 +313,27 @@ export default async function IndividualMatchDetailPage({
                       <div className="mb-4 rounded-xl border border-amber-400/15 bg-amber-300/[0.04] px-4 py-3">
                         <div className="flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.16em] text-amber-300">
                           <Sparkles size={14} />
-                          La partita in breve
+                          Presentazione
                         </div>
-                        <p className="mt-2 text-sm font-medium leading-relaxed text-zinc-300">
-                          {gameSummary}
-                        </p>
+                        <div className="mt-2 space-y-1.5 text-sm font-medium leading-relaxed text-zinc-300">
+                          {introduction.map((line) => (
+                            <p key={line}>{line}</p>
+                          ))}
+                        </div>
                       </div>
 
                       <div className="grid grid-cols-[52px_minmax(0,1fr)_48px_72px] gap-2 border-b border-zinc-800 px-2 pb-2 text-[9px] font-black uppercase tracking-wider text-zinc-600 sm:grid-cols-[70px_minmax(0,1fr)_70px_96px] sm:gap-3">
-                        <span>Tiro</span>
-                        <span>Cronaca</span>
+                        <span>Momento</span>
+                        <span>Momenti chiave</span>
                         <span className="text-right">Punti</span>
                         <span className="text-right">Parziale</span>
                       </div>
 
                       <ol className="divide-y divide-zinc-800/70">
-                        {chronicle.map((shot, shotIndex) => {
+                        {featuredChronicle.map((shot, shotIndex) => {
                           const isPlayerOne =
                             shot.playerSide === "PLAYER_ONE";
-                          const isFinalShot =
-                            shotIndex === chronicle.length - 1;
+                          const isFinalShot = shot.highlight === "WINNER";
                           const playerName = isPlayerOne
                             ? `${playerOne.firstName} ${playerOne.lastName}`
                             : `${playerTwo.firstName} ${playerTwo.lastName}`;
@@ -307,7 +345,7 @@ export default async function IndividualMatchDetailPage({
                               : `${playerTwo.firstName} ${playerTwo.lastName}`;
 
                           const previousPhase =
-                            chronicle[shotIndex - 1]?.phase;
+                            featuredChronicle[shotIndex - 1]?.phase;
                           const startsNewPhase =
                             previousPhase !== shot.phase;
 
@@ -375,6 +413,18 @@ export default async function IndividualMatchDetailPage({
                           );
                         })}
                       </ol>
+
+                      <div className="mt-4 rounded-xl border border-emerald-400/15 bg-emerald-300/[0.04] px-4 py-3">
+                        <div className="flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.16em] text-emerald-300">
+                          <Sparkles size={14} />
+                          Epilogo
+                        </div>
+                        <div className="mt-2 space-y-1.5 text-sm font-medium leading-relaxed text-zinc-300">
+                          {closing.map((line) => (
+                            <p key={line}>{line}</p>
+                          ))}
+                        </div>
+                      </div>
                     </div>
                   </details>
                 );
@@ -424,4 +474,16 @@ function formatDateTime(value: Date) {
     hour: "2-digit",
     minute: "2-digit",
   }).format(value);
+}
+
+function getIndividualVenue(matchId: number) {
+  const venues = [
+    "La Sala Centrale · Tavolo 1",
+    "La Sala Federale · Tavolo 2",
+    "L'Arena del Circuito · Tavolo 3",
+    "La Sala Verde · Tavolo 4",
+    "La Sala Masters · Tavolo 5",
+  ];
+
+  return venues[Math.abs(matchId) % venues.length];
 }
