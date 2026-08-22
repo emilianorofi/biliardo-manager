@@ -14,6 +14,25 @@ export const MATCH_TARGET_POINTS: Record<MatchSpecialty, number> = {
   TUTTI_DOPPI: 600,
 };
 
+export const MATCH_SHOT_SCORES: Record<MatchSpecialty, readonly number[]> = {
+  ITALIANA: [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
+  GORIZIANA: [
+    2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36,
+    38, 40, 42, 44, 46, 48, 50, 52, 54, 56, 60, 64, 68, 72, 76, 80, 84, 88,
+    92, 96, 100, 104, 108, 112,
+  ],
+  TUTTI_DOPPI: [
+    4, 8, 12, 16, 20, 24, 28, 32, 36, 40, 44, 48, 52, 56, 60, 64, 68, 72,
+    76, 80, 84, 88, 92, 96, 100, 104, 108, 112,
+  ],
+};
+
+export const MATCH_TOTAL_SCORE_STEP: Record<MatchSpecialty, number> = {
+  ITALIANA: 1,
+  GORIZIANA: 2,
+  TUTTI_DOPPI: 4,
+};
+
 export type MatchPlayerValues = {
   precisione: number;
   diretto: number;

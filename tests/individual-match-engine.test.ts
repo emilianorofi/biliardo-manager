@@ -8,6 +8,7 @@ import {
   simulateIndividualBestOfThree,
   type IndividualMatchPlayer,
 } from "../lib/individual-match-engine";
+import { MATCH_SHOT_SCORES } from "../lib/match-engine";
 
 test("qualifica esattamente i primi 256 giocatori per overall", () => {
   const players = Array.from({ length: 260 }, (_, index) =>
@@ -111,7 +112,7 @@ test("usa il traguardo punti previsto da ogni specialità", () => {
       playerTwoPerformanceRating: 80,
       randomValue: 0.5,
     }),
-    { playerOneScore: 329, playerTwoScore: 400 }
+    { playerOneScore: 330, playerTwoScore: 400 }
   );
   assert.deepEqual(
     calculateIndividualGameScore({
@@ -121,8 +122,23 @@ test("usa il traguardo punti previsto da ogni specialità", () => {
       playerTwoPerformanceRating: 70,
       randomValue: 0.5,
     }),
-    { playerOneScore: 600, playerTwoScore: 493 }
+    { playerOneScore: 600, playerTwoScore: 492 }
   );
+});
+
+test("conserva i punteggi ammessi per ogni singolo tiro", () => {
+  assert.deepEqual(MATCH_SHOT_SCORES.ITALIANA, [
+    2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
+  ]);
+  assert.deepEqual(MATCH_SHOT_SCORES.GORIZIANA, [
+    2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36,
+    38, 40, 42, 44, 46, 48, 50, 52, 54, 56, 60, 64, 68, 72, 76, 80, 84, 88,
+    92, 96, 100, 104, 108, 112,
+  ]);
+  assert.deepEqual(MATCH_SHOT_SCORES.TUTTI_DOPPI, [
+    4, 8, 12, 16, 20, 24, 28, 32, 36, 40, 44, 48, 52, 56, 60, 64, 68, 72,
+    76, 80, 84, 88, 92, 96, 100, 104, 108, 112,
+  ]);
 });
 
 function createPlayer(id: number, rating: number): IndividualMatchPlayer {

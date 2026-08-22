@@ -1,6 +1,8 @@
 import {
   calculatePlayerPerformance,
+  MATCH_SHOT_SCORES,
   MATCH_TARGET_POINTS,
+  MATCH_TOTAL_SCORE_STEP,
   type MatchPerformancePlayerValues,
   type MatchSpecialty,
 } from "@/lib/match-engine";
@@ -159,10 +161,16 @@ export function calculateIndividualGameScore({
     0.42,
     0.96
   );
-  const loserScore = clamp(
+  const rawLoserScore = clamp(
     Math.round(targetPoints * losingShare),
-    1,
+    MATCH_SHOT_SCORES[specialty][0],
     targetPoints - 1
+  );
+  const scoreStep = MATCH_TOTAL_SCORE_STEP[specialty];
+  const loserScore = clamp(
+    Math.round(rawLoserScore / scoreStep) * scoreStep,
+    MATCH_SHOT_SCORES[specialty][0],
+    targetPoints - scoreStep
   );
 
   return winnerSide === "PLAYER_ONE"
