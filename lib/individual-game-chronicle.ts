@@ -4,25 +4,194 @@ import {
   type MatchSpecialty,
 } from "@/lib/match-engine";
 
-export type IndividualChroniclePlayerSide =
-  | "PLAYER_ONE"
-  | "PLAYER_TWO";
+export type IndividualChroniclePlayerSide = "PLAYER_ONE" | "PLAYER_TWO";
+
+export type IndividualChroniclePlayerValues = {
+  precisione: number;
+  diretto: number;
+  sponde: number;
+  tattica: number;
+  mentalita: number;
+  difesa: number;
+  realizzazione: number;
+  creativita: number;
+  misura: number;
+  form: number;
+  morale: number;
+  experience: number;
+};
+
+type ShotFamily = "DIRECT" | "CUSHION";
+
+type ShotDefinition = {
+  key: string;
+  name: string;
+  family: ShotFamily;
+  difficulty: number;
+  weights: Record<MatchSpecialty, number>;
+};
+
+export type IndividualChronicleShotOutcome =
+  | "COMPLETE"
+  | "PARTIAL_POINTS"
+  | "PARTIAL_DEFENSE"
+  | "ERROR"
+  | "FOUL"
+  | "OWN_BALL_PINS";
 
 export type IndividualChronicleShot = {
   order: number;
   playerSide: IndividualChroniclePlayerSide;
+  scoringSide: IndividualChroniclePlayerSide;
+  shotName: string;
+  shotFamily: ShotFamily;
+  outcome: IndividualChronicleShotOutcome;
   points: number;
   playerOneTotal: number;
   playerTwoTotal: number;
   phase: "OPENING" | "MIDDLE" | "FINISH";
   commentary: string;
-  highlight: "NONE" | "MISS" | "LEAD_CHANGE" | "BIG_SHOT" | "WINNER";
+  highlight:
+    | "NONE"
+    | "MISS"
+    | "FOUL"
+    | "LEAD_CHANGE"
+    | "BIG_SHOT"
+    | "WINNER";
 };
 
-const CHRONICLE_ATTEMPTS: Record<MatchSpecialty, number> = {
-  ITALIANA: 13,
-  GORIZIANA: 16,
-  TUTTI_DOPPI: 18,
+const SHOT_DEFINITIONS: ShotDefinition[] = [
+  {
+    key: "RADDRIZZO",
+    name: "Raddrizzo",
+    family: "DIRECT",
+    difficulty: 2,
+    weights: { ITALIANA: 18, GORIZIANA: 10, TUTTI_DOPPI: 17 },
+  },
+  {
+    key: "ROVESCIO",
+    name: "Rovescio",
+    family: "DIRECT",
+    difficulty: 2,
+    weights: { ITALIANA: 15, GORIZIANA: 11, TUTTI_DOPPI: 17 },
+  },
+  {
+    key: "TRAVERSINO",
+    name: "Traversino",
+    family: "DIRECT",
+    difficulty: 3,
+    weights: { ITALIANA: 12, GORIZIANA: 4, TUTTI_DOPPI: 7 },
+  },
+  {
+    key: "GIRO",
+    name: "Giro",
+    family: "DIRECT",
+    difficulty: 3,
+    weights: { ITALIANA: 11, GORIZIANA: 4, TUTTI_DOPPI: 6 },
+  },
+  {
+    key: "GIRONE",
+    name: "Girone",
+    family: "DIRECT",
+    difficulty: 4,
+    weights: { ITALIANA: 7, GORIZIANA: 3, TUTTI_DOPPI: 4 },
+  },
+  {
+    key: "ANGOLO_PRIMA",
+    name: "Angolo di prima",
+    family: "DIRECT",
+    difficulty: 3,
+    weights: { ITALIANA: 5, GORIZIANA: 3, TUTTI_DOPPI: 5 },
+  },
+  {
+    key: "ANGOLO_SECONDA",
+    name: "Angolo di seconda",
+    family: "DIRECT",
+    difficulty: 4,
+    weights: { ITALIANA: 3, GORIZIANA: 2, TUTTI_DOPPI: 3 },
+  },
+  {
+    key: "STRISCIO",
+    name: "Striscio",
+    family: "DIRECT",
+    difficulty: 3,
+    weights: { ITALIANA: 5, GORIZIANA: 4, TUTTI_DOPPI: 7 },
+  },
+  {
+    key: "CANDELA",
+    name: "Candela",
+    family: "CUSHION",
+    difficulty: 3,
+    weights: { ITALIANA: 5, GORIZIANA: 4, TUTTI_DOPPI: 4 },
+  },
+  {
+    key: "SPONDA_BIGLIA",
+    name: "Sponda-biglia",
+    family: "CUSHION",
+    difficulty: 3,
+    weights: { ITALIANA: 5, GORIZIANA: 14, TUTTI_DOPPI: 10 },
+  },
+  {
+    key: "BRICOLLA",
+    name: "Bricolla",
+    family: "CUSHION",
+    difficulty: 3,
+    weights: { ITALIANA: 13, GORIZIANA: 18, TUTTI_DOPPI: 12 },
+  },
+  {
+    key: "GARUFFA",
+    name: "Garuffa",
+    family: "CUSHION",
+    difficulty: 4,
+    weights: { ITALIANA: 8, GORIZIANA: 11, TUTTI_DOPPI: 8 },
+  },
+  {
+    key: "MEZZA_GARUFFA",
+    name: "Mezza garuffa",
+    family: "CUSHION",
+    difficulty: 3,
+    weights: { ITALIANA: 7, GORIZIANA: 9, TUTTI_DOPPI: 8 },
+  },
+  {
+    key: "GANCIO",
+    name: "Gancio",
+    family: "CUSHION",
+    difficulty: 4,
+    weights: { ITALIANA: 3, GORIZIANA: 5, TUTTI_DOPPI: 4 },
+  },
+  {
+    key: "PARABOLA",
+    name: "Parabola",
+    family: "CUSHION",
+    difficulty: 5,
+    weights: { ITALIANA: 2, GORIZIANA: 3, TUTTI_DOPPI: 3 },
+  },
+  {
+    key: "TRE_SPONDE_CALCIO",
+    name: "Tre sponde di calcio",
+    family: "CUSHION",
+    difficulty: 3,
+    weights: { ITALIANA: 8, GORIZIANA: 15, TUTTI_DOPPI: 9 },
+  },
+  {
+    key: "CINQUE_SPONDE_CALCIO",
+    name: "Cinque sponde di calcio",
+    family: "CUSHION",
+    difficulty: 4,
+    weights: { ITALIANA: 5, GORIZIANA: 9, TUTTI_DOPPI: 5 },
+  },
+];
+
+const FOUL_BASE_POINTS: Record<MatchSpecialty, number> = {
+  ITALIANA: 2,
+  GORIZIANA: 2,
+  TUTTI_DOPPI: 4,
+};
+
+const FILOTTO_POINTS: Record<MatchSpecialty, number> = {
+  ITALIANA: 8,
+  GORIZIANA: 30,
+  TUTTI_DOPPI: 60,
 };
 
 export function buildIndividualGameChronicle({
@@ -31,12 +200,20 @@ export function buildIndividualGameChronicle({
   winnerSide,
   playerOneScore,
   playerTwoScore,
+  playerOnePerformanceRating,
+  playerTwoPerformanceRating,
+  playerOne,
+  playerTwo,
 }: {
   gameId: number;
   specialty: MatchSpecialty;
   winnerSide: IndividualChroniclePlayerSide;
   playerOneScore: number;
   playerTwoScore: number;
+  playerOnePerformanceRating: number;
+  playerTwoPerformanceRating: number;
+  playerOne: IndividualChroniclePlayerValues;
+  playerTwo: IndividualChroniclePlayerValues;
 }) {
   const allowedScores = MATCH_SHOT_SCORES[specialty];
   const random = createSeededRandom(
@@ -45,17 +222,34 @@ export function buildIndividualGameChronicle({
   const narrativeRandom = createSeededRandom(
     gameId * 193 + playerOneScore * 29 + playerTwoScore * 43
   );
-  const playerOneAttempts = CHRONICLE_ATTEMPTS[specialty];
-  const playerTwoAttempts =
+  const playerOneRawAttempts = getAttemptCount(
+    specialty,
+    playerOneScore,
+    playerOnePerformanceRating,
+    random
+  );
+  const playerTwoRawAttempts = getAttemptCount(
+    specialty,
+    playerTwoScore,
+    playerTwoPerformanceRating,
+    random
+  );
+  const pairedAttempts = Math.max(
+    playerOneRawAttempts,
     winnerSide === "PLAYER_ONE"
-      ? CHRONICLE_ATTEMPTS[specialty] - 1
-      : CHRONICLE_ATTEMPTS[specialty];
+      ? playerTwoRawAttempts + 1
+      : playerTwoRawAttempts
+  );
+  const playerOneAttempts = pairedAttempts;
+  const playerTwoAttempts =
+    winnerSide === "PLAYER_ONE" ? pairedAttempts - 1 : pairedAttempts;
   const playerOneShots = distributeScore({
     total: playerOneScore,
     attempts: playerOneAttempts,
     allowedScores,
     requireLastScore: winnerSide === "PLAYER_ONE",
-    minimumMisses: 2,
+    minimumMisses: getMinimumMisses(specialty, playerOneAttempts, playerOne),
+    missProbability: getMissProbability(specialty, playerOne),
     random,
   });
   const playerTwoShots = distributeScore({
@@ -63,40 +257,47 @@ export function buildIndividualGameChronicle({
     attempts: playerTwoAttempts,
     allowedScores,
     requireLastScore: winnerSide === "PLAYER_TWO",
-    minimumMisses: 2,
+    minimumMisses: getMinimumMisses(specialty, playerTwoAttempts, playerTwo),
+    missProbability: getMissProbability(specialty, playerTwo),
     random,
   });
-  const chronicle: Array<
-    Omit<IndividualChronicleShot, "phase" | "commentary" | "highlight">
+  const rawChronicle: Array<
+    Omit<
+      IndividualChronicleShot,
+      | "phase"
+      | "commentary"
+      | "highlight"
+      | "shotName"
+      | "shotFamily"
+      | "outcome"
+    >
   > = [];
   let playerOneTotal = 0;
   let playerTwoTotal = 0;
 
-  for (
-    let attemptIndex = 0;
-    attemptIndex < Math.max(playerOneShots.length, playerTwoShots.length);
-    attemptIndex += 1
-  ) {
-    const playerOnePoints = playerOneShots[attemptIndex];
+  for (let index = 0; index < playerOneAttempts; index += 1) {
+    const playerOnePoints = playerOneShots[index];
 
     if (playerOnePoints !== undefined) {
       playerOneTotal += playerOnePoints;
-      chronicle.push({
-        order: chronicle.length + 1,
+      rawChronicle.push({
+        order: rawChronicle.length + 1,
         playerSide: "PLAYER_ONE",
+        scoringSide: "PLAYER_ONE",
         points: playerOnePoints,
         playerOneTotal,
         playerTwoTotal,
       });
     }
 
-    const playerTwoPoints = playerTwoShots[attemptIndex];
+    const playerTwoPoints = playerTwoShots[index];
 
     if (playerTwoPoints !== undefined) {
       playerTwoTotal += playerTwoPoints;
-      chronicle.push({
-        order: chronicle.length + 1,
+      rawChronicle.push({
+        order: rawChronicle.length + 1,
         playerSide: "PLAYER_TWO",
+        scoringSide: "PLAYER_TWO",
         points: playerTwoPoints,
         playerOneTotal,
         playerTwoTotal,
@@ -104,15 +305,51 @@ export function buildIndividualGameChronicle({
     }
   }
 
-  return chronicle.map((shot, index) => {
-    const previousShot = chronicle[index - 1];
+  return rawChronicle.map((rawShot, index) => {
+    const previousShot = rawChronicle[index - 1];
     const previousPlayerOneTotal = previousShot?.playerOneTotal ?? 0;
     const previousPlayerTwoTotal = previousShot?.playerTwoTotal ?? 0;
-    const isFinalShot = index === chronicle.length - 1;
-    const phase = getChroniclePhase(index, chronicle.length);
+    const isFinalShot = index === rawChronicle.length - 1;
+    const scoringPlayer =
+      rawShot.scoringSide === "PLAYER_ONE" ? playerOne : playerTwo;
+    const potentialOffender =
+      rawShot.scoringSide === "PLAYER_ONE" ? playerTwo : playerOne;
+    const adverseShot = selectShot(
+      specialty,
+      potentialOffender,
+      rawShot.points,
+      narrativeRandom
+    );
+    const adverseEvent =
+      rawShot.points > 0 &&
+      narrativeRandom() <
+        getAdverseEventProbability(potentialOffender, adverseShot);
+    const playerSide = adverseEvent
+      ? oppositeSide(rawShot.scoringSide)
+      : rawShot.scoringSide;
+    const actingPlayer = adverseEvent ? potentialOffender : scoringPlayer;
+    const selectedShot = adverseEvent
+      ? adverseShot
+      : selectShot(specialty, actingPlayer, rawShot.points, narrativeRandom);
+    const outcome = getShotOutcome({
+      specialty,
+      shot: selectedShot,
+      player: actingPlayer,
+      points: rawShot.points,
+      adverseEvent,
+      random: narrativeRandom,
+    });
+    const enrichedShot = {
+      ...rawShot,
+      playerSide,
+      shotName: getShotName(specialty, selectedShot, rawShot.points),
+      shotFamily: selectedShot.family,
+      outcome,
+    };
     const narrative = buildShotNarrative({
       specialty,
-      shot,
+      shot: enrichedShot,
+      shotDefinition: selectedShot,
       previousPlayerOneTotal,
       previousPlayerTwoTotal,
       isFinalShot,
@@ -120,11 +357,87 @@ export function buildIndividualGameChronicle({
     });
 
     return {
-      ...shot,
-      phase,
+      ...enrichedShot,
+      phase: getChroniclePhase(index, rawChronicle.length),
       ...narrative,
     };
   });
+}
+
+function getAttemptCount(
+  specialty: MatchSpecialty,
+  total: number,
+  performanceRating: number,
+  random: () => number
+) {
+  const rating = clamp(performanceRating, 1, 100);
+  const expectedAverage: Record<MatchSpecialty, number> = {
+    ITALIANA: 1.25 + rating * 0.032,
+    GORIZIANA: 4.5 + rating * 0.115,
+    TUTTI_DOPPI: 7 + rating * 0.16,
+  };
+  const variation = 0.9 + random() * 0.2;
+  const minimumAttempts: Record<MatchSpecialty, number> = {
+    ITALIANA: 16,
+    GORIZIANA: 22,
+    TUTTI_DOPPI: 26,
+  };
+
+  return Math.max(
+    minimumAttempts[specialty],
+    Math.ceil(total / (expectedAverage[specialty] * variation))
+  );
+}
+
+function getMinimumMisses(
+  specialty: MatchSpecialty,
+  attempts: number,
+  player: IndividualChroniclePlayerValues
+) {
+  return Math.max(
+    3,
+    Math.round(attempts * getMissProbability(specialty, player) * 0.72)
+  );
+}
+
+function getMissProbability(
+  specialty: MatchSpecialty,
+  player: IndividualChroniclePlayerValues
+) {
+  const execution = getExecutionRating(player, specialty);
+  const base: Record<MatchSpecialty, number> = {
+    ITALIANA: 0.4,
+    GORIZIANA: 0.44,
+    TUTTI_DOPPI: 0.42,
+  };
+
+  return clamp(base[specialty] + (50 - execution) * 0.0022, 0.25, 0.55);
+}
+
+function getExecutionRating(
+  player: IndividualChroniclePlayerValues,
+  specialty: MatchSpecialty
+) {
+  const specialtySkill =
+    specialty === "ITALIANA"
+      ? player.diretto
+      : specialty === "GORIZIANA"
+        ? player.sponde
+        : player.diretto * 0.65 + player.sponde * 0.35;
+  const condition =
+    (clamp(player.form, 1, 10) + clamp(player.morale, 1, 10)) * 2;
+
+  return clamp(
+    player.precisione * 0.32 +
+      specialtySkill * 0.32 +
+      player.misura * 0.14 +
+      player.mentalita * 0.1 +
+      player.realizzazione * 0.08 +
+      clamp(player.experience, 0, 100) * 0.02 +
+      condition * 0.02,
+    1,
+    100
+  );
 }
 
 function distributeScore({
@@ -133,6 +446,7 @@ function distributeScore({
   allowedScores,
   requireLastScore,
   minimumMisses,
+  missProbability,
   random,
 }: {
   total: number;
@@ -140,6 +454,7 @@ function distributeScore({
   allowedScores: readonly number[];
   requireLastScore: boolean;
   minimumMisses: number;
+  missProbability: number;
   random: () => number;
 }) {
   const memo = new Map<string, boolean>();
@@ -187,15 +502,14 @@ function distributeScore({
       throw new Error("INDIVIDUAL_CHRONICLE_SCORE_NOT_REPRESENTABLE");
     }
 
-    const missProbability = Math.max(
-      0.14,
-      remainingMisses / (remainingAttempts + 1)
-    );
+    const requiredMissProbability =
+      remainingMisses / Math.max(1, remainingAttempts + 1);
     const canMiss = feasibleScores.includes(0);
-    const shouldMiss = canMiss && random() < missProbability;
+    const shouldMiss =
+      canMiss && random() < Math.max(requiredMissProbability, missProbability);
     const scoringOptions = feasibleScores.filter((score) => score > 0);
     const average = remaining / Math.max(1, remainingAttempts + 1);
-    const desiredScore = average * (0.75 + random() * 0.5);
+    const desiredScore = average * (0.62 + random() * 0.56);
     const selectedScore = shouldMiss
       ? 0
       : (scoringOptions.length > 0 ? scoringOptions : feasibleScores).reduce(
@@ -266,6 +580,106 @@ function canRepresent(
   return representable;
 }
 
+function selectShot(
+  specialty: MatchSpecialty,
+  player: IndividualChroniclePlayerValues,
+  points: number,
+  random: () => number
+) {
+  const candidates = SHOT_DEFINITIONS.map((shot) => {
+    const familyRating =
+      shot.family === "DIRECT" ? player.diretto : player.sponde;
+    const creativityFactor =
+      shot.difficulty >= 4
+        ? 0.65 + clamp(player.creativita, 0, 100) / 180
+        : 1;
+    const tacticalFactor = 0.8 + clamp(player.tattica, 0, 100) / 250;
+    const gorizianaHighScoreFactor =
+      specialty === "GORIZIANA" && points > 56
+        ? shot.family === "CUSHION"
+          ? 2.4
+          : 0
+        : 1;
+
+    return {
+      value: shot,
+      weight:
+        shot.weights[specialty] *
+        (0.7 + clamp(familyRating, 0, 100) / 170) *
+        creativityFactor *
+        tacticalFactor *
+        gorizianaHighScoreFactor,
+    };
+  }).filter((candidate) => candidate.weight > 0);
+
+  return selectWeighted(candidates, random);
+}
+
+function getAdverseEventProbability(
+  player: IndividualChroniclePlayerValues,
+  shot: ShotDefinition
+) {
+  const pressureControl =
+    player.precisione * 0.55 +
+    player.mentalita * 0.25 +
+    clamp(player.experience, 0, 100) * 0.1 +
+    clamp(player.form, 1, 10);
+
+  return clamp(
+    0.018 + (100 - pressureControl) * 0.00065 + shot.difficulty * 0.006,
+    0.025,
+    0.13
+  );
+}
+
+function getShotOutcome({
+  specialty,
+  shot,
+  player,
+  points,
+  adverseEvent,
+  random,
+}: {
+  specialty: MatchSpecialty;
+  shot: ShotDefinition;
+  player: IndividualChroniclePlayerValues;
+  points: number;
+  adverseEvent: boolean;
+  random: () => number;
+}): IndividualChronicleShotOutcome {
+  if (adverseEvent) {
+    const foulProbability =
+      shot.key === "PARABOLA" ? 0.72 : 0.42 + shot.difficulty * 0.04;
+
+    return random() < foulProbability ? "FOUL" : "OWN_BALL_PINS";
+  }
+
+  const defenseRating =
+    player.misura * 0.45 + player.difesa * 0.35 + player.tattica * 0.2;
+  const bigShotPenalty = isBigShot(specialty, points) ? 0.08 : 0;
+  const defenseProbability = clamp(
+    0.2 + defenseRating * 0.006 - shot.difficulty * 0.035 - bigShotPenalty,
+    0.18,
+    0.78
+  );
+  const goodDefense = random() < defenseProbability;
+
+  if (points > 0) return goodDefense ? "COMPLETE" : "PARTIAL_POINTS";
+  return goodDefense ? "PARTIAL_DEFENSE" : "ERROR";
+}
+
+function getShotName(
+  specialty: MatchSpecialty,
+  shot: ShotDefinition,
+  points: number
+) {
+  if (shot.family === "DIRECT" && points === FILOTTO_POINTS[specialty]) {
+    return `${shot.name} · filotto`;
+  }
+
+  return shot.name;
+}
+
 export function buildIndividualGameSummary({
   chronicle,
   winnerSide,
@@ -288,10 +702,7 @@ export function buildIndividualGameSummary({
   for (const shot of chronicle) {
     const leader = getLeader(shot.playerOneTotal, shot.playerTwoTotal);
 
-    if (leader && currentLeader && leader !== currentLeader) {
-      leadChanges += 1;
-    }
-
+    if (leader && currentLeader && leader !== currentLeader) leadChanges += 1;
     if (leader) currentLeader = leader;
 
     const winnerDeficit =
@@ -302,8 +713,15 @@ export function buildIndividualGameSummary({
   }
 
   const targetPoints = MATCH_TARGET_POINTS[specialty];
-  const zeroPointShots = chronicle.filter((shot) => shot.points === 0).length;
   const biggestShot = Math.max(...chronicle.map((shot) => shot.points));
+  const partialShots = chronicle.filter(
+    (shot) =>
+      shot.outcome === "PARTIAL_POINTS" ||
+      shot.outcome === "PARTIAL_DEFENSE"
+  ).length;
+  const adverseEvents = chronicle.filter(
+    (shot) => shot.outcome === "FOUL" || shot.outcome === "OWN_BALL_PINS"
+  ).length;
   const finalScore = `${finalShot.playerOneTotal}–${finalShot.playerTwoTotal}`;
   const comeback = winnerMaximumDeficit >= targetPoints * 0.15;
   let opening: string;
@@ -313,35 +731,37 @@ export function buildIndividualGameSummary({
   } else if (leadChanges >= 3) {
     opening = `Il comando cambia ${leadChanges} volte prima dello strappo decisivo di ${winnerName}.`;
   } else {
-    opening = `${winnerName} costruisce il successo con pazienza, alternando misura, difesa e accelerazioni.`;
+    opening = `${winnerName} costruisce il successo alternando realizzazione, misura e difesa.`;
   }
 
   const middle = isBigShot(specialty, biggestShot)
-    ? `Il colpo più pesante vale ${biggestShot} punti, ma la differenza nasce soprattutto nella continuità.`
-    : `${zeroPointShots} tiri non muovono il punteggio: la posizione conta quanto l'attacco.`;
+    ? `Il colpo più pesante vale ${biggestShot} punti; ${partialShots} giocate riescono invece soltanto a metà.`
+    : `${partialShots} giocate riescono soltanto a metà: non sempre punti e difesa arrivano insieme.`;
+  const discipline =
+    adverseEvents > 0
+      ? ` Gli errori che assegnano punti all'avversario sono ${adverseEvents}.`
+      : " Nessuno regala punti con falli o passaggi della propria sui birilli.";
 
-  return `${opening} ${middle} Il tiro decisivo da ${finalShot.points} punti fissa il ${finalScore}.`;
-}
+  const closing =
+    finalShot.playerSide === finalShot.scoringSide
+      ? `Il tiro decisivo da ${finalShot.points} punti fissa il ${finalScore}.`
+      : `L'errore decisivo assegna ${finalShot.points} punti e fissa il ${finalScore}.`;
 
-function getChroniclePhase(index: number, totalShots: number) {
-  if (index < Math.ceil(totalShots * 0.25)) return "OPENING" as const;
-  if (index >= Math.floor(totalShots * 0.75)) return "FINISH" as const;
-  return "MIDDLE" as const;
+  return `${opening} ${middle}${discipline} ${closing}`;
 }
 
 function buildShotNarrative({
   specialty,
   shot,
+  shotDefinition,
   previousPlayerOneTotal,
   previousPlayerTwoTotal,
   isFinalShot,
   random,
 }: {
   specialty: MatchSpecialty;
-  shot: Omit<
-    IndividualChronicleShot,
-    "phase" | "commentary" | "highlight"
-  >;
+  shot: Omit<IndividualChronicleShot, "phase" | "commentary" | "highlight">;
+  shotDefinition: ShotDefinition;
   previousPlayerOneTotal: number;
   previousPlayerTwoTotal: number;
   isFinalShot: boolean;
@@ -351,10 +771,7 @@ function buildShotNarrative({
     previousPlayerOneTotal,
     previousPlayerTwoTotal
   );
-  const currentLeader = getLeader(
-    shot.playerOneTotal,
-    shot.playerTwoTotal
-  );
+  const currentLeader = getLeader(shot.playerOneTotal, shot.playerTwoTotal);
   const tied =
     shot.playerOneTotal === shot.playerTwoTotal &&
     shot.playerOneTotal > 0 &&
@@ -364,35 +781,37 @@ function buildShotNarrative({
     currentLeader !== null &&
     previousLeader !== currentLeader;
   const previousDeficit =
-    shot.playerSide === "PLAYER_ONE"
+    shot.scoringSide === "PLAYER_ONE"
       ? previousPlayerTwoTotal - previousPlayerOneTotal
       : previousPlayerOneTotal - previousPlayerTwoTotal;
   const currentDeficit =
-    shot.playerSide === "PLAYER_ONE"
+    shot.scoringSide === "PLAYER_ONE"
       ? shot.playerTwoTotal - shot.playerOneTotal
       : shot.playerOneTotal - shot.playerTwoTotal;
-  let commentary = selectShotCommentary(specialty, shot.points, random);
+  let commentary = getOutcomeCommentary(
+    specialty,
+    shot,
+    shotDefinition,
+    random
+  );
   let highlight: IndividualChronicleShot["highlight"] = "NONE";
 
-  if (shot.points === 0) highlight = "MISS";
-  if (isBigShot(specialty, shot.points)) highlight = "BIG_SHOT";
+  if (shot.outcome === "ERROR") highlight = "MISS";
+  if (shot.outcome === "FOUL" || shot.outcome === "OWN_BALL_PINS") {
+    highlight = "FOUL";
+  } else if (isBigShot(specialty, shot.points)) {
+    highlight = "BIG_SHOT";
+  }
 
   if (tied) {
-    commentary += selectTemplate(
-      [
-        " Aggancio perfetto: il tabellone torna in parità.",
-        " Tutto da rifare: i due giocatori sono di nuovo appaiati.",
-      ],
-      random
-    );
+    commentary += " Il tabellone torna in parità.";
     highlight = "LEAD_CHANGE";
   } else if (leadChanged) {
     commentary += selectTemplate(
       [
-        " Sorpasso: cambia il comando della partita.",
-        " Controsorpasso immediato: nessuno riesce a scappare.",
-        " Nuovo ribaltamento, con il pubblico dentro la partita.",
-        " Il margine era sottile e ora il comando passa di mano.",
+        " È sorpasso: cambia il comando della partita.",
+        " Il margine si rovescia e la pressione passa sull'altra sedia.",
+        " Nuovo cambio al comando, con la partita ancora apertissima.",
       ],
       random
     );
@@ -406,98 +825,130 @@ function buildShotNarrative({
   }
 
   if (isFinalShot) {
-    commentary += " È il colpo che chiude la partita.";
+    commentary +=
+      shot.playerSide === shot.scoringSide
+        ? " È il tiro che chiude la partita."
+        : " Sono i punti assegnati che chiudono la partita.";
     highlight = "WINNER";
   }
 
   return { commentary, highlight };
 }
 
-function selectShotCommentary(
+function getOutcomeCommentary(
   specialty: MatchSpecialty,
+  shot: Omit<IndividualChronicleShot, "phase" | "commentary" | "highlight">,
+  shotDefinition: ShotDefinition,
+  random: () => number
+) {
+  if (shot.outcome === "FOUL") {
+    const basePoints = FOUL_BASE_POINTS[specialty];
+    const foul =
+      shotDefinition.key === "PARABOLA" || random() < 0.45
+        ? "steccaccia"
+        : "mancato contatto";
+    const consequence =
+      shot.points > basePoints
+        ? `ai ${basePoints} punti di fallo si sommano i birilli, per un totale di ${shot.points} assegnati all'avversario`
+        : `sono ${shot.points} punti assegnati all'avversario`;
+    const placement =
+      foul === "mancato contatto"
+        ? selectTemplate(
+            [
+              " L'avversario sceglie di ripartire dall'acchito.",
+              " L'avversario preferisce lasciare le bilie dove sono.",
+            ],
+            random
+          )
+        : "";
+
+    return `${capitalize(foul)} sul ${shotDefinition.name.toLowerCase()}: ${consequence}.${placement}`;
+  }
+
+  if (shot.outcome === "OWN_BALL_PINS") {
+    return `${shotDefinition.name}: sui birilli passa la propria. I ${shot.points} punti vanno all'avversario e il gioco prosegue.`;
+  }
+
+  const scoringPhrase =
+    shot.points > 0
+      ? getScoringPhrase(specialty, shotDefinition, shot.points, random)
+      : "i birilli non si muovono";
+
+  if (shot.outcome === "COMPLETE") {
+    return `${shotDefinition.name}: ${scoringPhrase} e la rimanenza è coperta. Tiro completo.`;
+  }
+
+  if (shot.outcome === "PARTIAL_POINTS") {
+    return `${shotDefinition.name}: ${scoringPhrase}, ma la difesa non riesce. Tiro preso per metà e replica possibile.`;
+  }
+
+  if (shot.outcome === "PARTIAL_DEFENSE") {
+    return `${shotDefinition.name}: ${scoringPhrase}, però la misura salva il turno. Tiro preso per metà, con il castello a protezione.`;
+  }
+
+  const measureError =
+    shotDefinition.key === "TRE_SPONDE_CALCIO" ||
+    shotDefinition.key === "CINQUE_SPONDE_CALCIO"
+      ? selectTemplate(
+          [
+            "La bilia avversaria resta corta e concede un diretto semplice.",
+            "La bilia avversaria corre lunga oltre il castello e resta visibile.",
+          ],
+          random
+        )
+      : selectTemplate(
+          [
+            "La quantità non è quella cercata e rimane un tavolo leggibile.",
+            "L'esecuzione sfila: niente punti e nessuna copertura.",
+            "Il tiro arriva soltanto vicino alla linea voluta e lascia una replica comoda.",
+          ],
+          random
+        );
+
+  return `${shotDefinition.name}: ${measureError}`;
+}
+
+function getScoringPhrase(
+  specialty: MatchSpecialty,
+  shot: ShotDefinition,
   points: number,
   random: () => number
 ) {
-  if (points === 0) {
+  if (shot.family === "DIRECT" && points === FILOTTO_POINTS[specialty]) {
+    return `trova il filotto da ${points} punti`;
+  }
+
+  if (specialty === "GORIZIANA" && shot.family === "CUSHION") {
     return selectTemplate(
       [
-        "Cerca il castello, ma la traiettoria sfila: nessun punto e tavolo all'avversario.",
-        "Tiro soprattutto difensivo: il punteggio non si muove, la posizione però resta scomoda.",
-        "La misura non è quella voluta e i birilli restano fermi.",
-        "Prova a forzare l'angolo, senza trovare il passaggio giusto sul castello.",
+        `il conteggio di sponda raddoppia i birilli e porta ${points} punti`,
+        `l'arrivo di sponda vale doppio e produce ${points} punti`,
       ],
       random
     );
   }
 
-  const band = getShotBand(specialty, points);
-  const templates: Record<MatchSpecialty, Record<typeof band, string[]>> = {
-    ITALIANA: {
-      LOW: [
-        "Tocco sottile sul castello: pochi punti e grande attenzione alla misura.",
-        "Gioca semplice, raccoglie il necessario e lascia una posizione controllata.",
-        "Impatto leggero sui birilli: bottino contenuto, ma nessun rischio inutile.",
-      ],
-      MEDIUM: [
-        "Esecuzione pulita: buona quantità e biglia avversaria accompagnata lontano.",
-        "Trova bene il primo impatto e dà ritmo alla propria rimonta.",
-        "Tiro preciso, con il giusto equilibrio tra punti e difesa.",
-      ],
-      HIGH: [
-        "Gran passaggio sul castello: il parziale cambia improvvisamente velocità.",
-        "Colpo di qualità, pieno e ben misurato: arriva un bottino pesante.",
-        "La biglia entra con l'angolo giusto e il castello si apre.",
-      ],
-      EXCEPTIONAL: [
-        "Tutto il castello: esecuzione perfetta e massimo raccolto possibile.",
-        "Una giocata da applausi, precisa dall'impatto fino all'ultimo birillo.",
-      ],
-    },
-    GORIZIANA: {
-      LOW: [
-        "Passaggio controllato: qualche birillo e posizione ancora tutta da costruire.",
-        "Preferisce la misura alla forza e raccoglie un piccolo vantaggio.",
-        "Tiro prudente, utile soprattutto per non concedere una replica comoda.",
-      ],
-      MEDIUM: [
-        "Impatto pieno sul castello: un buon bottino senza perdere il controllo.",
-        "Trova una linea efficace e aggiunge punti importanti al proprio parziale.",
-        "La quantità è corretta: esecuzione concreta e tavolo ben gestito.",
-      ],
-      HIGH: [
-        "Serie pesante sui birilli: il pubblico si accende e la partita cambia tono.",
-        "Colpo coraggioso e ben riuscito, con un parziale che pesa sull'incontro.",
-        "Il castello viene attraversato in pieno: accelerazione improvvisa.",
-      ],
-      EXCEPTIONAL: [
-        "Una giocata spettacolare: il castello esplode e arriva un punteggio enorme.",
-        "Tiro da fuoriclasse, potenza e precisione si incontrano alla perfezione.",
-      ],
-    },
-    TUTTI_DOPPI: {
-      LOW: [
-        "Sfrutta il doppio conteggio con prudenza, senza forzare la posizione.",
-        "Pochi birilli coinvolti, ma il tiro resta ordinato e ben misurato.",
-        "Giocata essenziale: qualche punto e biglia avversaria tenuta a distanza.",
-      ],
-      MEDIUM: [
-        "Il doppio conteggio premia una traiettoria pulita e ben costruita.",
-        "Buon impatto sul castello: il parziale cresce con regolarità.",
-        "Esecuzione solida, senza eccessi ma con un risultato importante.",
-      ],
-      HIGH: [
-        "Tiro pesante: i punti doppi fanno impennare il tabellone.",
-        "Grande lettura dell'angolo e raccolto consistente sul castello.",
-        "Accelera nel momento giusto con una giocata di notevole difficoltà.",
-      ],
-      EXCEPTIONAL: [
-        "Colpo devastante a tutti doppi: il parziale viene completamente riscritto.",
-        "Una bordata da applausi, trasformata in un bottino eccezionale.",
-      ],
-    },
-  };
+  if (
+    (shot.key === "GIRO" || shot.key === "GIRONE") &&
+    points <= MATCH_SHOT_SCORES[specialty][2]
+  ) {
+    return `cerca la ciliegia e raccoglie ${points} punti`;
+  }
 
-  return selectTemplate(templates[specialty][band], random);
+  return selectTemplate(
+    [
+      `l'arrivo sul castello produce ${points} punti`,
+      `la quantità è buona e arrivano ${points} punti`,
+      `il passaggio sui birilli vale ${points} punti`,
+    ],
+    random
+  );
+}
+
+function getChroniclePhase(index: number, totalShots: number) {
+  if (index < Math.ceil(totalShots * 0.25)) return "OPENING" as const;
+  if (index >= Math.floor(totalShots * 0.75)) return "FINISH" as const;
+  return "MIDDLE" as const;
 }
 
 function getShotBand(specialty: MatchSpecialty, points: number) {
@@ -515,13 +966,7 @@ function getShotBand(specialty: MatchSpecialty, points: number) {
 }
 
 function isBigShot(specialty: MatchSpecialty, points: number) {
-  const thresholds: Record<MatchSpecialty, number> = {
-    ITALIANA: 13,
-    GORIZIANA: 60,
-    TUTTI_DOPPI: 72,
-  };
-
-  return points >= thresholds[specialty];
+  return getShotBand(specialty, points) === "EXCEPTIONAL";
 }
 
 function getLeader(
@@ -532,8 +977,38 @@ function getLeader(
   return playerOneTotal > playerTwoTotal ? "PLAYER_ONE" : "PLAYER_TWO";
 }
 
+function oppositeSide(side: IndividualChroniclePlayerSide) {
+  return side === "PLAYER_ONE" ? "PLAYER_TWO" : "PLAYER_ONE";
+}
+
+function selectWeighted<T>(
+  candidates: Array<{ value: T; weight: number }>,
+  random: () => number
+) {
+  const totalWeight = candidates.reduce(
+    (total, candidate) => total + candidate.weight,
+    0
+  );
+  let cursor = random() * totalWeight;
+
+  for (const candidate of candidates) {
+    cursor -= candidate.weight;
+    if (cursor <= 0) return candidate.value;
+  }
+
+  return candidates.at(-1)!.value;
+}
+
 function selectTemplate(templates: readonly string[], random: () => number) {
   return templates[Math.floor(random() * templates.length)] ?? templates[0];
+}
+
+function capitalize(value: string) {
+  return value.charAt(0).toUpperCase() + value.slice(1);
+}
+
+function clamp(value: number, minimum: number, maximum: number) {
+  return Math.min(maximum, Math.max(minimum, value));
 }
 
 function createSeededRandom(seed: number) {
