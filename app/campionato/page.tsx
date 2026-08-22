@@ -2,12 +2,21 @@ import { getCurrentClubId } from "@/lib/current-club";
 import { getNextPlayableRound } from "@/lib/league-round";
 import { createLeagueTable } from "@/lib/league-table";
 import { prisma } from "@/lib/prisma";
+import LeagueSelector from "./LeagueSelector";
 
 export const dynamic = "force-dynamic";
 
-export default async function CampionatoPage() {
+type CampionatoPageProps = {
+  searchParams: Promise<{
+    league?: string | string[];
+  }>;
+};
+
+export default async function CampionatoPage({
+  searchParams,
+}: CampionatoPageProps) {
   const clubId = await getCurrentClubId();
-  const league = await prisma.league.findFirst({
+  const managedLeague = await prisma.league.findFirst({
     where: {
       status: {
         in: ["PREPARATION", "ACTIVE", "COMPLETED"],
@@ -20,6 +29,60 @@ export default async function CampionatoPage() {
     },
     orderBy: {
       id: "desc",
+    },
+    select: {
+      id: true,
+      seasonId: true,
+    },
+  });
+
+  if (!managedLeague) {
+    return (
+      <main className="rounded-2xl border border-zinc-800 bg-zinc-900 p-8 text-center text-zinc-100">
+        <h1 className="text-2xl font-black text-white">
+          Campionato non disponibile
+        </h1>
+
+        <p className="mt-2 text-sm text-zinc-400">
+          La tua squadra non è ancora iscritta a un campionato.
+        </p>
+      </main>
+    );
+  }
+
+  const availableLeagues = await prisma.league.findMany({
+    where: {
+      seasonId: managedLeague.seasonId,
+      status: {
+        in: ["PREPARATION", "ACTIVE", "COMPLETED"],
+      },
+    },
+    orderBy: [
+      { level: "asc" },
+      { groupCode: "asc" },
+    ],
+    select: {
+      id: true,
+      name: true,
+      level: true,
+      groupCode: true,
+    },
+  });
+  const requestedLeagueValue = (await searchParams).league;
+  const requestedLeagueId = Number.parseInt(
+    Array.isArray(requestedLeagueValue)
+      ? (requestedLeagueValue[0] ?? "")
+      : (requestedLeagueValue ?? ""),
+    10
+  );
+  const selectedLeagueId = availableLeagues.some(
+    (candidate) => candidate.id === requestedLeagueId
+  )
+    ? requestedLeagueId
+    : managedLeague.id;
+  const league = await prisma.league.findUnique({
+    where: {
+      id: selectedLeagueId,
     },
     include: {
       season: true,
@@ -100,11 +163,14 @@ export default async function CampionatoPage() {
           (fixture) => fixture.round === displayedRound
         );
 
+  const isManagedLeague = league.id === managedLeague.id;
   const recentClubFixtures = league.fixtures
     .filter(
       (fixture) =>
         fixture.status === "PLAYED" &&
-        (fixture.homeClub.id === clubId || fixture.awayClub.id === clubId)
+        (!isManagedLeague ||
+          fixture.homeClub.id === clubId ||
+          fixture.awayClub.id === clubId)
     )
     .sort(
       (first, second) =>
@@ -162,20 +228,28 @@ export default async function CampionatoPage() {
             </p>
           </div>
 
-          <div className="w-full max-w-xs rounded-xl border border-amber-400/20 bg-amber-400/5 px-4 py-3 lg:text-right">
-            <p className="text-[9px] font-bold uppercase tracking-wider text-zinc-500">
-              {league.status === "COMPLETED"
-                ? "Stagione"
-                : "Prossimo turno"}
-            </p>
+          <div className="grid w-full gap-3 sm:grid-cols-2 lg:max-w-xl">
+            <LeagueSelector
+              leagues={availableLeagues}
+              selectedLeagueId={league.id}
+              managedLeagueId={managedLeague.id}
+            />
 
-            <p className="mt-1 text-lg font-black text-amber-300">
-              {league.status === "COMPLETED"
-                ? "Campionato concluso"
-                : displayedRound === null
-                  ? "Da definire"
-                  : `Giornata ${displayedRound}`}
-            </p>
+            <div className="rounded-xl border border-amber-400/20 bg-amber-400/5 px-4 py-3 lg:text-right">
+              <p className="text-[9px] font-bold uppercase tracking-wider text-zinc-500">
+                {league.status === "COMPLETED"
+                  ? "Stagione"
+                  : "Prossimo turno"}
+              </p>
+
+              <p className="mt-1 text-lg font-black text-amber-300">
+                {league.status === "COMPLETED"
+                  ? "Campionato concluso"
+                  : displayedRound === null
+                    ? "Da definire"
+                    : `Giornata ${displayedRound}`}
+              </p>
+            </div>
           </div>
         </div>
       </header>
