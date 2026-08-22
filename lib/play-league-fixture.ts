@@ -294,12 +294,13 @@ export async function playLeagueFixture({
             status: completion.status,
           },
         });
-        const seasonCompletion =
-          await completeSeasonIfReady(
-            transaction,
-            fixture.league.seasonId,
-            { now }
-          );
+        const seasonCompletion = completion.isCompleted
+          ? await completeSeasonIfReady(
+              transaction,
+              fixture.league.seasonId,
+              { now }
+            )
+          : null;
 
         await transaction.gameEvent.create({
           data: {
@@ -319,6 +320,10 @@ export async function playLeagueFixture({
           updatedLeague,
           seasonCompletion,
         };
+      },
+      {
+        maxWait: 15000,
+        timeout: 60000,
       }
     );
 
