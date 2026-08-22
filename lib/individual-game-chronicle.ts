@@ -51,6 +51,7 @@ export type IndividualChronicleShot = {
   playerOneTotal: number;
   playerTwoTotal: number;
   phase: "OPENING" | "MIDDLE" | "FINISH";
+  technicalCommentary: string;
   commentary: string;
   highlight:
     | "NONE"
@@ -338,6 +339,7 @@ export function buildIndividualGameChronicle({
     Omit<
       IndividualChronicleShot,
       | "phase"
+      | "technicalCommentary"
       | "commentary"
       | "highlight"
       | "shotName"
@@ -932,7 +934,259 @@ export function selectIndividualChronicleHighlights({
     .map((index) => chronicle[index]);
 }
 
+export function buildIndividualGameBroadcast({
+  chronicle,
+  gameId,
+  specialty,
+  playerOneName,
+  playerTwoName,
+}: {
+  chronicle: IndividualChronicleShot[];
+  gameId: number;
+  specialty: MatchSpecialty;
+  playerOneName: string;
+  playerTwoName: string;
+}) {
+  const selectedShots = selectIndividualChronicleHighlights({
+    chronicle,
+    gameId,
+  });
+  const templateOffset = Math.floor(
+    createSeededRandom(gameId * 7_919 + 113)() * 997
+  );
+
+  return selectedShots.map((shot, selectedIndex) => {
+    const chronicleIndex = Math.max(
+      0,
+      chronicle.findIndex((candidate) => candidate.order === shot.order)
+    );
+    const previousShot = chronicle[chronicleIndex - 1] ?? null;
+    const previousSelectedShot = selectedShots[selectedIndex - 1] ?? null;
+    const playerName =
+      shot.playerSide === "PLAYER_ONE" ? playerOneName : playerTwoName;
+    const opponentName =
+      shot.playerSide === "PLAYER_ONE" ? playerTwoName : playerOneName;
+    const scoringPlayerName =
+      shot.scoringSide === "PLAYER_ONE" ? playerOneName : playerTwoName;
+
+    return {
+      ...shot,
+      commentary: buildBroadcastMoment({
+        shot,
+        previousShot,
+        previousSelectedShot,
+        chronicle,
+        chronicleIndex,
+        selectedIndex,
+        selectedCount: selectedShots.length,
+        specialty,
+        playerName,
+        opponentName,
+        scoringPlayerName,
+        templateOffset,
+      }),
+    };
+  });
+}
+
+function buildBroadcastMoment({
+  shot,
+  previousShot,
+  previousSelectedShot,
+  chronicle,
+  chronicleIndex,
+  selectedIndex,
+  selectedCount,
+  specialty,
+  playerName,
+  opponentName,
+  scoringPlayerName,
+  templateOffset,
+}: {
+  shot: IndividualChronicleShot;
+  previousShot: IndividualChronicleShot | null;
+  previousSelectedShot: IndividualChronicleShot | null;
+  chronicle: IndividualChronicleShot[];
+  chronicleIndex: number;
+  selectedIndex: number;
+  selectedCount: number;
+  specialty: MatchSpecialty;
+  playerName: string;
+  opponentName: string;
+  scoringPlayerName: string;
+  templateOffset: number;
+}) {
+  const target = MATCH_TARGET_POINTS[specialty];
+  const score = `${shot.playerOneTotal}–${shot.playerTwoTotal}`;
+  const technical = getBroadcastTechnicalDetail(shot);
+  const isFinal = shot.highlight === "WINNER";
+  const isTie =
+    shot.playerOneTotal === shot.playerTwoTotal && shot.playerOneTotal > 0;
+  const previousLeader = previousShot
+    ? getLeader(previousShot.playerOneTotal, previousShot.playerTwoTotal)
+    : null;
+  const currentLeader = getLeader(shot.playerOneTotal, shot.playerTwoTotal);
+  const isLeadChange =
+    previousLeader !== null &&
+    currentLeader !== null &&
+    previousLeader !== currentLeader;
+  const leaderScore = Math.max(shot.playerOneTotal, shot.playerTwoTotal);
+  const margin = Math.abs(shot.playerOneTotal - shot.playerTwoTotal);
+  const scorelessRun = countPreviousScorelessShots(chronicle, chronicleIndex);
+  const lateAndClose = leaderScore >= target * 0.7 && margin <= target * 0.12;
+  const selectionProgress =
+    selectedCount > 1 ? selectedIndex / (selectedCount - 1) : 1;
+
+  if (isFinal) {
+    if (shot.playerSide !== shot.scoringSide) {
+      return `Il tavolo sceglie il modo più amaro di chiudere. ${technical} Per un istante non si sente nulla: poi ${scoringPlayerName} guarda il tabellone, ${score}, e può finalmente lasciare uscire il respiro. È finita.`;
+    }
+
+    return selectBroadcastTemplate(
+      [
+        `Adesso il rumore della sala si spegne. ${playerName} resta in piedi, studia la chiusura e sa che questa bilia pesa più delle altre. ${technical} Le bilie si fermano, il tabellone dice ${score}: ${playerName} ce l'ha fatta.`,
+        `${playerName} torna al tavolo con la partita nelle mani. Niente fretta: un ultimo sguardo alla linea, un respiro, poi la stecca parte. ${technical} Sul ${score} si alzano gli applausi. È il punto che vale la partita.`,
+        `C'è un tiro per chiuderla e tutta la sala lo ha capito. ${playerName} prende tempo, si abbassa e non arretra. ${technical} Il ${score} è la sentenza finale: la tensione si scioglie tutta insieme.`,
+      ],
+      selectedIndex + templateOffset
+    );
+  }
+
+  if (shot.outcome === "FOUL" || shot.outcome === "OWN_BALL_PINS") {
+    const consequence =
+      selectionProgress > 0.65
+        ? `In questa fase non è soltanto un errore: sono punti e fiducia consegnati a ${scoringPlayerName}.`
+        : `Il regalo finisce sul tabellone di ${scoringPlayerName}, che ora può cambiare il tono della partita.`;
+
+    return `${selectBroadcastTemplate(
+      [
+        `La mano di ${playerName} tradisce proprio sul più delicato.`,
+        `${playerName} vede il disegno, ma nell'esecuzione qualcosa si spezza.`,
+        `È il primo vero colpo alla fiducia di ${playerName}.`,
+      ],
+      selectedIndex + templateOffset
+    )} ${technical} ${consequence} Il parziale è ${score}.`;
+  }
+
+  if (isTie) {
+    return `${playerName} rifiuta di lasciar scappare l'avversario. ${technical} Quando l'ultima bilia rallenta, sul tabellone c'è ${score}. Tutto da rifare, e adesso ogni scelta comincia a pesare.`;
+  }
+
+  if (isLeadChange || shot.highlight === "LEAD_CHANGE") {
+    return selectBroadcastTemplate(
+      [
+        `${playerName} non si accontenta di rientrare: vuole prendersi la partita. ${technical} Le cifre cambiano padrone, ${score}. Ora tocca a ${opponentName} trovare una risposta.`,
+        `La partita gira qui. ${playerName} riconosce il momento e non lo lascia passare: ${technical} Sul ${score} cambia chi comanda, e con il comando cambia anche il peso della prossima bilia.`,
+        `Sembrava un'altra fase favorevole a ${opponentName}; invece ${playerName} resta aggrappato al tavolo. ${technical} È sorpasso sul ${score}, con la sala che finalmente si accende.`,
+      ],
+      selectedIndex + templateOffset
+    );
+  }
+
+  if (lateAndClose) {
+    return selectBroadcastTemplate(
+      [
+        `Qui la stecca pesa. ${playerName} ha davanti un tiro che può spostare tutta la pressione e lo affronta senza scappare: ${technical} Il ${score} tiene entrambi dentro la partita; nessuno, ormai, può permettersi una bilia distratta.`,
+        `Siamo nel tratto in cui persino il silenzio sembra fare rumore. ${playerName} sceglie ${shot.shotName.toLowerCase()} e si prende il rischio: ${technical} Sul ${score} basta un dettaglio per cambiare tutto.`,
+      ],
+      selectedIndex + templateOffset
+    );
+  }
+
+  if (shot.highlight === "BIG_SHOT") {
+    return selectBroadcastTemplate(
+      [
+        `Questo è il colpo che sveglia la sala. ${playerName} vede una linea coraggiosa e la stecca con convinzione: ${technical} Sono ${shot.points} punti che valgono più del numero, perché obbligano ${opponentName} a inseguire sul ${score}.`,
+        `${playerName} sente che il tavolo gli sta offrendo qualcosa e decide di prenderlo. ${technical} Il pubblico accompagna le ultime corse delle bilie: il parziale sale a ${score} e la partita cambia temperatura.`,
+      ],
+      selectedIndex + templateOffset
+    );
+  }
+
+  if (shot.points === 0 && shot.outcome === "ERROR") {
+    const pause =
+      scorelessRun >= 2
+        ? `È un altro passaggio a vuoto, e la sedia sembra allontanarsi dal tavolo.`
+        : `Nessun punto: ${opponentName} si rialza e capisce di avere un'occasione.`;
+
+    return `${selectBroadcastTemplate(
+      [
+        `${playerName} rimane qualche secondo sulla linea, come se volesse convincersi che il varco esiste.`,
+        `La scelta di ${playerName} è ambiziosa, forse troppo per questo momento.`,
+        `Per la prima volta ${playerName} esita davvero prima di scendere sul tiro.`,
+      ],
+      selectedIndex + templateOffset
+    )} ${technical} ${pause}`;
+  }
+
+  if (shot.points === 0 && shot.outcome === "PARTIAL_DEFENSE") {
+    return `${playerName} non trova i birilli, ma non consegna il tavolo. ${technical} È una di quelle giocate che non fanno alzare il punteggio eppure costringono ${opponentName} a pensare: qui la pazienza conta quanto la realizzazione.`;
+  }
+
+  if (shot.outcome === "PARTIAL_POINTS") {
+    return selectBroadcastTemplate(
+      [
+        `${playerName} sceglie di attaccare e i punti arrivano. ${technical} Manca però il riparo: ${opponentName} resta con gli occhi sul tavolo e sa che può rispondere. Il parziale è ${score}.`,
+        `La realizzazione c'è, la protezione no. ${technical} ${playerName} aggiunge ${shot.points} punti, ma deve tornare alla sedia sapendo di aver lasciato una porta aperta a ${opponentName}.`,
+      ],
+      selectedIndex + templateOffset
+    );
+  }
+
+  if (shot.outcome === "COMPLETE") {
+    const controlLine =
+      previousSelectedShot?.scoringSide === shot.scoringSide
+        ? `${playerName} sta cucendo insieme punti e controllo; ${opponentName} fatica a spezzare il ritmo.`
+        : `${playerName} rimette la propria voce dentro la partita.`;
+
+    return selectBroadcastTemplate(
+      [
+        `${playerName} torna al tavolo con un'idea precisa. ${technical} Il punteggio va sul ${score}, ma soprattutto arriva una rimanenza che obbliga ${opponentName} a ricominciare da lontano. ${controlLine}`,
+        `Qui non basta fare punti: bisogna anche lasciare un problema. ${playerName} riesce in entrambe le cose. ${technical} Sul ${score} l'inerzia comincia a inclinarsi dalla sua parte.`,
+        `Niente gesto teatrale, solo una giocata pensata bene. ${technical} ${playerName} si prende ${shot.points} punti e una piccola porzione di tavolo; il ${score} racconta una partita che sta prendendo forma.`,
+      ],
+      selectedIndex + templateOffset
+    );
+  }
+
+  const openingMood =
+    selectionProgress < 0.25
+      ? `Sono ancora schermaglie, ma ${opponentName} ha già capito che ogni spazio verrà conteso.`
+      : `Non è lo strappo decisivo, è il modo con cui ${playerName} resta dentro la partita.`;
+
+  return `${playerName} prova a dare ritmo alla propria partita. ${technical} Il parziale diventa ${score}. ${openingMood}`;
+}
+
+function getBroadcastTechnicalDetail(shot: IndividualChronicleShot) {
+  return shot.technicalCommentary
+    .replace(/^.+? si prende il tavolo e cerca il tiro della chiusura\. /, "")
+    .replace(/ L'esecuzione riesce e la partita termina qui\.$/, "")
+    .replace(
+      "Giocata sul pallino: l'avversaria trova il pallino: 3 punti realizzati",
+      "L'avversaria trova il pallino: 3 punti"
+    );
+}
+
+function selectBroadcastTemplate(templates: string[], selectedIndex: number) {
+  return templates[Math.abs(selectedIndex) % templates.length];
+}
+
+function countPreviousScorelessShots(
+  chronicle: IndividualChronicleShot[],
+  chronicleIndex: number
+) {
+  let count = 0;
+
+  for (let index = chronicleIndex - 1; index >= 0; index -= 1) {
+    if (chronicle[index].points > 0) break;
+    count += 1;
+  }
+
+  return count;
+}
+
 export function buildIndividualGameIntroduction({
+  gameId,
   venue,
   tournamentName,
   stageLabel,
@@ -943,7 +1197,10 @@ export function buildIndividualGameIntroduction({
   playerTwoRanking,
   playerOneOverall,
   playerTwoOverall,
+  playerOne,
+  playerTwo,
 }: {
+  gameId?: number;
   venue: string;
   tournamentName: string;
   stageLabel: string;
@@ -954,8 +1211,11 @@ export function buildIndividualGameIntroduction({
   playerTwoRanking?: number | null;
   playerOneOverall?: number | null;
   playerTwoOverall?: number | null;
+  playerOne?: IndividualChroniclePlayerValues;
+  playerTwo?: IndividualChroniclePlayerValues;
 }) {
   const targetPoints = MATCH_TARGET_POINTS[specialty];
+  const random = createSeededRandom((gameId ?? 1) * 3_571 + 41);
   const rankingLine = getRankingIntroduction(
     playerOneName,
     playerTwoName,
@@ -968,14 +1228,37 @@ export function buildIndividualGameIntroduction({
     playerOneOverall,
     playerTwoOverall
   );
+  const styleLine = getStyleIntroduction(
+    playerOneName,
+    playerTwoName,
+    playerOne,
+    playerTwo,
+    specialty
+  );
+  const atmosphere = selectTemplate(
+    [
+      `${venue}: le voci si abbassano mentre le bilie vengono sistemate sul panno. Sta per cominciare la ${stageLabel.toLowerCase()} del ${tournamentName}.`,
+      `${venue}: luci ferme sul biliardo, pubblico vicino e quel brusio che precede soltanto le partite sentite. È ${stageLabel.toLowerCase()} del ${tournamentName}.`,
+      `${venue}: resta soltanto il rumore secco delle bilie di prova. ${stageLabel} del ${tournamentName}, adesso il tavolo è tutto per loro.`,
+    ],
+    random
+  );
+  const promise = selectTemplate(
+    [
+      `Si gioca a ${formatSpecialtyName(specialty)} fino a ${targetPoints}: ci sarà spazio per il coraggio, ma la partita finirà nelle mani di chi saprà restare lucido quando il tavolo diventerà pesante.`,
+      `${formatSpecialtyName(specialty)}, traguardo a ${targetPoints}. All'inizio parleranno le geometrie; più avanti conteranno il respiro, la scelta e la capacità di non arretrare.`,
+      `Il traguardo è a ${targetPoints} punti nella ${formatSpecialtyName(specialty)}. Ogni giocata può sembrare soltanto una linea sul panno, finché non arriva quella che cambia il cuore della partita.`,
+    ],
+    random
+  );
 
   return [
-    `${venue} ospita una delle sfide più attese di ${stageLabel.toLowerCase()} del ${tournamentName}.`,
+    atmosphere,
     `${playerOneName}${formatRankingSuffix(playerOneRanking)} affronta ${playerTwoName}${formatRankingSuffix(playerTwoRanking)}.`,
     rankingLine,
+    styleLine,
     overallLine,
-    `Si gioca a ${formatSpecialtyName(specialty)}, con traguardo fissato a ${targetPoints} punti: realizzazione e misura avranno lo stesso peso.`,
-    "Le prime battute serviranno a leggere il tavolo, ma ogni errore può cambiare subito l'inerzia della partita.",
+    promise,
   ];
 }
 
@@ -1028,35 +1311,46 @@ export function buildIndividualGameClosing({
     );
   const biggestShotPlayer =
     biggestShot?.playerSide === "PLAYER_TWO" ? playerTwoName : playerOneName;
-  const adverseEvents = chronicle.filter(
-    (shot) => shot.outcome === "FOUL" || shot.outcome === "OWN_BALL_PINS"
-  ).length;
   const finalScore = `${finalShot.playerOneTotal}–${finalShot.playerTwoTotal}`;
+  const finalMargin = Math.abs(
+    finalShot.playerOneTotal - finalShot.playerTwoTotal
+  );
+  const random = createSeededRandom(
+    gameOrder * 2_009 + finalShot.playerOneTotal * 17 + finalShot.playerTwoTotal
+  );
   const matchFlow =
     winnerMaximumDeficit >= targetPoints * 0.15
-      ? `${winnerName} completa una rimonta costruita senza perdere lucidità nei momenti più delicati.`
+      ? `${winnerName} era finito lontano, quasi fuori dalla partita. Non ha inseguito il punteggio: ha inseguito una bilia alla volta, finché la rimonta è diventata reale.`
       : leadChanges >= 3
-        ? `Il comando cambia ${leadChanges} volte, prima che ${winnerName} trovi l'allungo definitivo.`
-        : `${winnerName} prende progressivamente il controllo e non concede il rientro decisivo.`;
+        ? `Il comando è passato di mano ${leadChanges} volte. Nessuno ha accettato la sedia troppo a lungo, finché ${winnerName} ha trovato l'ultimo strappo.`
+        : `${winnerName} ha preso lentamente possesso del tavolo: prima la misura, poi i punti, infine quel controllo che ha tolto ossigeno alla risposta.`;
   const decisiveLine =
     finalShot.playerSide === finalShot.scoringSide
-      ? `${winnerName} riconosce il tiro della chiusura e lo realizza: il tabellone si ferma sul ${finalScore}.`
-      : `L'ultimo errore di ${loserName} assegna i punti decisivi e fissa il ${finalScore}.`;
+      ? `${winnerName} ha visto il tiro della chiusura, ha aspettato che il respiro tornasse calmo e lo ha giocato. Quando le bilie si sono fermate, il tabellone segnava ${finalScore}.`
+      : `L'ultima traiettoria di ${loserName} si è spenta nel modo peggiore. I punti sono andati dall'altra parte e il tabellone si è fermato sul ${finalScore}.`;
   const biggestLine = biggestShot
-    ? `Il colpo più pesante è il ${biggestShot.shotName.toLowerCase()} da ${biggestShot.points} punti firmato da ${biggestShotPlayer}.`
-    : "La partita si decide più sulla continuità che su una singola grande realizzazione.";
-  const disciplineLine =
-    adverseEvents > 0
-      ? `${adverseEvents} episodi tra falli e passaggi della propria sui birilli incidono sull'andamento del punteggio.`
-      : "Nessuno dei due regala punti con falli: la differenza nasce interamente dalle realizzazioni.";
+    ? `Resterà negli occhi anche il ${biggestShot.shotName.toLowerCase()} da ${biggestShot.points} di ${biggestShotPlayer}: il colpo che ha fatto cambiare rumore alla sala.`
+    : "Non c'è stato un solo colpo da ricordare: la differenza è nata dalla pazienza con cui è stata costruita ogni rimanenza.";
+  const loserLine =
+    finalMargin <= targetPoints * 0.12
+      ? `${loserName} rimane qualche secondo a guardare il panno. È arrivato a una manciata di punti, abbastanza vicino da sentire quanto brucia.`
+      : `${loserName} stringe la mano e saluta il tavolo. Il punteggio è severo, ma non racconta da solo tutta la resistenza messa dentro la partita.`;
+  const roomLine = selectTemplate(
+    [
+      `Per un istante resta soltanto silenzio. Poi arrivano gli applausi, mentre ${winnerName} lascia finalmente cadere la tensione dalle spalle.`,
+      `La sala esplode soltanto adesso. ${winnerName} chiude gli occhi per un attimo: tutta la pressione tenuta dentro può finalmente uscire.`,
+      `Prima un respiro collettivo, poi gli applausi. ${winnerName} si volta dal tavolo sapendo che questa partita gli resterà addosso.`,
+    ],
+    random
+  );
 
   return [
     decisiveLine,
+    roomLine,
     matchFlow,
     biggestLine,
-    disciplineLine,
-    `${loserName} resta in partita fino alla fase conclusiva, ma non trova l'ultima risposta utile.`,
-    `${winnerName} conquista così la partita ${gameOrder} dell'incontro.`,
+    loserLine,
+    `${winnerName} porta con sé la partita ${gameOrder}: non soltanto un punto nell'incontro, ma una storia conquistata bilia dopo bilia.`,
   ];
 }
 
@@ -1136,6 +1430,46 @@ function getOverallIntroduction(
   return `I valori alla vigilia sono ${roundedOne} contro ${roundedTwo}: ${strongerName} ha qualcosa in più sulla carta, non ancora sul biliardo.`;
 }
 
+function getStyleIntroduction(
+  playerOneName: string,
+  playerTwoName: string,
+  playerOne: IndividualChroniclePlayerValues | undefined,
+  playerTwo: IndividualChroniclePlayerValues | undefined,
+  specialty: MatchSpecialty
+) {
+  if (!playerOne || !playerTwo) {
+    return `${playerOneName} e ${playerTwoName} arrivano con armi diverse: la sfida sarà capire chi riuscirà a imporre per primo il proprio biliardo.`;
+  }
+
+  return `${describePlayerIdentity(playerOneName, playerOne, specialty)}; ${describePlayerIdentity(playerTwoName, playerTwo, specialty)}.`;
+}
+
+function describePlayerIdentity(
+  playerName: string,
+  player: IndividualChroniclePlayerValues,
+  specialty: MatchSpecialty
+) {
+  const qualities = [
+    { value: player.misura, phrase: "ama governare la misura" },
+    { value: player.difesa, phrase: "sa togliere aria all'avversario con la difesa" },
+    { value: player.realizzazione, phrase: "vive delle occasioni che riesce a trasformare" },
+    { value: player.mentalita, phrase: "ha nella tenuta mentale la sua forza" },
+    { value: player.tattica, phrase: "legge il tavolo qualche istante prima degli altri" },
+    { value: player.creativita, phrase: "non ha paura di inventare una linea" },
+    {
+      value: specialty === "GORIZIANA" ? player.sponde + 5 : player.sponde,
+      phrase: "si sente a casa quando entrano in gioco le sponde",
+    },
+    {
+      value: specialty === "TUTTI_DOPPI" ? player.diretto + 5 : player.diretto,
+      phrase: "può fare male appena vede un diretto",
+    },
+    { value: player.precisione, phrase: "costruisce tutto sulla precisione" },
+  ].sort((left, right) => right.value - left.value);
+
+  return `${playerName} ${qualities[0].phrase}`;
+}
+
 function formatRankingSuffix(ranking?: number | null) {
   return ranking ? `, numero ${ranking} del ranking` : "";
 }
@@ -1157,7 +1491,10 @@ function buildShotNarrative({
   random,
 }: {
   specialty: MatchSpecialty;
-  shot: Omit<IndividualChronicleShot, "phase" | "commentary" | "highlight">;
+  shot: Omit<
+    IndividualChronicleShot,
+    "phase" | "technicalCommentary" | "commentary" | "highlight"
+  >;
   shotDefinition: ShotDefinition;
   previousPlayerOneTotal: number;
   previousPlayerTwoTotal: number;
@@ -1187,7 +1524,7 @@ function buildShotNarrative({
     shot.scoringSide === "PLAYER_ONE"
       ? shot.playerTwoTotal - shot.playerOneTotal
       : shot.playerOneTotal - shot.playerTwoTotal;
-  let commentary = getOutcomeCommentary(
+  const technicalCommentary = getOutcomeCommentary(
     specialty,
     shot,
     shotDefinition,
@@ -1195,6 +1532,7 @@ function buildShotNarrative({
     actingPlayerName,
     random
   );
+  let commentary = technicalCommentary;
   let highlight: IndividualChronicleShot["highlight"] = "NONE";
 
   if (shot.outcome === "ERROR") highlight = "MISS";
@@ -1233,12 +1571,15 @@ function buildShotNarrative({
     highlight = "WINNER";
   }
 
-  return { commentary, highlight };
+  return { technicalCommentary, commentary, highlight };
 }
 
 function getOutcomeCommentary(
   specialty: MatchSpecialty,
-  shot: Omit<IndividualChronicleShot, "phase" | "commentary" | "highlight">,
+  shot: Omit<
+    IndividualChronicleShot,
+    "phase" | "technicalCommentary" | "commentary" | "highlight"
+  >,
   shotDefinition: ShotDefinition,
   isFinalShot: boolean,
   actingPlayerName: string,
