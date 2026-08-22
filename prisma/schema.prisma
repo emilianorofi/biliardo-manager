@@ -487,6 +487,8 @@ model IndividualTournamentMatch {
   status   String    @default("SCHEDULED")
   playedAt DateTime?
 
+  games IndividualTournamentGame[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -498,6 +500,28 @@ model IndividualTournamentMatch {
   @@index([playerOneId])
   @@index([playerTwoId])
   @@index([winnerPlayerId])
+}
+
+model IndividualTournamentGame {
+  id Int @id @default(autoincrement())
+
+  matchId Int
+  match   IndividualTournamentMatch @relation(fields: [matchId], references: [id], onDelete: Cascade)
+
+  order      Int
+  specialty  String
+  winnerSide String
+
+  playerOnePerformanceRating Float
+  playerTwoPerformanceRating Float
+
+  reconstructed Boolean @default(false)
+
+  createdAt DateTime @default(now())
+
+  @@unique([matchId, order])
+  @@index([matchId])
+  @@index([specialty])
 }
 
 model League {

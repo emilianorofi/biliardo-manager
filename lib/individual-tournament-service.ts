@@ -313,6 +313,21 @@ export async function playIndividualTournamentStage(
         )
         .join(", ");
 
+      await transaction.individualTournamentGame.createMany({
+        data: results.flatMap(({ match, result }) =>
+          result.games.map((game) => ({
+            matchId: match.id,
+            order: game.order,
+            specialty: game.specialty,
+            winnerSide: game.winnerSide,
+            playerOnePerformanceRating:
+              game.playerOnePerformanceRating,
+            playerTwoPerformanceRating:
+              game.playerTwoPerformanceRating,
+          }))
+        ),
+      });
+
       await transaction.$executeRawUnsafe(`
         UPDATE "IndividualTournamentMatch" AS tournament_match
         SET

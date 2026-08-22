@@ -33,9 +33,13 @@ export default async function PlayerPage({
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ from?: string }>;
+  searchParams: Promise<{
+    from?: string;
+    round?: string;
+    stage?: string;
+  }>;
 }) {
-  const [{ id }, { from }] = await Promise.all([
+  const [{ id }, { from, round, stage }] = await Promise.all([
     params,
     searchParams,
   ]);
@@ -138,14 +142,24 @@ export default async function PlayerPage({
         listing.status === "ACTIVE" ||
         listing.status === "PENDING_TRANSFER"
     ) ?? null;
-  const isVisiblePlayer =
-    databasePlayer !== null &&
-    (databasePlayer.clubId === clubId ||
-      currentListing !== null);
 
-  if (!databasePlayer || !isVisiblePlayer) {
+  if (!databasePlayer) {
     notFound();
   }
+
+  const individualRound = Number.parseInt(round ?? "", 10);
+  const comesFromIndividual =
+    from === "individuale" && Number.isInteger(individualRound);
+  const backHref = comesFromMarket
+    ? "/market"
+    : comesFromIndividual
+      ? `/individuale/${individualRound}${stage ? `?stage=${stage}` : ""}`
+      : "/players";
+  const backLabel = comesFromMarket
+    ? "Torna al mercato"
+    : comesFromIndividual
+      ? "Torna al tabellone"
+      : "Torna alla rosa";
 
 const playerAttributes: Player["attributes"] = {
   precisione: Math.round(databasePlayer.precisione),
@@ -229,13 +243,11 @@ const player: Player = {
     <main className="space-y-3">
       <header className="rounded-2xl border border-emerald-900/60 bg-[#15261f] p-3 sm:p-4">
         <Link
-          href={comesFromMarket ? "/market" : "/players"}
+          href={backHref}
           className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-300 transition hover:text-emerald-200"
         >
           <ArrowLeft size={14} />
-          {comesFromMarket
-            ? "Torna al mercato"
-            : "Torna alla rosa"}
+          {backLabel}
         </Link>
 
         <div className="mt-2 grid gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(340px,0.75fr)] lg:items-center">

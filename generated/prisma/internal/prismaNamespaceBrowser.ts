@@ -67,6 +67,7 @@ export const ModelName = {
   IndividualTournament: 'IndividualTournament',
   IndividualTournamentEntry: 'IndividualTournamentEntry',
   IndividualTournamentMatch: 'IndividualTournamentMatch',
+  IndividualTournamentGame: 'IndividualTournamentGame',
   League: 'League',
   LeagueEntry: 'LeagueEntry',
   LeagueFixture: 'LeagueFixture',
@@ -402,6 +403,21 @@ export const IndividualTournamentMatchScalarFieldEnum = {
 } as const
 
 export type IndividualTournamentMatchScalarFieldEnum = (typeof IndividualTournamentMatchScalarFieldEnum)[keyof typeof IndividualTournamentMatchScalarFieldEnum]
+
+
+export const IndividualTournamentGameScalarFieldEnum = {
+  id: 'id',
+  matchId: 'matchId',
+  order: 'order',
+  specialty: 'specialty',
+  winnerSide: 'winnerSide',
+  playerOnePerformanceRating: 'playerOnePerformanceRating',
+  playerTwoPerformanceRating: 'playerTwoPerformanceRating',
+  reconstructed: 'reconstructed',
+  createdAt: 'createdAt'
+} as const
+
+export type IndividualTournamentGameScalarFieldEnum = (typeof IndividualTournamentGameScalarFieldEnum)[keyof typeof IndividualTournamentGameScalarFieldEnum]
 
 
 export const LeagueScalarFieldEnum = {

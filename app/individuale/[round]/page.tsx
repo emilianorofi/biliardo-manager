@@ -302,6 +302,8 @@ export default async function IndividualBracketPage({
                     : undefined
                 }
                 currentClubId={clubId}
+                leagueRound={leagueRound}
+                selectedStage={selectedStage}
               />
             ))}
           </div>
@@ -386,12 +388,19 @@ function BracketMatchCard({
   playerOneEntry,
   playerTwoEntry,
   currentClubId,
+  leagueRound,
+  selectedStage,
 }: {
   match: BracketMatch;
   playerOneEntry?: BracketEntry;
   playerTwoEntry?: BracketEntry;
   currentClubId: number;
+  leagueRound: number;
+  selectedStage: string;
 }) {
+  const playerReturnQuery =
+    `from=individuale&round=${leagueRound}&stage=${selectedStage}`;
+
   return (
     <article className="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950/25">
       <div className="flex items-center justify-between border-b border-zinc-800 px-3 py-2">
@@ -414,6 +423,7 @@ function BracketMatchCard({
           score={match.playerOneWins}
           winner={match.winnerPlayerId === match.playerOneId}
           currentClubId={currentClubId}
+          returnQuery={playerReturnQuery}
         />
         <BracketPlayerRow
           player={match.playerTwo}
@@ -421,8 +431,18 @@ function BracketMatchCard({
           score={match.playerTwoWins}
           winner={match.winnerPlayerId === match.playerTwoId}
           currentClubId={currentClubId}
+          returnQuery={playerReturnQuery}
         />
       </div>
+
+      {match.status === "PLAYED" && (
+        <Link
+          href={`/individuale/${leagueRound}/incontri/${match.id}?stage=${selectedStage}`}
+          className="flex items-center justify-center gap-1 border-t border-zinc-800 px-3 py-2 text-[10px] font-black uppercase tracking-wider text-amber-300 transition hover:bg-amber-400/5 hover:text-amber-200"
+        >
+          Dettagli incontro <ChevronRight size={13} />
+        </Link>
+      )}
     </article>
   );
 }
@@ -433,12 +453,14 @@ function BracketPlayerRow({
   score,
   winner,
   currentClubId,
+  returnQuery,
 }: {
   player: BracketPlayer | null;
   entry?: BracketEntry;
   score: number;
   winner: boolean;
   currentClubId: number;
+  returnQuery: string;
 }) {
   const managedPlayer = player?.clubId === currentClubId;
 
@@ -453,13 +475,20 @@ function BracketPlayerRow({
           {player?.nationality ?? "·"}
         </span>
         <div className="min-w-0">
-          <p
-            className={`truncate text-xs font-black ${
-              winner ? "text-emerald-300" : "text-zinc-300"
-            }`}
-          >
-            {player ? `${player.firstName} ${player.lastName}` : "Da definire"}
-          </p>
+          {player ? (
+            <Link
+              href={`/players/${player.id}?${returnQuery}`}
+              className={`block truncate text-xs font-black transition hover:text-amber-200 ${
+                winner ? "text-emerald-300" : "text-zinc-300"
+              }`}
+            >
+              {player.firstName} {player.lastName}
+            </Link>
+          ) : (
+            <p className="truncate text-xs font-black text-zinc-300">
+              Da definire
+            </p>
+          )}
           {entry && (
             <p className="mt-0.5 text-[9px] text-zinc-600">
               Ranking #{entry.rankingAtDraw} · OVR {Math.round(entry.overallAtDraw)}

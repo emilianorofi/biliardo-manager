@@ -68,8 +68,9 @@ export function simulateIndividualBestOfThree(
   const specialties = getMatchSpecialties(tournamentType, random);
   let playerOneWins = 0;
   let playerTwoWins = 0;
+  const games = [];
 
-  for (const specialty of specialties) {
+  for (const [index, specialty] of specialties.entries()) {
     if (playerOneWins === 2 || playerTwoWins === 2) {
       break;
     }
@@ -93,6 +94,18 @@ export function simulateIndividualBestOfThree(
     } else {
       playerTwoWins += 1;
     }
+
+    games.push({
+      order: index + 1,
+      specialty,
+      winnerSide: result.winner === "HOME" ? "PLAYER_ONE" : "PLAYER_TWO",
+      winnerPlayerId:
+        result.winner === "HOME" ? playerOne.id : playerTwo.id,
+      playerOnePerformanceRating:
+        playerOnePerformance.performanceRating,
+      playerTwoPerformanceRating:
+        playerTwoPerformance.performanceRating,
+    });
   }
 
   return {
@@ -102,6 +115,7 @@ export function simulateIndividualBestOfThree(
       playerOneWins === 2 ? playerTwo.id : playerOne.id,
     playerOneWins,
     playerTwoWins,
+    games,
   };
 }
 

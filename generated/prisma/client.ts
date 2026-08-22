@@ -122,6 +122,11 @@ export type IndividualTournamentEntry = Prisma.IndividualTournamentEntryModel
  */
 export type IndividualTournamentMatch = Prisma.IndividualTournamentMatchModel
 /**
+ * Model IndividualTournamentGame
+ *
+ */
+export type IndividualTournamentGame = Prisma.IndividualTournamentGameModel
+/**
  * Model League
  *
  */

@@ -413,6 +413,7 @@ export const ModelName = {
   IndividualTournament: 'IndividualTournament',
   IndividualTournamentEntry: 'IndividualTournamentEntry',
   IndividualTournamentMatch: 'IndividualTournamentMatch',
+  IndividualTournamentGame: 'IndividualTournamentGame',
   League: 'League',
   LeagueEntry: 'LeagueEntry',
   LeagueFixture: 'LeagueFixture',
@@ -434,7 +435,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "club" | "manager" | "player" | "transferListing" | "transferBid" | "academyPlayer" | "formation" | "trainingPlan" | "trainingSession" | "trainingResult" | "clubWeeklyUpdate" | "gameEvent" | "season" | "individualTournament" | "individualTournamentEntry" | "individualTournamentMatch" | "league" | "leagueEntry" | "leagueFixture" | "leagueFixtureGame" | "playerFixtureAppearance" | "playerGamePerformance"
+    modelProps: "club" | "manager" | "player" | "transferListing" | "transferBid" | "academyPlayer" | "formation" | "trainingPlan" | "trainingSession" | "trainingResult" | "clubWeeklyUpdate" | "gameEvent" | "season" | "individualTournament" | "individualTournamentEntry" | "individualTournamentMatch" | "individualTournamentGame" | "league" | "leagueEntry" | "leagueFixture" | "leagueFixtureGame" | "playerFixtureAppearance" | "playerGamePerformance"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1622,6 +1623,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    IndividualTournamentGame: {
+      payload: Prisma.$IndividualTournamentGamePayload<ExtArgs>
+      fields: Prisma.IndividualTournamentGameFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.IndividualTournamentGameFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$IndividualTournamentGamePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.IndividualTournamentGameFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$IndividualTournamentGamePayload>
+        }
+        findFirst: {
+          args: Prisma.IndividualTournamentGameFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$IndividualTournamentGamePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.IndividualTournamentGameFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$IndividualTournamentGamePayload>
+        }
+        findMany: {
+          args: Prisma.IndividualTournamentGameFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$IndividualTournamentGamePayload>[]
+        }
+        create: {
+          args: Prisma.IndividualTournamentGameCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$IndividualTournamentGamePayload>
+        }
+        createMany: {
+          args: Prisma.IndividualTournamentGameCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.IndividualTournamentGameCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$IndividualTournamentGamePayload>[]
+        }
+        delete: {
+          args: Prisma.IndividualTournamentGameDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$IndividualTournamentGamePayload>
+        }
+        update: {
+          args: Prisma.IndividualTournamentGameUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$IndividualTournamentGamePayload>
+        }
+        deleteMany: {
+          args: Prisma.IndividualTournamentGameDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.IndividualTournamentGameUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.IndividualTournamentGameUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$IndividualTournamentGamePayload>[]
+        }
+        upsert: {
+          args: Prisma.IndividualTournamentGameUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$IndividualTournamentGamePayload>
+        }
+        aggregate: {
+          args: Prisma.IndividualTournamentGameAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateIndividualTournamentGame>
+        }
+        groupBy: {
+          args: Prisma.IndividualTournamentGameGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.IndividualTournamentGameGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.IndividualTournamentGameCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.IndividualTournamentGameCountAggregateOutputType> | number
+        }
+      }
+    }
     League: {
       payload: Prisma.$LeaguePayload<ExtArgs>
       fields: Prisma.LeagueFieldRefs
@@ -2418,6 +2493,21 @@ export const IndividualTournamentMatchScalarFieldEnum = {
 export type IndividualTournamentMatchScalarFieldEnum = (typeof IndividualTournamentMatchScalarFieldEnum)[keyof typeof IndividualTournamentMatchScalarFieldEnum]
 
 
+export const IndividualTournamentGameScalarFieldEnum = {
+  id: 'id',
+  matchId: 'matchId',
+  order: 'order',
+  specialty: 'specialty',
+  winnerSide: 'winnerSide',
+  playerOnePerformanceRating: 'playerOnePerformanceRating',
+  playerTwoPerformanceRating: 'playerTwoPerformanceRating',
+  reconstructed: 'reconstructed',
+  createdAt: 'createdAt'
+} as const
+
+export type IndividualTournamentGameScalarFieldEnum = (typeof IndividualTournamentGameScalarFieldEnum)[keyof typeof IndividualTournamentGameScalarFieldEnum]
+
+
 export const LeagueScalarFieldEnum = {
   id: 'id',
   seasonId: 'seasonId',
@@ -2790,6 +2880,7 @@ export type GlobalOmitConfig = {
   individualTournament?: Prisma.IndividualTournamentOmit
   individualTournamentEntry?: Prisma.IndividualTournamentEntryOmit
   individualTournamentMatch?: Prisma.IndividualTournamentMatchOmit
+  individualTournamentGame?: Prisma.IndividualTournamentGameOmit
   league?: Prisma.LeagueOmit
   leagueEntry?: Prisma.LeagueEntryOmit
   leagueFixture?: Prisma.LeagueFixtureOmit

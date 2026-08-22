@@ -37,12 +37,49 @@ test("un incontro individuale termina appena un giocatore vince due prove", () =
     () => randomValues[randomIndex++]
   );
 
-  assert.deepEqual(result, {
-    winnerPlayerId: 1,
-    loserPlayerId: 2,
-    playerOneWins: 2,
-    playerTwoWins: 1,
-  });
+  assert.equal(result.winnerPlayerId, 1);
+  assert.equal(result.loserPlayerId, 2);
+  assert.equal(result.playerOneWins, 2);
+  assert.equal(result.playerTwoWins, 1);
+  assert.deepEqual(
+    result.games.map((game) => ({
+      order: game.order,
+      specialty: game.specialty,
+      winnerSide: game.winnerSide,
+      winnerPlayerId: game.winnerPlayerId,
+    })),
+    [
+      {
+        order: 1,
+        specialty: "ITALIANA",
+        winnerSide: "PLAYER_ONE",
+        winnerPlayerId: 1,
+      },
+      {
+        order: 2,
+        specialty: "ITALIANA",
+        winnerSide: "PLAYER_TWO",
+        winnerPlayerId: 2,
+      },
+      {
+        order: 3,
+        specialty: "ITALIANA",
+        winnerSide: "PLAYER_ONE",
+        winnerPlayerId: 1,
+      },
+    ]
+  );
+  assert.deepEqual(
+    result.games.map((game) => [
+      game.playerOnePerformanceRating,
+      game.playerTwoPerformanceRating,
+    ]),
+    [
+      [70, 70],
+      [70, 70],
+      [70, 70],
+    ]
+  );
   assert.equal(randomIndex, 3);
 });
 
