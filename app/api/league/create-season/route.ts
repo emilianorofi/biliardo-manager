@@ -21,6 +21,7 @@ export async function POST() {
           players: result.totalClubPlayers,
           leagues: result.totalLeagues,
           createdClubs: result.createdClubs,
+          renamedClubs: result.renamedClubs,
           createdPlayers: result.createdPlayers,
           createdLeagues: result.createdLeagues,
           createdFixtures: result.createdFixtures,

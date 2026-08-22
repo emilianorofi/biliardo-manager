@@ -7,6 +7,11 @@ Questa specifica definisce la struttura iniziale stabile di Biliardo Manager.
 Ogni girone contiene otto squadre e disputa quattordici giornate, con andata
 e ritorno.
 
+Tutte le partite della stessa giornata vengono disputate nello stesso istante
+in ogni girone. Il motore temporale elabora l'intera giornata mondiale come un
+unico evento, così nessuna classifica può rimanere con squadre aventi un numero
+diverso di incontri giocati.
+
 | Categoria | Gironi | Squadre | Squadre totali |
 | --- | ---: | ---: | ---: |
 | Prima Serie | 1 | 8 | 8 |
@@ -77,6 +82,14 @@ senza cancellare la stagione o i risultati già esistenti:
 
 ```text
 npm run world:bootstrap
+```
+
+Il comando seguente riallinea i campionati IA alla giornata raggiunta dalla
+Prima Serie. È idempotente e si arresta senza modifiche se nei gironi inferiori
+è già subentrato un manager umano:
+
+```text
+npm run world:synchronize
 ```
 
 Se la Prima Serie ha già un calendario, i nuovi gironi ne riutilizzano le date.

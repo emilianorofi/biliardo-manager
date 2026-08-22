@@ -12,6 +12,7 @@ async function main() {
   console.log(
     `Club: ${result.totalClubs} totali, ${result.createdClubs} creati`
   );
+  console.log(`Club IA rinominati: ${result.renamedClubs}`);
   console.log(
     `Giocatori nelle squadre: ${result.totalClubPlayers} totali, ${result.createdPlayers} creati`
   );

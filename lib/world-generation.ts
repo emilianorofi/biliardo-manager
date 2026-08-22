@@ -4,44 +4,127 @@ import {
   WORLD_NATIONALITY_ALLOCATION,
 } from "@/lib/world-structure";
 
-const CLUB_CITIES = [
-  "Torino",
-  "Milano",
-  "Bergamo",
-  "Brescia",
-  "Verona",
-  "Padova",
-  "Bologna",
-  "Parma",
-  "Modena",
-  "Genova",
-  "Firenze",
-  "Prato",
-  "Pisa",
-  "Livorno",
-  "Roma",
-  "Viterbo",
-  "Perugia",
-  "Ancona",
-  "Pescara",
-  "Napoli",
-  "Caserta",
-  "Bari",
-  "Lecce",
-  "Cosenza",
-  "Reggio Calabria",
-  "Palermo",
-  "Catania",
-  "Cagliari",
-  "Sassari",
-  "Olbia",
-] as const;
-
-const CLUB_IDENTITIES = [
-  "Biliardo",
-  "Sporting",
-  "Master",
-  "Accademia",
+const CLUB_THEMES = [
+  {
+    city: "Torino",
+    names: ["Mole Granata", "Cavalieri Sabaudi", "Draghi del Po", "Reale Torino"],
+  },
+  {
+    city: "Milano",
+    names: ["Navigli Milano", "Ambrosiana Stecca", "Visconti Milano", "Duomo d'Oro"],
+  },
+  {
+    city: "Bergamo",
+    names: ["Orobici Bergamo", "Mura Venete", "Falchi Bergamaschi", "Città Alta"],
+  },
+  {
+    city: "Brescia",
+    names: ["Leonessa Brescia", "Mille Miglia", "Rondinelle d'Oro", "Capitolium"],
+  },
+  {
+    city: "Verona",
+    names: ["Arena Verona", "Scaligeri", "Draghi dell'Adige", "Mastini Veronesi"],
+  },
+  {
+    city: "Padova",
+    names: ["Santo Padova", "Carraresi", "Prato della Valle", "Antenore"],
+  },
+  {
+    city: "Bologna",
+    names: ["Due Torri", "Petroniana", "Nettuno Bologna", "Felsinea"],
+  },
+  {
+    city: "Parma",
+    names: ["Ducale Parma", "Crociati", "Farnese", "Leoni Gialloblù"],
+  },
+  {
+    city: "Modena",
+    names: ["Ghirlandina", "Estense Modena", "Canarini", "Via Emilia"],
+  },
+  {
+    city: "Genova",
+    names: ["Lanterna Genova", "Dogi Liguri", "Grifoni", "La Superba"],
+  },
+  {
+    city: "Firenze",
+    names: ["Giglio Firenze", "Medicea", "Signori dell'Arno", "Rinascimento"],
+  },
+  {
+    city: "Prato",
+    names: ["Cavalieri Prato", "Draghi del Bisenzio", "Arte Tessile", "Etrusca Prato"],
+  },
+  {
+    city: "Pisa",
+    names: ["Torre Pendente", "Repubblica Marinara", "Lungarno", "Campo dei Miracoli"],
+  },
+  {
+    city: "Livorno",
+    names: ["Quattro Mori", "Labronica", "Fortezza Livorno", "Corsari del Tirreno"],
+  },
+  {
+    city: "Roma",
+    names: ["Lupa Capitolina", "Cesari Roma", "Gladiatori", "Trastevere"],
+  },
+  {
+    city: "Viterbo",
+    names: ["Tuscia", "Città dei Papi", "Falchi Cimini", "Etruria Viterbo"],
+  },
+  {
+    city: "Perugia",
+    names: ["Grifo Perugia", "Augusta", "Signori del Trasimeno", "Etrusca Perugia"],
+  },
+  {
+    city: "Ancona",
+    names: ["Dorica", "Falchi del Conero", "Adriatica Ancona", "Mole Vanvitelliana"],
+  },
+  {
+    city: "Pescara",
+    names: ["Delfini Pescara", "Adriatico", "D'Annunzio", "Lupi del Gran Sasso"],
+  },
+  {
+    city: "Napoli",
+    names: ["Vesuvio", "Partenope", "Maschio Angioino", "Golfo d'Oro"],
+  },
+  {
+    city: "Caserta",
+    names: ["Reggia Caserta", "Borbonica", "Volturno", "Campania Felix"],
+  },
+  {
+    city: "Bari",
+    names: ["Levante Bari", "San Nicola", "Petruzzelli", "Leoni della Muraglia"],
+  },
+  {
+    city: "Lecce",
+    names: ["Barocco Lecce", "Lupi del Salento", "Messapi", "Porta Napoli"],
+  },
+  {
+    city: "Cosenza",
+    names: ["Bruzi Cosenza", "Lupi della Sila", "Draghi del Crati", "Consentia"],
+  },
+  {
+    city: "Reggio Calabria",
+    names: ["Bronzi dello Stretto", "Magna Grecia", "Fata Morgana", "Reghion"],
+  },
+  {
+    city: "Palermo",
+    names: ["Aquile Palermo", "Conca d'Oro", "Normanna", "Monte Pellegrino"],
+  },
+  {
+    city: "Catania",
+    names: ["Etna Catania", "Elefanti Etnei", "Liotru", "Ciclopi di Aci"],
+  },
+  {
+    city: "Cagliari",
+    names: ["Fenicotteri", "Castello Cagliari", "Golfo degli Angeli", "Nuragici"],
+  },
+  {
+    city: "Sassari",
+    names: ["Torres Sassari", "Logudoro", "Monte d'Accoddi", "Turritana"],
+  },
+  {
+    city: "Olbia",
+    names: ["Gallura", "Tavolara", "Costa Smeralda", "Guerrieri Nuragici"],
+  },
 ] as const;
 
 const CLUB_COLORS = [
@@ -154,15 +237,16 @@ export function createAiClubBlueprint(sequence: number) {
     throw new Error("La posizione del club IA non è valida.");
   }
 
-  const city = CLUB_CITIES[Math.floor(sequence / CLUB_IDENTITIES.length)];
-  const identity = CLUB_IDENTITIES[sequence % CLUB_IDENTITIES.length];
+  const theme = CLUB_THEMES[Math.floor(sequence / 4)];
+  const city = theme.city;
+  const name = theme.names[sequence % theme.names.length];
   const colors = CLUB_COLORS[sequence % CLUB_COLORS.length];
   const serial = String(sequence + 1).padStart(3, "0");
 
   return {
-    name: `${identity} ${city}`,
+    name,
     normalizedName: `world-ai-${serial}`,
-    shortName: `IA${serial}`,
+    shortName: createClubShortName(name),
     city,
     country: "Italia",
     primaryColor: colors[0],
@@ -176,6 +260,25 @@ export function createAiClubBlueprint(sequence: number) {
     trainerLevel: Math.max(1, 4 - Math.floor(sequence / 32)),
     youthCoachLevel: Math.max(1, 3 - Math.floor(sequence / 64)),
   };
+}
+
+function createClubShortName(name: string) {
+  const words = name
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^A-Za-z0-9 ]/g, " ")
+    .split(/\s+/)
+    .filter(Boolean);
+
+  if (words.length === 1) {
+    return words[0].slice(0, 3).toUpperCase();
+  }
+
+  return words
+    .slice(0, 4)
+    .map((word) => word[0])
+    .join("")
+    .toUpperCase();
 }
 
 export function buildNationalityQueue(

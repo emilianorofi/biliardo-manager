@@ -61,6 +61,16 @@ test("genera 120 identità di club differenti", () => {
     new Set(clubs.map((club) => club.normalizedName)).size,
     120
   );
+  assert.equal(
+    clubs.some((club) =>
+      /^(Biliardo|Sporting|Master|Accademia) /.test(club.name)
+    ),
+    false
+  );
+  assert.equal(
+    clubs.some((club) => club.shortName.startsWith("IA")),
+    false
+  );
 });
 
 test("la coda delle nazionalità conserva tutte le quote iniziali", () => {

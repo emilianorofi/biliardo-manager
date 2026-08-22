@@ -29,6 +29,7 @@ type ClockCandidate = {
     | "WEEKLY_NEWS";
   id: number;
   scheduledAt: Date;
+  round?: number;
 };
 
 export async function processGameClock(
@@ -114,6 +115,7 @@ async function findNextDueEvent(
       },
       select: {
         id: true,
+        round: true,
         scheduledAt: true,
       },
       orderBy: [
@@ -180,6 +182,7 @@ async function findNextDueEvent(
     candidates.push({
       type: "LEAGUE",
       id: fixture.id,
+      round: fixture.round,
       scheduledAt:
         fixture.scheduledAt,
     });
@@ -233,55 +236,7 @@ async function processCandidate(
 ) {
   switch (candidate.type) {
     case "LEAGUE":
-      try {
-        const result =
-          await playLeagueFixture({
-            fixtureId: candidate.id,
-            now: candidate.scheduledAt,
-          });
-
-        return {
-          type: candidate.type,
-          id: candidate.id,
-          status: "PROCESSED",
-          scheduledAt:
-            candidate.scheduledAt,
-          score: `${result.fixture.homeScore}-${result.fixture.awayScore}`,
-        };
-      } catch (error) {
-        if (
-          error instanceof
-            PlayLeagueFixtureError &&
-          error.status === 409
-        ) {
-          const fixture =
-            await prisma.leagueFixture.findUnique({
-              where: {
-                id: candidate.id,
-              },
-              select: {
-                status: true,
-              },
-            });
-
-          if (
-            fixture?.status ===
-            "SCHEDULED"
-          ) {
-            throw error;
-          }
-
-          return {
-            type: candidate.type,
-            id: candidate.id,
-            status: "SKIPPED",
-            scheduledAt:
-              candidate.scheduledAt,
-          };
-        }
-
-        throw error;
-      }
+      return processLeagueRound(candidate);
 
     case "WEEKLY_UPDATE": {
       const result =
@@ -312,6 +267,93 @@ async function processCandidate(
         candidate,
         now
       );
+  }
+}
+
+async function processLeagueRound(
+  candidate: ClockCandidate
+) {
+  if (candidate.round === undefined) {
+    throw new Error("LEAGUE_ROUND_MISSING");
+  }
+
+  const fixtures = await prisma.leagueFixture.findMany({
+    where: {
+      status: "SCHEDULED",
+      scheduledAt: candidate.scheduledAt,
+      round: candidate.round,
+      league: {
+        status: "ACTIVE",
+      },
+    },
+    orderBy: {
+      id: "asc",
+    },
+    select: {
+      id: true,
+    },
+  });
+  const scores: Array<{
+    fixtureId: number;
+    score: string;
+  }> = [];
+
+  for (const fixture of fixtures) {
+    const result = await processLeagueFixture(
+      fixture.id,
+      candidate.scheduledAt
+    );
+
+    if (result) {
+      scores.push(result);
+    }
+  }
+
+  return {
+    type: candidate.type,
+    id: candidate.id,
+    status: "PROCESSED",
+    scheduledAt: candidate.scheduledAt,
+    round: candidate.round,
+    processedFixtures: scores.length,
+    scores,
+  };
+}
+
+async function processLeagueFixture(
+  fixtureId: number,
+  scheduledAt: Date
+) {
+  try {
+    const result = await playLeagueFixture({
+      fixtureId,
+      now: scheduledAt,
+    });
+
+    return {
+      fixtureId,
+      score: `${result.fixture.homeScore}-${result.fixture.awayScore}`,
+    };
+  } catch (error) {
+    if (
+      error instanceof PlayLeagueFixtureError &&
+      error.status === 409
+    ) {
+      const fixture = await prisma.leagueFixture.findUnique({
+        where: {
+          id: fixtureId,
+        },
+        select: {
+          status: true,
+        },
+      });
+
+      if (fixture?.status !== "SCHEDULED") {
+        return null;
+      }
+    }
+
+    throw error;
   }
 }
 

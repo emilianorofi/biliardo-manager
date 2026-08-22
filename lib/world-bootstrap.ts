@@ -30,6 +30,7 @@ export type WorldBootstrapResult = {
   seasonNumber: number;
   seasonStatus: string;
   createdClubs: number;
+  renamedClubs: number;
   createdPlayers: number;
   createdLeagues: number;
   createdFixtures: number;
@@ -48,7 +49,7 @@ export async function bootstrapWorld(
       `;
 
       const season = await findOrCreateCurrentSeason(transaction);
-      const createdClubs = await ensureWorldClubs(transaction);
+      const clubResult = await ensureWorldClubs(transaction);
       const leagueResult = await ensureWorldLeagues(
         transaction,
         season.id,
@@ -102,7 +103,8 @@ export async function bootstrapWorld(
         seasonId: season.id,
         seasonNumber: season.number,
         seasonStatus: season.status,
-        createdClubs,
+        createdClubs: clubResult.createdClubs,
+        renamedClubs: clubResult.renamedClubs,
         createdPlayers,
         createdLeagues: leagueResult.createdLeagues,
         createdFixtures: scheduleResult.createdFixtures,
@@ -161,10 +163,11 @@ async function ensureWorldClubs(
   const initialCount = await transaction.club.count();
   let missingClubs = Math.max(0, TOTAL_WORLD_CLUBS - initialCount);
   let createdClubs = 0;
+  let renamedClubs = 0;
 
   for (
     let sequence = 0;
-    sequence < TOTAL_WORLD_CLUBS && missingClubs > 0;
+    sequence < TOTAL_WORLD_CLUBS;
     sequence += 1
   ) {
     const blueprint = createAiClubBlueprint(sequence);
@@ -174,10 +177,32 @@ async function ensureWorldClubs(
       },
       select: {
         id: true,
+        name: true,
+        shortName: true,
       },
     });
 
     if (existing) {
+      if (
+        existing.name !== blueprint.name ||
+        existing.shortName !== blueprint.shortName
+      ) {
+        await transaction.club.update({
+          where: {
+            id: existing.id,
+          },
+          data: {
+            name: blueprint.name,
+            shortName: blueprint.shortName,
+          },
+        });
+        renamedClubs += 1;
+      }
+
+      continue;
+    }
+
+    if (missingClubs === 0) {
       continue;
     }
 
@@ -192,7 +217,10 @@ async function ensureWorldClubs(
     throw new Error("WORLD_CLUB_GENERATION_INCOMPLETE");
   }
 
-  return createdClubs;
+  return {
+    createdClubs,
+    renamedClubs,
+  };
 }
 
 async function ensureWorldLeagues(
