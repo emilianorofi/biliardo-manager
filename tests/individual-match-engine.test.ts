@@ -10,6 +10,7 @@ import {
 } from "../lib/individual-match-engine";
 import {
   buildIndividualGameClosing,
+  buildIndividualGameBroadcast,
   buildIndividualGameChronicle,
   buildIndividualGameIntroduction,
   buildIndividualGameSummary,
@@ -658,6 +659,49 @@ test("seleziona da venti a venticinque momenti chiave", () => {
   for (let index = 1; index < highlights.length; index += 1) {
     assert.ok(highlights[index - 1].order < highlights[index].order);
   }
+});
+
+test("trasforma i momenti chiave in una telecronaca che segue la partita", () => {
+  const chronicle = buildIndividualGameChronicle({
+    ...withChroniclePlayers({
+      gameId: 1447,
+      specialty: "ITALIANA" as const,
+      winnerSide: "PLAYER_ONE" as const,
+      playerOneScore: 80,
+      playerTwoScore: 74,
+    }),
+    playerOneName: "Andrea Quarta",
+    playerTwoName: "Matteo Gualemi",
+  });
+  const broadcast = buildIndividualGameBroadcast({
+    chronicle,
+    gameId: 1447,
+    specialty: "ITALIANA",
+    playerOneName: "Andrea Quarta",
+    playerTwoName: "Matteo Gualemi",
+  });
+  const fullStory = broadcast.map((shot) => shot.commentary).join(" ");
+  const sentenceOpenings = new Set(
+    broadcast.map((shot) => shot.commentary.split(".")[0])
+  );
+  const finalMoment = broadcast.at(-1)!;
+
+  assert.ok(broadcast.length >= 20);
+  assert.ok(broadcast.length <= 25);
+  assert.ok(broadcast.every((shot) => shot.technicalCommentary.length > 0));
+  assert.match(fullStory, /Andrea Quarta/);
+  assert.match(fullStory, /Matteo Gualemi/);
+  assert.ok(sentenceOpenings.size >= 10);
+  assert.equal(finalMoment.highlight, "WINNER");
+  assert.match(finalMoment.commentary, /Andrea Quarta/);
+  assert.match(
+    finalMoment.commentary,
+    /ce l'ha fatta|punto che vale la partita|sentenza finale/
+  );
+  assert.doesNotMatch(
+    finalMoment.commentary,
+    /replica possibile|partita ancora apertissima|cambio al comando/
+  );
 });
 
 test("costruisce presentazione ed epilogo in più righe", () => {
