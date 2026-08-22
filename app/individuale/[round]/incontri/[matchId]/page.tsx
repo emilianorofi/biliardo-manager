@@ -1,8 +1,10 @@
-import { ArrowLeft, CircleDot } from "lucide-react";
+import { ArrowLeft, ChevronDown, CircleDot } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { buildIndividualGameChronicle } from "@/lib/individual-game-chronicle";
 import { INDIVIDUAL_MATCH_STAGES } from "@/lib/individual-tournament-calendar";
+import type { MatchSpecialty } from "@/lib/match-engine";
 import { prisma } from "@/lib/prisma";
 import { ROME_TIME_ZONE } from "@/lib/rome-calendar";
 
@@ -153,7 +155,7 @@ export default async function IndividualMatchDetailPage({
               <h2 className="text-lg font-black text-white">Partite</h2>
             </div>
             <p className="mt-1 text-xs text-zinc-500">
-              Il risultato di ogni partita disputata.
+              Seleziona una partita per leggere la cronaca tiro per tiro.
             </p>
           </div>
         </div>
@@ -181,37 +183,107 @@ export default async function IndividualMatchDetailPage({
             <div className="divide-y divide-zinc-800">
               {match.games.map((game) => {
                 const playerOneWon = game.winnerSide === "PLAYER_ONE";
+                const chronicle = buildIndividualGameChronicle({
+                  gameId: game.id,
+                  specialty: game.specialty as MatchSpecialty,
+                  winnerSide: playerOneWon ? "PLAYER_ONE" : "PLAYER_TWO",
+                  playerOneScore: game.playerOneScore,
+                  playerTwoScore: game.playerTwoScore,
+                });
 
                 return (
-                  <article
-                    key={game.id}
-                    className="grid grid-cols-[minmax(0,1fr)_96px_minmax(0,1fr)] items-center gap-3 px-4 py-4 sm:grid-cols-[minmax(0,1fr)_130px_minmax(0,1fr)]"
-                  >
-                    <p
-                      className={`text-right text-3xl font-black tabular-nums ${
-                        playerOneWon ? "text-emerald-300" : "text-zinc-500"
-                      }`}
-                    >
-                      {game.playerOneScore}
-                    </p>
+                  <details key={game.id} className="group">
+                    <summary className="grid cursor-pointer list-none grid-cols-[minmax(0,1fr)_96px_minmax(0,1fr)] items-center gap-3 px-4 py-4 marker:content-none sm:grid-cols-[minmax(0,1fr)_130px_minmax(0,1fr)] [&::-webkit-details-marker]:hidden">
+                      <p
+                        className={`text-right text-3xl font-black tabular-nums ${
+                          playerOneWon ? "text-emerald-300" : "text-zinc-500"
+                        }`}
+                      >
+                        {game.playerOneScore}
+                      </p>
 
-                    <div className="text-center">
-                      <p className="text-[10px] font-black uppercase tracking-wider text-zinc-400">
-                        Partita {game.order}
+                      <div className="text-center">
+                        <p className="text-[10px] font-black uppercase tracking-wider text-zinc-400">
+                          Partita {game.order}
+                        </p>
+                        <p className="mt-1 text-[10px] font-black text-amber-300 sm:text-xs">
+                          {formatSpecialty(game.specialty)}
+                        </p>
+                        <span className="mt-1 inline-flex items-center gap-1 text-[9px] font-bold text-zinc-500">
+                          Cronaca
+                          <ChevronDown
+                            size={12}
+                            className="transition group-open:rotate-180"
+                          />
+                        </span>
+                      </div>
+
+                      <p
+                        className={`text-3xl font-black tabular-nums ${
+                          playerOneWon ? "text-zinc-500" : "text-emerald-300"
+                        }`}
+                      >
+                        {game.playerTwoScore}
                       </p>
-                      <p className="mt-1 text-[10px] font-black text-amber-300 sm:text-xs">
-                        {formatSpecialty(game.specialty)}
-                      </p>
+                    </summary>
+
+                    <div className="border-t border-zinc-800 bg-zinc-950/35 px-3 pb-4 pt-3 sm:px-4">
+                      <div className="grid grid-cols-[52px_minmax(0,1fr)_48px_72px] gap-2 border-b border-zinc-800 px-2 pb-2 text-[9px] font-black uppercase tracking-wider text-zinc-600 sm:grid-cols-[70px_minmax(0,1fr)_70px_96px] sm:gap-3">
+                        <span>Tiro</span>
+                        <span>Giocatore</span>
+                        <span className="text-right">Punti</span>
+                        <span className="text-right">Parziale</span>
+                      </div>
+
+                      <ol className="divide-y divide-zinc-800/70">
+                        {chronicle.map((shot, shotIndex) => {
+                          const isPlayerOne =
+                            shot.playerSide === "PLAYER_ONE";
+                          const isFinalShot =
+                            shotIndex === chronicle.length - 1;
+                          const playerName = isPlayerOne
+                            ? `${playerOne.firstName} ${playerOne.lastName}`
+                            : `${playerTwo.firstName} ${playerTwo.lastName}`;
+
+                          return (
+                            <li
+                              key={shot.order}
+                              className="grid grid-cols-[52px_minmax(0,1fr)_48px_72px] items-center gap-2 px-2 py-2.5 text-xs sm:grid-cols-[70px_minmax(0,1fr)_70px_96px] sm:gap-3 sm:text-sm"
+                            >
+                              <span className="font-bold text-zinc-600">
+                                {shot.order}
+                              </span>
+                              <span
+                                className={`truncate font-bold ${
+                                  isFinalShot
+                                    ? "text-emerald-300"
+                                    : "text-zinc-300"
+                                }`}
+                              >
+                                {playerName}
+                              </span>
+                              <span
+                                className={`text-right font-black tabular-nums ${
+                                  shot.points > 0
+                                    ? "text-amber-300"
+                                    : "text-zinc-600"
+                                }`}
+                              >
+                                {shot.points > 0 ? `+${shot.points}` : "0"}
+                              </span>
+                              <span
+                                className={`text-right font-black tabular-nums ${
+                                  isFinalShot ? "text-white" : "text-zinc-400"
+                                }`}
+                              >
+                                {shot.playerOneTotal}–{shot.playerTwoTotal}
+                              </span>
+                            </li>
+                          );
+                        })}
+                      </ol>
                     </div>
-
-                    <p
-                      className={`text-3xl font-black tabular-nums ${
-                        playerOneWon ? "text-zinc-500" : "text-emerald-300"
-                      }`}
-                    >
-                      {game.playerTwoScore}
-                    </p>
-                  </article>
+                  </details>
                 );
               })}
             </div>
