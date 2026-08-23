@@ -258,6 +258,27 @@ const TUTTI_DOPPI_CUSHION_PREFERRED = [
   16, 20, 24, 28, 32, 36, 40, 44, 48, 52, 56,
 ] as const;
 
+type OnePassShotScoreProfile = {
+  max: number;
+  preferred?: readonly number[];
+};
+
+const ONE_PASS_SHOT_SCORE_PROFILES: Record<
+  Exclude<MatchSpecialty, "ITALIANA">,
+  Record<string, OnePassShotScoreProfile>
+> = {
+  GORIZIANA: {
+    GARUFFA: { max: 72, preferred: [16, 36, 40] },
+    MEZZA_GARUFFA: { max: 72, preferred: [16, 36, 40] },
+    PARABOLA: { max: 52 },
+  },
+  TUTTI_DOPPI: {
+    GARUFFA: { max: 72, preferred: [16, 36, 40] },
+    MEZZA_GARUFFA: { max: 72, preferred: [16, 36, 40] },
+    PARABOLA: { max: 52 },
+  },
+};
+
 const FOUL_BASE_POINTS: Record<MatchSpecialty, number> = {
   ITALIANA: 2,
   GORIZIANA: 2,
@@ -720,6 +741,12 @@ function getShotScoreAffinity(
       : 0.18;
   }
 
+  const onePassProfile = ONE_PASS_SHOT_SCORE_PROFILES[specialty][shot.key];
+
+  if (onePassProfile?.preferred) {
+    return onePassProfile.preferred.includes(points) ? 8 : 0.35;
+  }
+
   if (specialty === "GORIZIANA") {
     const preferred =
       shot.family === "DIRECT"
@@ -747,6 +774,10 @@ function isShotScoreCompatible(
   if (specialty === "ITALIANA") {
     return getItalianScoreOptions(shot, points).length > 0;
   }
+
+  const onePassProfile = ONE_PASS_SHOT_SCORE_PROFILES[specialty][shot.key];
+
+  if (onePassProfile && points > onePassProfile.max) return false;
 
   if (specialty === "GORIZIANA") {
     if (shot.family === "DIRECT") return points <= 56;
@@ -2073,9 +2104,12 @@ function getGorizianaScoringPhrase(
   const multiplier = shot.family === "CUSHION" ? 2 : 1;
   const basePoints = points / multiplier;
   const forceFilotto = shot.family === "DIRECT" && points === 30;
+  const forceOnePassPallino =
+    (shot.key === "GARUFFA" || shot.key === "MEZZA_GARUFFA") &&
+    points > 60;
   const pallinoPossible = basePoints >= 6 && basePoints <= 56;
   const pallinoPoints =
-    basePoints > 50
+    forceOnePassPallino || basePoints > 50
       ? 6
       : !forceFilotto && pallinoPossible && random() < 0.18
         ? 6
@@ -2097,6 +2131,10 @@ function getGorizianaScoringPhrase(
     action += " e aggiunge i 6 punti del pallino";
   }
 
+  if (forceOnePassPallino) {
+    return `${pinPoints} punti di birilli diventano ${pinPoints * 2} con il tiro di sponda; l'arrivo sul pallino aggiunge 12 punti, totale ${points}`;
+  }
+
   return multiplier === 2
     ? `${action}; il tiro di sponda raddoppia il conteggio fino a ${points}`
     : `${action} per un totale di ${points} punti`;
@@ -2108,9 +2146,12 @@ function getTuttiDoppiScoringPhrase(
   random: () => number
 ) {
   const forceFilotto = shot.family === "DIRECT" && points === 60;
+  const forceOnePassPallino =
+    (shot.key === "GARUFFA" || shot.key === "MEZZA_GARUFFA") &&
+    points > 60;
   const pallinoPossible = points >= 12;
   const pallinoPoints =
-    points > 100
+    forceOnePassPallino || points > 100
       ? 12
       : !forceFilotto && pallinoPossible && random() < 0.16
         ? 12
