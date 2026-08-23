@@ -293,10 +293,17 @@ export default async function IndividualMatchDetailPage({
                   specialty: game.specialty as MatchSpecialty,
                   playerOneName,
                   playerTwoName,
+                  playerOne,
+                  playerTwo,
+                  playerOnePerformanceRating:
+                    game.playerOnePerformanceRating,
+                  playerTwoPerformanceRating:
+                    game.playerTwoPerformanceRating,
                   gameOrder: game.order,
                   matchPlayerOneWins: playerOneWinsAfter,
                   matchPlayerTwoWins: playerTwoWinsAfter,
                   isDecisiveGame,
+                  isTournamentFinal,
                 });
                 const closing = buildIndividualGameClosing({
                   chronicle,
@@ -372,11 +379,11 @@ export default async function IndividualMatchDetailPage({
                             Il racconto
                           </p>
                           <p className="mt-1 text-sm font-black text-white">
-                            La partita, momento dopo momento
+                            La partita, capitolo dopo capitolo
                           </p>
                         </div>
                         <p className="text-right text-[10px] font-bold text-zinc-600">
-                          {featuredChronicle.length} passaggi scelti
+                          {featuredChronicle.length} capitoli
                         </p>
                       </div>
 
@@ -424,7 +431,7 @@ export default async function IndividualMatchDetailPage({
                               >
                                 <div className="flex items-center justify-between gap-3 text-[9px] font-black uppercase tracking-[0.14em]">
                                   <span className="text-zinc-600">
-                                    Momento {shot.order}
+                                    Capitolo {shotIndex + 1}
                                   </span>
                                   <span
                                     className={
@@ -439,42 +446,46 @@ export default async function IndividualMatchDetailPage({
 
                                 <div className="mt-2 flex items-start justify-between gap-3">
                                   <div className="min-w-0">
-                                  <p
+                                    <p
                                       className={`text-sm font-black sm:text-base ${
-                                      isFinalShot
-                                        ? "text-emerald-300"
-                                        : shot.highlight === "LEAD_CHANGE" ||
-                                            shot.highlight === "BIG_SHOT"
-                                          ? "text-amber-200"
-                                          : "text-zinc-300"
-                                    }`}
-                                  >
-                                    {playerName}
-                                  </p>
-                                    <p className="mt-0.5 text-[9px] font-black uppercase tracking-wider text-emerald-400/70">
-                                    {shot.shotName}
-                                  </p>
+                                        isFinalShot
+                                          ? "text-emerald-300"
+                                          : shot.highlight === "LEAD_CHANGE" ||
+                                              shot.highlight === "BIG_SHOT"
+                                            ? "text-amber-200"
+                                            : "text-zinc-200"
+                                      }`}
+                                    >
+                                      {shot.storyTitle ?? "La partita continua"}
+                                    </p>
+                                    {shot.showShotDetail ? (
+                                      <p className="mt-1 text-[9px] font-black uppercase tracking-wider text-emerald-400/70">
+                                        {playerName} · {shot.shotName}
+                                      </p>
+                                    ) : null}
                                   </div>
-                                  <span
-                                    className={`shrink-0 rounded-full border px-2.5 py-1 text-xs font-black tabular-nums ${
-                                    shot.points > 0
-                                        ? "border-amber-400/20 bg-amber-300/[0.06] text-amber-300"
-                                        : "border-zinc-800 text-zinc-600"
-                                  }`}
-                                >
-                                  {shot.points > 0 ? (
-                                    <>
-                                      +{shot.points}
-                                      {pointsAwardedToOpponent ? (
+                                  {shot.showShotDetail ? (
+                                    <span
+                                      className={`shrink-0 rounded-full border px-2.5 py-1 text-xs font-black tabular-nums ${
+                                        shot.points > 0
+                                          ? "border-amber-400/20 bg-amber-300/[0.06] text-amber-300"
+                                          : "border-zinc-800 text-zinc-600"
+                                      }`}
+                                    >
+                                      {shot.points > 0 ? (
+                                        <>
+                                          +{shot.points}
+                                          {pointsAwardedToOpponent ? (
                                           <span className="ml-1 text-[8px] leading-tight text-rose-300/80">
-                                          a {scoringPlayerName}
-                                        </span>
-                                      ) : null}
-                                    </>
-                                  ) : (
-                                    "0"
-                                  )}
-                                </span>
+                                              a {scoringPlayerName}
+                                            </span>
+                                          ) : null}
+                                        </>
+                                      ) : (
+                                        "0"
+                                      )}
+                                    </span>
+                                  ) : null}
                                 </div>
 
                                 <p className="mt-3 text-sm font-medium leading-7 text-zinc-300">
