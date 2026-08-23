@@ -696,12 +696,116 @@ test("trasforma i momenti chiave in una telecronaca che segue la partita", () =>
   assert.match(finalMoment.commentary, /Andrea Quarta/);
   assert.match(
     finalMoment.commentary,
-    /ce l'ha fatta|punto che vale la partita|sentenza finale/
+    /ha vinto l'incontro|punto che chiude tutto|sentenza finale/
   );
   assert.doesNotMatch(
     finalMoment.commentary,
     /replica possibile|partita ancora apertissima|cambio al comando/
   );
+});
+
+test("tiene aperto l'incontro tra una partita e la successiva", () => {
+  const chronicle = buildIndividualGameChronicle({
+    ...withChroniclePlayers({
+      gameId: 1501,
+      specialty: "ITALIANA" as const,
+      winnerSide: "PLAYER_ONE" as const,
+      playerOneScore: 80,
+      playerTwoScore: 68,
+    }),
+    playerOneName: "Mario Rossi",
+    playerTwoName: "Luca Bianchi",
+  });
+  const broadcast = buildIndividualGameBroadcast({
+    chronicle,
+    gameId: 1501,
+    specialty: "ITALIANA",
+    playerOneName: "Mario Rossi",
+    playerTwoName: "Luca Bianchi",
+    gameOrder: 1,
+    matchPlayerOneWins: 1,
+    matchPlayerTwoWins: 0,
+    isDecisiveGame: false,
+  });
+  const closing = buildIndividualGameClosing({
+    chronicle,
+    specialty: "ITALIANA",
+    winnerSide: "PLAYER_ONE",
+    playerOneName: "Mario Rossi",
+    playerTwoName: "Luca Bianchi",
+    gameOrder: 1,
+    matchPlayerOneWins: 1,
+    matchPlayerTwoWins: 0,
+    isDecisiveGame: false,
+  });
+  const finalMoment = broadcast.at(-1)!.commentary;
+  const closingText = closing.join(" ");
+
+  assert.match(
+    finalMoment,
+    /l'incontro continua|non ancora l'incontro|non quella dell'incontro/
+  );
+  assert.doesNotMatch(
+    finalMoment,
+    /è finita davvero|ha vinto l'incontro|punto che chiude tutto/
+  );
+  assert.match(closingText, /1–0/);
+  assert.match(closingText, /partita 2/);
+  assert.match(closingText, /Luca Bianchi/);
+  assert.match(closingText, /risposta|riprendersi/);
+  assert.doesNotMatch(closingText, /è il campione|supera il turno/);
+});
+
+test("presenta la partita successiva come continuazione dell'incontro", () => {
+  const introduction = buildIndividualGameIntroduction({
+    gameId: 1502,
+    gameOrder: 2,
+    matchPlayerOneWinsBefore: 1,
+    matchPlayerTwoWinsBefore: 0,
+    venue: "La Sala Centrale · Tavolo 1",
+    tournamentName: "Torneo Italiana",
+    stageLabel: "Semifinale",
+    specialty: "GORIZIANA",
+    playerOneName: "Mario Rossi",
+    playerTwoName: "Luca Bianchi",
+  }).join(" ");
+
+  assert.match(introduction, /Mario Rossi conduce l'incontro 1–0/);
+  assert.match(introduction, /Luca Bianchi/);
+  assert.match(introduction, /rimettere tutto in equilibrio/);
+  assert.match(introduction, /partita decisiva/);
+  assert.match(introduction, /non è un verdetto/);
+});
+
+test("incorona il campione soltanto dopo la partita decisiva della finale", () => {
+  const chronicle = buildIndividualGameChronicle({
+    ...withChroniclePlayers({
+      gameId: 1503,
+      specialty: "TUTTI_DOPPI" as const,
+      winnerSide: "PLAYER_TWO" as const,
+      playerOneScore: 512,
+      playerTwoScore: 600,
+    }),
+    playerOneName: "Mario Rossi",
+    playerTwoName: "Luca Bianchi",
+  });
+  const closing = buildIndividualGameClosing({
+    chronicle,
+    specialty: "TUTTI_DOPPI",
+    winnerSide: "PLAYER_TWO",
+    playerOneName: "Mario Rossi",
+    playerTwoName: "Luca Bianchi",
+    gameOrder: 3,
+    matchPlayerOneWins: 1,
+    matchPlayerTwoWins: 2,
+    isDecisiveGame: true,
+    isTournamentFinal: true,
+    tournamentName: "Mondiale Individuale",
+  }).join(" ");
+
+  assert.match(closing, /Luca Bianchi vince l'incontro 1–2/);
+  assert.match(closing, /campione del Mondiale Individuale/);
+  assert.doesNotMatch(closing, /partita 4/);
 });
 
 test("costruisce presentazione ed epilogo in più righe", () => {
