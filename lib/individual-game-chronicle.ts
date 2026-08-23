@@ -344,6 +344,12 @@ type OnePassShotScoreProfile = {
   preferred?: readonly number[];
 };
 
+type NinePinTrajectory = {
+  outerPins: number;
+  innerPins: number;
+  redPin: boolean;
+};
+
 type NinePinScoreOption = PinFallScore & {
   outerPins: number;
   innerPins: number;
@@ -371,6 +377,49 @@ const ONE_PASS_SHOT_SCORE_PROFILES: Record<
     PARABOLA: { max: 52 },
   },
 };
+
+// On a single crossing the ball can only knock down adjacent pins along its
+// path through the nine-pin castle. These are the possible contiguous
+// sections of the outer-inner-red-inner-outer line; independent pin counts
+// would invent trajectories such as outer + red while skipping the inner.
+const CONTIGUOUS_NINE_PIN_TRAJECTORIES: readonly NinePinTrajectory[] = [
+  { outerPins: 0, innerPins: 0, redPin: false },
+  { outerPins: 1, innerPins: 0, redPin: false },
+  { outerPins: 0, innerPins: 1, redPin: false },
+  { outerPins: 0, innerPins: 0, redPin: true },
+  { outerPins: 1, innerPins: 1, redPin: false },
+  { outerPins: 0, innerPins: 1, redPin: true },
+  { outerPins: 1, innerPins: 1, redPin: true },
+  { outerPins: 0, innerPins: 2, redPin: true },
+  { outerPins: 1, innerPins: 2, redPin: true },
+  { outerPins: 2, innerPins: 2, redPin: true },
+] as const;
+
+const CANDELA_NINE_PIN_TRAJECTORIES: readonly NinePinTrajectory[] = [
+  { outerPins: 0, innerPins: 0, redPin: false },
+  { outerPins: 1, innerPins: 0, redPin: false },
+  { outerPins: 0, innerPins: 1, redPin: false },
+  { outerPins: 1, innerPins: 1, redPin: false },
+] as const;
+
+const SINGLE_PASS_NINE_PIN_SHOTS = new Set([
+  "RADDRIZZO",
+  "ROVESCIO",
+  "TRAVERSINO_PIANO",
+  "GIRO",
+  "GIRONE",
+  "ANGOLO_PRIMA",
+  "ANGOLO_SECONDA",
+  "STRISCIO",
+  "CANDELA",
+  "SPONDA_BIGLIA",
+  "GARUFFA",
+  "MEZZA_GARUFFA",
+  "GANCIO",
+  "PARABOLA",
+  "TRE_SPONDE_CALCIO",
+  "CINQUE_SPONDE_CALCIO",
+]);
 
 const FOUL_BASE_POINTS: Record<MatchSpecialty, number> = {
   ITALIANA: 2,
@@ -536,7 +585,7 @@ export function buildIndividualGameChronicle({
     const enrichedShot = {
       ...rawShot,
       playerSide,
-      shotName: getShotName(selectedShot),
+      shotName: getShotName(selectedShot, specialty, rawShot.points),
       shotFamily: selectedShot.family,
       outcome,
     };
@@ -868,36 +917,58 @@ function getNinePinScoreOptions(
   if (cached) return cached;
 
   const onePassProfile = ONE_PASS_SHOT_SCORE_PROFILES[specialty][shot.key];
-  const maximumPinsPerType = onePassProfile ? 2 : 4;
   const options: NinePinScoreOption[] = [];
+  const trajectories = getNinePinTrajectories(shot);
 
-  for (let outerPins = 0; outerPins <= maximumPinsPerType; outerPins += 1) {
-    for (let innerPins = 0; innerPins <= maximumPinsPerType; innerPins += 1) {
-      for (const redPin of [false, true]) {
-        for (const pallinoContact of [
-          "NONE",
-          "OPPONENT_BALL",
-        ] as const) {
-          const score = calculatePinFallScore({
-            specialty,
-            outerPins,
-            innerPins,
-            redPin,
-            pallinoContact,
-            cushionShot: shot.family === "CUSHION",
-          });
+  for (const { outerPins, innerPins, redPin } of trajectories) {
+    for (const pallinoContact of ["NONE", "OPPONENT_BALL"] as const) {
+      const score = calculatePinFallScore({
+        specialty,
+        outerPins,
+        innerPins,
+        redPin,
+        pallinoContact,
+        cushionShot: shot.family === "CUSHION",
+      });
 
-          if (
-            score.totalPoints === points &&
-            (!onePassProfile || points <= onePassProfile.max)
-          ) {
-            options.push({
-              ...score,
+      if (
+        score.totalPoints === points &&
+        (!onePassProfile || points <= onePassProfile.max)
+      ) {
+        options.push({
+          ...score,
+          outerPins,
+          innerPins,
+          redPin,
+          pallinoContact,
+        });
+      }
+    }
+  }
+
+  if (options.length === 0 && !SINGLE_PASS_NINE_PIN_SHOTS.has(shot.key)) {
+    for (let outerPins = 0; outerPins <= 4; outerPins += 1) {
+      for (let innerPins = 0; innerPins <= 4; innerPins += 1) {
+        for (const redPin of [false, true]) {
+          for (const pallinoContact of ["NONE", "OPPONENT_BALL"] as const) {
+            const score = calculatePinFallScore({
+              specialty,
               outerPins,
               innerPins,
               redPin,
               pallinoContact,
+              cushionShot: shot.family === "CUSHION",
             });
+
+            if (score.totalPoints === points) {
+              options.push({
+                ...score,
+                outerPins,
+                innerPins,
+                redPin,
+                pallinoContact,
+              });
+            }
           }
         }
       }
@@ -906,6 +977,11 @@ function getNinePinScoreOptions(
 
   NINE_PIN_SCORE_OPTIONS_CACHE.set(cacheKey, options);
   return options;
+}
+
+function getNinePinTrajectories(shot: ShotDefinition) {
+  if (shot.key === "CANDELA") return CANDELA_NINE_PIN_TRAJECTORIES;
+  return CONTIGUOUS_NINE_PIN_TRAJECTORIES;
 }
 
 function selectNinePinScoreOption(
@@ -1099,7 +1175,17 @@ function getShotOutcome({
 
 function getShotName(
   shot: ShotDefinition,
+  specialty: MatchSpecialty,
+  points: number
 ) {
+  if (
+    shot.key === "BRICOLLA" &&
+    specialty !== "ITALIANA" &&
+    points > 72
+  ) {
+    return "Bricolla a più passate";
+  }
+
   return shot.name;
 }
 
@@ -1214,6 +1300,73 @@ export function selectIndividualChronicleHighlights({
     .map((index) => chronicle[index]);
 }
 
+type BroadcastStoryContext = {
+  winnerSide: IndividualChroniclePlayerSide;
+  leadChanges: number;
+  winnerMaximumDeficit: number;
+  decisiveOrder: number | null;
+};
+
+function analyzeBroadcastStory(
+  chronicle: IndividualChronicleShot[],
+  specialty: MatchSpecialty
+): BroadcastStoryContext {
+  const finalShot = chronicle.at(-1);
+  const winnerSide: IndividualChroniclePlayerSide =
+    !finalShot || finalShot.playerOneTotal >= finalShot.playerTwoTotal
+      ? "PLAYER_ONE"
+      : "PLAYER_TWO";
+  let currentLeader: IndividualChroniclePlayerSide | null = null;
+  let leadChanges = 0;
+  let winnerMaximumDeficit = 0;
+
+  for (const shot of chronicle) {
+    const leader = getLeader(shot.playerOneTotal, shot.playerTwoTotal);
+
+    if (leader && currentLeader && leader !== currentLeader) leadChanges += 1;
+    if (leader) currentLeader = leader;
+
+    const deficit =
+      winnerSide === "PLAYER_ONE"
+        ? shot.playerTwoTotal - shot.playerOneTotal
+        : shot.playerOneTotal - shot.playerTwoTotal;
+    winnerMaximumDeficit = Math.max(winnerMaximumDeficit, deficit);
+  }
+
+  const target = MATCH_TARGET_POINTS[specialty];
+  const minimumDecisiveProgress = target * 0.18;
+  const decisiveShot = chronicle.find((shot, index) => {
+    const winnerTotal =
+      winnerSide === "PLAYER_ONE" ? shot.playerOneTotal : shot.playerTwoTotal;
+    const loserTotal =
+      winnerSide === "PLAYER_ONE" ? shot.playerTwoTotal : shot.playerOneTotal;
+
+    return (
+      winnerTotal >= minimumDecisiveProgress &&
+      winnerTotal > loserTotal &&
+      chronicle.slice(index).every((laterShot) => {
+        const laterWinnerTotal =
+          winnerSide === "PLAYER_ONE"
+            ? laterShot.playerOneTotal
+            : laterShot.playerTwoTotal;
+        const laterLoserTotal =
+          winnerSide === "PLAYER_ONE"
+            ? laterShot.playerTwoTotal
+            : laterShot.playerOneTotal;
+
+        return laterWinnerTotal > laterLoserTotal;
+      })
+    );
+  });
+
+  return {
+    winnerSide,
+    leadChanges,
+    winnerMaximumDeficit,
+    decisiveOrder: decisiveShot?.order ?? null,
+  };
+}
+
 export function buildIndividualGameBroadcast({
   chronicle,
   gameId,
@@ -1242,6 +1395,7 @@ export function buildIndividualGameBroadcast({
   const templateOffset = Math.floor(
     createSeededRandom(gameId * 7_919 + 113)() * 997
   );
+  const story = analyzeBroadcastStory(chronicle, specialty);
 
   return selectedShots.map((shot, selectedIndex) => {
     const chronicleIndex = Math.max(
@@ -1268,6 +1422,9 @@ export function buildIndividualGameBroadcast({
         selectedIndex,
         selectedCount: selectedShots.length,
         specialty,
+        story,
+        playerOneName,
+        playerTwoName,
         playerName,
         opponentName,
         scoringPlayerName,
@@ -1290,6 +1447,9 @@ function buildBroadcastMoment({
   selectedIndex,
   selectedCount,
   specialty,
+  story,
+  playerOneName,
+  playerTwoName,
   playerName,
   opponentName,
   scoringPlayerName,
@@ -1307,6 +1467,9 @@ function buildBroadcastMoment({
   selectedIndex: number;
   selectedCount: number;
   specialty: MatchSpecialty;
+  story: BroadcastStoryContext;
+  playerOneName: string;
+  playerTwoName: string;
   playerName: string;
   opponentName: string;
   scoringPlayerName: string;
@@ -1336,6 +1499,28 @@ function buildBroadcastMoment({
   const lateAndClose = leaderScore >= target * 0.7 && margin <= target * 0.12;
   const selectionProgress =
     selectedCount > 1 ? selectedIndex / (selectedCount - 1) : 1;
+  const currentRun = getCurrentScoringRun(chronicle, chronicleIndex);
+  const previousSelectedChronicleIndex = previousSelectedShot
+    ? chronicle.findIndex(
+        (candidate) => candidate.order === previousSelectedShot.order
+      )
+    : -1;
+  const previousSelectedRun = getCurrentScoringRun(
+    chronicle,
+    previousSelectedChronicleIndex
+  );
+  const segmentLead = getBroadcastSegmentLead({
+    previousSelectedShot,
+    shot,
+    target,
+    playerOneName,
+    playerTwoName,
+  });
+  const crossesDecisivePassage =
+    story.decisiveOrder !== null &&
+    shot.order >= story.decisiveOrder &&
+    (previousSelectedShot?.order ?? 0) < story.decisiveOrder;
+  const comebackStory = story.winnerMaximumDeficit >= target * 0.12;
 
   if (isFinal) {
     if (!isDecisiveGame) {
@@ -1377,32 +1562,65 @@ function buildBroadcastMoment({
       [
         `La mano di ${playerName} tradisce proprio sul più delicato.`,
         `${playerName} vede il disegno, ma nell'esecuzione qualcosa si spezza.`,
-        `È il primo vero colpo alla fiducia di ${playerName}.`,
+        `${playerName} resta un istante piegato sul biliardo: sa di aver regalato più di un semplice punteggio.`,
       ],
       selectedIndex + templateOffset
     )} ${technical} ${consequence} Il parziale è ${score}.`;
   }
 
+  if (selectedIndex === 0) {
+    if (shot.points === 0) {
+      return `${playerName} ha la prima occasione per capire il panno. ${technical} Il tabellone resta fermo, ma la posizione lasciata dice già a ${opponentName} quale tipo di partita lo aspetta.`;
+    }
+
+    return `${playerName} rompe l'attesa e mette il primo segno sul tabellone. ${technical} È soltanto l'inizio, ${score}, ma adesso la partita ha una voce.`;
+  }
+
+  if (crossesDecisivePassage) {
+    const winnerName =
+      story.winnerSide === "PLAYER_ONE" ? playerOneName : playerTwoName;
+    const loserName =
+      story.winnerSide === "PLAYER_ONE" ? playerTwoName : playerOneName;
+    const path = comebackStory
+      ? `${winnerName} era stato sotto di ${story.winnerMaximumDeficit} punti; con questa sequenza completa la risalita e mette finalmente il naso avanti.`
+      : `${winnerName} passa davanti e, da questo momento, non concederà più a ${loserName} nemmeno la parità.`;
+
+    return `Eccolo, il passaggio su cui si piega la partita. ${technical} ${path} Il tabellone segna ${score}; ${loserName} non è ancora battuto, ma adesso deve inseguire senza più margine per un regalo.`;
+  }
+
   if (isTie) {
-    return `${playerName} rifiuta di lasciar scappare l'avversario. ${technical} Quando l'ultima bilia rallenta, sul tabellone c'è ${score}. Tutto da rifare, e adesso ogni scelta comincia a pesare.`;
+    return `${playerName} rifiuta di lasciar scappare l'avversario. ${technical} Quando l'ultima bilia rallenta, sul tabellone c'è ${score}. Dalla sedia ${opponentName} si rialza subito: la partita ricomincia da zero, ma la tensione no.`;
   }
 
   if (isLeadChange || shot.highlight === "LEAD_CHANGE") {
     return selectBroadcastTemplate(
       [
-        `${playerName} non si accontenta di rientrare: vuole prendersi la partita. ${technical} Le cifre cambiano padrone, ${score}. Ora tocca a ${opponentName} trovare una risposta.`,
-        `La partita gira qui. ${playerName} riconosce il momento e non lo lascia passare: ${technical} Sul ${score} cambia chi comanda, e con il comando cambia anche il peso della prossima bilia.`,
-        `Sembrava un'altra fase favorevole a ${opponentName}; invece ${playerName} resta aggrappato al tavolo. ${technical} È sorpasso sul ${score}, con la sala che finalmente si accende.`,
+        `${playerName} non si accontenta di rientrare: vuole prendersi il tavolo. ${technical} È sorpasso, ${score}. ${opponentName} si alza prima ancora che le bilie siano ferme: la risposta non può aspettare.`,
+        `${playerName} trova il varco nel momento giusto. ${technical} Sul ${score} cambia chi comanda; dalla sedia di ${opponentName} sparisce qualunque espressione, perché la prossima bilia è già diventata una prova di nervi.`,
+        `${opponentName} sembrava avere la partita in mano, ma ${playerName} non ha smesso di rosicchiare punti. ${technical} Il sorpasso è servito, ${score}, e il pubblico accompagna le bilie fino all'ultimo centimetro.`,
       ],
       selectedIndex + templateOffset
     );
   }
 
+
+  if (
+    shot.points > 0 &&
+    currentRun.shots >= 2 &&
+    currentRun.points >= target * 0.12 &&
+    previousSelectedRun.points < target * 0.12
+  ) {
+    return `${opponentName} continua a tornare al tavolo da una posizione scomoda e non riesce a interrompere la serie. ${technical} ${playerName} ha raccolto ${currentRun.points} punti senza subirne: non è più un singolo colpo, è uno strappo. Sul ${score} la partita comincia a chiedere una reazione vera.`;
+  }
+
   if (lateAndClose) {
+    const playerOneNeeded = Math.max(0, target - shot.playerOneTotal);
+    const playerTwoNeeded = Math.max(0, target - shot.playerTwoTotal);
+
     return selectBroadcastTemplate(
       [
-        `Qui la stecca pesa. ${playerName} ha davanti un tiro che può spostare tutta la pressione e lo affronta senza scappare: ${technical} Il ${score} tiene entrambi dentro la partita; nessuno, ormai, può permettersi una bilia distratta.`,
-        `Siamo nel tratto in cui persino il silenzio sembra fare rumore. ${playerName} sceglie ${shot.shotName.toLowerCase()} e si prende il rischio: ${technical} Sul ${score} basta un dettaglio per cambiare tutto.`,
+        `Qui non si gioca più soltanto contro il tavolo. ${playerName} prende tempo, controlla due volte la linea e parte: ${technical} Sul ${score} a ${playerOneName} mancano ${playerOneNeeded} punti, a ${playerTwoName} ${playerTwoNeeded}. Ogni rientro può essere l'ultimo buono.`,
+        `${playerName} resta basso sulla stecca qualche secondo in più. ${technical} Il ${score} lascia entrambi a distanza di un solo passaggio importante: nessuno parla, perché tutti stanno facendo lo stesso conto.`,
       ],
       selectedIndex + templateOffset
     );
@@ -1411,8 +1629,8 @@ function buildBroadcastMoment({
   if (shot.highlight === "BIG_SHOT") {
     return selectBroadcastTemplate(
       [
-        `Questo è il colpo che sveglia la sala. ${playerName} vede una linea coraggiosa e la stecca con convinzione: ${technical} Sono ${shot.points} punti che valgono più del numero, perché obbligano ${opponentName} a inseguire sul ${score}.`,
-        `${playerName} sente che il tavolo gli sta offrendo qualcosa e decide di prenderlo. ${technical} Il pubblico accompagna le ultime corse delle bilie: il parziale sale a ${score} e la partita cambia temperatura.`,
+        `Questo è il colpo che sveglia la sala. ${playerName} vede la linea, non la rifiuta e accelera la stecca: ${technical} I ${shot.points} punti aprono il margine sul ${score}; ${opponentName} resta in piedi accanto alla sedia, già dentro la replica.`,
+        `${playerName} sceglie la soluzione più ambiziosa del tavolo e la esegue senza trattenere il braccio. ${technical} Il pubblico segue l'ultima corsa in piedi: sul ${score}, ${opponentName} sa che una risposta normale potrebbe non bastare.`,
       ],
       selectedIndex + templateOffset
     );
@@ -1428,7 +1646,7 @@ function buildBroadcastMoment({
       [
         `${playerName} rimane qualche secondo sulla linea, come se volesse convincersi che il varco esiste.`,
         `La scelta di ${playerName} è ambiziosa, forse troppo per questo momento.`,
-        `Per la prima volta ${playerName} esita davvero prima di scendere sul tiro.`,
+        `${playerName} cambia impugnatura, torna sulla linea e alla fine decide di giocarla.`,
       ],
       selectedIndex + templateOffset
     )} ${technical} ${pause}`;
@@ -1441,8 +1659,8 @@ function buildBroadcastMoment({
   if (shot.outcome === "PARTIAL_POINTS") {
     return selectBroadcastTemplate(
       [
-        `${playerName} sceglie di attaccare e i punti arrivano. ${technical} Manca però il riparo: ${opponentName} resta con gli occhi sul tavolo e sa che può rispondere. Il parziale è ${score}.`,
-        `La realizzazione c'è, la protezione no. ${technical} ${playerName} aggiunge ${shot.points} punti, ma deve tornare alla sedia sapendo di aver lasciato una porta aperta a ${opponentName}.`,
+        `${segmentLead}${playerName} sceglie di attaccare e i punti arrivano. ${technical} Manca però il riparo: ${opponentName} è già in piedi e cerca con gli occhi la traiettoria della risposta.`,
+        `${segmentLead}La realizzazione c'è, la protezione no. ${technical} ${playerName} aggiunge ${shot.points} punti, poi torna alla sedia senza staccare gli occhi dal tavolo: sa di aver lasciato a ${opponentName} una possibilità vera.`,
       ],
       selectedIndex + templateOffset
     );
@@ -1456,9 +1674,9 @@ function buildBroadcastMoment({
 
     return selectBroadcastTemplate(
       [
-        `${playerName} torna al tavolo con un'idea precisa. ${technical} Il punteggio va sul ${score}, ma soprattutto arriva una rimanenza che obbliga ${opponentName} a ricominciare da lontano. ${controlLine}`,
-        `Qui non basta fare punti: bisogna anche lasciare un problema. ${playerName} riesce in entrambe le cose. ${technical} Sul ${score} l'inerzia comincia a inclinarsi dalla sua parte.`,
-        `Niente gesto teatrale, solo una giocata pensata bene. ${technical} ${playerName} si prende ${shot.points} punti e una piccola porzione di tavolo; il ${score} racconta una partita che sta prendendo forma.`,
+        `${segmentLead}${playerName} torna al tavolo con un'idea precisa. ${technical} I punti si sommano alla difesa e ${opponentName}, quando si alza, trova ancora il castello davanti. ${controlLine}`,
+        `${segmentLead}Qui il realizzo è soltanto metà del lavoro. ${playerName} mette dentro anche la misura: ${technical} ${opponentName} osserva il tavolo da entrambi i lati prima di scegliere da dove provare a uscire.`,
+        `${segmentLead}${playerName} non forza ciò che il tavolo non offre. ${technical} Sono ${shot.points} punti e, soprattutto, una rimanenza che costringe ${opponentName} a giocare per riaprire la posizione prima ancora che per segnare.`,
       ],
       selectedIndex + templateOffset
     );
@@ -1469,7 +1687,7 @@ function buildBroadcastMoment({
       ? `Sono ancora schermaglie, ma ${opponentName} ha già capito che ogni spazio verrà conteso.`
       : `Non è lo strappo decisivo, è il modo con cui ${playerName} resta dentro la partita.`;
 
-  return `${playerName} prova a dare ritmo alla propria partita. ${technical} Il parziale diventa ${score}. ${openingMood}`;
+  return `${segmentLead}${playerName} prova a dare ritmo alla propria partita. ${technical} ${openingMood}`;
 }
 
 function getBroadcastTechnicalDetail(shot: IndividualChronicleShot) {
@@ -1498,6 +1716,71 @@ function countPreviousScorelessShots(
   }
 
   return count;
+}
+
+function getCurrentScoringRun(
+  chronicle: IndividualChronicleShot[],
+  chronicleIndex: number
+) {
+  let anchorIndex = chronicleIndex;
+
+  while (anchorIndex >= 0 && chronicle[anchorIndex].points === 0) {
+    anchorIndex -= 1;
+  }
+
+  const current = chronicle[anchorIndex];
+
+  if (!current) return { points: 0, shots: 0 };
+
+  let points = 0;
+  let shots = 0;
+
+  for (let index = anchorIndex; index >= 0; index -= 1) {
+    const candidate = chronicle[index];
+
+    if (candidate.points === 0) continue;
+    if (candidate.scoringSide !== current.scoringSide) break;
+    points += candidate.points;
+    shots += 1;
+  }
+
+  return { points, shots };
+}
+
+function getBroadcastSegmentLead({
+  previousSelectedShot,
+  shot,
+  target,
+  playerOneName,
+  playerTwoName,
+}: {
+  previousSelectedShot: IndividualChronicleShot | null;
+  shot: IndividualChronicleShot;
+  target: number;
+  playerOneName: string;
+  playerTwoName: string;
+}) {
+  if (
+    !previousSelectedShot ||
+    shot.order - previousSelectedShot.order < 3
+  ) {
+    return "";
+  }
+
+  const playerOneGain =
+    shot.playerOneTotal - previousSelectedShot.playerOneTotal;
+  const playerTwoGain =
+    shot.playerTwoTotal - previousSelectedShot.playerTwoTotal;
+  const gap = Math.abs(playerOneGain - playerTwoGain);
+
+  if (gap < target * 0.08) return "";
+
+  const dominantName =
+    playerOneGain > playerTwoGain ? playerOneName : playerTwoName;
+  const dominantGain = Math.max(playerOneGain, playerTwoGain);
+  const otherGain = Math.min(playerOneGain, playerTwoGain);
+
+  return `Fra un momento chiave e il successivo, ${dominantName} ha costruito un parziale di ${dominantGain}–${otherGain}. `;
 }
 
 export function buildIndividualGameIntroduction({
@@ -2040,7 +2323,7 @@ function getOutcomeCommentary(
       random
     );
 
-    return `${actingPlayerName} si prende il tavolo e cerca il tiro della chiusura. ${shotDefinition.name}: ${scoringPhrase}. L'esecuzione riesce e la partita termina qui.`;
+    return `${actingPlayerName} si prende il tavolo e cerca il tiro della chiusura. ${shot.shotName}: ${scoringPhrase}. L'esecuzione riesce e la partita termina qui.`;
   }
 
   if (shot.outcome === "FOUL") {
@@ -2076,7 +2359,7 @@ function getOutcomeCommentary(
         ? " L'avversaria prende anche il pallino da 3."
         : "";
 
-    return `${shotDefinition.name}: sui birilli passa la propria.${pallino} I ${shot.points} punti vanno all'avversario e il gioco prosegue.`;
+    return `${shot.shotName}: sui birilli passa la propria.${pallino} I ${shot.points} punti vanno all'avversario e il gioco prosegue.`;
   }
 
   const scoringPhrase =
@@ -2095,7 +2378,7 @@ function getOutcomeCommentary(
       random
     );
 
-    return `${shotDefinition.name}: ${scoringPhrase}, ${ending}.${label}`;
+    return `${shot.shotName}: ${scoringPhrase}, ${ending}.${label}`;
   }
 
   if (shot.outcome === "PARTIAL_POINTS") {
@@ -2109,7 +2392,7 @@ function getOutcomeCommentary(
       random
     );
 
-    return `${shotDefinition.name}: ${scoringPhrase}, ${ending}.${label}`;
+    return `${shot.shotName}: ${scoringPhrase}, ${ending}.${label}`;
   }
 
   if (shot.outcome === "PARTIAL_DEFENSE") {
@@ -2123,7 +2406,7 @@ function getOutcomeCommentary(
       random
     );
 
-    return `${shotDefinition.name}: ${scoringPhrase}, ${ending}.${label}`;
+    return `${shot.shotName}: ${scoringPhrase}, ${ending}.${label}`;
   }
 
   const measureError =
@@ -2145,7 +2428,7 @@ function getOutcomeCommentary(
           random
         );
 
-  return `${shotDefinition.name}: ${measureError}`;
+  return `${shot.shotName}: ${measureError}`;
 }
 
 function getItalianFoulConsequence(points: number, random: () => number) {
