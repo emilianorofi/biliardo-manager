@@ -940,12 +940,20 @@ export function buildIndividualGameBroadcast({
   specialty,
   playerOneName,
   playerTwoName,
+  gameOrder = 1,
+  matchPlayerOneWins = 0,
+  matchPlayerTwoWins = 0,
+  isDecisiveGame = true,
 }: {
   chronicle: IndividualChronicleShot[];
   gameId: number;
   specialty: MatchSpecialty;
   playerOneName: string;
   playerTwoName: string;
+  gameOrder?: number;
+  matchPlayerOneWins?: number;
+  matchPlayerTwoWins?: number;
+  isDecisiveGame?: boolean;
 }) {
   const selectedShots = selectIndividualChronicleHighlights({
     chronicle,
@@ -983,6 +991,10 @@ export function buildIndividualGameBroadcast({
         playerName,
         opponentName,
         scoringPlayerName,
+        gameOrder,
+        matchPlayerOneWins,
+        matchPlayerTwoWins,
+        isDecisiveGame,
         templateOffset,
       }),
     };
@@ -1001,6 +1013,10 @@ function buildBroadcastMoment({
   playerName,
   opponentName,
   scoringPlayerName,
+  gameOrder,
+  matchPlayerOneWins,
+  matchPlayerTwoWins,
+  isDecisiveGame,
   templateOffset,
 }: {
   shot: IndividualChronicleShot;
@@ -1014,6 +1030,10 @@ function buildBroadcastMoment({
   playerName: string;
   opponentName: string;
   scoringPlayerName: string;
+  gameOrder: number;
+  matchPlayerOneWins: number;
+  matchPlayerTwoWins: number;
+  isDecisiveGame: boolean;
   templateOffset: number;
 }) {
   const target = MATCH_TARGET_POINTS[specialty];
@@ -1038,15 +1058,30 @@ function buildBroadcastMoment({
     selectedCount > 1 ? selectedIndex / (selectedCount - 1) : 1;
 
   if (isFinal) {
+    if (!isDecisiveGame) {
+      const gameWinnerName = scoringPlayerName;
+      const gameLoserName =
+        shot.playerSide === shot.scoringSide ? opponentName : playerName;
+
+      return selectBroadcastTemplate(
+        [
+          `Il tavolo arriva alla bilia che decide la partita ${gameOrder}. ${technical} ${gameWinnerName} si prende questo capitolo sul ${score}, ma l'incontro continua: ora è ${matchPlayerOneWins}–${matchPlayerTwoWins}. ${gameLoserName} ha già ripreso il gesso in mano.`,
+          `La sala capisce che la partita ${gameOrder} è arrivata al suo punto decisivo. ${technical} ${gameWinnerName} porta a casa il capitolo, non ancora l'incontro: il conto complessivo è ${matchPlayerOneWins}–${matchPlayerTwoWins}, e dall'altra sedia si prepara subito la risposta.`,
+          `C'è la chiusura della partita ${gameOrder}, non quella dell'incontro. ${technical} Sul ${score} arrivano gli applausi per ${gameWinnerName}, mentre ${gameLoserName} resta vicino al tavolo. Il prossimo capitolo vale già una reazione.`,
+        ],
+        selectedIndex + templateOffset
+      );
+    }
+
     if (shot.playerSide !== shot.scoringSide) {
-      return `Il tavolo sceglie il modo più amaro di chiudere. ${technical} Per un istante non si sente nulla: poi ${scoringPlayerName} guarda il tabellone, ${score}, e può finalmente lasciare uscire il respiro. È finita.`;
+      return `Il tavolo sceglie il modo più amaro di chiudere. ${technical} Per un istante non si sente nulla: poi ${scoringPlayerName} guarda il tabellone, ${score}, e può finalmente lasciare uscire il respiro. Questa volta è finita davvero: l'incontro è suo.`;
     }
 
     return selectBroadcastTemplate(
       [
-        `Adesso il rumore della sala si spegne. ${playerName} resta in piedi, studia la chiusura e sa che questa bilia pesa più delle altre. ${technical} Le bilie si fermano, il tabellone dice ${score}: ${playerName} ce l'ha fatta.`,
-        `${playerName} torna al tavolo con la partita nelle mani. Niente fretta: un ultimo sguardo alla linea, un respiro, poi la stecca parte. ${technical} Sul ${score} si alzano gli applausi. È il punto che vale la partita.`,
-        `C'è un tiro per chiuderla e tutta la sala lo ha capito. ${playerName} prende tempo, si abbassa e non arretra. ${technical} Il ${score} è la sentenza finale: la tensione si scioglie tutta insieme.`,
+        `Adesso il rumore della sala si spegne. ${playerName} resta in piedi, studia la chiusura e sa che questa bilia pesa più delle altre. ${technical} Le bilie si fermano, il tabellone dice ${score}: è finita davvero, ${playerName} ha vinto l'incontro.`,
+        `${playerName} torna al tavolo con l'incontro nelle mani. Niente fretta: un ultimo sguardo alla linea, un respiro, poi la stecca parte. ${technical} Sul ${score} si alzano gli applausi. È il punto che chiude tutto.`,
+        `C'è un tiro per chiudere l'incontro e tutta la sala lo ha capito. ${playerName} prende tempo, si abbassa e non arretra. ${technical} Il ${score} è la sentenza finale: questa volta non c'è un'altra partita.`,
       ],
       selectedIndex + templateOffset
     );
@@ -1187,6 +1222,10 @@ function countPreviousScorelessShots(
 
 export function buildIndividualGameIntroduction({
   gameId,
+  gameOrder = 1,
+  matchPlayerOneWinsBefore = 0,
+  matchPlayerTwoWinsBefore = 0,
+  isTournamentFinal = false,
   venue,
   tournamentName,
   stageLabel,
@@ -1201,6 +1240,10 @@ export function buildIndividualGameIntroduction({
   playerTwo,
 }: {
   gameId?: number;
+  gameOrder?: number;
+  matchPlayerOneWinsBefore?: number;
+  matchPlayerTwoWinsBefore?: number;
+  isTournamentFinal?: boolean;
   venue: string;
   tournamentName: string;
   stageLabel: string;
@@ -1238,7 +1281,7 @@ export function buildIndividualGameIntroduction({
   const atmosphere = selectTemplate(
     [
       `${venue}: le voci si abbassano mentre le bilie vengono sistemate sul panno. Sta per cominciare la ${stageLabel.toLowerCase()} del ${tournamentName}.`,
-      `${venue}: luci ferme sul biliardo, pubblico vicino e quel brusio che precede soltanto le partite sentite. È ${stageLabel.toLowerCase()} del ${tournamentName}.`,
+      `${venue}: luci ferme sul biliardo, pubblico vicino e quel brusio che precede soltanto le partite sentite. ${stageLabel} del ${tournamentName}, si comincia.`,
       `${venue}: resta soltanto il rumore secco delle bilie di prova. ${stageLabel} del ${tournamentName}, adesso il tavolo è tutto per loro.`,
     ],
     random
@@ -1252,6 +1295,21 @@ export function buildIndividualGameIntroduction({
     random
   );
 
+  if (gameOrder > 1) {
+    return buildIndividualGameContinuationIntroduction({
+      venue,
+      specialty,
+      targetPoints,
+      playerOneName,
+      playerTwoName,
+      matchPlayerOneWinsBefore,
+      matchPlayerTwoWinsBefore,
+      isTournamentFinal,
+      styleLine,
+      random,
+    });
+  }
+
   return [
     atmosphere,
     `${playerOneName}${formatRankingSuffix(playerOneRanking)} affronta ${playerTwoName}${formatRankingSuffix(playerTwoRanking)}.`,
@@ -1262,6 +1320,70 @@ export function buildIndividualGameIntroduction({
   ];
 }
 
+function buildIndividualGameContinuationIntroduction({
+  venue,
+  specialty,
+  targetPoints,
+  playerOneName,
+  playerTwoName,
+  matchPlayerOneWinsBefore,
+  matchPlayerTwoWinsBefore,
+  isTournamentFinal,
+  styleLine,
+  random,
+}: {
+  venue: string;
+  specialty: MatchSpecialty;
+  targetPoints: number;
+  playerOneName: string;
+  playerTwoName: string;
+  matchPlayerOneWinsBefore: number;
+  matchPlayerTwoWinsBefore: number;
+  isTournamentFinal: boolean;
+  styleLine: string;
+  random: () => number;
+}) {
+  const matchScore = `${matchPlayerOneWinsBefore}–${matchPlayerTwoWinsBefore}`;
+  const tied = matchPlayerOneWinsBefore === matchPlayerTwoWinsBefore;
+  const leaderName =
+    matchPlayerOneWinsBefore > matchPlayerTwoWinsBefore
+      ? playerOneName
+      : playerTwoName;
+  const chasingName = leaderName === playerOneName ? playerTwoName : playerOneName;
+  const resetLine = selectTemplate(
+    [
+      `Il breve intervallo è finito. ${venue}: tornano il gesso sulla punta e il rumore delle bilie sistemate, perché nessuno dei due vuole restare seduto.`,
+      `Le bilie della partita precedente sono state appena raccolte. A ${venue} il pubblico continua a parlare di quei punti, ma i giocatori hanno già voltato pagina.`,
+      `Pochi minuti, un sorso d'acqua e di nuovo sotto le luci di ${venue}. Il punteggio resta, tutto il resto deve ricominciare.`,
+    ],
+    random
+  );
+
+  if (tied) {
+    const stakes = isTournamentFinal
+      ? `Una partita per parte, ${matchScore}: chi vince adesso alza il trofeo e diventa campione.`
+      : `Una partita per parte, ${matchScore}: il prossimo punto nell'incontro vale il passaggio del turno.`;
+
+    return [
+      resetLine,
+      stakes,
+      `${playerOneName} e ${playerTwoName} non hanno più una partita alle spalle né una davanti: hanno soltanto questa.`,
+      styleLine,
+      `Si decide a ${formatSpecialtyName(specialty)}, traguardo a ${targetPoints}. La tecnica porta fino al finale; lì servirà anche il coraggio di restare sul tiro.`,
+      "Le voci calano di nuovo. Non c'è più spazio per amministrare: da questo momento ogni bilia può essere quella che resterà nella memoria.",
+    ];
+  }
+
+  return [
+    resetLine,
+    `${leaderName} conduce l'incontro ${matchScore}. Ha preso la prima partita, ma non ha ancora preso l'avversario.`,
+    `${chasingName} torna al tavolo con un compito semplice da dire e difficile da compiere: vincere la prossima per rimettere tutto in equilibrio.`,
+    styleLine,
+    `Ora si gioca a ${formatSpecialtyName(specialty)}, fino a ${targetPoints}. ${leaderName} può chiudere l'incontro; ${chasingName} può trascinarlo alla partita decisiva.`,
+    `Nessuno lascia la sala e nessuno abbassa la voce: il ${matchScore} non è un verdetto, è soltanto il punto da cui riparte la sfida.`,
+  ];
+}
+
 export function buildIndividualGameClosing({
   chronicle,
   specialty,
@@ -1269,6 +1391,11 @@ export function buildIndividualGameClosing({
   playerOneName,
   playerTwoName,
   gameOrder,
+  matchPlayerOneWins,
+  matchPlayerTwoWins,
+  isDecisiveGame = true,
+  isTournamentFinal = false,
+  tournamentName,
 }: {
   chronicle: IndividualChronicleShot[];
   specialty: MatchSpecialty;
@@ -1276,6 +1403,11 @@ export function buildIndividualGameClosing({
   playerOneName: string;
   playerTwoName: string;
   gameOrder: number;
+  matchPlayerOneWins?: number;
+  matchPlayerTwoWins?: number;
+  isDecisiveGame?: boolean;
+  isTournamentFinal?: boolean;
+  tournamentName?: string;
 }) {
   const finalShot = chronicle.at(-1);
 
@@ -1312,6 +1444,11 @@ export function buildIndividualGameClosing({
   const biggestShotPlayer =
     biggestShot?.playerSide === "PLAYER_TWO" ? playerTwoName : playerOneName;
   const finalScore = `${finalShot.playerOneTotal}–${finalShot.playerTwoTotal}`;
+  const seriesPlayerOneWins =
+    matchPlayerOneWins ?? (winnerSide === "PLAYER_ONE" ? 2 : 0);
+  const seriesPlayerTwoWins =
+    matchPlayerTwoWins ?? (winnerSide === "PLAYER_TWO" ? 2 : 0);
+  const matchScore = `${seriesPlayerOneWins}–${seriesPlayerTwoWins}`;
   const finalMargin = Math.abs(
     finalShot.playerOneTotal - finalShot.playerTwoTotal
   );
@@ -1344,13 +1481,39 @@ export function buildIndividualGameClosing({
     random
   );
 
+  if (!isDecisiveGame) {
+    const nextGameOrder = gameOrder + 1;
+    const continuationLine =
+      finalShot.playerSide === finalShot.scoringSide
+        ? `${winnerName} trova la chiusura della partita ${gameOrder}: le bilie si fermano sul ${finalScore} e il primo applauso rompe la tensione.`
+        : `L'ultimo errore di ${loserName} consegna la partita ${gameOrder} a ${winnerName}, con il tabellone fermo sul ${finalScore}.`;
+
+    const nextChapterLine =
+      seriesPlayerOneWins === seriesPlayerTwoWins
+        ? `Fra poco si ricomincia con la partita ${nextGameOrder}. Una vittoria a testa: tutto quello che hanno costruito fin qui conduce allo stesso tavolo, per il capitolo decisivo.`
+        : `Fra poco si ricomincia con la partita ${nextGameOrder}. ${winnerName} può avvicinarsi alla chiusura; ${loserName} ha ancora il tavolo per riprendersi tutto.`;
+
+    return [
+      continuationLine,
+      `Il conto dell'incontro è ${matchScore}. È cambiato il punteggio, non c'è ancora un verdetto.`,
+      matchFlow,
+      biggestLine,
+      `${loserName} non lascia che la delusione diventi resa: torna al proprio posto, passa il gesso sulla punta e comincia già a pensare alla risposta.`,
+      nextChapterLine,
+    ];
+  }
+
+  const verdictLine = isTournamentFinal
+    ? `${winnerName} vince l'incontro ${matchScore} ed è il campione${tournamentName ? ` del ${tournamentName}` : ""}. Il titolo adesso ha il suo nome.`
+    : `${winnerName} vince l'incontro ${matchScore} e supera il turno. Questa volta non c'è un'altra partita a cui affidare la risposta.`;
+
   return [
     decisiveLine,
     roomLine,
     matchFlow,
     biggestLine,
     loserLine,
-    `${winnerName} porta con sé la partita ${gameOrder}: non soltanto un punto nell'incontro, ma una storia conquistata bilia dopo bilia.`,
+    verdictLine,
   ];
 }
 
