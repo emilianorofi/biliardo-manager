@@ -62,6 +62,87 @@ export type IndividualChronicleShot = {
     | "WINNER";
 };
 
+export type ChroniclePallinoContact =
+  | "NONE"
+  | "OPPONENT_BALL"
+  | "OWN_BALL";
+
+export type PinFallScore = {
+  basePinPoints: number;
+  pinPoints: number;
+  pallinoPoints: number;
+  totalPoints: number;
+  redAlone: boolean;
+};
+
+export function calculatePinFallScore({
+  specialty,
+  outerPins,
+  innerPins = 0,
+  redPin = false,
+  pallinoContact = "NONE",
+  cushionShot = false,
+}: {
+  specialty: MatchSpecialty;
+  outerPins: number;
+  innerPins?: number;
+  redPin?: boolean;
+  pallinoContact?: ChroniclePallinoContact;
+  cushionShot?: boolean;
+}): PinFallScore {
+  const maximumOuterPins = 4;
+  const maximumInnerPins = specialty === "ITALIANA" ? 0 : 4;
+
+  if (
+    !Number.isInteger(outerPins) ||
+    !Number.isInteger(innerPins) ||
+    outerPins < 0 ||
+    outerPins > maximumOuterPins ||
+    innerPins < 0 ||
+    innerPins > maximumInnerPins
+  ) {
+    throw new Error("INVALID_PIN_FALL");
+  }
+
+  const otherPins = outerPins + innerPins;
+  const redAlone = redPin && otherPins === 0;
+  const redValue = redPin
+    ? redAlone
+      ? specialty === "ITALIANA"
+        ? 10
+        : 30
+      : specialty === "ITALIANA"
+        ? 4
+        : 10
+    : 0;
+  const basePinPoints =
+    outerPins * 2 +
+    (specialty === "ITALIANA" ? 0 : innerPins * 8) +
+    redValue;
+  const multiplier =
+    specialty === "TUTTI_DOPPI" ||
+    (specialty === "GORIZIANA" && cushionShot)
+      ? 2
+      : 1;
+  const pinPoints = basePinPoints * multiplier;
+  const pallinoPoints =
+    pallinoContact === "NONE"
+      ? 0
+      : specialty === "ITALIANA"
+        ? pallinoContact === "OPPONENT_BALL"
+          ? 3
+          : 4
+        : 6 * multiplier;
+
+  return {
+    basePinPoints,
+    pinPoints,
+    pallinoPoints,
+    totalPoints: pinPoints + pallinoPoints,
+    redAlone,
+  };
+}
+
 const SHOT_DEFINITIONS: ShotDefinition[] = [
   {
     key: "RADDRIZZO",
@@ -262,6 +343,18 @@ type OnePassShotScoreProfile = {
   max: number;
   preferred?: readonly number[];
 };
+
+type NinePinScoreOption = PinFallScore & {
+  outerPins: number;
+  innerPins: number;
+  redPin: boolean;
+  pallinoContact: "NONE" | "OPPONENT_BALL";
+};
+
+const NINE_PIN_SCORE_OPTIONS_CACHE = new Map<
+  string,
+  NinePinScoreOption[]
+>();
 
 const ONE_PASS_SHOT_SCORE_PROFILES: Record<
   Exclude<MatchSpecialty, "ITALIANA">,
@@ -764,6 +857,171 @@ function getShotScoreAffinity(
   return (preferred as readonly number[]).includes(points) ? 3.4 : 0.7;
 }
 
+function getNinePinScoreOptions(
+  specialty: "GORIZIANA" | "TUTTI_DOPPI",
+  shot: ShotDefinition,
+  points: number
+) {
+  const cacheKey = `${specialty}:${shot.key}:${points}`;
+  const cached = NINE_PIN_SCORE_OPTIONS_CACHE.get(cacheKey);
+
+  if (cached) return cached;
+
+  const onePassProfile = ONE_PASS_SHOT_SCORE_PROFILES[specialty][shot.key];
+  const maximumPinsPerType = onePassProfile ? 2 : 4;
+  const options: NinePinScoreOption[] = [];
+
+  for (let outerPins = 0; outerPins <= maximumPinsPerType; outerPins += 1) {
+    for (let innerPins = 0; innerPins <= maximumPinsPerType; innerPins += 1) {
+      for (const redPin of [false, true]) {
+        for (const pallinoContact of [
+          "NONE",
+          "OPPONENT_BALL",
+        ] as const) {
+          const score = calculatePinFallScore({
+            specialty,
+            outerPins,
+            innerPins,
+            redPin,
+            pallinoContact,
+            cushionShot: shot.family === "CUSHION",
+          });
+
+          if (
+            score.totalPoints === points &&
+            (!onePassProfile || points <= onePassProfile.max)
+          ) {
+            options.push({
+              ...score,
+              outerPins,
+              innerPins,
+              redPin,
+              pallinoContact,
+            });
+          }
+        }
+      }
+    }
+  }
+
+  NINE_PIN_SCORE_OPTIONS_CACHE.set(cacheKey, options);
+  return options;
+}
+
+function selectNinePinScoreOption(
+  specialty: "GORIZIANA" | "TUTTI_DOPPI",
+  shot: ShotDefinition,
+  points: number,
+  random: () => number
+) {
+  const options = getNinePinScoreOptions(specialty, shot, points);
+
+  if (options.length === 0) {
+    throw new Error("NINE_PIN_SCORE_NOT_REPRESENTABLE");
+  }
+
+  const preferredMaximumOptions =
+    shot.key === "PARABOLA" && points === 52
+      ? options.filter((option) =>
+          isPreferredOnePassComposition(shot, points, option)
+        )
+      : [];
+  const selectableOptions =
+    preferredMaximumOptions.length > 0 ? preferredMaximumOptions : options;
+
+  return selectWeighted(
+    selectableOptions.map((option) => ({
+      value: option,
+      weight: getNinePinScoreOptionWeight(specialty, shot, points, option),
+    })),
+    random
+  );
+}
+
+function getNinePinScoreOptionWeight(
+  specialty: "GORIZIANA" | "TUTTI_DOPPI",
+  shot: ShotDefinition,
+  points: number,
+  option: NinePinScoreOption
+) {
+  const isDirectFilotto =
+    shot.family === "DIRECT" &&
+    ((specialty === "GORIZIANA" && points === 30) ||
+      (specialty === "TUTTI_DOPPI" && points === 60));
+  const isFullCentralLine =
+    option.outerPins === 2 &&
+    option.innerPins === 2 &&
+    option.redPin &&
+    option.pallinoContact === "NONE";
+
+  if (isDirectFilotto) return isFullCentralLine ? 80 : 0.05;
+
+  if (isPreferredOnePassComposition(shot, points, option)) return 60;
+
+  return (
+    (option.pallinoContact === "NONE" ? 4 : 0.75) *
+    (option.redAlone ? 0.3 : 1) *
+    (1 + option.outerPins * 0.08 + option.innerPins * 0.12)
+  );
+}
+
+function isPreferredOnePassComposition(
+  shot: ShotDefinition,
+  points: number,
+  option: NinePinScoreOption
+) {
+  if (shot.key === "PARABOLA" && points === 52) {
+    return (
+      option.outerPins === 0 &&
+      option.innerPins === 2 &&
+      option.redPin &&
+      option.pallinoContact === "NONE"
+    );
+  }
+
+  if (shot.key !== "GARUFFA" && shot.key !== "MEZZA_GARUFFA") {
+    return false;
+  }
+
+  if (points === 16) {
+    return (
+      option.outerPins === 0 &&
+      option.innerPins === 1 &&
+      !option.redPin &&
+      option.pallinoContact === "NONE"
+    );
+  }
+
+  if (points === 36) {
+    return (
+      option.outerPins === 0 &&
+      option.innerPins === 1 &&
+      option.redPin &&
+      option.pallinoContact === "NONE"
+    );
+  }
+
+  if (points === 40) {
+    return (
+      option.outerPins === 1 &&
+      option.innerPins === 1 &&
+      option.redPin &&
+      option.pallinoContact === "NONE"
+    );
+  }
+
+  if (points === 72) {
+    return (
+      option.outerPins === 2 &&
+      option.innerPins === 2 &&
+      option.redPin &&
+      option.pallinoContact === "OPPONENT_BALL"
+    );
+  }
+
+  return false;
+}
+
 function isShotScoreCompatible(
   specialty: MatchSpecialty,
   shot: ShotDefinition,
@@ -775,16 +1033,7 @@ function isShotScoreCompatible(
     return getItalianScoreOptions(shot, points).length > 0;
   }
 
-  const onePassProfile = ONE_PASS_SHOT_SCORE_PROFILES[specialty][shot.key];
-
-  if (onePassProfile && points > onePassProfile.max) return false;
-
-  if (specialty === "GORIZIANA") {
-    if (shot.family === "DIRECT") return points <= 56;
-    return points % 4 === 0;
-  }
-
-  return true;
+  return getNinePinScoreOptions(specialty, shot, points).length > 0;
 }
 
 function getAdverseEventProbability(
@@ -2101,43 +2350,40 @@ function getGorizianaScoringPhrase(
   points: number,
   random: () => number
 ) {
-  const multiplier = shot.family === "CUSHION" ? 2 : 1;
-  const basePoints = points / multiplier;
-  const forceFilotto = shot.family === "DIRECT" && points === 30;
-  const forceOnePassPallino =
-    (shot.key === "GARUFFA" || shot.key === "MEZZA_GARUFFA") &&
-    points > 60;
-  const pallinoPossible = basePoints >= 6 && basePoints <= 56;
-  const pallinoPoints =
-    forceOnePassPallino || basePoints > 50
-      ? 6
-      : !forceFilotto && pallinoPossible && random() < 0.18
-        ? 6
-        : 0;
-  const pinPoints = basePoints - pallinoPoints;
-  let action: string;
+  const option = selectNinePinScoreOption(
+    "GORIZIANA",
+    shot,
+    points,
+    random
+  );
+  const pinFall = getNinePinFallDescription(option, "GORIZIANA");
+  const isFilotto =
+    shot.family === "DIRECT" &&
+    points === 30 &&
+    option.outerPins === 2 &&
+    option.innerPins === 2 &&
+    option.redPin &&
+    option.pallinoContact === "NONE";
 
-  if (forceFilotto) {
-    action = "trova il filotto da 30";
-  } else if (pinPoints === 0) {
-    action = "trova soltanto il pallino";
-  } else if (pinPoints === 50) {
-    action = "porta giù l'intero castello";
-  } else {
-    action = `realizza ${pinPoints} punti di birilli`;
+  if (isFilotto) {
+    return "trova il filotto: due esterni, due interni e il rosso valgono 30 punti";
   }
 
-  if (pallinoPoints > 0 && pinPoints > 0) {
-    action += " e aggiunge i 6 punti del pallino";
+  if (option.pinPoints === 0) {
+    return `trova soltanto il pallino da ${option.pallinoPoints}`;
   }
 
-  if (forceOnePassPallino) {
-    return `${pinPoints} punti di birilli diventano ${pinPoints * 2} con il tiro di sponda; l'arrivo sul pallino aggiunge 12 punti, totale ${points}`;
+  if (shot.family === "CUSHION") {
+    const pinScore = `${pinFall}: ${option.basePinPoints} punti di birilli che la sponda raddoppia a ${option.pinPoints}`;
+
+    return option.pallinoPoints > 0
+      ? `${pinScore}; l'arrivo sul pallino aggiunge ${option.pallinoPoints}, totale ${points}`
+      : `${pinScore}, totale ${points}`;
   }
 
-  return multiplier === 2
-    ? `${action}; il tiro di sponda raddoppia il conteggio fino a ${points}`
-    : `${action} per un totale di ${points} punti`;
+  return option.pallinoPoints > 0
+    ? `${pinFall} per ${option.pinPoints} punti; il pallino aggiunge ${option.pallinoPoints}, totale ${points}`
+    : `${pinFall}, per un totale di ${points} punti`;
 }
 
 function getTuttiDoppiScoringPhrase(
@@ -2145,35 +2391,73 @@ function getTuttiDoppiScoringPhrase(
   points: number,
   random: () => number
 ) {
-  const forceFilotto = shot.family === "DIRECT" && points === 60;
-  const forceOnePassPallino =
-    (shot.key === "GARUFFA" || shot.key === "MEZZA_GARUFFA") &&
-    points > 60;
-  const pallinoPossible = points >= 12;
-  const pallinoPoints =
-    forceOnePassPallino || points > 100
-      ? 12
-      : !forceFilotto && pallinoPossible && random() < 0.16
-        ? 12
-        : 0;
-  const pinPoints = points - pallinoPoints;
-  let action: string;
+  const option = selectNinePinScoreOption(
+    "TUTTI_DOPPI",
+    shot,
+    points,
+    random
+  );
+  const pinFall = getNinePinFallDescription(option, "TUTTI_DOPPI");
+  const isFilotto =
+    shot.family === "DIRECT" &&
+    points === 60 &&
+    option.outerPins === 2 &&
+    option.innerPins === 2 &&
+    option.redPin &&
+    option.pallinoContact === "NONE";
 
-  if (forceFilotto) {
-    action = "trova il filotto da 60";
-  } else if (pinPoints === 0) {
-    action = "trova soltanto il pallino da 12";
-  } else if (pinPoints === 100) {
-    action = "porta giù l'intero castello da 100";
-  } else {
-    action = `realizza ${pinPoints} punti di birilli`;
+  if (isFilotto) {
+    return "trova il filotto: due esterni, due interni e il rosso valgono 60 punti a Tutti Doppi";
   }
 
-  if (pallinoPoints > 0 && pinPoints > 0) {
-    action += " e aggiunge i 12 punti del pallino";
+  if (option.pinPoints === 0) {
+    return `trova soltanto il pallino da ${option.pallinoPoints}`;
   }
 
-  return `${action}, totale ${points}`;
+  return option.pallinoPoints > 0
+    ? `${pinFall} per ${option.pinPoints} punti di birilli; il pallino aggiunge ${option.pallinoPoints}, totale ${points}`
+    : `${pinFall}, per un totale di ${points} punti`;
+}
+
+function getNinePinFallDescription(
+  option: NinePinScoreOption,
+  specialty: "GORIZIANA" | "TUTTI_DOPPI"
+) {
+  if (option.pinPoints === 0) return "non cadono birilli";
+
+  const multiplier = specialty === "TUTTI_DOPPI" ? 2 : 1;
+
+  if (option.redAlone) {
+    return `cade soltanto il rosso da ${30 * multiplier}`;
+  }
+
+  const parts: string[] = [];
+
+  if (option.outerPins > 0) {
+    parts.push(
+      `${getPinCountLabel(option.outerPins, "esterno", "esterni")} da ${2 * multiplier}`
+    );
+  }
+
+  if (option.innerPins > 0) {
+    parts.push(
+      `${getPinCountLabel(option.innerPins, "interno", "interni")} da ${8 * multiplier}`
+    );
+  }
+
+  if (option.redPin) parts.push(`il rosso da ${10 * multiplier}`);
+
+  const fallenPins =
+    option.outerPins + option.innerPins + (option.redPin ? 1 : 0);
+
+  return `${fallenPins === 1 ? "cade" : "cadono"} ${joinItalianList(parts)}`;
+}
+
+function getPinCountLabel(count: number, singular: string, plural: string) {
+  if (count === 1) return `un ${singular}`;
+  if (count === 2) return `due ${plural}`;
+  if (count === 3) return `tre ${plural}`;
+  return `quattro ${plural}`;
 }
 
 function getChroniclePhase(index: number, totalShots: number) {
