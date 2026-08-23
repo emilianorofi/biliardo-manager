@@ -14,6 +14,7 @@ import {
   buildIndividualGameChronicle,
   buildIndividualGameIntroduction,
   buildIndividualGameSummary,
+  calculatePinFallScore,
   selectIndividualChronicleHighlights,
 } from "../lib/individual-game-chronicle";
 import { MATCH_SHOT_SCORES } from "../lib/match-engine";
@@ -147,6 +148,89 @@ test("conserva i punteggi ammessi per ogni singolo tiro", () => {
     4, 8, 12, 16, 20, 24, 28, 32, 36, 40, 44, 48, 52, 56, 60, 64, 68, 72,
     76, 80, 84, 88, 92, 96, 100, 104, 108, 112,
   ]);
+});
+
+test("calcola i birilli, il rosso e il pallino secondo la specialita", () => {
+  const italianFilotto = calculatePinFallScore({
+    specialty: "ITALIANA",
+    outerPins: 2,
+    redPin: true,
+  });
+  const italianRedAndOwnPallino = calculatePinFallScore({
+    specialty: "ITALIANA",
+    outerPins: 0,
+    redPin: true,
+    pallinoContact: "OWN_BALL",
+  });
+  const italianCastle = calculatePinFallScore({
+    specialty: "ITALIANA",
+    outerPins: 4,
+    redPin: true,
+  });
+  const gorizianaRedAlone = calculatePinFallScore({
+    specialty: "GORIZIANA",
+    outerPins: 0,
+    innerPins: 0,
+    redPin: true,
+  });
+  const gorizianaCastle = calculatePinFallScore({
+    specialty: "GORIZIANA",
+    outerPins: 4,
+    innerPins: 4,
+    redPin: true,
+  });
+  const gorizianaDirect = calculatePinFallScore({
+    specialty: "GORIZIANA",
+    outerPins: 2,
+    innerPins: 2,
+    redPin: true,
+  });
+  const gorizianaCushionWithPallino = calculatePinFallScore({
+    specialty: "GORIZIANA",
+    outerPins: 2,
+    innerPins: 2,
+    redPin: true,
+    pallinoContact: "OPPONENT_BALL",
+    cushionShot: true,
+  });
+  const tuttiDoppiWithPallino = calculatePinFallScore({
+    specialty: "TUTTI_DOPPI",
+    outerPins: 2,
+    innerPins: 2,
+    redPin: true,
+    pallinoContact: "OWN_BALL",
+  });
+  const tuttiDoppiCastle = calculatePinFallScore({
+    specialty: "TUTTI_DOPPI",
+    outerPins: 4,
+    innerPins: 4,
+    redPin: true,
+  });
+
+  assert.deepEqual(italianFilotto, {
+    basePinPoints: 8,
+    pinPoints: 8,
+    pallinoPoints: 0,
+    totalPoints: 8,
+    redAlone: false,
+  });
+  assert.equal(italianRedAndOwnPallino.pinPoints, 10);
+  assert.equal(italianRedAndOwnPallino.pallinoPoints, 4);
+  assert.equal(italianRedAndOwnPallino.totalPoints, 14);
+  assert.equal(italianRedAndOwnPallino.redAlone, true);
+  assert.equal(italianCastle.totalPoints, 12);
+  assert.equal(gorizianaRedAlone.totalPoints, 30);
+  assert.equal(gorizianaRedAlone.redAlone, true);
+  assert.equal(gorizianaCastle.totalPoints, 50);
+  assert.equal(gorizianaDirect.basePinPoints, 30);
+  assert.equal(gorizianaDirect.totalPoints, 30);
+  assert.equal(gorizianaCushionWithPallino.pinPoints, 60);
+  assert.equal(gorizianaCushionWithPallino.pallinoPoints, 12);
+  assert.equal(gorizianaCushionWithPallino.totalPoints, 72);
+  assert.equal(tuttiDoppiWithPallino.pinPoints, 60);
+  assert.equal(tuttiDoppiWithPallino.pallinoPoints, 12);
+  assert.equal(tuttiDoppiWithPallino.totalPoints, 72);
+  assert.equal(tuttiDoppiCastle.totalPoints, 100);
 });
 
 test("costruisce una cronaca alternata con punteggi e totali corretti", () => {
@@ -651,7 +735,7 @@ test("limita garuffa, mezza garuffa e parabola nelle specialita a molti punti", 
           ) {
             highGaruffaScores += 1;
             assert.match(shot.commentary, /pallino/);
-            assert.match(shot.commentary, /12 punti/);
+            assert.match(shot.commentary, /12(?: punti)?/);
           }
 
           if (
@@ -661,14 +745,37 @@ test("limita garuffa, mezza garuffa e parabola nelle specialita a molti punti", 
           ) {
             assert.match(
               shot.commentary,
-              /30 punti di birilli diventano 60.*pallino.*12 punti.*totale 72/
+              /30 punti di birilli.*raddoppia a 60.*pallino.*12.*totale 72/
             );
           }
+
+          assert.doesNotMatch(
+            shot.commentary,
+            /40 punti di birilli.*raddoppia.*80/
+          );
         }
 
         if (shot.points > 0 && shot.shotName === "Parabola") {
           parabolaScores += 1;
           assert.ok(shot.points <= 52);
+
+          if (
+            shot.points === 52 &&
+            shot.playerSide === shot.scoringSide
+          ) {
+            if (specialty === "GORIZIANA") {
+              assert.match(
+                shot.commentary,
+                /due interni da 8.*rosso da 10.*26 punti di birilli.*raddoppia a 52/
+              );
+            } else {
+              assert.match(
+                shot.commentary,
+                /due interni da 16.*rosso da 20.*totale di 52 punti/
+              );
+            }
+            assert.doesNotMatch(shot.commentary, /pallino/);
+          }
         }
       }
     }
