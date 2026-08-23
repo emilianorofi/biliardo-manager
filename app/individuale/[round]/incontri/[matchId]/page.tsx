@@ -229,6 +229,27 @@ export default async function IndividualMatchDetailPage({
             <div className="divide-y divide-zinc-800">
               {match.games.map((game) => {
                 const playerOneWon = game.winnerSide === "PLAYER_ONE";
+                const previousGames = match.games.filter(
+                  (candidate) => candidate.order < game.order
+                );
+                const gamesThroughCurrent = match.games.filter(
+                  (candidate) => candidate.order <= game.order
+                );
+                const playerOneWinsBefore = previousGames.filter(
+                  (candidate) => candidate.winnerSide === "PLAYER_ONE"
+                ).length;
+                const playerTwoWinsBefore = previousGames.filter(
+                  (candidate) => candidate.winnerSide === "PLAYER_TWO"
+                ).length;
+                const playerOneWinsAfter = gamesThroughCurrent.filter(
+                  (candidate) => candidate.winnerSide === "PLAYER_ONE"
+                ).length;
+                const playerTwoWinsAfter = gamesThroughCurrent.filter(
+                  (candidate) => candidate.winnerSide === "PLAYER_TWO"
+                ).length;
+                const isDecisiveGame =
+                  playerOneWinsAfter === 2 || playerTwoWinsAfter === 2;
+                const isTournamentFinal = match.stage === "FINAL";
                 const chronicle = buildIndividualGameChronicle({
                   gameId: game.id,
                   specialty: game.specialty as MatchSpecialty,
@@ -249,6 +270,10 @@ export default async function IndividualMatchDetailPage({
                   : "PLAYER_TWO";
                 const introduction = buildIndividualGameIntroduction({
                   gameId: game.id,
+                  gameOrder: game.order,
+                  matchPlayerOneWinsBefore: playerOneWinsBefore,
+                  matchPlayerTwoWinsBefore: playerTwoWinsBefore,
+                  isTournamentFinal,
                   venue,
                   tournamentName: match.tournament.name,
                   stageLabel: formatStage(match.stage),
@@ -268,6 +293,10 @@ export default async function IndividualMatchDetailPage({
                   specialty: game.specialty as MatchSpecialty,
                   playerOneName,
                   playerTwoName,
+                  gameOrder: game.order,
+                  matchPlayerOneWins: playerOneWinsAfter,
+                  matchPlayerTwoWins: playerTwoWinsAfter,
+                  isDecisiveGame,
                 });
                 const closing = buildIndividualGameClosing({
                   chronicle,
@@ -276,7 +305,17 @@ export default async function IndividualMatchDetailPage({
                   playerOneName,
                   playerTwoName,
                   gameOrder: game.order,
+                  matchPlayerOneWins: playerOneWinsAfter,
+                  matchPlayerTwoWins: playerTwoWinsAfter,
+                  isDecisiveGame,
+                  isTournamentFinal,
+                  tournamentName: match.tournament.name,
                 });
+                const closingTitle = isDecisiveGame
+                  ? isTournamentFinal
+                    ? "Il campione"
+                    : "Verdetto dell'incontro"
+                  : `Verso la partita ${game.order + 1}`;
 
                 return (
                   <details key={game.id} className="group">
@@ -297,7 +336,7 @@ export default async function IndividualMatchDetailPage({
                           {formatSpecialty(game.specialty)}
                         </p>
                         <span className="mt-1 inline-flex items-center gap-1 text-[9px] font-bold text-zinc-500">
-                          Cronaca
+                          Incontro {playerOneWinsAfter}–{playerTwoWinsAfter}
                           <ChevronDown
                             size={12}
                             className="transition group-open:rotate-180"
@@ -447,10 +486,26 @@ export default async function IndividualMatchDetailPage({
                         })}
                       </ol>
 
-                      <div className="mt-4 rounded-xl border border-emerald-400/15 bg-emerald-300/[0.04] px-4 py-3">
-                        <div className="flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.16em] text-emerald-300">
+                      <div
+                        className={`mt-4 rounded-xl border px-4 py-3 ${
+                          isTournamentFinal && isDecisiveGame
+                            ? "border-amber-400/25 bg-amber-300/[0.06]"
+                            : isDecisiveGame
+                              ? "border-emerald-400/15 bg-emerald-300/[0.04]"
+                              : "border-sky-400/15 bg-sky-300/[0.04]"
+                        }`}
+                      >
+                        <div
+                          className={`flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.16em] ${
+                            isTournamentFinal && isDecisiveGame
+                              ? "text-amber-300"
+                              : isDecisiveGame
+                                ? "text-emerald-300"
+                                : "text-sky-300"
+                          }`}
+                        >
                           <Sparkles size={14} />
-                          Epilogo
+                          {closingTitle}
                         </div>
                         <div className="mt-2 space-y-1.5 text-sm font-medium leading-relaxed text-zinc-300">
                           {closing.map((line) => (
