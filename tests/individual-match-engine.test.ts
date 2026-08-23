@@ -864,7 +864,7 @@ test("racconta il tiro decisivo senza lasciare aperta la partita", () => {
   );
 });
 
-test("seleziona da venti a venticinque momenti chiave", () => {
+test("seleziona da nove a dodici capitoli della partita", () => {
   const chronicle = buildIndividualGameChronicle(
     withChroniclePlayers({
       gameId: 1301,
@@ -879,8 +879,8 @@ test("seleziona da venti a venticinque momenti chiave", () => {
     gameId: 1301,
   });
 
-  assert.ok(highlights.length >= 20);
-  assert.ok(highlights.length <= 25);
+  assert.ok(highlights.length >= 9);
+  assert.ok(highlights.length <= 12);
   assert.equal(highlights.at(-1)!.order, chronicle.at(-1)!.order);
   assert.equal(highlights.at(-1)!.highlight, "WINNER");
 
@@ -889,15 +889,27 @@ test("seleziona da venti a venticinque momenti chiave", () => {
   }
 });
 
-test("trasforma i momenti chiave in una telecronaca che segue la partita", () => {
+test("trasforma i momenti chiave in un racconto della partita", () => {
+  const playerOne = {
+    ...createPlayer(1, 84),
+    form: 8,
+    morale: 9,
+  };
+  const playerTwo = {
+    ...createPlayer(2, 80),
+    form: 4,
+    morale: 3,
+  };
   const chronicle = buildIndividualGameChronicle({
-    ...withChroniclePlayers({
-      gameId: 1447,
-      specialty: "ITALIANA" as const,
-      winnerSide: "PLAYER_ONE" as const,
-      playerOneScore: 80,
-      playerTwoScore: 74,
-    }),
+    gameId: 1447,
+    specialty: "ITALIANA" as const,
+    winnerSide: "PLAYER_ONE" as const,
+    playerOneScore: 80,
+    playerTwoScore: 74,
+    playerOnePerformanceRating: 86,
+    playerTwoPerformanceRating: 79,
+    playerOne,
+    playerTwo,
     playerOneName: "Andrea Quarta",
     playerTwoName: "Matteo Gualemi",
   });
@@ -907,20 +919,45 @@ test("trasforma i momenti chiave in una telecronaca che segue la partita", () =>
     specialty: "ITALIANA",
     playerOneName: "Andrea Quarta",
     playerTwoName: "Matteo Gualemi",
+    playerOne,
+    playerTwo,
+    playerOnePerformanceRating: 86,
+    playerTwoPerformanceRating: 79,
+    matchPlayerOneWins: 2,
+    matchPlayerTwoWins: 1,
   });
   const fullStory = broadcast.map((shot) => shot.commentary).join(" ");
   const sentenceOpenings = new Set(
     broadcast.map((shot) => shot.commentary.split(".")[0])
   );
   const finalMoment = broadcast.at(-1)!;
+  const technicalChapters = broadcast.filter((shot) => shot.showShotDetail);
+  const narrativeChapters = broadcast.filter((shot) => !shot.showShotDetail);
 
-  assert.ok(broadcast.length >= 20);
-  assert.ok(broadcast.length <= 25);
+  assert.ok(broadcast.length >= 9);
+  assert.ok(broadcast.length <= 12);
   assert.ok(broadcast.every((shot) => shot.technicalCommentary.length > 0));
+  assert.ok(broadcast.every((shot) => shot.storyTitle));
+  assert.ok(technicalChapters.length > 0);
+  assert.ok(narrativeChapters.length > technicalChapters.length);
+  assert.ok(
+    narrativeChapters.every(
+      (shot) => !shot.commentary.includes(`${shot.shotName}:`)
+    )
+  );
   assert.match(fullStory, /Andrea Quarta/);
   assert.match(fullStory, /Matteo Gualemi/);
-  assert.ok(sentenceOpenings.size >= 10);
-  assert.match(fullStory, /strappo|sorpasso|parziale|passaggio/);
+  assert.match(
+    fullStory,
+    /forma eccellente \(8\/10\).*fiducia altissima \(9\/10\)/
+  );
+  assert.match(
+    fullStory,
+    /condizione ordinaria \(4\/10\).*fiducia fragile \(3\/10\)/
+  );
+  assert.match(fullStory, /rendimento prodotto fin qui, 86 contro 79/);
+  assert.ok(sentenceOpenings.size >= 7);
+  assert.match(fullStory, /ritmo|sorpasso|parziale|pressione|partita/);
   assert.doesNotMatch(
     fullStory,
     /Niente gesto teatrale|piccola porzione di tavolo|cambia temperatura|persino il silenzio/
@@ -929,7 +966,7 @@ test("trasforma i momenti chiave in una telecronaca che segue la partita", () =>
   assert.match(finalMoment.commentary, /Andrea Quarta/);
   assert.match(
     finalMoment.commentary,
-    /ha vinto l'incontro|punto che chiude tutto|sentenza finale/
+    /È finita|vince l'incontro|supera il turno/
   );
   assert.doesNotMatch(
     finalMoment.commentary,
