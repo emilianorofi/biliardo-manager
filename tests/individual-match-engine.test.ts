@@ -612,6 +612,74 @@ test("limita i realizzi dei tiri dell'Italiana a una sola passata", () => {
   assert.ok(garuffaShots > 50);
 });
 
+test("limita garuffa, mezza garuffa e parabola nelle specialita a molti punti", () => {
+  const specialties = ["GORIZIANA", "TUTTI_DOPPI"] as const;
+  const preferredGaruffaScores = new Set([16, 36, 40]);
+  let garuffaScores = 0;
+  let preferredGaruffaScoresFound = 0;
+  let highGaruffaScores = 0;
+  let parabolaScores = 0;
+
+  for (const specialty of specialties) {
+    for (let gameId = 1280; gameId < 1430; gameId += 1) {
+      const chronicle = buildIndividualGameChronicle(
+        withChroniclePlayers({
+          gameId: gameId + (specialty === "TUTTI_DOPPI" ? 1000 : 0),
+          specialty,
+          winnerSide: "PLAYER_ONE" as const,
+          playerOneScore: specialty === "GORIZIANA" ? 400 : 800,
+          playerTwoScore: specialty === "GORIZIANA" ? 348 : 704,
+        })
+      );
+
+      for (const shot of chronicle) {
+        if (
+          shot.points > 0 &&
+          (shot.shotName === "Garuffa" ||
+            shot.shotName === "Mezza garuffa")
+        ) {
+          garuffaScores += 1;
+          assert.ok(shot.points <= 72);
+
+          if (preferredGaruffaScores.has(shot.points)) {
+            preferredGaruffaScoresFound += 1;
+          }
+
+          if (
+            shot.points > 60 &&
+            shot.playerSide === shot.scoringSide
+          ) {
+            highGaruffaScores += 1;
+            assert.match(shot.commentary, /pallino/);
+            assert.match(shot.commentary, /12 punti/);
+          }
+
+          if (
+            specialty === "GORIZIANA" &&
+            shot.points === 72 &&
+            shot.playerSide === shot.scoringSide
+          ) {
+            assert.match(
+              shot.commentary,
+              /30 punti di birilli diventano 60.*pallino.*12 punti.*totale 72/
+            );
+          }
+        }
+
+        if (shot.points > 0 && shot.shotName === "Parabola") {
+          parabolaScores += 1;
+          assert.ok(shot.points <= 52);
+        }
+      }
+    }
+  }
+
+  assert.ok(garuffaScores > 150);
+  assert.ok(preferredGaruffaScoresFound / garuffaScores > 0.65);
+  assert.ok(highGaruffaScores > 0);
+  assert.ok(parabolaScores > 30);
+});
+
 test("racconta il tiro decisivo senza lasciare aperta la partita", () => {
   const chronicle = buildIndividualGameChronicle({
     ...withChroniclePlayers({
