@@ -787,6 +787,59 @@ test("limita garuffa, mezza garuffa e parabola nelle specialita a molti punti", 
   assert.ok(parabolaScores > 30);
 });
 
+test("rispetta le traiettorie contigue di striscio e candela", () => {
+  let strisci = 0;
+  let candele = 0;
+
+  for (let gameId = 1700; gameId < 1820; gameId += 1) {
+    const chronicle = buildIndividualGameChronicle(
+      withChroniclePlayers({
+        gameId,
+        specialty: "GORIZIANA" as const,
+        winnerSide: "PLAYER_ONE" as const,
+        playerOneScore: 400,
+        playerTwoScore: 352,
+      })
+    );
+
+    for (const shot of chronicle) {
+      if (shot.points === 0 || shot.playerSide !== shot.scoringSide) continue;
+
+      if (shot.shotName === "Striscio") {
+        strisci += 1;
+        if (/estern[^.]*rosso/.test(shot.technicalCommentary)) {
+          assert.match(shot.technicalCommentary, /intern/);
+        }
+        assert.doesNotMatch(
+          shot.technicalCommentary,
+          /tre esterni|quattro esterni|tre interni|quattro interni/
+        );
+
+        if (shot.points === 18) {
+          assert.match(shot.technicalCommentary, /un interno da 8.*rosso da 10/);
+          assert.doesNotMatch(shot.technicalCommentary, /pallino/);
+        }
+      }
+
+      if (shot.shotName === "Candela") {
+        candele += 1;
+        assert.doesNotMatch(
+          shot.technicalCommentary,
+          /due esterni|tre esterni|quattro esterni|rosso/
+        );
+
+        if (shot.points === 12) {
+          assert.match(shot.technicalCommentary, /soltanto il pallino da 12/);
+          assert.doesNotMatch(shot.technicalCommentary, /cadono birilli/);
+        }
+      }
+    }
+  }
+
+  assert.ok(strisci > 20);
+  assert.ok(candele > 20);
+});
+
 test("racconta il tiro decisivo senza lasciare aperta la partita", () => {
   const chronicle = buildIndividualGameChronicle({
     ...withChroniclePlayers({
@@ -867,6 +920,11 @@ test("trasforma i momenti chiave in una telecronaca che segue la partita", () =>
   assert.match(fullStory, /Andrea Quarta/);
   assert.match(fullStory, /Matteo Gualemi/);
   assert.ok(sentenceOpenings.size >= 10);
+  assert.match(fullStory, /strappo|sorpasso|parziale|passaggio/);
+  assert.doesNotMatch(
+    fullStory,
+    /Niente gesto teatrale|piccola porzione di tavolo|cambia temperatura|persino il silenzio/
+  );
   assert.equal(finalMoment.highlight, "WINNER");
   assert.match(finalMoment.commentary, /Andrea Quarta/);
   assert.match(
