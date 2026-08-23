@@ -53,6 +53,8 @@ export type IndividualChronicleShot = {
   phase: "OPENING" | "MIDDLE" | "FINISH";
   technicalCommentary: string;
   commentary: string;
+  storyTitle?: string;
+  showShotDetail?: boolean;
   highlight:
     | "NONE"
     | "MISS"
@@ -1266,18 +1268,18 @@ export function selectIndividualChronicleHighlights({
   chronicle: IndividualChronicleShot[];
   gameId: number;
 }) {
-  const targetCount = Math.min(chronicle.length, 20 + Math.abs(gameId) % 6);
+  const targetCount = Math.min(chronicle.length, 9 + Math.abs(gameId) % 4);
 
   if (chronicle.length <= targetCount) return chronicle;
 
   const lastIndex = chronicle.length - 1;
   const selectedIndexes = new Set([
-    0,
-    1,
-    Math.floor(lastIndex * 0.25),
-    Math.floor(lastIndex * 0.5),
-    Math.floor(lastIndex * 0.75),
-    lastIndex - 1,
+    Math.floor(lastIndex * 0.08),
+    Math.floor(lastIndex * 0.22),
+    Math.floor(lastIndex * 0.4),
+    Math.floor(lastIndex * 0.58),
+    Math.floor(lastIndex * 0.76),
+    Math.floor(lastIndex * 0.9),
     lastIndex,
   ]);
   const rankedShots = chronicle
@@ -1373,20 +1375,30 @@ export function buildIndividualGameBroadcast({
   specialty,
   playerOneName,
   playerTwoName,
+  playerOne,
+  playerTwo,
+  playerOnePerformanceRating,
+  playerTwoPerformanceRating,
   gameOrder = 1,
   matchPlayerOneWins = 0,
   matchPlayerTwoWins = 0,
   isDecisiveGame = true,
+  isTournamentFinal = false,
 }: {
   chronicle: IndividualChronicleShot[];
   gameId: number;
   specialty: MatchSpecialty;
   playerOneName: string;
   playerTwoName: string;
+  playerOne?: IndividualChroniclePlayerValues;
+  playerTwo?: IndividualChroniclePlayerValues;
+  playerOnePerformanceRating?: number;
+  playerTwoPerformanceRating?: number;
   gameOrder?: number;
   matchPlayerOneWins?: number;
   matchPlayerTwoWins?: number;
   isDecisiveGame?: boolean;
+  isTournamentFinal?: boolean;
 }) {
   const selectedShots = selectIndividualChronicleHighlights({
     chronicle,
@@ -1404,19 +1416,45 @@ export function buildIndividualGameBroadcast({
     );
     const previousShot = chronicle[chronicleIndex - 1] ?? null;
     const previousSelectedShot = selectedShots[selectedIndex - 1] ?? null;
-    const playerName =
-      shot.playerSide === "PLAYER_ONE" ? playerOneName : playerTwoName;
-    const opponentName =
-      shot.playerSide === "PLAYER_ONE" ? playerTwoName : playerOneName;
-    const scoringPlayerName =
-      shot.scoringSide === "PLAYER_ONE" ? playerOneName : playerTwoName;
+    const previousSelectedChronicleIndex = previousSelectedShot
+      ? chronicle.findIndex(
+          (candidate) => candidate.order === previousSelectedShot.order
+        )
+      : -1;
+    const segment = chronicle.slice(
+      previousSelectedChronicleIndex + 1,
+      chronicleIndex + 1
+    );
+    const crossesDecisivePassage =
+      story.decisiveOrder !== null &&
+      shot.order >= story.decisiveOrder &&
+      (previousSelectedShot?.order ?? 0) < story.decisiveOrder;
+    const showShotDetail = shouldShowShotDetail({
+      shot,
+      previousShot,
+      crossesDecisivePassage,
+      selectedIndex,
+      specialty,
+    });
+    const storyTitle = getStoryBeatTitle({
+      shot,
+      selectedIndex,
+      selectedCount: selectedShots.length,
+      crossesDecisivePassage,
+      segment,
+      previousSelectedShot,
+      specialty,
+    });
 
     return {
       ...shot,
-      commentary: buildBroadcastMoment({
+      storyTitle,
+      showShotDetail,
+      commentary: buildMatchStoryBeat({
         shot,
         previousShot,
         previousSelectedShot,
+        segment,
         chronicle,
         chronicleIndex,
         selectedIndex,
@@ -1425,17 +1463,644 @@ export function buildIndividualGameBroadcast({
         story,
         playerOneName,
         playerTwoName,
-        playerName,
-        opponentName,
-        scoringPlayerName,
+        playerOne,
+        playerTwo,
+        playerOnePerformanceRating,
+        playerTwoPerformanceRating,
         gameOrder,
         matchPlayerOneWins,
         matchPlayerTwoWins,
         isDecisiveGame,
+        isTournamentFinal,
+        crossesDecisivePassage,
+        showShotDetail,
         templateOffset,
       }),
     };
   });
+}
+
+type StorySegmentStats = {
+  playerOneGain: number;
+  playerTwoGain: number;
+  playerOneAttempts: number;
+  playerTwoAttempts: number;
+  playerOneScoringVisits: number;
+  playerTwoScoringVisits: number;
+  playerOneEmptyVisits: number;
+  playerTwoEmptyVisits: number;
+  playerOneAdverseEvents: number;
+  playerTwoAdverseEvents: number;
+};
+
+function shouldShowShotDetail({
+  shot,
+  previousShot,
+  crossesDecisivePassage,
+  selectedIndex,
+  specialty,
+}: {
+  shot: IndividualChronicleShot;
+  previousShot: IndividualChronicleShot | null;
+  crossesDecisivePassage: boolean;
+  selectedIndex: number;
+  specialty: MatchSpecialty;
+}) {
+  if (shot.highlight === "WINNER" || crossesDecisivePassage) return true;
+  if (
+    shot.highlight === "FOUL" ||
+    shot.highlight === "LEAD_CHANGE" ||
+    shot.highlight === "BIG_SHOT"
+  ) {
+    return true;
+  }
+
+  if (
+    previousShot &&
+    shot.playerOneTotal === shot.playerTwoTotal &&
+    previousShot.playerOneTotal !== previousShot.playerTwoTotal
+  ) {
+    return true;
+  }
+
+  const previousDeficit = previousShot
+    ? shot.scoringSide === "PLAYER_ONE"
+      ? previousShot.playerTwoTotal - previousShot.playerOneTotal
+      : previousShot.playerOneTotal - previousShot.playerTwoTotal
+    : 0;
+  const currentDeficit =
+    shot.scoringSide === "PLAYER_ONE"
+      ? shot.playerTwoTotal - shot.playerOneTotal
+      : shot.playerOneTotal - shot.playerTwoTotal;
+
+  return (
+    selectedIndex > 0 &&
+    shot.points > 0 &&
+    previousDeficit >= MATCH_TARGET_POINTS[specialty] * 0.1 &&
+    currentDeficit <= previousDeficit * 0.55
+  );
+}
+
+function getStoryBeatTitle({
+  shot,
+  selectedIndex,
+  selectedCount,
+  crossesDecisivePassage,
+  segment,
+  previousSelectedShot,
+  specialty,
+}: {
+  shot: IndividualChronicleShot;
+  selectedIndex: number;
+  selectedCount: number;
+  crossesDecisivePassage: boolean;
+  segment: IndividualChronicleShot[];
+  previousSelectedShot: IndividualChronicleShot | null;
+  specialty: MatchSpecialty;
+}) {
+  if (shot.highlight === "WINNER") return "La bilia che chiude";
+  if (crossesDecisivePassage) return "La svolta";
+  if (shot.highlight === "FOUL") return "La prima crepa";
+  if (shot.playerOneTotal === shot.playerTwoTotal) return "Di nuovo insieme";
+  if (shot.highlight === "LEAD_CHANGE") return "Il sorpasso";
+  if (shot.highlight === "BIG_SHOT") return "Il colpo che accende la sala";
+  if (selectedIndex === 0) return "Dentro la partita";
+
+  const stats = getStorySegmentStats(segment, previousSelectedShot);
+  const segmentGap = Math.abs(stats.playerOneGain - stats.playerTwoGain);
+  const progress = selectedCount > 1 ? selectedIndex / (selectedCount - 1) : 1;
+
+  if (progress >= 0.78) return "Il tavolo si fa pesante";
+  if (segmentGap >= MATCH_TARGET_POINTS[specialty] * 0.1) {
+    return progress < 0.48 ? "Il primo strappo" : "La risposta";
+  }
+  if (progress >= 0.5) return "La pressione sale";
+  return "La partita prende forma";
+}
+
+function buildMatchStoryBeat({
+  shot,
+  previousShot,
+  previousSelectedShot,
+  segment,
+  chronicle,
+  chronicleIndex,
+  selectedIndex,
+  selectedCount,
+  specialty,
+  story,
+  playerOneName,
+  playerTwoName,
+  playerOne,
+  playerTwo,
+  playerOnePerformanceRating,
+  playerTwoPerformanceRating,
+  gameOrder,
+  matchPlayerOneWins,
+  matchPlayerTwoWins,
+  isDecisiveGame,
+  isTournamentFinal,
+  crossesDecisivePassage,
+  showShotDetail,
+  templateOffset,
+}: {
+  shot: IndividualChronicleShot;
+  previousShot: IndividualChronicleShot | null;
+  previousSelectedShot: IndividualChronicleShot | null;
+  segment: IndividualChronicleShot[];
+  chronicle: IndividualChronicleShot[];
+  chronicleIndex: number;
+  selectedIndex: number;
+  selectedCount: number;
+  specialty: MatchSpecialty;
+  story: BroadcastStoryContext;
+  playerOneName: string;
+  playerTwoName: string;
+  playerOne?: IndividualChroniclePlayerValues;
+  playerTwo?: IndividualChroniclePlayerValues;
+  playerOnePerformanceRating?: number;
+  playerTwoPerformanceRating?: number;
+  gameOrder: number;
+  matchPlayerOneWins: number;
+  matchPlayerTwoWins: number;
+  isDecisiveGame: boolean;
+  isTournamentFinal: boolean;
+  crossesDecisivePassage: boolean;
+  showShotDetail: boolean;
+  templateOffset: number;
+}) {
+  const target = MATCH_TARGET_POINTS[specialty];
+  const score = `${shot.playerOneTotal}–${shot.playerTwoTotal}`;
+  const stats = getStorySegmentStats(segment, previousSelectedShot);
+  const gameWinnerName =
+    story.winnerSide === "PLAYER_ONE" ? playerOneName : playerTwoName;
+  const gameLoserName =
+    story.winnerSide === "PLAYER_ONE" ? playerTwoName : playerOneName;
+  const flow = buildStorySegmentFlow({
+    stats,
+    playerOneName,
+    playerTwoName,
+    target,
+    score,
+    selectedIndex,
+    selectedCount,
+    templateOffset,
+  });
+  const concentration = buildConcentrationLine({
+    stats,
+    playerOneName,
+    playerTwoName,
+    playerOne,
+    playerTwo,
+    selectedIndex,
+  });
+  const technical = showShotDetail
+    ? buildStoryShotLine({
+        shot,
+        previousShot,
+        crossesDecisivePassage,
+        playerOneName,
+        playerTwoName,
+      })
+    : "";
+
+  if (shot.highlight === "WINNER") {
+    const closingAction =
+      shot.playerSide === shot.scoringSide
+        ? `${gameWinnerName} riconosce la possibilità, si prende tutto il tempo necessario e va sul tiro della chiusura. ${getBroadcastTechnicalDetail(shot)}`
+        : `La pressione presenta il conto a ${gameLoserName}. ${getBroadcastTechnicalDetail(shot)}`;
+
+    if (!isDecisiveGame) {
+      return `${flow} ${closingAction} Il ${score} consegna a ${gameWinnerName} la partita ${gameOrder}, ma l'incontro continua: il conto adesso è ${matchPlayerOneWins}–${matchPlayerTwoWins}. ${gameLoserName} rimane accanto al tavolo, passa il gesso sulla punta e comincia già a costruire la risposta.`;
+    }
+
+    const verdict = isTournamentFinal
+      ? `È finita: ${gameWinnerName} vince l'incontro ${matchPlayerOneWins}–${matchPlayerTwoWins} ed è il campione.`
+      : `È finita: ${gameWinnerName} vince l'incontro ${matchPlayerOneWins}–${matchPlayerTwoWins} e supera il turno.`;
+
+    return `${flow} ${closingAction} Le bilie si fermano sul ${score}; per un istante la sala trattiene il respiro, poi arrivano gli applausi. ${verdict}`;
+  }
+
+  if (selectedIndex === 0) {
+    const stakes = buildStoryStakesLine({
+      gameOrder,
+      matchPlayerOneWins,
+      matchPlayerTwoWins,
+      story,
+      playerOneName,
+      playerTwoName,
+      isDecisiveGame,
+      isTournamentFinal,
+    });
+    const conditions = buildConditionLine({
+      playerOneName,
+      playerTwoName,
+      playerOne,
+      playerTwo,
+    });
+
+    return `${stakes} ${conditions} ${flow} ${concentration}${technical ? ` ${technical}` : ""}`;
+  }
+
+  const performance =
+    selectedIndex === Math.floor(selectedCount / 2)
+      ? buildPerformanceLine({
+          playerOneName,
+          playerTwoName,
+          playerOnePerformanceRating,
+          playerTwoPerformanceRating,
+        })
+      : "";
+  const tension = buildStoryTensionLine({
+    shot,
+    target,
+    story,
+    playerOneName,
+    playerTwoName,
+    chronicle,
+    chronicleIndex,
+  });
+
+  return [flow, concentration, performance, technical, tension]
+    .filter(Boolean)
+    .join(" ");
+}
+
+function getStorySegmentStats(
+  segment: IndividualChronicleShot[],
+  previousSelectedShot: IndividualChronicleShot | null
+): StorySegmentStats {
+  const finalShot = segment.at(-1);
+  const stats: StorySegmentStats = {
+    playerOneGain: finalShot
+      ? finalShot.playerOneTotal -
+        (previousSelectedShot?.playerOneTotal ?? 0)
+      : 0,
+    playerTwoGain: finalShot
+      ? finalShot.playerTwoTotal -
+        (previousSelectedShot?.playerTwoTotal ?? 0)
+      : 0,
+    playerOneAttempts: 0,
+    playerTwoAttempts: 0,
+    playerOneScoringVisits: 0,
+    playerTwoScoringVisits: 0,
+    playerOneEmptyVisits: 0,
+    playerTwoEmptyVisits: 0,
+    playerOneAdverseEvents: 0,
+    playerTwoAdverseEvents: 0,
+  };
+
+  for (const candidate of segment) {
+    const prefix = candidate.playerSide === "PLAYER_ONE" ? "playerOne" : "playerTwo";
+    stats[`${prefix}Attempts`] += 1;
+
+    if (candidate.playerSide !== candidate.scoringSide) {
+      stats[`${prefix}AdverseEvents`] += 1;
+    } else if (candidate.points > 0) {
+      stats[`${prefix}ScoringVisits`] += 1;
+    } else {
+      stats[`${prefix}EmptyVisits`] += 1;
+    }
+  }
+
+  return stats;
+}
+
+function buildStoryStakesLine({
+  gameOrder,
+  matchPlayerOneWins,
+  matchPlayerTwoWins,
+  story,
+  playerOneName,
+  playerTwoName,
+  isDecisiveGame,
+  isTournamentFinal,
+}: {
+  gameOrder: number;
+  matchPlayerOneWins: number;
+  matchPlayerTwoWins: number;
+  story: BroadcastStoryContext;
+  playerOneName: string;
+  playerTwoName: string;
+  isDecisiveGame: boolean;
+  isTournamentFinal: boolean;
+}) {
+  const winnerAlreadyAdded = story.winnerSide === "PLAYER_ONE" ? 1 : 0;
+  const loserAlreadyAdded = story.winnerSide === "PLAYER_TWO" ? 1 : 0;
+  const beforeOne = Math.max(0, matchPlayerOneWins - winnerAlreadyAdded);
+  const beforeTwo = Math.max(0, matchPlayerTwoWins - loserAlreadyAdded);
+  const beforeScore = `${beforeOne}–${beforeTwo}`;
+
+  if (beforeOne === 1 && beforeTwo === 1) {
+    return isTournamentFinal
+      ? `Non c'è più domani: si parte dall'${beforeScore} e questa partita assegna il titolo.`
+      : `Si parte dall'${beforeScore}: questa partita vale il passaggio del turno e non concede appelli.`;
+  }
+
+  if (gameOrder > 1 && beforeOne !== beforeTwo) {
+    const leaderName = beforeOne > beforeTwo ? playerOneName : playerTwoName;
+    const chasingName = leaderName === playerOneName ? playerTwoName : playerOneName;
+    return `${leaderName} entra nella partita ${gameOrder} avanti ${beforeScore} e può chiudere l'incontro. Per ${chasingName} ogni punto serve a tenere viva la sfida.`;
+  }
+
+  if (isDecisiveGame) {
+    return `La prima partita deve ancora scegliere il proprio padrone, ma il suo peso è già chiaro: chi la prende costringe l'altro a inseguire.`;
+  }
+
+  return `${playerOneName} e ${playerTwoName} entrano nella partita ${gameOrder} sapendo che il primo strappo può cambiare l'intero incontro.`;
+}
+
+function buildConditionLine({
+  playerOneName,
+  playerTwoName,
+  playerOne,
+  playerTwo,
+}: {
+  playerOneName: string;
+  playerTwoName: string;
+  playerOne?: IndividualChroniclePlayerValues;
+  playerTwo?: IndividualChroniclePlayerValues;
+}) {
+  if (!playerOne || !playerTwo) {
+    return "I primi scambi serviranno anche a capire chi dei due riesce a portare sul panno la propria giornata migliore.";
+  }
+
+  const one = describeCondition(playerOneName, playerOne);
+  const two = describeCondition(playerTwoName, playerTwo);
+  const conditionGap =
+    playerOne.form + playerOne.morale - playerTwo.form - playerTwo.morale;
+  const reading =
+    Math.abs(conditionGap) <= 2
+      ? "Alla vigilia nessuno dei due ha un vantaggio emotivo evidente."
+      : `${conditionGap > 0 ? playerOneName : playerTwoName} arriva con qualcosa in più da spendere, almeno nei numeri.`;
+
+  return `${one}; ${two}. ${reading}`;
+}
+
+function describeCondition(
+  playerName: string,
+  player: IndividualChroniclePlayerValues
+) {
+  const formDescription =
+    player.form >= 8
+      ? "una forma eccellente"
+      : player.form >= 6
+        ? "una buona forma"
+        : player.form >= 4
+          ? "una condizione ordinaria"
+          : "una forma lontana dal meglio";
+  const moraleDescription =
+    player.morale >= 8
+      ? "una fiducia altissima"
+      : player.morale >= 6
+        ? "un morale solido"
+        : player.morale >= 4
+          ? "un morale da proteggere"
+          : "una fiducia fragile";
+
+  return `${playerName} porta al tavolo ${formDescription} (${player.form}/10) e ${moraleDescription} (${player.morale}/10)`;
+}
+
+function buildStorySegmentFlow({
+  stats,
+  playerOneName,
+  playerTwoName,
+  target,
+  score,
+  selectedIndex,
+  selectedCount,
+  templateOffset,
+}: {
+  stats: StorySegmentStats;
+  playerOneName: string;
+  playerTwoName: string;
+  target: number;
+  score: string;
+  selectedIndex: number;
+  selectedCount: number;
+  templateOffset: number;
+}) {
+  const gap = Math.abs(stats.playerOneGain - stats.playerTwoGain);
+  const dominantName =
+    stats.playerOneGain > stats.playerTwoGain ? playerOneName : playerTwoName;
+  const trailingName =
+    dominantName === playerOneName ? playerTwoName : playerOneName;
+  const dominantGain = Math.max(stats.playerOneGain, stats.playerTwoGain);
+  const trailingGain = Math.min(stats.playerOneGain, stats.playerTwoGain);
+  const progress = selectedCount > 1 ? selectedIndex / (selectedCount - 1) : 1;
+
+  if (dominantGain === 0 && trailingGain === 0) {
+    return `${playerOneName} e ${playerTwoName} si tengono lontani dai birilli: il tavolo resta chiuso e ogni scelta serve prima di tutto a non concedere il diretto.`;
+  }
+
+  if (gap >= target * 0.1) {
+    return selectBroadcastTemplate(
+      [
+        `${dominantName} si prende questo tratto con un parziale di ${dominantGain}–${trailingGain}. Non è un colpo isolato: sta trovando più spesso la prima scelta e costringe ${trailingName} a rincorrere il tavolo prima ancora del punteggio.`,
+        `La partita cambia passo. Tra un passaggio e l'altro ${dominantName} raccoglie ${dominantGain} punti contro ${trailingGain}: ${trailingName} resta dentro la sfida, ma adesso deve spezzare un ritmo che non gli appartiene.`,
+        `${dominantName} mette insieme pazienza e punti, ${dominantGain} a ${trailingGain} in questo tratto. Sul ${score} il margine comincia ad avere un peso e ${trailingName} non può più aspettare soltanto l'errore.`,
+      ],
+      selectedIndex + templateOffset
+    );
+  }
+
+  if (stats.playerOneGain === 0 || stats.playerTwoGain === 0) {
+    return `${dominantName} raccoglie ${dominantGain} punti mentre ${trailingName} resta fermo. Il tabellone dice ${score}: non decide ancora nulla, ma la sedia comincia a sembrare più lontana dal tavolo.`;
+  }
+
+  if (progress >= 0.72) {
+    return `Si rispondono senza riuscire a staccarsi: ${stats.playerOneGain} punti per ${playerOneName}, ${stats.playerTwoGain} per ${playerTwoName}. Sul ${score} ogni rientro al tavolo porta con sé il pensiero della chiusura.`;
+  }
+
+  return `Il punteggio cresce da entrambe le parti: ${stats.playerOneGain} punti per ${playerOneName}, ${stats.playerTwoGain} per ${playerTwoName}. Nessuno riesce ancora a imporre una fuga e il ${score} conserva tutta la partita dentro di sé.`;
+}
+
+function buildConcentrationLine({
+  stats,
+  playerOneName,
+  playerTwoName,
+  playerOne,
+  playerTwo,
+  selectedIndex,
+}: {
+  stats: StorySegmentStats;
+  playerOneName: string;
+  playerTwoName: string;
+  playerOne?: IndividualChroniclePlayerValues;
+  playerTwo?: IndividualChroniclePlayerValues;
+  selectedIndex: number;
+}) {
+  const oneTrouble = stats.playerOneEmptyVisits + stats.playerOneAdverseEvents;
+  const twoTrouble = stats.playerTwoEmptyVisits + stats.playerTwoAdverseEvents;
+  const totalAttempts = stats.playerOneAttempts + stats.playerTwoAttempts;
+
+  if (totalAttempts < 4) return "";
+
+  const oneRate = stats.playerOneAttempts
+    ? stats.playerOneScoringVisits / stats.playerOneAttempts
+    : 0;
+  const twoRate = stats.playerTwoAttempts
+    ? stats.playerTwoScoringVisits / stats.playerTwoAttempts
+    : 0;
+
+  if (Math.abs(oneRate - twoRate) >= 0.3) {
+    const focusedName = oneRate > twoRate ? playerOneName : playerTwoName;
+    const strugglingName = focusedName === playerOneName ? playerTwoName : playerOneName;
+    const focusedVisits = Math.max(
+      stats.playerOneScoringVisits,
+      stats.playerTwoScoringVisits
+    );
+    const focusedAttempts =
+      focusedName === playerOneName
+        ? stats.playerOneAttempts
+        : stats.playerTwoAttempts;
+    const strugglingPlayer = focusedName === playerOneName ? playerTwo : playerOne;
+    const trustLine =
+      strugglingPlayer && strugglingPlayer.morale <= 3
+        ? ` La fiducia fragile (${strugglingPlayer.morale}/10) non lo aiuta a cancellare l'errore precedente.`
+        : "";
+
+    return `${focusedName} appare più presente: trova punti in ${focusedVisits} dei suoi ${focusedAttempts} passaggi, mentre ${strugglingName} fatica a dare continuità alle scelte.${trustLine}`;
+  }
+
+  if (oneTrouble + twoTrouble >= 3) {
+    return `La concentrazione va e viene: ${playerOneName} lascia ${oneTrouble} occasioni senza il risultato cercato, ${playerTwoName} ${twoTrouble}. Nessuno riesce ancora a sentirsi davvero al sicuro.`;
+  }
+
+  if (selectedIndex === 0) {
+    return "L'avvio è prudente e concentrato: prima di cercare il colpo, entrambi vogliono capire velocità del panno e risposta delle sponde.";
+  }
+
+  return selectedIndex % 2 === 0
+    ? "Il livello di attenzione resta alto: pochi regali, scelte misurate e la sensazione che il primo vero errore possa lasciare un segno."
+    : "Entrambi restano dentro la partita con la testa: nessuna fretta di forzare, nessuna voglia di consegnare all'altro un tavolo semplice.";
+}
+
+function buildPerformanceLine({
+  playerOneName,
+  playerTwoName,
+  playerOnePerformanceRating,
+  playerTwoPerformanceRating,
+}: {
+  playerOneName: string;
+  playerTwoName: string;
+  playerOnePerformanceRating?: number;
+  playerTwoPerformanceRating?: number;
+}) {
+  if (
+    playerOnePerformanceRating == null ||
+    playerTwoPerformanceRating == null
+  ) {
+    return "A metà cammino il rendimento resta vicino: la differenza non è nella quantità dei tentativi, ma nella qualità delle scelte sotto pressione.";
+  }
+
+  const one = Math.round(playerOnePerformanceRating);
+  const two = Math.round(playerTwoPerformanceRating);
+
+  if (Math.abs(one - two) <= 3) {
+    return `Anche il rendimento racconta equilibrio, ${one} contro ${two}: fin qui nessuno dei due ha giocato abbastanza meglio da sentirsi padrone della partita.`;
+  }
+
+  const sharperName = one > two ? playerOneName : playerTwoName;
+  return `Il rendimento prodotto fin qui, ${one} contro ${two}, premia ${sharperName}. Il dato non chiude la partita, ma spiega perché il tavolo sembra rispondergli con maggiore continuità.`;
+}
+
+function buildStoryShotLine({
+  shot,
+  previousShot,
+  crossesDecisivePassage,
+  playerOneName,
+  playerTwoName,
+}: {
+  shot: IndividualChronicleShot;
+  previousShot: IndividualChronicleShot | null;
+  crossesDecisivePassage: boolean;
+  playerOneName: string;
+  playerTwoName: string;
+}) {
+  const actingName =
+    shot.playerSide === "PLAYER_ONE" ? playerOneName : playerTwoName;
+  const scoringName =
+    shot.scoringSide === "PLAYER_ONE" ? playerOneName : playerTwoName;
+  const previousLeader = previousShot
+    ? getLeader(previousShot.playerOneTotal, previousShot.playerTwoTotal)
+    : null;
+  const currentLeader = getLeader(shot.playerOneTotal, shot.playerTwoTotal);
+  const technical = getBroadcastTechnicalDetail(shot);
+
+  if (shot.highlight === "FOUL") {
+    return `La pressione apre una crepa: ${actingName} sbaglia nel momento meno adatto. ${technical} I punti vanno a ${scoringName}, e il tavolo cambia improvvisamente padrone.`;
+  }
+
+  if (crossesDecisivePassage) {
+    return `La svolta ha una traiettoria precisa. ${technical} Da questa bilia in avanti chi insegue non riuscirà più a tornare in parità.`;
+  }
+
+  if (
+    previousLeader &&
+    currentLeader &&
+    previousLeader !== currentLeader
+  ) {
+    return `Il sorpasso nasce qui. ${actingName} accetta il rischio e trova il tiro che cercava: ${technical} Quando le bilie si fermano, il comando è cambiato.`;
+  }
+
+  if (shot.playerOneTotal === shot.playerTwoTotal) {
+    return `${scoringName} ricuce tutto con la giocata che serviva: ${technical} La parità rimette entrambi davanti allo stesso bivio.`;
+  }
+
+  return `Il colpo che merita di essere ricordato arriva adesso. ${actingName} vede una linea che può cambiare il tono della partita e non si tira indietro: ${technical}`;
+}
+
+function buildStoryTensionLine({
+  shot,
+  target,
+  story,
+  playerOneName,
+  playerTwoName,
+  chronicle,
+  chronicleIndex,
+}: {
+  shot: IndividualChronicleShot;
+  target: number;
+  story: BroadcastStoryContext;
+  playerOneName: string;
+  playerTwoName: string;
+  chronicle: IndividualChronicleShot[];
+  chronicleIndex: number;
+}) {
+  const leader = getLeader(shot.playerOneTotal, shot.playerTwoTotal);
+  const leaderScore = Math.max(shot.playerOneTotal, shot.playerTwoTotal);
+  const margin = Math.abs(shot.playerOneTotal - shot.playerTwoTotal);
+  const winnerName =
+    story.winnerSide === "PLAYER_ONE" ? playerOneName : playerTwoName;
+  const loserName =
+    story.winnerSide === "PLAYER_ONE" ? playerTwoName : playerOneName;
+
+  if (leaderScore >= target * 0.78 && margin <= target * 0.12) {
+    const oneNeeds = Math.max(0, target - shot.playerOneTotal);
+    const twoNeeds = Math.max(0, target - shot.playerTwoTotal);
+    return `Ora i conti entrano nella testa: ad ${playerOneName} mancano ${oneNeeds} punti, a ${playerTwoName} ${twoNeeds}. Una sola occasione pulita può valere la partita.`;
+  }
+
+  if (
+    story.winnerMaximumDeficit >= target * 0.12 &&
+    leader === story.winnerSide &&
+    chronicle
+      .slice(chronicleIndex)
+      .every((candidate) => getLeader(candidate.playerOneTotal, candidate.playerTwoTotal) !== (story.winnerSide === "PLAYER_ONE" ? "PLAYER_TWO" : "PLAYER_ONE"))
+  ) {
+    return `${winnerName} ha assorbito il momento peggiore e adesso è davanti. ${loserName} lo sente: la partita che sembrava sotto controllo gli sta scivolando di mano.`;
+  }
+
+  if (leaderScore >= target * 0.62) {
+    const leaderName = leader === "PLAYER_ONE" ? playerOneName : playerTwoName;
+    const chaserName = leaderName === playerOneName ? playerTwoName : playerOneName;
+    return leader
+      ? `${leaderName} vede avvicinarsi il traguardo; ${chaserName}, però, è ancora a un buon passaggio dal riaprire tutto.`
+      : "La parità arriva quando il tavolo comincia a pesare davvero: da qui in avanti ogni scelta avrà il suono di una decisione.";
+  }
+
+  return "";
 }
 
 function buildBroadcastMoment({
