@@ -236,7 +236,7 @@ const SHOT_DEFINITIONS: ShotDefinition[] = [
     name: "Ebrea",
     family: "CUSHION",
     difficulty: 5,
-    weights: { ITALIANA: 0, GORIZIANA: 3, TUTTI_DOPPI: 4 },
+    weights: { ITALIANA: 0, GORIZIANA: 0.12, TUTTI_DOPPI: 0.12 },
   },
   {
     key: "GARUFFA",
@@ -731,64 +731,54 @@ function distributeScore({
   missProbability: number;
   random: () => number;
 }) {
+  const rareHighScoreProbability = 0.0005;
   const memo = new Map<string, boolean>();
+  const ordinaryMemo = new Map<string, boolean>();
+  const ordinaryAllowedScores = allowedScores.filter((score) => score <= 72);
   const scores: number[] = [];
   let remaining = total;
   let remainingMisses = minimumMisses;
 
   for (let index = 0; index < attempts; index += 1) {
     const remainingAttempts = attempts - index - 1;
-    const feasibleScores = [0, ...allowedScores].filter((score) => {
-      if (score > remaining) return false;
-
-      const nextTotal = remaining - score;
-      const nextMinimumMisses = Math.max(
-        0,
-        remainingMisses - (score === 0 ? 1 : 0)
-      );
-
-      if (remainingAttempts === 0) {
-        return (
-          nextTotal === 0 &&
-          nextMinimumMisses === 0 &&
-          (lastScoreMustExceed === undefined ||
-            score > lastScoreMustExceed)
-        );
-      }
-
-      return lastScoreMustExceed !== undefined
-        ? canRepresentWithFinalScoreAbove(
-            nextTotal,
-            remainingAttempts,
-            allowedScores,
-            memo,
-            nextMinimumMisses,
-            lastScoreMustExceed
-          )
-        : canRepresent(
-            nextTotal,
-            remainingAttempts,
-            allowedScores,
-            memo,
-            nextMinimumMisses
-          );
+    const feasibleScores = getFeasibleScores({
+      remaining,
+      remainingAttempts,
+      remainingMisses,
+      allowedScores,
+      lastScoreMustExceed,
+      memo,
     });
 
     if (feasibleScores.length === 0) {
       throw new Error("INDIVIDUAL_CHRONICLE_SCORE_NOT_REPRESENTABLE");
     }
 
+    const ordinaryFeasibleScores = getFeasibleScores({
+      remaining,
+      remainingAttempts,
+      remainingMisses,
+      allowedScores: ordinaryAllowedScores,
+      lastScoreMustExceed,
+      memo: ordinaryMemo,
+    });
+    const selectableScores =
+      ordinaryFeasibleScores.length > 0 &&
+      random() >= rareHighScoreProbability
+        ? ordinaryFeasibleScores
+        : feasibleScores;
+
     const requiredMissProbability =
       remainingMisses / Math.max(1, remainingAttempts + 1);
-    const canMiss = feasibleScores.includes(0);
+    const canMiss = selectableScores.includes(0);
     const shouldMiss =
       canMiss && random() < Math.max(requiredMissProbability, missProbability);
-    const scoringOptions = feasibleScores.filter((score) => score > 0);
+    const scoringOptions = selectableScores.filter((score) => score > 0);
     const average = remaining / Math.max(1, remainingAttempts + 1);
     const desiredScore = average * (0.62 + random() * 0.56);
     const selectedScore = shouldMiss
       ? 0
-      : (scoringOptions.length > 0 ? scoringOptions : feasibleScores).reduce(
+      : (scoringOptions.length > 0 ? scoringOptions : selectableScores).reduce(
           (best, candidate) =>
             Math.abs(candidate - desiredScore) <
             Math.abs(best - desiredScore)
@@ -802,6 +792,57 @@ function distributeScore({
   }
 
   return scores;
+}
+
+function getFeasibleScores({
+  remaining,
+  remainingAttempts,
+  remainingMisses,
+  allowedScores,
+  lastScoreMustExceed,
+  memo,
+}: {
+  remaining: number;
+  remainingAttempts: number;
+  remainingMisses: number;
+  allowedScores: readonly number[];
+  lastScoreMustExceed?: number;
+  memo: Map<string, boolean>;
+}) {
+  return [0, ...allowedScores].filter((score) => {
+    if (score > remaining) return false;
+
+    const nextTotal = remaining - score;
+    const nextMinimumMisses = Math.max(
+      0,
+      remainingMisses - (score === 0 ? 1 : 0)
+    );
+
+    if (remainingAttempts === 0) {
+      return (
+        nextTotal === 0 &&
+        nextMinimumMisses === 0 &&
+        (lastScoreMustExceed === undefined || score > lastScoreMustExceed)
+      );
+    }
+
+    return lastScoreMustExceed !== undefined
+      ? canRepresentWithFinalScoreAbove(
+          nextTotal,
+          remainingAttempts,
+          allowedScores,
+          memo,
+          nextMinimumMisses,
+          lastScoreMustExceed
+        )
+      : canRepresent(
+          nextTotal,
+          remainingAttempts,
+          allowedScores,
+          memo,
+          nextMinimumMisses
+        );
+  });
 }
 
 function canRepresentWithFinalScoreAbove(

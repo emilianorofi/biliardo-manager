@@ -135,7 +135,7 @@ test("raggiunge il traguardo previsto e conserva l'intero tiro finale", () => {
       playerTwoPerformanceRating: 70,
       randomValue: 0.5,
     }),
-    { playerOneScore: 624, playerTwoScore: 492 }
+    { playerOneScore: 616, playerTwoScore: 492 }
   );
 });
 
@@ -921,7 +921,6 @@ test("limita garuffa, mezza garuffa e parabola nelle specialita a molti punti", 
 test("mantiene la bricolla su una passata e assegna le passate multiple all'Ebrea", () => {
   const specialties = ["GORIZIANA", "TUTTI_DOPPI"] as const;
   let bricolle = 0;
-  let highScoringPasses = 0;
 
   for (const specialty of specialties) {
     for (let gameId = 2600; gameId < 2750; gameId += 1) {
@@ -959,26 +958,64 @@ test("mantiene la bricolla su una passata e assegna le passate multiple all'Ebre
           }
         }
 
-        if (
-          shot.points > 72 &&
-          shot.shotName === "Ebrea"
-        ) {
-          highScoringPasses += 1;
-          assert.equal(shot.shotFamily, "CUSHION");
-
-          if (shot.playerSide === shot.scoringSide) {
-            assert.match(
-              shot.technicalCommentary,
-              /sponda|avversaria|castello/
-            );
-          }
-        }
       }
     }
   }
 
+  const forcedEbrea = buildIndividualGameChronicle(
+    withChroniclePlayers({
+      gameId: 9876,
+      specialty: "GORIZIANA" as const,
+      winnerSide: "PLAYER_ONE" as const,
+      playerOneScore: 508,
+      playerTwoScore: 352,
+    })
+  ).at(-1)!;
+
   assert.ok(bricolle > 100);
-  assert.ok(highScoringPasses > 0);
+  assert.equal(forcedEbrea.shotName, "Ebrea");
+  assert.equal(forcedEbrea.shotFamily, "CUSHION");
+  assert.equal(forcedEbrea.points, 112);
+});
+
+test("fa comparire l'Ebrea soltanto di rado", () => {
+  const specialties = ["GORIZIANA", "TUTTI_DOPPI"] as const;
+  const gamesPerSpecialty = 80;
+  let gamesWithEbrea = 0;
+  let gamesWithMultipleEbree = 0;
+
+  for (const specialty of specialties) {
+    for (let index = 0; index < gamesPerSpecialty; index += 1) {
+      const score = calculateIndividualGameScore({
+        specialty,
+        winnerSide: "PLAYER_ONE",
+        playerOnePerformanceRating: 72,
+        playerTwoPerformanceRating: 76,
+        randomValue: (index + 0.5) / gamesPerSpecialty,
+      });
+      const chronicle = buildIndividualGameChronicle(
+        withChroniclePlayers({
+          gameId:
+            5000 + index + (specialty === "TUTTI_DOPPI" ? 1000 : 0),
+          specialty,
+          winnerSide: "PLAYER_ONE" as const,
+          ...score,
+        })
+      );
+      const ebreaCount = chronicle.filter(
+        (shot) => shot.shotName === "Ebrea"
+      ).length;
+
+      if (ebreaCount > 0) gamesWithEbrea += 1;
+      if (ebreaCount > 1) gamesWithMultipleEbree += 1;
+    }
+  }
+
+  const totalGames = specialties.length * gamesPerSpecialty;
+
+  assert.ok(gamesWithEbrea > 0);
+  assert.ok(gamesWithEbrea / totalGames <= 0.08);
+  assert.ok(gamesWithMultipleEbree / totalGames <= 0.01);
 });
 
 test("rispetta le traiettorie contigue di striscio e candela", () => {

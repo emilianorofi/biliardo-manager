@@ -192,11 +192,18 @@ export function calculateIndividualGameScore({
 }
 
 const EXACT_FINISH_PROBABILITY = 0.05;
+const RARE_HIGH_OVERSHOOT_PROBABILITY = 0.015;
 
 const MAXIMUM_WINNER_OVERSHOOT: Record<MatchSpecialty, number> = {
   ITALIANA: 15,
   GORIZIANA: 110,
   TUTTI_DOPPI: 108,
+};
+
+const COMMON_WINNER_OVERSHOOT: Record<MatchSpecialty, number> = {
+  ITALIANA: 15,
+  GORIZIANA: 50,
+  TUTTI_DOPPI: 68,
 };
 
 function calculateWinnerScore({
@@ -228,10 +235,30 @@ function calculateWinnerScore({
   const overshootRoll =
     (finishRoll - EXACT_FINISH_PROBABILITY) /
     (1 - EXACT_FINISH_PROBABILITY);
-  const overshootSteps = Math.min(
-    maximumSteps,
-    1 + Math.floor(Math.pow(overshootRoll, 2.4) * maximumSteps)
+  const commonMaximumSteps = Math.floor(
+    COMMON_WINNER_OVERSHOOT[specialty] / scoreStep
   );
+  const commonFinishProbability = 1 - RARE_HIGH_OVERSHOOT_PROBABILITY;
+  const overshootSteps =
+    overshootRoll < commonFinishProbability
+      ? Math.min(
+          commonMaximumSteps,
+          1 +
+            Math.floor(
+              Math.pow(overshootRoll / commonFinishProbability, 2.4) *
+                commonMaximumSteps
+            )
+        )
+      : Math.min(
+          maximumSteps,
+          commonMaximumSteps +
+            1 +
+            Math.floor(
+              ((overshootRoll - commonFinishProbability) /
+                RARE_HIGH_OVERSHOOT_PROBABILITY) *
+                (maximumSteps - commonMaximumSteps)
+            )
+        );
 
   return targetPoints + overshootSteps * scoreStep;
 }
