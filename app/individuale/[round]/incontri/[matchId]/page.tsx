@@ -363,7 +363,7 @@ export default async function IndividualMatchDetailPage({
                     <div className="border-t border-zinc-800 bg-zinc-950/35 px-3 pb-4 pt-3 sm:px-4">
                       <div className="mb-4 rounded-xl border border-amber-400/15 bg-amber-300/[0.04] px-4 py-3">
                         <div className="flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.16em] text-amber-300">
-                          <Sparkles size={14} />
+                          <Sparkles aria-hidden="true" size={14} />
                           Presentazione
                         </div>
                         <div className="mt-2 space-y-1.5 text-sm font-medium leading-relaxed text-zinc-300">
@@ -379,16 +379,16 @@ export default async function IndividualMatchDetailPage({
                             Il racconto
                           </p>
                           <p className="mt-1 text-sm font-black text-white">
-                            La partita, capitolo dopo capitolo
+                            La storia della partita
                           </p>
                         </div>
                         <p className="text-right text-[10px] font-bold text-zinc-600">
-                          {featuredChronicle.length} capitoli
+                          {featuredChronicle.length} passaggi
                         </p>
                       </div>
 
-                      <ol className="space-y-3">
-                        {featuredChronicle.map((shot, shotIndex) => {
+                      <ol className="space-y-4">
+                        {featuredChronicle.map((shot) => {
                           const isPlayerOne =
                             shot.playerSide === "PLAYER_ONE";
                           const isFinalShot = shot.highlight === "WINNER";
@@ -402,65 +402,49 @@ export default async function IndividualMatchDetailPage({
                               ? `${playerOne.firstName} ${playerOne.lastName}`
                               : `${playerTwo.firstName} ${playerTwo.lastName}`;
 
-                          const previousPhase =
-                            featuredChronicle[shotIndex - 1]?.phase;
-                          const startsNewPhase =
-                            previousPhase !== shot.phase;
-
                           return (
                             <li key={shot.order}>
-                              {startsNewPhase ? (
-                                <div className="mb-3 flex items-center gap-3 px-1 pt-2">
-                                  <span className="h-px flex-1 bg-zinc-800" />
-                                  <span className="text-[9px] font-black uppercase tracking-[0.2em] text-emerald-400/70">
-                                  {formatChroniclePhase(shot.phase)}
-                                  </span>
-                                  <span className="h-px flex-1 bg-zinc-800" />
-                                </div>
-                              ) : null}
-
                               <article
                                 className={`rounded-xl border px-4 py-4 ${
                                   isFinalShot
                                     ? "border-emerald-400/30 bg-emerald-300/[0.07]"
-                                    : shot.highlight === "LEAD_CHANGE" ||
-                                        shot.highlight === "BIG_SHOT"
+                                    : shot.showShotDetail &&
+                                        (shot.highlight === "LEAD_CHANGE" ||
+                                          shot.highlight === "BIG_SHOT")
                                       ? "border-amber-400/20 bg-amber-300/[0.04]"
                                       : "border-zinc-800 bg-zinc-900/35"
                                 }`}
                               >
-                                <div className="flex items-center justify-between gap-3 text-[9px] font-black uppercase tracking-[0.14em]">
-                                  <span className="text-zinc-600">
-                                    Capitolo {shotIndex + 1}
-                                  </span>
-                                  <span
-                                    className={
-                                      isFinalShot
-                                        ? "text-emerald-200"
-                                        : "text-zinc-500"
-                                    }
-                                  >
-                                    {shot.playerOneTotal}–{shot.playerTwoTotal}
-                                  </span>
-                                </div>
-
-                                <div className="mt-2 flex items-start justify-between gap-3">
+                                <div className="flex items-start justify-between gap-3">
                                   <div className="min-w-0">
                                     <p
                                       className={`text-sm font-black sm:text-base ${
                                         isFinalShot
                                           ? "text-emerald-300"
-                                          : shot.highlight === "LEAD_CHANGE" ||
-                                              shot.highlight === "BIG_SHOT"
+                                          : shot.showShotDetail &&
+                                              (shot.highlight === "LEAD_CHANGE" ||
+                                                shot.highlight === "BIG_SHOT")
                                             ? "text-amber-200"
                                             : "text-zinc-200"
                                       }`}
                                     >
                                       {shot.storyTitle ?? "La partita continua"}
                                     </p>
+                                    <p
+                                      className={`mt-1 text-[10px] font-black tabular-nums ${
+                                        isFinalShot
+                                          ? "text-emerald-200"
+                                          : "text-zinc-500"
+                                      }`}
+                                    >
+                                      {shot.playerOneTotal}–{shot.playerTwoTotal}
+                                    </p>
                                     {shot.showShotDetail ? (
                                       <p className="mt-1 text-[9px] font-black uppercase tracking-wider text-emerald-400/70">
-                                        {playerName} · {shot.shotName}
+                                        {pointsAwardedToOpponent
+                                          ? `Errore di ${playerName}`
+                                          : playerName}{" "}
+                                        · {shot.shotName}
                                       </p>
                                     ) : null}
                                   </div>
@@ -476,7 +460,7 @@ export default async function IndividualMatchDetailPage({
                                         <>
                                           +{shot.points}
                                           {pointsAwardedToOpponent ? (
-                                          <span className="ml-1 text-[8px] leading-tight text-rose-300/80">
+                                            <span className="ml-1 text-[8px] leading-tight text-rose-300/80">
                                               a {scoringPlayerName}
                                             </span>
                                           ) : null}
@@ -515,7 +499,7 @@ export default async function IndividualMatchDetailPage({
                                 : "text-sky-300"
                           }`}
                         >
-                          <Sparkles size={14} />
+                          <Sparkles aria-hidden="true" size={14} />
                           {closingTitle}
                         </div>
                         <div className="mt-2 space-y-1.5 text-sm font-medium leading-relaxed text-zinc-300">
@@ -556,12 +540,6 @@ function formatStage(value: string) {
 function formatSpecialty(value: string) {
   if (value === "TUTTI_DOPPI") return "Tutti Doppi";
   return value.charAt(0) + value.slice(1).toLowerCase();
-}
-
-function formatChroniclePhase(value: "OPENING" | "MIDDLE" | "FINISH") {
-  if (value === "OPENING") return "Le prime geometrie";
-  if (value === "MIDDLE") return "La partita cambia voce";
-  return "Ogni punto pesa";
 }
 
 function formatDateTime(value: Date) {

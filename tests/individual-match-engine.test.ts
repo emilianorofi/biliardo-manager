@@ -787,6 +787,57 @@ test("limita garuffa, mezza garuffa e parabola nelle specialita a molti punti", 
   assert.ok(parabolaScores > 30);
 });
 
+test("mantiene la bricolla su una sola passata del castello", () => {
+  const specialties = ["GORIZIANA", "TUTTI_DOPPI"] as const;
+  let bricolle = 0;
+  let highScoringPasses = 0;
+
+  for (const specialty of specialties) {
+    for (let gameId = 2600; gameId < 2750; gameId += 1) {
+      const chronicle = buildIndividualGameChronicle(
+        withChroniclePlayers({
+          gameId: gameId + (specialty === "TUTTI_DOPPI" ? 1000 : 0),
+          specialty,
+          winnerSide: "PLAYER_ONE" as const,
+          playerOneScore: specialty === "GORIZIANA" ? 400 : 600,
+          playerTwoScore: specialty === "GORIZIANA" ? 352 : 512,
+        })
+      );
+
+      for (const shot of chronicle) {
+        assert.notEqual(shot.shotName, "Bricolla a più passate");
+
+        if (shot.shotName === "Bricolla") {
+          bricolle += 1;
+          assert.ok(shot.points <= 72);
+          assert.doesNotMatch(
+            shot.technicalCommentary,
+            /tre esterni|quattro esterni|tre interni|quattro interni/
+          );
+
+          if (/estern[^.]*rosso/.test(shot.technicalCommentary)) {
+            assert.match(shot.technicalCommentary, /intern/);
+          }
+
+          if (shot.playerSide === shot.scoringSide) {
+            assert.match(shot.technicalCommentary, /forza|castello/);
+          }
+        }
+
+        if (
+          shot.points > 72 &&
+          shot.shotName === "Giocata di sponda a più passate"
+        ) {
+          highScoringPasses += 1;
+        }
+      }
+    }
+  }
+
+  assert.ok(bricolle > 100);
+  assert.ok(highScoringPasses > 0);
+});
+
 test("rispetta le traiettorie contigue di striscio e candela", () => {
   let strisci = 0;
   let candele = 0;
@@ -864,7 +915,7 @@ test("racconta il tiro decisivo senza lasciare aperta la partita", () => {
   );
 });
 
-test("seleziona da nove a dodici capitoli della partita", () => {
+test("seleziona da cinque a sette passaggi della partita", () => {
   const chronicle = buildIndividualGameChronicle(
     withChroniclePlayers({
       gameId: 1301,
@@ -879,8 +930,8 @@ test("seleziona da nove a dodici capitoli della partita", () => {
     gameId: 1301,
   });
 
-  assert.ok(highlights.length >= 9);
-  assert.ok(highlights.length <= 12);
+  assert.ok(highlights.length >= 5);
+  assert.ok(highlights.length <= 7);
   assert.equal(highlights.at(-1)!.order, chronicle.at(-1)!.order);
   assert.equal(highlights.at(-1)!.highlight, "WINNER");
 
@@ -934,12 +985,13 @@ test("trasforma i momenti chiave in un racconto della partita", () => {
   const technicalChapters = broadcast.filter((shot) => shot.showShotDetail);
   const narrativeChapters = broadcast.filter((shot) => !shot.showShotDetail);
 
-  assert.ok(broadcast.length >= 9);
-  assert.ok(broadcast.length <= 12);
+  assert.ok(broadcast.length >= 5);
+  assert.ok(broadcast.length <= 7);
   assert.ok(broadcast.every((shot) => shot.technicalCommentary.length > 0));
   assert.ok(broadcast.every((shot) => shot.storyTitle));
   assert.ok(technicalChapters.length > 0);
-  assert.ok(narrativeChapters.length > technicalChapters.length);
+  assert.ok(technicalChapters.length <= 3);
+  assert.ok(narrativeChapters.length >= technicalChapters.length);
   assert.ok(
     narrativeChapters.every(
       (shot) => !shot.commentary.includes(`${shot.shotName}:`)
@@ -955,9 +1007,10 @@ test("trasforma i momenti chiave in un racconto della partita", () => {
     fullStory,
     /condizione ordinaria \(4\/10\).*fiducia fragile \(3\/10\)/
   );
-  assert.match(fullStory, /rendimento prodotto fin qui, 86 contro 79/);
-  assert.ok(sentenceOpenings.size >= 7);
-  assert.match(fullStory, /ritmo|sorpasso|parziale|pressione|partita/);
+  assert.doesNotMatch(fullStory, /rendimento prodotto fin qui|86 contro 79/);
+  assert.match(fullStory, /valori tecnici|vantaggio tecnico|valori iniziali/);
+  assert.ok(sentenceOpenings.size >= 4);
+  assert.match(fullStory, /ritmo|sorpasso|pressione|partita/);
   assert.doesNotMatch(
     fullStory,
     /Niente gesto teatrale|piccola porzione di tavolo|cambia temperatura|persino il silenzio/
@@ -1112,7 +1165,7 @@ test("costruisce presentazione ed epilogo in più righe", () => {
   });
 
   assert.equal(introduction.length, 6);
-  assert.equal(closing.length, 6);
+  assert.equal(closing.length, 5);
   assert.match(introduction.join(" "), /Mario Rossi/);
   assert.match(introduction.join(" "), /numero 4 del ranking/);
   assert.match(introduction.join(" "), /Sala Centrale/);
