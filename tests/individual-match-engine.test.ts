@@ -17,7 +17,11 @@ import {
   calculatePinFallScore,
   selectIndividualChronicleHighlights,
 } from "../lib/individual-game-chronicle";
-import { MATCH_SHOT_SCORES } from "../lib/match-engine";
+import {
+  MATCH_SHOT_SCORES,
+  MATCH_TARGET_POINTS,
+  MATCH_TOTAL_SCORE_STEP,
+} from "../lib/match-engine";
 
 test("qualifica esattamente i primi 256 giocatori per overall", () => {
   const players = Array.from({ length: 260 }, (_, index) =>
@@ -94,15 +98,15 @@ test("un incontro individuale termina appena un giocatore vince due prove", () =
   assert.deepEqual(
     result.games.map((game) => [game.playerOneScore, game.playerTwoScore]),
     [
-      [80, 62],
-      [75, 80],
-      [80, 62],
+      [82, 62],
+      [75, 85],
+      [82, 62],
     ]
   );
   assert.equal(randomIndex, 3);
 });
 
-test("usa il traguardo punti previsto da ogni specialità", () => {
+test("raggiunge il traguardo previsto e conserva l'intero tiro finale", () => {
   assert.deepEqual(
     calculateIndividualGameScore({
       specialty: "ITALIANA",
@@ -111,7 +115,7 @@ test("usa il traguardo punti previsto da ogni specialità", () => {
       playerTwoPerformanceRating: 70,
       randomValue: 0.5,
     }),
-    { playerOneScore: 80, playerTwoScore: 66 }
+    { playerOneScore: 81, playerTwoScore: 66 }
   );
   assert.deepEqual(
     calculateIndividualGameScore({
@@ -121,7 +125,7 @@ test("usa il traguardo punti previsto da ogni specialità", () => {
       playerTwoPerformanceRating: 80,
       randomValue: 0.5,
     }),
-    { playerOneScore: 330, playerTwoScore: 400 }
+    { playerOneScore: 330, playerTwoScore: 402 }
   );
   assert.deepEqual(
     calculateIndividualGameScore({
@@ -131,8 +135,35 @@ test("usa il traguardo punti previsto da ogni specialità", () => {
       playerTwoPerformanceRating: 70,
       randomValue: 0.5,
     }),
-    { playerOneScore: 600, playerTwoScore: 492 }
+    { playerOneScore: 624, playerTwoScore: 492 }
   );
+});
+
+test("chiude esattamente sul traguardo soltanto di rado", () => {
+  const specialties = ["ITALIANA", "GORIZIANA", "TUTTI_DOPPI"] as const;
+
+  for (const specialty of specialties) {
+    const target = MATCH_TARGET_POINTS[specialty];
+    const scoreStep = MATCH_TOTAL_SCORE_STEP[specialty];
+    let exactFinishes = 0;
+
+    for (let index = 0; index < 1000; index += 1) {
+      const score = calculateIndividualGameScore({
+        specialty,
+        winnerSide: "PLAYER_ONE",
+        playerOnePerformanceRating: 80,
+        playerTwoPerformanceRating: 70,
+        randomValue: (index + 0.5) / 1000,
+      }).playerOneScore;
+
+      assert.ok(score >= target);
+      assert.equal((score - target) % scoreStep, 0);
+      if (score === target) exactFinishes += 1;
+    }
+
+    assert.ok(exactFinishes >= 20);
+    assert.ok(exactFinishes <= 90);
+  }
 });
 
 test("conserva i punteggi ammessi per ogni singolo tiro", () => {
@@ -315,6 +346,51 @@ test("chiude ogni specialità con il tiro del vincitore", () => {
       assert.ok(shot.playerOneTotal <= game.playerOneScore);
       assert.ok(shot.playerTwoTotal <= game.playerTwoScore);
     }
+  }
+});
+
+test("il tiro conclusivo parte sotto il traguardo e può superarlo", () => {
+  const cases = [
+    {
+      gameId: 771,
+      specialty: "ITALIANA" as const,
+      target: 80,
+      winnerScore: 84,
+      loserScore: 67,
+    },
+    {
+      gameId: 772,
+      specialty: "GORIZIANA" as const,
+      target: 400,
+      winnerScore: 418,
+      loserScore: 346,
+    },
+    {
+      gameId: 773,
+      specialty: "TUTTI_DOPPI" as const,
+      target: 600,
+      winnerScore: 624,
+      loserScore: 508,
+    },
+  ];
+
+  for (const game of cases) {
+    const chronicle = buildIndividualGameChronicle(
+      withChroniclePlayers({
+        gameId: game.gameId,
+        specialty: game.specialty,
+        winnerSide: "PLAYER_ONE",
+        playerOneScore: game.winnerScore,
+        playerTwoScore: game.loserScore,
+      })
+    );
+    const finalShot = chronicle.at(-1)!;
+    const scoreBeforeFinalShot =
+      finalShot.playerOneTotal - finalShot.points;
+
+    assert.ok(scoreBeforeFinalShot < game.target);
+    assert.equal(finalShot.playerOneTotal, game.winnerScore);
+    assert.ok(finalShot.playerOneTotal > game.target);
   }
 });
 
@@ -515,6 +591,61 @@ test("rispetta il conteggio semplice e doppio della Goriziana", () => {
 
   assert.ok(directOnlyScores > 0);
   assert.ok(cushionOnlyScores > 0);
+});
+
+test("distingue Giro e Girone dai rispettivi tiri di calcio", () => {
+  const firstBallShots = new Set(["Giro", "Girone"]);
+  const cushionFirstShots = new Set([
+    "Tre sponde di calcio",
+    "Cinque sponde di calcio",
+    "Ebrea",
+  ]);
+  let firstBallShotsFound = 0;
+  let cushionFirstShotsFound = 0;
+  let ebreeFound = 0;
+
+  for (let gameId = 960; gameId < 1160; gameId += 1) {
+    const chronicle = buildIndividualGameChronicle(
+      withChroniclePlayers({
+        gameId,
+        specialty: "GORIZIANA" as const,
+        winnerSide: "PLAYER_ONE" as const,
+        playerOneScore: 400,
+        playerTwoScore: 348,
+      })
+    );
+
+    for (const shot of chronicle) {
+      if (firstBallShots.has(shot.shotName)) {
+        firstBallShotsFound += 1;
+        assert.equal(shot.shotFamily, "DIRECT");
+
+        if (shot.points > 0 && shot.playerSide === shot.scoringSide) {
+          assert.doesNotMatch(shot.technicalCommentary, /raddoppia/);
+        }
+      }
+
+      if (cushionFirstShots.has(shot.shotName)) {
+        cushionFirstShotsFound += 1;
+        assert.equal(shot.shotFamily, "CUSHION");
+      }
+
+      if (
+        shot.shotName === "Ebrea" &&
+        shot.playerSide === shot.scoringSide
+      ) {
+        ebreeFound += 1;
+        assert.match(
+          shot.technicalCommentary,
+          /sponda|avversaria|castello/
+        );
+      }
+    }
+  }
+
+  assert.ok(firstBallShotsFound > 100);
+  assert.ok(cushionFirstShotsFound > 100);
+  assert.ok(ebreeFound > 0);
 });
 
 test("associa i tiri dell'Italiana alle realizzazioni più frequenti", () => {
@@ -787,7 +918,7 @@ test("limita garuffa, mezza garuffa e parabola nelle specialita a molti punti", 
   assert.ok(parabolaScores > 30);
 });
 
-test("mantiene la bricolla su una sola passata del castello", () => {
+test("mantiene la bricolla su una passata e assegna le passate multiple all'Ebrea", () => {
   const specialties = ["GORIZIANA", "TUTTI_DOPPI"] as const;
   let bricolle = 0;
   let highScoringPasses = 0;
@@ -806,6 +937,10 @@ test("mantiene la bricolla su una sola passata del castello", () => {
 
       for (const shot of chronicle) {
         assert.notEqual(shot.shotName, "Bricolla a più passate");
+        assert.notEqual(
+          shot.shotName,
+          "Giocata di sponda a più passate"
+        );
 
         if (shot.shotName === "Bricolla") {
           bricolle += 1;
@@ -826,9 +961,17 @@ test("mantiene la bricolla su una sola passata del castello", () => {
 
         if (
           shot.points > 72 &&
-          shot.shotName === "Giocata di sponda a più passate"
+          shot.shotName === "Ebrea"
         ) {
           highScoringPasses += 1;
+          assert.equal(shot.shotFamily, "CUSHION");
+
+          if (shot.playerSide === shot.scoringSide) {
+            assert.match(
+              shot.technicalCommentary,
+              /sponda|avversaria|castello/
+            );
+          }
         }
       }
     }

@@ -172,16 +172,97 @@ export function calculateIndividualGameScore({
     MATCH_SHOT_SCORES[specialty][0],
     targetPoints - scoreStep
   );
+  const winnerScore = calculateWinnerScore({
+    specialty,
+    targetPoints,
+    winnerRating,
+    loserRating,
+    randomValue,
+  });
 
   return winnerSide === "PLAYER_ONE"
     ? {
-        playerOneScore: targetPoints,
+        playerOneScore: winnerScore,
         playerTwoScore: loserScore,
       }
     : {
         playerOneScore: loserScore,
-        playerTwoScore: targetPoints,
+        playerTwoScore: winnerScore,
       };
+}
+
+const EXACT_FINISH_PROBABILITY = 0.05;
+
+const MAXIMUM_WINNER_OVERSHOOT: Record<MatchSpecialty, number> = {
+  ITALIANA: 15,
+  GORIZIANA: 110,
+  TUTTI_DOPPI: 108,
+};
+
+function calculateWinnerScore({
+  specialty,
+  targetPoints,
+  winnerRating,
+  loserRating,
+  randomValue,
+}: {
+  specialty: MatchSpecialty;
+  targetPoints: number;
+  winnerRating: number;
+  loserRating: number;
+  randomValue: number;
+}) {
+  const finishRoll = getFinishRoll({
+    specialty,
+    winnerRating,
+    loserRating,
+    randomValue,
+  });
+
+  if (finishRoll < EXACT_FINISH_PROBABILITY) return targetPoints;
+
+  const scoreStep = MATCH_TOTAL_SCORE_STEP[specialty];
+  const maximumSteps = Math.floor(
+    MAXIMUM_WINNER_OVERSHOOT[specialty] / scoreStep
+  );
+  const overshootRoll =
+    (finishRoll - EXACT_FINISH_PROBABILITY) /
+    (1 - EXACT_FINISH_PROBABILITY);
+  const overshootSteps = Math.min(
+    maximumSteps,
+    1 + Math.floor(Math.pow(overshootRoll, 2.4) * maximumSteps)
+  );
+
+  return targetPoints + overshootSteps * scoreStep;
+}
+
+function getFinishRoll({
+  specialty,
+  winnerRating,
+  loserRating,
+  randomValue,
+}: {
+  specialty: MatchSpecialty;
+  winnerRating: number;
+  loserRating: number;
+  randomValue: number;
+}) {
+  const specialtySalt: Record<MatchSpecialty, number> = {
+    ITALIANA: 0x2c1b3c6d,
+    GORIZIANA: 0x297a2d39,
+    TUTTI_DOPPI: 0x1b873593,
+  };
+  let state =
+    Math.floor(clamp(randomValue, 0, 1) * 0xffffffff) ^
+    specialtySalt[specialty] ^
+    Math.round(winnerRating * 1009) ^
+    Math.round(loserRating * 9176);
+
+  state = Math.imul(state ^ (state >>> 16), 0x7feb352d);
+  state = Math.imul(state ^ (state >>> 15), 0x846ca68b);
+  state ^= state >>> 16;
+
+  return (state >>> 0) / 0x100000000;
 }
 
 function clamp(value: number, minimum: number, maximum: number) {

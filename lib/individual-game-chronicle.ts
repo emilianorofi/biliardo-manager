@@ -232,8 +232,8 @@ const SHOT_DEFINITIONS: ShotDefinition[] = [
     weights: { ITALIANA: 13, GORIZIANA: 18, TUTTI_DOPPI: 12 },
   },
   {
-    key: "SPONDA_PASSATE",
-    name: "Giocata di sponda a più passate",
+    key: "EBREA",
+    name: "Ebrea",
     family: "CUSHION",
     difficulty: 5,
     weights: { ITALIANA: 0, GORIZIANA: 3, TUTTI_DOPPI: 4 },
@@ -492,11 +492,15 @@ export function buildIndividualGameChronicle({
   const playerOneAttempts = pairedAttempts;
   const playerTwoAttempts =
     winnerSide === "PLAYER_ONE" ? pairedAttempts - 1 : pairedAttempts;
+  const targetPoints = MATCH_TARGET_POINTS[specialty];
   const playerOneShots = distributeScore({
     total: playerOneScore,
     attempts: playerOneAttempts,
     allowedScores,
-    requireLastScore: winnerSide === "PLAYER_ONE",
+    lastScoreMustExceed:
+      winnerSide === "PLAYER_ONE"
+        ? getLastScoreThreshold(playerOneScore, targetPoints, allowedScores)
+        : undefined,
     minimumMisses: getMinimumMisses(specialty, playerOneAttempts, playerOne),
     missProbability: getMissProbability(specialty, playerOne),
     random,
@@ -505,7 +509,10 @@ export function buildIndividualGameChronicle({
     total: playerTwoScore,
     attempts: playerTwoAttempts,
     allowedScores,
-    requireLastScore: winnerSide === "PLAYER_TWO",
+    lastScoreMustExceed:
+      winnerSide === "PLAYER_TWO"
+        ? getLastScoreThreshold(playerTwoScore, targetPoints, allowedScores)
+        : undefined,
     minimumMisses: getMinimumMisses(specialty, playerTwoAttempts, playerTwo),
     missProbability: getMissProbability(specialty, playerTwo),
     random,
@@ -621,6 +628,16 @@ export function buildIndividualGameChronicle({
   });
 }
 
+function getLastScoreThreshold(
+  winnerScore: number,
+  targetPoints: number,
+  allowedScores: readonly number[]
+) {
+  const overshoot = Math.max(0, winnerScore - targetPoints);
+
+  return overshoot < allowedScores.at(-1)! ? overshoot : 0;
+}
+
 function getAttemptCount(
   specialty: MatchSpecialty,
   total: number,
@@ -701,7 +718,7 @@ function distributeScore({
   total,
   attempts,
   allowedScores,
-  requireLastScore,
+  lastScoreMustExceed,
   minimumMisses,
   missProbability,
   random,
@@ -709,7 +726,7 @@ function distributeScore({
   total: number;
   attempts: number;
   allowedScores: readonly number[];
-  requireLastScore: boolean;
+  lastScoreMustExceed?: number;
   minimumMisses: number;
   missProbability: number;
   random: () => number;
@@ -734,17 +751,19 @@ function distributeScore({
         return (
           nextTotal === 0 &&
           nextMinimumMisses === 0 &&
-          (!requireLastScore || score > 0)
+          (lastScoreMustExceed === undefined ||
+            score > lastScoreMustExceed)
         );
       }
 
-      return requireLastScore
-        ? canRepresentWithPositiveLast(
+      return lastScoreMustExceed !== undefined
+        ? canRepresentWithFinalScoreAbove(
             nextTotal,
             remainingAttempts,
             allowedScores,
             memo,
-            nextMinimumMisses
+            nextMinimumMisses,
+            lastScoreMustExceed
           )
         : canRepresent(
             nextTotal,
@@ -785,15 +804,17 @@ function distributeScore({
   return scores;
 }
 
-function canRepresentWithPositiveLast(
+function canRepresentWithFinalScoreAbove(
   total: number,
   attempts: number,
   allowedScores: readonly number[],
   memo: Map<string, boolean>,
-  minimumMisses: number
+  minimumMisses: number,
+  minimumExclusive: number
 ) {
   return allowedScores.some(
     (lastScore) =>
+      lastScore > minimumExclusive &&
       lastScore <= total &&
       canRepresent(
         total - lastScore,
@@ -886,7 +907,7 @@ function getShotScoreAffinity(
 ) {
   if (points === 0) return 1;
 
-  if (shot.key === "SPONDA_PASSATE") {
+  if (shot.key === "EBREA") {
     return points > 72 ? 9 : 0;
   }
 
@@ -3150,6 +3171,8 @@ function getOutcomeCommentary(
     const shotPreparation =
       shotDefinition.key === "BRICOLLA"
         ? "misura la forza per accompagnare l'avversaria nel castello; "
+        : shotDefinition.key === "EBREA"
+          ? "cerca prima la sponda e poi l'avversaria, per spingerla più volte attraverso il castello; "
         : "";
 
     return `${actingPlayerName} si prende il tavolo e cerca il tiro della chiusura. ${shot.shotName}: ${shotPreparation}${scoringPhrase}. L'esecuzione riesce e la partita termina qui.`;
@@ -3207,6 +3230,8 @@ function getOutcomeCommentary(
             ],
             random
           )
+        : shotDefinition.key === "EBREA"
+          ? "la battente trova prima la sponda e poi l'avversaria, che attraversa il castello con la forza cercata"
         : selectTemplate(
             [
               "e lascia una rimanenza coperta",
@@ -3224,6 +3249,8 @@ function getOutcomeCommentary(
     const ending =
       shotDefinition.key === "BRICOLLA"
         ? "ma la forza è eccessiva e l'avversaria supera il castello più del previsto"
+        : shotDefinition.key === "EBREA"
+          ? "ma dopo il contatto di sponda l'avversaria attraversa il castello senza lasciare copertura"
         : selectTemplate(
             [
               "ma la difesa non riesce e resta una replica possibile",
@@ -3241,6 +3268,8 @@ function getOutcomeCommentary(
     const ending =
       shotDefinition.key === "BRICOLLA"
         ? "ma la forza è quella cercata e l'avversaria si ferma a ridosso del castello"
+        : shotDefinition.key === "EBREA"
+          ? "e dopo il contatto di sponda l'avversaria termina la corsa protetta dal castello"
         : selectTemplate(
             [
               "ma la misura è precisa e il castello resta a protezione",
@@ -3256,6 +3285,8 @@ function getOutcomeCommentary(
   const measureError =
     shotDefinition.key === "BRICOLLA"
       ? "La forza non è quella cercata: l'avversaria corre troppo oltre il castello e resta visibile."
+      : shotDefinition.key === "EBREA"
+        ? "La battente trova la sponda, ma non accompagna l'avversaria nelle passate cercate sul castello."
       : shotDefinition.key === "TRE_SPONDE_CALCIO" ||
     shotDefinition.key === "CINQUE_SPONDE_CALCIO"
       ? selectTemplate(
@@ -3312,7 +3343,7 @@ function getShotReference(shot: ShotDefinition) {
     "CANDELA",
     "SPONDA_BIGLIA",
     "BRICOLLA",
-    "SPONDA_PASSATE",
+    "EBREA",
     "GARUFFA",
     "MEZZA_GARUFFA",
     "PARABOLA",
@@ -3326,6 +3357,8 @@ function getShotReference(shot: ShotDefinition) {
   if (shot.key === "ANGOLO_PRIMA" || shot.key === "ANGOLO_SECONDA") {
     return `sull'${name}`;
   }
+
+  if (shot.key === "EBREA") return `sull'${name}`;
 
   if (pluralShots.has(shot.key)) return `sulle ${name}`;
 
