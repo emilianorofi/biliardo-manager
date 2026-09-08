@@ -627,6 +627,11 @@ model LeagueFixtureGame {
 
   winnerSide String
 
+  homePoints Int
+  awayPoints Int
+
+  reconstructed Boolean @default(false)
+
   homePerformanceRating Float
   awayPerformanceRating Float
 

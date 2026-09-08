@@ -2,6 +2,7 @@ import { getCurrentClubId } from "@/lib/current-club";
 import { getNextPlayableRound } from "@/lib/league-round";
 import { createLeagueTable } from "@/lib/league-table";
 import { prisma } from "@/lib/prisma";
+import Link from "next/link";
 import LeagueSelector from "./LeagueSelector";
 
 export const dynamic = "force-dynamic";
@@ -447,6 +448,7 @@ export default async function CampionatoPage({
 }
 
 type Fixture = {
+  id: number;
   status: string;
   scheduledAt: Date;
   homeScore: number | null;
@@ -511,6 +513,17 @@ function FixtureRow({
           align="right"
         />
       </div>
+
+      {fixture.status === "PLAYED" && (
+        <div className="mt-2 flex justify-center">
+          <Link
+            href={`/campionato/incontri/${fixture.id}`}
+            className="text-[10px] font-black uppercase tracking-wider text-amber-300 transition hover:text-amber-200"
+          >
+            Apri il referto →
+          </Link>
+        </div>
+      )}
     </article>
   );
 }
@@ -581,6 +594,15 @@ function RecentResultRow({
         >
           {fixture.awayClub.name}
         </p>
+      </div>
+
+      <div className="mt-2 text-center">
+        <Link
+          href={`/campionato/incontri/${fixture.id}`}
+          className="text-[9px] font-black uppercase tracking-wider text-amber-300/80 transition hover:text-amber-200"
+        >
+          Referto completo →
+        </Link>
       </div>
     </article>
   );

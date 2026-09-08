@@ -118,6 +118,9 @@ export default async function NextMatchCard() {
             currentFixture.round ===
             playableRound
         ) ?? null;
+  const latestPlayedFixture = [...league.fixtures]
+    .filter((candidate) => candidate.status === "PLAYED")
+    .sort((first, second) => second.round - first.round)[0];
 
   const formationComplete =
     formation?.slotAPlayerId !== null &&
@@ -148,6 +151,15 @@ export default async function NextMatchCard() {
         >
           Vedi la classifica finale
         </Link>
+
+        {latestPlayedFixture && (
+          <Link
+            href={`/campionato/incontri/${latestPlayedFixture.id}`}
+            className="mt-3 inline-flex w-fit rounded-xl border border-emerald-800 px-4 py-2.5 text-sm font-bold text-slate-300 transition hover:bg-white/5 hover:text-white"
+          >
+            Apri l&apos;ultimo referto
+          </Link>
+        )}
       </section>
     );
   }
@@ -263,10 +275,10 @@ export default async function NextMatchCard() {
 
           {matchPlayed ? (
             <Link
-              href="/campionato"
+              href={`/campionato/incontri/${fixture.id}`}
               className="flex-1 rounded-xl bg-amber-400 px-4 py-2.5 text-center text-sm font-black text-[#122018] transition hover:bg-amber-300"
             >
-              Vedi risultato e classifica
+              Apri il referto
             </Link>
           ) : (
             <Link
@@ -278,10 +290,14 @@ export default async function NextMatchCard() {
           )}
 
           <Link
-            href="/campionato"
+            href={
+              latestPlayedFixture
+                ? `/campionato/incontri/${latestPlayedFixture.id}`
+                : "/campionato"
+            }
             className="flex-1 rounded-xl border border-emerald-800 px-4 py-2.5 text-center text-sm font-bold text-slate-300 transition hover:bg-white/5 hover:text-white"
           >
-            Vai al campionato
+            {latestPlayedFixture ? "Ultimo referto" : "Vai al campionato"}
           </Link>
         </div>
       </div>

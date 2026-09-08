@@ -71,6 +71,9 @@ export async function recordPlayerFixtureCareer(
           gameType: game.gameType,
           targetPoints: game.targetPoints,
           winnerSide: game.result.winner,
+          homePoints: game.homePoints,
+          awayPoints: game.awayPoints,
+          reconstructed: false,
           homePerformanceRating:
             game.homePerformanceRating,
           awayPerformanceRating:

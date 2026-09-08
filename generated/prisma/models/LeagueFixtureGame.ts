@@ -31,6 +31,8 @@ export type LeagueFixtureGameAvgAggregateOutputType = {
   fixtureId: number | null
   order: number | null
   targetPoints: number | null
+  homePoints: number | null
+  awayPoints: number | null
   homePerformanceRating: number | null
   awayPerformanceRating: number | null
   homeWinProbability: number | null
@@ -43,6 +45,8 @@ export type LeagueFixtureGameSumAggregateOutputType = {
   fixtureId: number | null
   order: number | null
   targetPoints: number | null
+  homePoints: number | null
+  awayPoints: number | null
   homePerformanceRating: number | null
   awayPerformanceRating: number | null
   homeWinProbability: number | null
@@ -58,6 +62,9 @@ export type LeagueFixtureGameMinAggregateOutputType = {
   gameType: string | null
   targetPoints: number | null
   winnerSide: string | null
+  homePoints: number | null
+  awayPoints: number | null
+  reconstructed: boolean | null
   homePerformanceRating: number | null
   awayPerformanceRating: number | null
   homeWinProbability: number | null
@@ -74,6 +81,9 @@ export type LeagueFixtureGameMaxAggregateOutputType = {
   gameType: string | null
   targetPoints: number | null
   winnerSide: string | null
+  homePoints: number | null
+  awayPoints: number | null
+  reconstructed: boolean | null
   homePerformanceRating: number | null
   awayPerformanceRating: number | null
   homeWinProbability: number | null
@@ -90,6 +100,9 @@ export type LeagueFixtureGameCountAggregateOutputType = {
   gameType: number
   targetPoints: number
   winnerSide: number
+  homePoints: number
+  awayPoints: number
+  reconstructed: number
   homePerformanceRating: number
   awayPerformanceRating: number
   homeWinProbability: number
@@ -105,6 +118,8 @@ export type LeagueFixtureGameAvgAggregateInputType = {
   fixtureId?: true
   order?: true
   targetPoints?: true
+  homePoints?: true
+  awayPoints?: true
   homePerformanceRating?: true
   awayPerformanceRating?: true
   homeWinProbability?: true
@@ -117,6 +132,8 @@ export type LeagueFixtureGameSumAggregateInputType = {
   fixtureId?: true
   order?: true
   targetPoints?: true
+  homePoints?: true
+  awayPoints?: true
   homePerformanceRating?: true
   awayPerformanceRating?: true
   homeWinProbability?: true
@@ -132,6 +149,9 @@ export type LeagueFixtureGameMinAggregateInputType = {
   gameType?: true
   targetPoints?: true
   winnerSide?: true
+  homePoints?: true
+  awayPoints?: true
+  reconstructed?: true
   homePerformanceRating?: true
   awayPerformanceRating?: true
   homeWinProbability?: true
@@ -148,6 +168,9 @@ export type LeagueFixtureGameMaxAggregateInputType = {
   gameType?: true
   targetPoints?: true
   winnerSide?: true
+  homePoints?: true
+  awayPoints?: true
+  reconstructed?: true
   homePerformanceRating?: true
   awayPerformanceRating?: true
   homeWinProbability?: true
@@ -164,6 +187,9 @@ export type LeagueFixtureGameCountAggregateInputType = {
   gameType?: true
   targetPoints?: true
   winnerSide?: true
+  homePoints?: true
+  awayPoints?: true
+  reconstructed?: true
   homePerformanceRating?: true
   awayPerformanceRating?: true
   homeWinProbability?: true
@@ -267,6 +293,9 @@ export type LeagueFixtureGameGroupByOutputType = {
   gameType: string
   targetPoints: number
   winnerSide: string
+  homePoints: number
+  awayPoints: number
+  reconstructed: boolean
   homePerformanceRating: number
   awayPerformanceRating: number
   homeWinProbability: number
@@ -306,6 +335,9 @@ export type LeagueFixtureGameWhereInput = {
   gameType?: Prisma.StringFilter<"LeagueFixtureGame"> | string
   targetPoints?: Prisma.IntFilter<"LeagueFixtureGame"> | number
   winnerSide?: Prisma.StringFilter<"LeagueFixtureGame"> | string
+  homePoints?: Prisma.IntFilter<"LeagueFixtureGame"> | number
+  awayPoints?: Prisma.IntFilter<"LeagueFixtureGame"> | number
+  reconstructed?: Prisma.BoolFilter<"LeagueFixtureGame"> | boolean
   homePerformanceRating?: Prisma.FloatFilter<"LeagueFixtureGame"> | number
   awayPerformanceRating?: Prisma.FloatFilter<"LeagueFixtureGame"> | number
   homeWinProbability?: Prisma.FloatFilter<"LeagueFixtureGame"> | number
@@ -324,6 +356,9 @@ export type LeagueFixtureGameOrderByWithRelationInput = {
   gameType?: Prisma.SortOrder
   targetPoints?: Prisma.SortOrder
   winnerSide?: Prisma.SortOrder
+  homePoints?: Prisma.SortOrder
+  awayPoints?: Prisma.SortOrder
+  reconstructed?: Prisma.SortOrder
   homePerformanceRating?: Prisma.SortOrder
   awayPerformanceRating?: Prisma.SortOrder
   homeWinProbability?: Prisma.SortOrder
@@ -346,6 +381,9 @@ export type LeagueFixtureGameWhereUniqueInput = Prisma.AtLeast<{
   gameType?: Prisma.StringFilter<"LeagueFixtureGame"> | string
   targetPoints?: Prisma.IntFilter<"LeagueFixtureGame"> | number
   winnerSide?: Prisma.StringFilter<"LeagueFixtureGame"> | string
+  homePoints?: Prisma.IntFilter<"LeagueFixtureGame"> | number
+  awayPoints?: Prisma.IntFilter<"LeagueFixtureGame"> | number
+  reconstructed?: Prisma.BoolFilter<"LeagueFixtureGame"> | boolean
   homePerformanceRating?: Prisma.FloatFilter<"LeagueFixtureGame"> | number
   awayPerformanceRating?: Prisma.FloatFilter<"LeagueFixtureGame"> | number
   homeWinProbability?: Prisma.FloatFilter<"LeagueFixtureGame"> | number
@@ -364,6 +402,9 @@ export type LeagueFixtureGameOrderByWithAggregationInput = {
   gameType?: Prisma.SortOrder
   targetPoints?: Prisma.SortOrder
   winnerSide?: Prisma.SortOrder
+  homePoints?: Prisma.SortOrder
+  awayPoints?: Prisma.SortOrder
+  reconstructed?: Prisma.SortOrder
   homePerformanceRating?: Prisma.SortOrder
   awayPerformanceRating?: Prisma.SortOrder
   homeWinProbability?: Prisma.SortOrder
@@ -388,6 +429,9 @@ export type LeagueFixtureGameScalarWhereWithAggregatesInput = {
   gameType?: Prisma.StringWithAggregatesFilter<"LeagueFixtureGame"> | string
   targetPoints?: Prisma.IntWithAggregatesFilter<"LeagueFixtureGame"> | number
   winnerSide?: Prisma.StringWithAggregatesFilter<"LeagueFixtureGame"> | string
+  homePoints?: Prisma.IntWithAggregatesFilter<"LeagueFixtureGame"> | number
+  awayPoints?: Prisma.IntWithAggregatesFilter<"LeagueFixtureGame"> | number
+  reconstructed?: Prisma.BoolWithAggregatesFilter<"LeagueFixtureGame"> | boolean
   homePerformanceRating?: Prisma.FloatWithAggregatesFilter<"LeagueFixtureGame"> | number
   awayPerformanceRating?: Prisma.FloatWithAggregatesFilter<"LeagueFixtureGame"> | number
   homeWinProbability?: Prisma.FloatWithAggregatesFilter<"LeagueFixtureGame"> | number
@@ -402,6 +446,9 @@ export type LeagueFixtureGameCreateInput = {
   gameType: string
   targetPoints: number
   winnerSide: string
+  homePoints: number
+  awayPoints: number
+  reconstructed?: boolean
   homePerformanceRating: number
   awayPerformanceRating: number
   homeWinProbability: number
@@ -420,6 +467,9 @@ export type LeagueFixtureGameUncheckedCreateInput = {
   gameType: string
   targetPoints: number
   winnerSide: string
+  homePoints: number
+  awayPoints: number
+  reconstructed?: boolean
   homePerformanceRating: number
   awayPerformanceRating: number
   homeWinProbability: number
@@ -435,6 +485,9 @@ export type LeagueFixtureGameUpdateInput = {
   gameType?: Prisma.StringFieldUpdateOperationsInput | string
   targetPoints?: Prisma.IntFieldUpdateOperationsInput | number
   winnerSide?: Prisma.StringFieldUpdateOperationsInput | string
+  homePoints?: Prisma.IntFieldUpdateOperationsInput | number
+  awayPoints?: Prisma.IntFieldUpdateOperationsInput | number
+  reconstructed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   homePerformanceRating?: Prisma.FloatFieldUpdateOperationsInput | number
   awayPerformanceRating?: Prisma.FloatFieldUpdateOperationsInput | number
   homeWinProbability?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -453,6 +506,9 @@ export type LeagueFixtureGameUncheckedUpdateInput = {
   gameType?: Prisma.StringFieldUpdateOperationsInput | string
   targetPoints?: Prisma.IntFieldUpdateOperationsInput | number
   winnerSide?: Prisma.StringFieldUpdateOperationsInput | string
+  homePoints?: Prisma.IntFieldUpdateOperationsInput | number
+  awayPoints?: Prisma.IntFieldUpdateOperationsInput | number
+  reconstructed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   homePerformanceRating?: Prisma.FloatFieldUpdateOperationsInput | number
   awayPerformanceRating?: Prisma.FloatFieldUpdateOperationsInput | number
   homeWinProbability?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -470,6 +526,9 @@ export type LeagueFixtureGameCreateManyInput = {
   gameType: string
   targetPoints: number
   winnerSide: string
+  homePoints: number
+  awayPoints: number
+  reconstructed?: boolean
   homePerformanceRating: number
   awayPerformanceRating: number
   homeWinProbability: number
@@ -484,6 +543,9 @@ export type LeagueFixtureGameUpdateManyMutationInput = {
   gameType?: Prisma.StringFieldUpdateOperationsInput | string
   targetPoints?: Prisma.IntFieldUpdateOperationsInput | number
   winnerSide?: Prisma.StringFieldUpdateOperationsInput | string
+  homePoints?: Prisma.IntFieldUpdateOperationsInput | number
+  awayPoints?: Prisma.IntFieldUpdateOperationsInput | number
+  reconstructed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   homePerformanceRating?: Prisma.FloatFieldUpdateOperationsInput | number
   awayPerformanceRating?: Prisma.FloatFieldUpdateOperationsInput | number
   homeWinProbability?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -500,6 +562,9 @@ export type LeagueFixtureGameUncheckedUpdateManyInput = {
   gameType?: Prisma.StringFieldUpdateOperationsInput | string
   targetPoints?: Prisma.IntFieldUpdateOperationsInput | number
   winnerSide?: Prisma.StringFieldUpdateOperationsInput | string
+  homePoints?: Prisma.IntFieldUpdateOperationsInput | number
+  awayPoints?: Prisma.IntFieldUpdateOperationsInput | number
+  reconstructed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   homePerformanceRating?: Prisma.FloatFieldUpdateOperationsInput | number
   awayPerformanceRating?: Prisma.FloatFieldUpdateOperationsInput | number
   homeWinProbability?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -531,6 +596,9 @@ export type LeagueFixtureGameCountOrderByAggregateInput = {
   gameType?: Prisma.SortOrder
   targetPoints?: Prisma.SortOrder
   winnerSide?: Prisma.SortOrder
+  homePoints?: Prisma.SortOrder
+  awayPoints?: Prisma.SortOrder
+  reconstructed?: Prisma.SortOrder
   homePerformanceRating?: Prisma.SortOrder
   awayPerformanceRating?: Prisma.SortOrder
   homeWinProbability?: Prisma.SortOrder
@@ -544,6 +612,8 @@ export type LeagueFixtureGameAvgOrderByAggregateInput = {
   fixtureId?: Prisma.SortOrder
   order?: Prisma.SortOrder
   targetPoints?: Prisma.SortOrder
+  homePoints?: Prisma.SortOrder
+  awayPoints?: Prisma.SortOrder
   homePerformanceRating?: Prisma.SortOrder
   awayPerformanceRating?: Prisma.SortOrder
   homeWinProbability?: Prisma.SortOrder
@@ -559,6 +629,9 @@ export type LeagueFixtureGameMaxOrderByAggregateInput = {
   gameType?: Prisma.SortOrder
   targetPoints?: Prisma.SortOrder
   winnerSide?: Prisma.SortOrder
+  homePoints?: Prisma.SortOrder
+  awayPoints?: Prisma.SortOrder
+  reconstructed?: Prisma.SortOrder
   homePerformanceRating?: Prisma.SortOrder
   awayPerformanceRating?: Prisma.SortOrder
   homeWinProbability?: Prisma.SortOrder
@@ -575,6 +648,9 @@ export type LeagueFixtureGameMinOrderByAggregateInput = {
   gameType?: Prisma.SortOrder
   targetPoints?: Prisma.SortOrder
   winnerSide?: Prisma.SortOrder
+  homePoints?: Prisma.SortOrder
+  awayPoints?: Prisma.SortOrder
+  reconstructed?: Prisma.SortOrder
   homePerformanceRating?: Prisma.SortOrder
   awayPerformanceRating?: Prisma.SortOrder
   homeWinProbability?: Prisma.SortOrder
@@ -588,6 +664,8 @@ export type LeagueFixtureGameSumOrderByAggregateInput = {
   fixtureId?: Prisma.SortOrder
   order?: Prisma.SortOrder
   targetPoints?: Prisma.SortOrder
+  homePoints?: Prisma.SortOrder
+  awayPoints?: Prisma.SortOrder
   homePerformanceRating?: Prisma.SortOrder
   awayPerformanceRating?: Prisma.SortOrder
   homeWinProbability?: Prisma.SortOrder
@@ -662,6 +740,9 @@ export type LeagueFixtureGameCreateWithoutFixtureInput = {
   gameType: string
   targetPoints: number
   winnerSide: string
+  homePoints: number
+  awayPoints: number
+  reconstructed?: boolean
   homePerformanceRating: number
   awayPerformanceRating: number
   homeWinProbability: number
@@ -678,6 +759,9 @@ export type LeagueFixtureGameUncheckedCreateWithoutFixtureInput = {
   gameType: string
   targetPoints: number
   winnerSide: string
+  homePoints: number
+  awayPoints: number
+  reconstructed?: boolean
   homePerformanceRating: number
   awayPerformanceRating: number
   homeWinProbability: number
@@ -724,6 +808,9 @@ export type LeagueFixtureGameScalarWhereInput = {
   gameType?: Prisma.StringFilter<"LeagueFixtureGame"> | string
   targetPoints?: Prisma.IntFilter<"LeagueFixtureGame"> | number
   winnerSide?: Prisma.StringFilter<"LeagueFixtureGame"> | string
+  homePoints?: Prisma.IntFilter<"LeagueFixtureGame"> | number
+  awayPoints?: Prisma.IntFilter<"LeagueFixtureGame"> | number
+  reconstructed?: Prisma.BoolFilter<"LeagueFixtureGame"> | boolean
   homePerformanceRating?: Prisma.FloatFilter<"LeagueFixtureGame"> | number
   awayPerformanceRating?: Prisma.FloatFilter<"LeagueFixtureGame"> | number
   homeWinProbability?: Prisma.FloatFilter<"LeagueFixtureGame"> | number
@@ -738,6 +825,9 @@ export type LeagueFixtureGameCreateWithoutPlayerPerformancesInput = {
   gameType: string
   targetPoints: number
   winnerSide: string
+  homePoints: number
+  awayPoints: number
+  reconstructed?: boolean
   homePerformanceRating: number
   awayPerformanceRating: number
   homeWinProbability: number
@@ -755,6 +845,9 @@ export type LeagueFixtureGameUncheckedCreateWithoutPlayerPerformancesInput = {
   gameType: string
   targetPoints: number
   winnerSide: string
+  homePoints: number
+  awayPoints: number
+  reconstructed?: boolean
   homePerformanceRating: number
   awayPerformanceRating: number
   homeWinProbability: number
@@ -785,6 +878,9 @@ export type LeagueFixtureGameUpdateWithoutPlayerPerformancesInput = {
   gameType?: Prisma.StringFieldUpdateOperationsInput | string
   targetPoints?: Prisma.IntFieldUpdateOperationsInput | number
   winnerSide?: Prisma.StringFieldUpdateOperationsInput | string
+  homePoints?: Prisma.IntFieldUpdateOperationsInput | number
+  awayPoints?: Prisma.IntFieldUpdateOperationsInput | number
+  reconstructed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   homePerformanceRating?: Prisma.FloatFieldUpdateOperationsInput | number
   awayPerformanceRating?: Prisma.FloatFieldUpdateOperationsInput | number
   homeWinProbability?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -802,6 +898,9 @@ export type LeagueFixtureGameUncheckedUpdateWithoutPlayerPerformancesInput = {
   gameType?: Prisma.StringFieldUpdateOperationsInput | string
   targetPoints?: Prisma.IntFieldUpdateOperationsInput | number
   winnerSide?: Prisma.StringFieldUpdateOperationsInput | string
+  homePoints?: Prisma.IntFieldUpdateOperationsInput | number
+  awayPoints?: Prisma.IntFieldUpdateOperationsInput | number
+  reconstructed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   homePerformanceRating?: Prisma.FloatFieldUpdateOperationsInput | number
   awayPerformanceRating?: Prisma.FloatFieldUpdateOperationsInput | number
   homeWinProbability?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -817,6 +916,9 @@ export type LeagueFixtureGameCreateManyFixtureInput = {
   gameType: string
   targetPoints: number
   winnerSide: string
+  homePoints: number
+  awayPoints: number
+  reconstructed?: boolean
   homePerformanceRating: number
   awayPerformanceRating: number
   homeWinProbability: number
@@ -831,6 +933,9 @@ export type LeagueFixtureGameUpdateWithoutFixtureInput = {
   gameType?: Prisma.StringFieldUpdateOperationsInput | string
   targetPoints?: Prisma.IntFieldUpdateOperationsInput | number
   winnerSide?: Prisma.StringFieldUpdateOperationsInput | string
+  homePoints?: Prisma.IntFieldUpdateOperationsInput | number
+  awayPoints?: Prisma.IntFieldUpdateOperationsInput | number
+  reconstructed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   homePerformanceRating?: Prisma.FloatFieldUpdateOperationsInput | number
   awayPerformanceRating?: Prisma.FloatFieldUpdateOperationsInput | number
   homeWinProbability?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -847,6 +952,9 @@ export type LeagueFixtureGameUncheckedUpdateWithoutFixtureInput = {
   gameType?: Prisma.StringFieldUpdateOperationsInput | string
   targetPoints?: Prisma.IntFieldUpdateOperationsInput | number
   winnerSide?: Prisma.StringFieldUpdateOperationsInput | string
+  homePoints?: Prisma.IntFieldUpdateOperationsInput | number
+  awayPoints?: Prisma.IntFieldUpdateOperationsInput | number
+  reconstructed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   homePerformanceRating?: Prisma.FloatFieldUpdateOperationsInput | number
   awayPerformanceRating?: Prisma.FloatFieldUpdateOperationsInput | number
   homeWinProbability?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -863,6 +971,9 @@ export type LeagueFixtureGameUncheckedUpdateManyWithoutFixtureInput = {
   gameType?: Prisma.StringFieldUpdateOperationsInput | string
   targetPoints?: Prisma.IntFieldUpdateOperationsInput | number
   winnerSide?: Prisma.StringFieldUpdateOperationsInput | string
+  homePoints?: Prisma.IntFieldUpdateOperationsInput | number
+  awayPoints?: Prisma.IntFieldUpdateOperationsInput | number
+  reconstructed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   homePerformanceRating?: Prisma.FloatFieldUpdateOperationsInput | number
   awayPerformanceRating?: Prisma.FloatFieldUpdateOperationsInput | number
   homeWinProbability?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -910,6 +1021,9 @@ export type LeagueFixtureGameSelect<ExtArgs extends runtime.Types.Extensions.Int
   gameType?: boolean
   targetPoints?: boolean
   winnerSide?: boolean
+  homePoints?: boolean
+  awayPoints?: boolean
+  reconstructed?: boolean
   homePerformanceRating?: boolean
   awayPerformanceRating?: boolean
   homeWinProbability?: boolean
@@ -929,6 +1043,9 @@ export type LeagueFixtureGameSelectCreateManyAndReturn<ExtArgs extends runtime.T
   gameType?: boolean
   targetPoints?: boolean
   winnerSide?: boolean
+  homePoints?: boolean
+  awayPoints?: boolean
+  reconstructed?: boolean
   homePerformanceRating?: boolean
   awayPerformanceRating?: boolean
   homeWinProbability?: boolean
@@ -946,6 +1063,9 @@ export type LeagueFixtureGameSelectUpdateManyAndReturn<ExtArgs extends runtime.T
   gameType?: boolean
   targetPoints?: boolean
   winnerSide?: boolean
+  homePoints?: boolean
+  awayPoints?: boolean
+  reconstructed?: boolean
   homePerformanceRating?: boolean
   awayPerformanceRating?: boolean
   homeWinProbability?: boolean
@@ -963,6 +1083,9 @@ export type LeagueFixtureGameSelectScalar = {
   gameType?: boolean
   targetPoints?: boolean
   winnerSide?: boolean
+  homePoints?: boolean
+  awayPoints?: boolean
+  reconstructed?: boolean
   homePerformanceRating?: boolean
   awayPerformanceRating?: boolean
   homeWinProbability?: boolean
@@ -971,7 +1094,7 @@ export type LeagueFixtureGameSelectScalar = {
   createdAt?: boolean
 }
 
-export type LeagueFixtureGameOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "fixtureId" | "order" | "specialty" | "gameType" | "targetPoints" | "winnerSide" | "homePerformanceRating" | "awayPerformanceRating" | "homeWinProbability" | "awayWinProbability" | "randomValue" | "createdAt", ExtArgs["result"]["leagueFixtureGame"]>
+export type LeagueFixtureGameOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "fixtureId" | "order" | "specialty" | "gameType" | "targetPoints" | "winnerSide" | "homePoints" | "awayPoints" | "reconstructed" | "homePerformanceRating" | "awayPerformanceRating" | "homeWinProbability" | "awayWinProbability" | "randomValue" | "createdAt", ExtArgs["result"]["leagueFixtureGame"]>
 export type LeagueFixtureGameInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   fixture?: boolean | Prisma.LeagueFixtureDefaultArgs<ExtArgs>
   playerPerformances?: boolean | Prisma.LeagueFixtureGame$playerPerformancesArgs<ExtArgs>
@@ -998,6 +1121,9 @@ export type $LeagueFixtureGamePayload<ExtArgs extends runtime.Types.Extensions.I
     gameType: string
     targetPoints: number
     winnerSide: string
+    homePoints: number
+    awayPoints: number
+    reconstructed: boolean
     homePerformanceRating: number
     awayPerformanceRating: number
     homeWinProbability: number
@@ -1436,6 +1562,9 @@ export interface LeagueFixtureGameFieldRefs {
   readonly gameType: Prisma.FieldRef<"LeagueFixtureGame", 'String'>
   readonly targetPoints: Prisma.FieldRef<"LeagueFixtureGame", 'Int'>
   readonly winnerSide: Prisma.FieldRef<"LeagueFixtureGame", 'String'>
+  readonly homePoints: Prisma.FieldRef<"LeagueFixtureGame", 'Int'>
+  readonly awayPoints: Prisma.FieldRef<"LeagueFixtureGame", 'Int'>
+  readonly reconstructed: Prisma.FieldRef<"LeagueFixtureGame", 'Boolean'>
   readonly homePerformanceRating: Prisma.FieldRef<"LeagueFixtureGame", 'Float'>
   readonly awayPerformanceRating: Prisma.FieldRef<"LeagueFixtureGame", 'Float'>
   readonly homeWinProbability: Prisma.FieldRef<"LeagueFixtureGame", 'Float'>

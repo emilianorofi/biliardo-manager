@@ -11,6 +11,7 @@ import {
   simulateMatchWinner,
   type SimulatedMatchResult,
 } from "@/lib/match-simulator";
+import { calculateIndividualGameScore } from "@/lib/individual-match-engine";
 
 export type FixtureCareerPlayer =
   MatchPerformancePlayerValues & {
@@ -54,6 +55,8 @@ export type SimulatedPlayerFixtureGame = {
   awaySlots: FormationSlot[];
   homePerformanceRating: number;
   awayPerformanceRating: number;
+  homePoints: number;
+  awayPoints: number;
   result: SimulatedMatchResult;
   participants: SimulatedFixtureParticipant[];
 };
@@ -106,6 +109,14 @@ export function simulateFixtureWithPlayers(
       awayPerformanceRating,
       randomValues?.[index]
     );
+    const score = calculateIndividualGameScore({
+      specialty: definition.specialty,
+      winnerSide:
+        result.winner === "HOME" ? "PLAYER_ONE" : "PLAYER_TWO",
+      playerOnePerformanceRating: homePerformanceRating,
+      playerTwoPerformanceRating: awayPerformanceRating,
+      randomValue: result.randomValue,
+    });
 
     return {
       order: definition.order,
@@ -119,6 +130,8 @@ export function simulateFixtureWithPlayers(
       awaySlots: [...definition.awaySlots],
       homePerformanceRating,
       awayPerformanceRating,
+      homePoints: score.playerOneScore,
+      awayPoints: score.playerTwoScore,
       result,
       participants: [
         ...createParticipants(

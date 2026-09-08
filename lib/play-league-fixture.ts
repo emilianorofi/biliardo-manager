@@ -352,6 +352,8 @@ export async function playLeagueFixture({
         targetPoints: game.targetPoints,
         homeSlots: game.homeSlots,
         awaySlots: game.awaySlots,
+        homePoints: game.homePoints,
+        awayPoints: game.awayPoints,
         homePerformanceRating:
           game.homePerformanceRating,
         awayPerformanceRating:
