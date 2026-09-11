@@ -411,13 +411,14 @@ export default async function CampionatoPage({
                       </td>
 
                       <td className="px-3 py-2">
-                        <p
-                          className={`truncate font-bold ${
+                        <Link
+                          href={`/clubs/${entry.clubId}`}
+                          className={`block truncate font-bold transition hover:text-amber-200 hover:underline ${
                             isCurrentClub ? "text-emerald-300" : "text-white"
                           }`}
                         >
                           {entry.clubName}
-                        </p>
+                        </Link>
                       </td>
 
                       <td className="px-2 py-2 text-center text-zinc-300">{entry.played}</td>
@@ -485,6 +486,7 @@ function FixtureRow({
     >
       <div className="grid grid-cols-[minmax(0,1fr)_76px_minmax(0,1fr)] items-center gap-2">
         <ClubName
+          id={fixture.homeClub.id}
           name={fixture.homeClub.name}
           shortName={fixture.homeClub.shortName}
           isCurrent={homeIsCurrent}
@@ -507,6 +509,7 @@ function FixtureRow({
         </div>
 
         <ClubName
+          id={fixture.awayClub.id}
           name={fixture.awayClub.name}
           shortName={fixture.awayClub.shortName}
           isCurrent={awayIsCurrent}
@@ -529,11 +532,13 @@ function FixtureRow({
 }
 
 function ClubName({
+  id,
   name,
   shortName,
   isCurrent,
   align = "left",
 }: {
+  id: number;
   name: string;
   shortName: string;
   isCurrent: boolean;
@@ -541,13 +546,14 @@ function ClubName({
 }) {
   return (
     <div className={`min-w-0 ${align === "right" ? "text-right" : "text-left"}`}>
-      <p
-        className={`truncate text-xs font-bold ${
+      <Link
+        href={`/clubs/${id}`}
+        className={`block truncate text-xs font-bold transition hover:text-amber-200 hover:underline ${
           isCurrent ? "text-emerald-300" : "text-white"
         }`}
       >
         {name}
-      </p>
+      </Link>
 
       <p className="mt-0.5 text-[9px] uppercase tracking-wide text-zinc-600">
         {shortName}
@@ -569,13 +575,14 @@ function RecentResultRow({
   return (
     <article className="px-4 py-2.5">
       <div className="grid grid-cols-[minmax(0,1fr)_88px_minmax(0,1fr)] items-center gap-2">
-        <p
-          className={`truncate text-[11px] font-semibold ${
+        <Link
+          href={`/clubs/${fixture.homeClub.id}`}
+          className={`truncate text-[11px] font-semibold transition hover:text-amber-200 hover:underline ${
             homeIsCurrent ? "text-emerald-400/80" : "text-zinc-400"
           }`}
         >
           {fixture.homeClub.name}
-        </p>
+        </Link>
 
         <div className="text-center">
           <p className="text-xl font-black leading-none text-amber-300">
@@ -587,13 +594,14 @@ function RecentResultRow({
           </p>
         </div>
 
-        <p
-          className={`truncate text-right text-[11px] font-semibold ${
+        <Link
+          href={`/clubs/${fixture.awayClub.id}`}
+          className={`truncate text-right text-[11px] font-semibold transition hover:text-amber-200 hover:underline ${
             awayIsCurrent ? "text-emerald-400/80" : "text-zinc-400"
           }`}
         >
           {fixture.awayClub.name}
-        </p>
+        </Link>
       </div>
 
       <div className="mt-2 text-center">

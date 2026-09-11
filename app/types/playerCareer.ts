@@ -43,7 +43,9 @@ export type PlayerCareerAppearance = {
   leagueName: string;
   round: number;
   clubName: string;
+  clubId: number | null;
   opponentClubName: string;
+  opponentClubId: number | null;
   side: "HOME" | "AWAY";
   formationSlot: "A" | "B" | "C";
   teamScore: number;
@@ -57,7 +59,9 @@ export type PlayerCareerTransfer = {
   completedAt: string;
   type: PlayerCareerTransferType;
   fromClubName: string | null;
+  fromClubId: number | null;
   toClubName: string | null;
+  toClubId: number | null;
   amount: number | null;
 };
 

@@ -209,6 +209,7 @@ export default async function LeagueFixtureDetailPage({
 
           <div className="mt-6 grid grid-cols-[minmax(0,1fr)_64px_minmax(0,1fr)] items-center gap-3 sm:grid-cols-[minmax(0,1fr)_110px_minmax(0,1fr)]">
             <ClubHeading
+              id={fixture.homeClub.id}
               name={fixture.homeClub.name}
               shortName={fixture.homeClub.shortName}
               city={fixture.homeClub.city}
@@ -218,6 +219,7 @@ export default async function LeagueFixtureDetailPage({
               contro
             </p>
             <ClubHeading
+              id={fixture.awayClub.id}
               name={fixture.awayClub.name}
               shortName={fixture.awayClub.shortName}
               city={fixture.awayClub.city}
@@ -593,10 +595,12 @@ export default async function LeagueFixtureDetailPage({
               </div>
               <div className="grid md:grid-cols-2 md:divide-x md:divide-zinc-800">
                 <FormationList
+                  clubId={fixture.homeClub.id}
                   clubName={fixture.homeClub.name}
                   appearances={homeFormation}
                 />
                 <FormationList
+                  clubId={fixture.awayClub.id}
                   clubName={fixture.awayClub.name}
                   appearances={awayFormation}
                 />
@@ -619,7 +623,17 @@ export default async function LeagueFixtureDetailPage({
                     {mvp.playerFirstName} {mvp.playerLastName}
                   </Link>
                   <p className="mt-1 text-sm text-zinc-400">
-                    {mvp.clubName} · slot {mvp.formationSlot}
+                    <Link
+                      href={`/clubs/${
+                        mvp.side === "HOME"
+                          ? fixture.homeClub.id
+                          : fixture.awayClub.id
+                      }`}
+                      className="transition hover:text-amber-200 hover:underline"
+                    >
+                      {mvp.clubName}
+                    </Link>{" "}
+                    · slot {mvp.formationSlot}
                   </p>
                   <div className="mt-4 grid grid-cols-2 gap-2">
                     <Stat label="Prove vinte" value={`${countWins(mvp)}/3`} />
@@ -690,12 +704,14 @@ type Appearance = PlayerIdentity & {
 };
 
 function ClubHeading({
+  id,
   name,
   shortName,
   city,
   position,
   align = "left",
 }: {
+  id: number;
   name: string;
   shortName: string;
   city: string;
@@ -704,7 +720,12 @@ function ClubHeading({
 }) {
   return (
     <div className={align === "right" ? "text-right" : "text-left"}>
-      <p className="text-lg font-black text-white sm:text-2xl">{name}</p>
+      <Link
+        href={`/clubs/${id}`}
+        className="text-lg font-black text-white transition hover:text-amber-200 hover:underline sm:text-2xl"
+      >
+        {name}
+      </Link>
       <p className="mt-1 text-xs text-zinc-500">
         {city} · {shortName} · {formatPosition(position)} in classifica
       </p>
@@ -748,17 +769,22 @@ function PlayersLine({
 }
 
 function FormationList({
+  clubId,
   clubName,
   appearances,
 }: {
+  clubId: number;
   clubName: string;
   appearances: Appearance[];
 }) {
   return (
     <div className="p-4">
-      <p className="text-xs font-black uppercase tracking-wider text-zinc-500">
+      <Link
+        href={`/clubs/${clubId}`}
+        className="text-xs font-black uppercase tracking-wider text-zinc-500 transition hover:text-amber-200 hover:underline"
+      >
         {clubName}
-      </p>
+      </Link>
       <div className="mt-3 space-y-2">
         {appearances.map((appearance) => (
           <div

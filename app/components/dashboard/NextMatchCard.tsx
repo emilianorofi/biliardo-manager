@@ -201,6 +201,7 @@ export default async function NextMatchCard() {
       <div className="flex flex-1 flex-col p-4">
         <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
           <ClubSide
+            id={fixture.homeClub.id}
             name={
               fixture.homeClub.name
             }
@@ -245,6 +246,7 @@ export default async function NextMatchCard() {
           </div>
 
           <ClubSide
+            id={fixture.awayClub.id}
             name={
               fixture.awayClub.name
             }
@@ -306,12 +308,14 @@ export default async function NextMatchCard() {
 }
 
 function ClubSide({
+  id,
   name,
   shortName,
   city,
   isUser,
   align = "left",
 }: {
+  id: number;
   name: string;
   shortName: string;
   city: string;
@@ -337,15 +341,16 @@ function ClubSide({
         {shortName}
       </div>
 
-      <p
-        className={`mt-2 text-sm font-black ${
+      <Link
+        href={`/clubs/${id}`}
+        className={`mt-2 text-sm font-black transition hover:text-amber-200 hover:underline ${
           isUser
             ? "text-amber-300"
             : "text-white"
         }`}
       >
         {name}
-      </p>
+      </Link>
 
       <p className="mt-1 text-xs text-slate-500">
         {city}

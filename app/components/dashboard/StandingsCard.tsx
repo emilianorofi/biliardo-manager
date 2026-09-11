@@ -147,15 +147,16 @@ export default async function StandingsCard() {
                   </div>
 
                   <div className="min-w-0">
-                    <p
-                      className={`truncate text-sm font-medium ${
+                    <Link
+                      href={`/clubs/${entry.clubId}`}
+                      className={`block truncate text-sm font-medium transition hover:text-amber-200 hover:underline ${
                         isUserClub
                           ? "text-emerald-300"
                           : "text-white"
                       }`}
                     >
                       {entry.clubName}
-                    </p>
+                    </Link>
 
                     <p className="text-xs text-zinc-500">
                       {entry.played} giocate

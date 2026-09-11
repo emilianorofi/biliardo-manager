@@ -39,8 +39,10 @@ export interface MarketPlayer {
   bidCount: number;
 
   sellerClub: string | null;
+  sellerClubId: number | null;
   isUserListing: boolean;
   lastBidClub: string | null;
+  lastBidClubId: number | null;
 
   expiresAt: string | null;
   expiresAtLabel: string | null;
@@ -79,5 +81,6 @@ export interface MarketHistoryItem {
   openingPrice: number;
   salary: number;
   counterpartClub: string | null;
+  counterpartClubId: number | null;
   completedAtLabel: string;
 }

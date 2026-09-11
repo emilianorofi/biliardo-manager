@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import {
   ArrowDownLeft,
   ArrowUpRight,
@@ -148,15 +150,23 @@ export default function MarketHistory({
 }
 
 function getDescription(item: MarketHistoryItem) {
+  const counterpart =
+    item.counterpartClub && item.counterpartClubId ? (
+      <Link
+        href={`/clubs/${item.counterpartClubId}`}
+        className="font-semibold text-zinc-300 transition hover:text-amber-200 hover:underline"
+      >
+        {item.counterpartClub}
+      </Link>
+    ) : (
+      "un altro club"
+    );
+
   switch (item.kind) {
     case "PURCHASE":
-      return `Acquistato da ${
-        item.counterpartClub ?? "un altro club"
-      }.`;
+      return <>Acquistato da {counterpart}.</>;
     case "SALE":
-      return `Venduto a ${
-        item.counterpartClub ?? "un altro club"
-      }.`;
+      return <>Venduto a {counterpart}.</>;
     case "FREE_AGENT":
       return "Ingaggiato dal mercato degli svincolati.";
     case "EXPIRED":

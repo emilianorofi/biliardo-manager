@@ -39,6 +39,7 @@ type CareerPerformanceInput = {
 export type CareerAppearanceInput = {
   id: number;
   playedAt: Date;
+  clubId?: number | null;
   clubName: string;
   opponentClubName: string;
   side: string;
@@ -48,6 +49,8 @@ export type CareerAppearanceInput = {
   performanceRating: number;
   fixture: {
     round: number;
+    homeClubId?: number;
+    awayClubId?: number;
     league: {
       name: string;
       season: {
@@ -66,9 +69,11 @@ export type CareerTransferInput = {
   finalPrice: number | null;
   completedAt: Date | null;
   sellerClub: {
+    id?: number;
     name: string;
   } | null;
   winnerClub: {
+    id?: number;
     name: string;
   } | null;
 };
@@ -163,7 +168,9 @@ function normalizeTransfer(
     completedAt: listing.completedAt.toISOString(),
     type: assertTransferType(listing.listingType),
     fromClubName: listing.sellerClub?.name ?? null,
+    fromClubId: listing.sellerClub?.id ?? null,
     toClubName: listing.winnerClub?.name ?? null,
+    toClubId: listing.winnerClub?.id ?? null,
     amount: listing.finalPrice,
   };
 }
@@ -202,7 +209,12 @@ function normalizeAppearance(
     leagueName: appearance.fixture.league.name,
     round: appearance.fixture.round,
     clubName: appearance.clubName,
+    clubId: appearance.clubId ?? null,
     opponentClubName: appearance.opponentClubName,
+    opponentClubId:
+      appearance.side === "HOME"
+        ? appearance.fixture.awayClubId ?? null
+        : appearance.fixture.homeClubId ?? null,
     side: assertSide(appearance.side),
     formationSlot: assertFormationSlot(
       appearance.formationSlot

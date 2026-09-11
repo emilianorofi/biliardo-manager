@@ -298,7 +298,16 @@ export default function MarketPlayerCard({
           iconClassName="text-green-400"
           label={isAuction ? "Venditore" : "Stato"}
           value={
-            player.sellerClub ?? "Senza club"
+            player.sellerClub && player.sellerClubId ? (
+              <Link
+                href={`/clubs/${player.sellerClubId}`}
+                className="transition hover:text-amber-200 hover:underline"
+              >
+                {player.sellerClub}
+              </Link>
+            ) : (
+              "Senza club"
+            )
           }
         />
 
@@ -324,14 +333,24 @@ export default function MarketPlayerCard({
               : player.salary
           )}
           detail={
-            isAuction
-              ? `${
-                  player.lastBidClub ??
+            isAuction ? (
+              <>
+                {player.lastBidClub && player.lastBidClubId ? (
+                  <Link
+                    href={`/clubs/${player.lastBidClubId}`}
+                    className="transition hover:text-amber-200 hover:underline"
+                  >
+                    {player.lastBidClub}
+                  </Link>
+                ) : (
                   `${player.bidCount} offerte`
-                } · Stipendio ${formatCurrency(
-                  player.salary
-                )}`
-              : "Nessun costo di acquisto"
+                )}
+                {" · Stipendio "}
+                {formatCurrency(player.salary)}
+              </>
+            ) : (
+              "Nessun costo di acquisto"
+            )
           }
         />
 
@@ -624,7 +643,7 @@ function MarketInfo({
   iconClassName: string;
   label: string;
   value: React.ReactNode;
-  detail?: string | null;
+  detail?: React.ReactNode;
 }) {
   return (
     <div className="min-w-0 text-zinc-300">

@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import {
   ChartNoAxesColumnIncreasing,
   CircleDot,
@@ -256,9 +258,18 @@ function AppearanceRow({
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
           <div className="flex min-w-0 items-center gap-1.5">
-            <span className="truncate text-xs font-black text-white">
-              vs {appearance.opponentClubName}
-            </span>
+            {appearance.opponentClubId ? (
+              <Link
+                href={`/clubs/${appearance.opponentClubId}`}
+                className="truncate text-xs font-black text-white transition hover:text-amber-200 hover:underline"
+              >
+                vs {appearance.opponentClubName}
+              </Link>
+            ) : (
+              <span className="truncate text-xs font-black text-white">
+                vs {appearance.opponentClubName}
+              </span>
+            )}
           <span
               className={`shrink-0 rounded px-1.5 py-0.5 text-[10px] font-black ${
               result === "WIN"
@@ -382,9 +393,27 @@ function TransferRow({
       </div>
 
       <div className="flex min-w-0 items-center gap-2 text-xs font-bold text-slate-200">
-        <span className="truncate">{fromClubName}</span>
+        {transfer.fromClubId ? (
+          <Link
+            href={`/clubs/${transfer.fromClubId}`}
+            className="truncate transition hover:text-amber-200 hover:underline"
+          >
+            {fromClubName}
+          </Link>
+        ) : (
+          <span className="truncate">{fromClubName}</span>
+        )}
         <MoveRight className="shrink-0 text-emerald-500" size={13} />
-        <span className="truncate text-white">{toClubName}</span>
+        {transfer.toClubId ? (
+          <Link
+            href={`/clubs/${transfer.toClubId}`}
+            className="truncate text-white transition hover:text-amber-200 hover:underline"
+          >
+            {toClubName}
+          </Link>
+        ) : (
+          <span className="truncate text-white">{toClubName}</span>
+        )}
       </div>
 
       <p className="text-xs font-black text-amber-300 sm:text-right">
