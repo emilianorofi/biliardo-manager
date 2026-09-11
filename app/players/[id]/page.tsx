@@ -8,7 +8,9 @@ import TransferListingForm from "@/app/components/player/TransferListingForm";
 import type { Player } from "@/app/types/player";
 import { getCurrentClubId } from "@/lib/current-club";
 import { MIN_FIRST_TEAM_PLAYERS } from "@/lib/game-config";
+import { getNationalityDisplay } from "@/lib/nationalities";
 import { buildPlayerCareerView } from "@/lib/player-career-stats";
+import { buildGlobalPlayerRanking } from "@/lib/player-ranking";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
@@ -51,7 +53,7 @@ export default async function PlayerPage({
     notFound();
   }
 
-  const [databasePlayer, rosterCount, activeSales] =
+  const [databasePlayer, rosterCount, activeSales, rankablePlayers] =
     await Promise.all([
       prisma.player.findUnique({
         where: {
@@ -132,6 +134,23 @@ export default async function PlayerPage({
           status: {
             in: ["ACTIVE", "PENDING_TRANSFER"],
           },
+        },
+      }),
+      prisma.player.findMany({
+        where: {
+          careerStatus: "ACTIVE",
+        },
+        select: {
+          id: true,
+          precisione: true,
+          diretto: true,
+          sponde: true,
+          tattica: true,
+          mentalita: true,
+          difesa: true,
+          realizzazione: true,
+          creativita: true,
+          misura: true,
         },
       }),
     ]);
@@ -215,6 +234,10 @@ const player: Player = {
   attributes: playerAttributes,
 };
 
+  const nationality = getNationalityDisplay(player.nationality);
+  const globalRanking =
+    buildGlobalPlayerRanking(rankablePlayers).get(player.id)?.position ?? null;
+
   const specialties = [
     {
       label: "Italiana",
@@ -265,8 +288,19 @@ const player: Player = {
                 {player.firstName} {player.lastName}
               </h1>
 
-              <p className="mt-0.5 text-xs text-slate-400">
-                {player.nationality} · {player.age} anni
+              <p className="mt-0.5 flex items-center gap-1.5 text-xs text-slate-400">
+                <span
+                  role="img"
+                  aria-label={`Bandiera di ${nationality.label}`}
+                  className="text-sm leading-none"
+                >
+                  {nationality.flag}
+                </span>
+                <span className="font-bold text-slate-300">
+                  {nationality.code}
+                </span>
+                <span aria-hidden="true">·</span>
+                <span>{player.age} anni</span>
               </p>
 
               <div className="mt-1.5 flex flex-wrap gap-1.5">
@@ -283,11 +317,16 @@ const player: Player = {
           </div>
 
           <div className="space-y-2">
-            <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-4">
+            <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-5">
               <ProfileMetric
                 label="Overall"
                 value={player.overall}
                 highlight="amber"
+              />
+              <ProfileMetric
+                label="Ranking"
+                value={globalRanking ? `#${globalRanking}` : "N.C."}
+                highlight="sky"
               />
               <ProfileMetric
                 label="Forma"
@@ -399,7 +438,7 @@ const player: Player = {
             />
             <InfoRow
               label="Nazionalità"
-              value={player.nationality}
+              value={`${nationality.flag} ${nationality.code}`}
               last
             />
           </div>

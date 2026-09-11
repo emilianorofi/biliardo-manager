@@ -1,8 +1,7 @@
 import clsx from "clsx";
 
 import type { Player } from "@/app/types/player";
-
-const PLAYER_PORTRAIT_IDENTITIES = [1, 2, 3] as const;
+import { getPlayerPortraitIdentity } from "@/lib/player-portraits";
 
 type PortraitPlayer = Pick<
   Player,
@@ -16,8 +15,7 @@ export default function PlayerPortrait({
   player: PortraitPlayer;
   className?: string;
 }) {
-  const identity =
-    (Math.abs(player.id) % PLAYER_PORTRAIT_IDENTITIES.length) + 1;
+  const identity = getPlayerPortraitIdentity(player.id);
   const agePhase = getAgePhaseIndex(player.age);
   const column = agePhase % 4;
   const row = Math.floor(agePhase / 4);

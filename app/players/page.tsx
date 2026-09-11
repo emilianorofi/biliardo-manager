@@ -1,51 +1,72 @@
 import PlayerListCard from "@/app/components/player/PlayerListCard";
 import type { Player } from "@/app/types/player";
 import { getCurrentClubId } from "@/lib/current-club";
+import { buildGlobalPlayerRanking } from "@/lib/player-ranking";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
 export default async function PlayersPage() {
   const clubId = await getCurrentClubId();
-  const club = await prisma.club.findUnique({
-    where: {
-      id: clubId,
-    },
-    include: {
-      players: {
-        orderBy: [
-          {
-            lastName: "asc",
-          },
-          {
-            firstName: "asc",
-          },
-        ],
-        include: {
-          fixtureAppearances: {
-            orderBy: {
-              playedAt: "desc",
+  const [club, rankablePlayers] = await Promise.all([
+    prisma.club.findUnique({
+      where: {
+        id: clubId,
+      },
+      include: {
+        players: {
+          orderBy: [
+            {
+              lastName: "asc",
             },
-            take: 1,
-            select: {
-              playedAt: true,
-              opponentClubName: true,
-              teamScore: true,
-              opponentScore: true,
-              formationSlot: true,
-              performanceRating: true,
+            {
+              firstName: "asc",
+            },
+          ],
+          include: {
+            fixtureAppearances: {
+              orderBy: {
+                playedAt: "desc",
+              },
+              take: 1,
+              select: {
+                playedAt: true,
+                opponentClubName: true,
+                teamScore: true,
+                opponentScore: true,
+                formationSlot: true,
+                performanceRating: true,
+              },
             },
           },
         },
       },
-    },
-  });
+    }),
+    prisma.player.findMany({
+      where: {
+        careerStatus: "ACTIVE",
+      },
+      select: {
+        id: true,
+        precisione: true,
+        diretto: true,
+        sponde: true,
+        tattica: true,
+        mentalita: true,
+        difesa: true,
+        realizzazione: true,
+        creativita: true,
+        misura: true,
+      },
+    }),
+  ]);
 
   if (!club) {
     throw new Error("Club principale non disponibile.");
   }
 
   const databasePlayers = club.players;
+  const globalRanking = buildGlobalPlayerRanking(rankablePlayers);
 
   const players: Player[] = databasePlayers.map(
     (player) => {
@@ -209,6 +230,7 @@ export default async function PlayersPage() {
             latestPerformance={
               latestPerformances.get(player.id) ?? null
             }
+            globalRanking={globalRanking.get(player.id)?.position ?? null}
           />
         ))}
 

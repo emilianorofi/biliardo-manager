@@ -89,7 +89,7 @@ export default function PlayerListCard({
                     flag={nationality.flag}
                     label={nationality.label}
                   />
-                  {nationality.label}
+                  <span title={nationality.label}>{nationality.code}</span>
                 </span>
                 <span aria-hidden="true">·</span>
                 <span>{player.age} anni</span>
