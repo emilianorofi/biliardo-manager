@@ -328,7 +328,7 @@ export default async function IndividualMatchDetailPage({
                   <details key={game.id} className="group">
                     <summary className="grid cursor-pointer list-none grid-cols-[minmax(0,1fr)_96px_minmax(0,1fr)] items-center gap-3 px-4 py-4 marker:content-none sm:grid-cols-[minmax(0,1fr)_130px_minmax(0,1fr)] [&::-webkit-details-marker]:hidden">
                       <p
-                        className={`text-right text-3xl font-black tabular-nums ${
+                        className={`whitespace-nowrap text-right text-3xl font-black tabular-nums ${
                           playerOneWon ? "text-emerald-300" : "text-zinc-500"
                         }`}
                       >
@@ -352,7 +352,7 @@ export default async function IndividualMatchDetailPage({
                       </div>
 
                       <p
-                        className={`text-3xl font-black tabular-nums ${
+                        className={`whitespace-nowrap text-3xl font-black tabular-nums ${
                           playerOneWon ? "text-zinc-500" : "text-emerald-300"
                         }`}
                       >

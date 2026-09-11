@@ -1,15 +1,23 @@
 import {
   Activity,
   ArrowLeft,
+  ChevronDown,
   CircleDot,
   Medal,
+  Sparkles,
   Trophy,
   UsersRound,
 } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import {
+  buildIndividualGameBroadcast,
+  buildIndividualGameChronicle,
+  type IndividualChroniclePlayerValues,
+} from "@/lib/individual-game-chronicle";
 import { createLeagueTable } from "@/lib/league-table";
+import type { MatchSpecialty } from "@/lib/match-engine";
 import { prisma } from "@/lib/prisma";
 import { ROME_TIME_ZONE } from "@/lib/rome-calendar";
 
@@ -81,7 +89,23 @@ export default async function LeagueFixtureDetailPage({
         include: {
           playerPerformances: {
             include: {
-              appearance: true,
+              appearance: {
+                include: {
+                  player: {
+                    select: {
+                      precisione: true,
+                      diretto: true,
+                      sponde: true,
+                      tattica: true,
+                      mentalita: true,
+                      difesa: true,
+                      realizzazione: true,
+                      creativita: true,
+                      misura: true,
+                    },
+                  },
+                },
+              },
             },
           },
         },
@@ -274,53 +298,280 @@ export default async function LeagueFixtureDetailPage({
 
             <div className="divide-y divide-zinc-800">
               {fixture.games.map((game) => {
+                const previousGames = fixture.games.filter(
+                  (candidate) => candidate.order < game.order
+                );
+                const homeWinsBefore = previousGames.filter(
+                  (candidate) => candidate.winnerSide === "HOME"
+                ).length;
+                const awayWinsBefore = previousGames.length - homeWinsBefore;
+                const homeWinsAfter =
+                  homeWinsBefore + (game.winnerSide === "HOME" ? 1 : 0);
+                const awayWinsAfter =
+                  awayWinsBefore + (game.winnerSide === "AWAY" ? 1 : 0);
                 const homePlayers = game.playerPerformances
-                  .filter((performance) => performance.appearance.side === "HOME")
+                  .filter(
+                    (performance) => performance.appearance.side === "HOME"
+                  )
                   .map((performance) => performance.appearance);
                 const awayPlayers = game.playerPerformances
-                  .filter((performance) => performance.appearance.side === "AWAY")
+                  .filter(
+                    (performance) => performance.appearance.side === "AWAY"
+                  )
                   .map((performance) => performance.appearance);
+                const homeSide = buildChronicleSide(
+                  homePlayers,
+                  game.homePerformanceRating
+                );
+                const awaySide = buildChronicleSide(
+                  awayPlayers,
+                  game.awayPerformanceRating
+                );
+                const homeWon = game.winnerSide === "HOME";
+                const chronicle = buildIndividualGameChronicle({
+                  gameId: game.id,
+                  specialty: game.specialty as MatchSpecialty,
+                  winnerSide: homeWon ? "PLAYER_ONE" : "PLAYER_TWO",
+                  playerOneScore: game.homePoints,
+                  playerTwoScore: game.awayPoints,
+                  playerOnePerformanceRating: game.homePerformanceRating,
+                  playerTwoPerformanceRating: game.awayPerformanceRating,
+                  playerOne: homeSide.values,
+                  playerTwo: awaySide.values,
+                  playerOneName: homeSide.name,
+                  playerTwoName: awaySide.name,
+                });
+                const isLastGame = game.order === fixture.games.length;
+                const featuredChronicle = buildIndividualGameBroadcast({
+                  chronicle,
+                  gameId: game.id,
+                  specialty: game.specialty as MatchSpecialty,
+                  playerOneName: homeSide.name,
+                  playerTwoName: awaySide.name,
+                  playerOne: homeSide.values,
+                  playerTwo: awaySide.values,
+                  playerOnePerformanceRating: game.homePerformanceRating,
+                  playerTwoPerformanceRating: game.awayPerformanceRating,
+                  gameOrder: game.order,
+                  matchPlayerOneWins: homeWinsAfter,
+                  matchPlayerTwoWins: awayWinsAfter,
+                  isDecisiveGame: false,
+                  isTournamentFinal: false,
+                }).map((shot, index, selectedShots) =>
+                  isLastGame && index === selectedShots.length - 1
+                    ? {
+                        ...shot,
+                        commentary: buildLastLeagueGameCommentary({
+                          shot,
+                          winnerName: homeWon ? homeSide.name : awaySide.name,
+                          homeScore: homeWinsAfter,
+                          awayScore: awayWinsAfter,
+                        }),
+                      }
+                    : shot
+                );
+                const introduction = buildLeagueGameIntroduction({
+                  gameOrder: game.order,
+                  specialty: game.specialty,
+                  homeClubName: fixture.homeClub.name,
+                  awayClubName: fixture.awayClub.name,
+                  homeSide,
+                  awaySide,
+                  homeWinsBefore,
+                  awayWinsBefore,
+                  isLastGame,
+                });
+                const closing = buildLeagueGameClosing({
+                  winnerName: homeWon ? homeSide.name : awaySide.name,
+                  homeClubName: fixture.homeClub.name,
+                  awayClubName: fixture.awayClub.name,
+                  homePoints: game.homePoints,
+                  awayPoints: game.awayPoints,
+                  homeScore: homeWinsAfter,
+                  awayScore: awayWinsAfter,
+                  isLastGame,
+                });
 
                 return (
-                  <article
-                    key={game.id}
-                    className="grid gap-3 px-4 py-4 md:grid-cols-[130px_minmax(0,1fr)_110px_minmax(0,1fr)] md:items-center"
-                  >
-                    <div>
-                      <p className="text-[9px] font-black uppercase tracking-wider text-zinc-600">
-                        Prova {game.order} · {game.gameType === "SINGLES" ? "Singolo" : "Coppia"}
-                      </p>
-                      <p className="mt-1 text-sm font-black text-emerald-300">
-                        {formatSpecialty(game.specialty)}
-                      </p>
-                      <p className="mt-0.5 text-[10px] text-zinc-500">
-                        Traguardo {game.targetPoints}
-                      </p>
+                  <details key={game.id} className="group">
+                    <summary className="cursor-pointer list-none px-4 py-4 marker:content-none [&::-webkit-details-marker]:hidden">
+                      <div className="grid gap-3 md:grid-cols-[130px_minmax(0,1fr)_150px_minmax(0,1fr)] md:items-center">
+                        <div>
+                          <p className="text-[9px] font-black uppercase tracking-wider text-zinc-600">
+                            Prova {game.order} · {game.gameType === "SINGLES" ? "Singolo" : "Coppia"}
+                          </p>
+                          <p className="mt-1 text-sm font-black text-emerald-300">
+                            {formatSpecialty(game.specialty)}
+                          </p>
+                          <p className="mt-0.5 text-[10px] text-zinc-500">
+                            Traguardo {game.targetPoints}
+                          </p>
+                        </div>
+
+                        <PlayersLine players={homePlayers} won={homeWon} />
+
+                        <div className="order-first text-center md:order-none">
+                          <p className="whitespace-nowrap text-2xl font-black tabular-nums text-white">
+                            <span className={homeWon ? "text-amber-300" : ""}>
+                              {game.homePoints}
+                            </span>
+                            <span className="px-2 text-zinc-600">–</span>
+                            <span className={!homeWon ? "text-amber-300" : ""}>
+                              {game.awayPoints}
+                            </span>
+                          </p>
+                          <span className="mt-1 inline-flex items-center gap-1 whitespace-nowrap text-[9px] font-black uppercase tracking-wider text-zinc-500">
+                            Leggi la cronaca
+                            <ChevronDown
+                              size={12}
+                              className="transition group-open:rotate-180"
+                            />
+                          </span>
+                        </div>
+
+                        <PlayersLine
+                          players={awayPlayers}
+                          won={!homeWon}
+                          align="right"
+                        />
+                      </div>
+                    </summary>
+
+                    <div className="border-t border-zinc-800 bg-zinc-950/35 px-3 pb-4 pt-3 sm:px-4">
+                      <div className="mb-4 rounded-xl border border-amber-400/15 bg-amber-300/[0.04] px-4 py-3">
+                        <div className="flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.16em] text-amber-300">
+                          <Sparkles aria-hidden="true" size={14} />
+                          Presentazione
+                        </div>
+                        <div className="mt-2 space-y-1.5 text-sm font-medium leading-relaxed text-zinc-300">
+                          {introduction.map((line) => (
+                            <p key={line}>{line}</p>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="mb-3 flex items-end justify-between gap-3 px-1">
+                        <div>
+                          <p className="text-[9px] font-black uppercase tracking-[0.18em] text-emerald-300">
+                            Il racconto
+                          </p>
+                          <p className="mt-1 text-sm font-black text-white">
+                            La storia della prova
+                          </p>
+                        </div>
+                        <p className="text-right text-[10px] font-bold text-zinc-600">
+                          {featuredChronicle.length} passaggi
+                        </p>
+                      </div>
+
+                      <ol className="space-y-4">
+                        {featuredChronicle.map((shot) => {
+                          const shooterIsHome =
+                            shot.playerSide === "PLAYER_ONE";
+                          const scorerIsHome =
+                            shot.scoringSide === "PLAYER_ONE";
+                          const isFinalShot = shot.highlight === "WINNER";
+                          const playerName = shooterIsHome
+                            ? homeSide.name
+                            : awaySide.name;
+                          const scoringName = scorerIsHome
+                            ? homeSide.name
+                            : awaySide.name;
+                          const pointsAwardedToOpponent =
+                            shot.playerSide !== shot.scoringSide;
+
+                          return (
+                            <li key={shot.order}>
+                              <article
+                                className={`rounded-xl border px-4 py-4 ${
+                                  isFinalShot
+                                    ? "border-emerald-400/30 bg-emerald-300/[0.07]"
+                                    : shot.showShotDetail &&
+                                        (shot.highlight === "LEAD_CHANGE" ||
+                                          shot.highlight === "BIG_SHOT")
+                                      ? "border-amber-400/20 bg-amber-300/[0.04]"
+                                      : "border-zinc-800 bg-zinc-900/35"
+                                }`}
+                              >
+                                <div className="flex items-start justify-between gap-3">
+                                  <div className="min-w-0">
+                                    <p
+                                      className={`text-sm font-black sm:text-base ${
+                                        isFinalShot
+                                          ? "text-emerald-300"
+                                          : shot.showShotDetail &&
+                                              (shot.highlight === "LEAD_CHANGE" ||
+                                                shot.highlight === "BIG_SHOT")
+                                            ? "text-amber-200"
+                                            : "text-zinc-200"
+                                      }`}
+                                    >
+                                      {shot.storyTitle ?? "La prova continua"}
+                                    </p>
+                                    <p
+                                      className={`mt-1 whitespace-nowrap text-[10px] font-black tabular-nums ${
+                                        isFinalShot
+                                          ? "text-emerald-200"
+                                          : "text-zinc-500"
+                                      }`}
+                                    >
+                                      {shot.playerOneTotal}–{shot.playerTwoTotal}
+                                    </p>
+                                    {shot.showShotDetail && (
+                                      <p className="mt-1 text-[9px] font-black uppercase tracking-wider text-emerald-400/70">
+                                        {pointsAwardedToOpponent
+                                          ? `Errore di ${playerName}`
+                                          : playerName}{" "}
+                                        · {shot.shotName}
+                                      </p>
+                                    )}
+                                  </div>
+                                  {shot.showShotDetail && (
+                                    <span
+                                      className={`shrink-0 rounded-full border px-2.5 py-1 text-xs font-black tabular-nums ${
+                                        shot.points > 0
+                                          ? "border-amber-400/20 bg-amber-300/[0.06] text-amber-300"
+                                          : "border-zinc-800 text-zinc-600"
+                                      }`}
+                                    >
+                                      {shot.points > 0 ? (
+                                        <>
+                                          +{shot.points}
+                                          {pointsAwardedToOpponent && (
+                                            <span className="ml-1 text-[8px] leading-tight text-rose-300/80">
+                                              a {scoringName}
+                                            </span>
+                                          )}
+                                        </>
+                                      ) : (
+                                        "0"
+                                      )}
+                                    </span>
+                                  )}
+                                </div>
+
+                                <p className="mt-3 text-sm font-medium leading-7 text-zinc-300">
+                                  {shot.commentary}
+                                </p>
+                              </article>
+                            </li>
+                          );
+                        })}
+                      </ol>
+
+                      <div className="mt-4 rounded-xl border border-sky-400/15 bg-sky-300/[0.04] px-4 py-3">
+                        <div className="flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.16em] text-sky-300">
+                          <Sparkles aria-hidden="true" size={14} />
+                          {isLastGame ? "Il verdetto" : `Verso la prova ${game.order + 1}`}
+                        </div>
+                        <div className="mt-2 space-y-1.5 text-sm font-medium leading-relaxed text-zinc-300">
+                          {closing.map((line) => (
+                            <p key={line}>{line}</p>
+                          ))}
+                        </div>
+                      </div>
                     </div>
-
-                    <PlayersLine
-                      players={homePlayers}
-                      won={game.winnerSide === "HOME"}
-                    />
-
-                    <div className="order-first text-center md:order-none">
-                      <p className="text-2xl font-black text-white">
-                        <span className={game.winnerSide === "HOME" ? "text-amber-300" : ""}>
-                          {game.homePoints}
-                        </span>
-                        <span className="px-2 text-zinc-600">–</span>
-                        <span className={game.winnerSide === "AWAY" ? "text-amber-300" : ""}>
-                          {game.awayPoints}
-                        </span>
-                      </p>
-                    </div>
-
-                    <PlayersLine
-                      players={awayPlayers}
-                      won={game.winnerSide === "AWAY"}
-                      align="right"
-                    />
-                  </article>
+                  </details>
                 );
               })}
             </div>
@@ -414,6 +665,17 @@ type PlayerIdentity = {
   playerLastName: string;
   side: string;
   formationSlot: string;
+};
+
+type ChronicleAppearance = PlayerIdentity & {
+  overall: number;
+  form: number;
+  morale: number;
+  experience: number;
+  player: Omit<
+    IndividualChroniclePlayerValues,
+    "form" | "morale" | "experience"
+  > | null;
 };
 
 type Appearance = PlayerIdentity & {
@@ -651,4 +913,147 @@ function formatDateTime(date: Date) {
     minute: "2-digit",
     timeZone: ROME_TIME_ZONE,
   }).format(date);
+}
+
+function buildChronicleSide(
+  players: ChronicleAppearance[],
+  fallbackRating: number
+) {
+  const name = players
+    .map((player) => `${player.playerFirstName} ${player.playerLastName}`)
+    .join(" e ");
+  const technicalFallback = players.length > 0
+    ? average(players.map((player) => player.overall))
+    : fallbackRating;
+  const technicalValue = (
+    key: keyof NonNullable<ChronicleAppearance["player"]>
+  ) =>
+    average(
+      players.map((player) => player.player?.[key] ?? technicalFallback)
+    );
+
+  return {
+    name: name || "Formazione non disponibile",
+    values: {
+      precisione: technicalValue("precisione"),
+      diretto: technicalValue("diretto"),
+      sponde: technicalValue("sponde"),
+      tattica: technicalValue("tattica"),
+      mentalita: technicalValue("mentalita"),
+      difesa: technicalValue("difesa"),
+      realizzazione: technicalValue("realizzazione"),
+      creativita: technicalValue("creativita"),
+      misura: technicalValue("misura"),
+      form: average(players.map((player) => player.form), 5),
+      morale: average(players.map((player) => player.morale), 5),
+      experience: average(players.map((player) => player.experience), 0),
+    } satisfies IndividualChroniclePlayerValues,
+  };
+}
+
+type ChronicleSide = ReturnType<typeof buildChronicleSide>;
+
+function buildLeagueGameIntroduction({
+  gameOrder,
+  specialty,
+  homeClubName,
+  awayClubName,
+  homeSide,
+  awaySide,
+  homeWinsBefore,
+  awayWinsBefore,
+  isLastGame,
+}: {
+  gameOrder: number;
+  specialty: string;
+  homeClubName: string;
+  awayClubName: string;
+  homeSide: ChronicleSide;
+  awaySide: ChronicleSide;
+  homeWinsBefore: number;
+  awayWinsBefore: number;
+  isLastGame: boolean;
+}) {
+  const gameContext =
+    gameOrder === 1
+      ? "apre l'incontro"
+      : isLastGame
+        ? "chiude il programma delle sei partite"
+        : "porta avanti il confronto";
+  const stakes = isLastGame
+    ? `È l'ultima delle sei prove: dopo questa partita il ${homeWinsBefore}–${awayWinsBefore} diventerà il risultato definitivo dell'incontro.`
+    : `Prima di iniziare, il confronto tra ${homeClubName} e ${awayClubName} è sul ${homeWinsBefore}–${awayWinsBefore}.`;
+
+  return [
+    `La prova ${gameOrder} ${gameContext}: ${formatSpecialty(specialty)}, con ${homeSide.name} contro ${awaySide.name}.`,
+    `${homeSide.name} arriva con forma ${formatOneDecimal(homeSide.values.form)}/10 e morale ${formatOneDecimal(homeSide.values.morale)}/10; ${awaySide.name} con forma ${formatOneDecimal(awaySide.values.form)}/10 e morale ${formatOneDecimal(awaySide.values.morale)}/10.`,
+    stakes,
+  ];
+}
+
+function buildLeagueGameClosing({
+  winnerName,
+  homeClubName,
+  awayClubName,
+  homePoints,
+  awayPoints,
+  homeScore,
+  awayScore,
+  isLastGame,
+}: {
+  winnerName: string;
+  homeClubName: string;
+  awayClubName: string;
+  homePoints: number;
+  awayPoints: number;
+  homeScore: number;
+  awayScore: number;
+  isLastGame: boolean;
+}) {
+  const winningClubName = homePoints > awayPoints ? homeClubName : awayClubName;
+  const resultLine = `${winnerName} porta la prova a ${winningClubName} sul ${homePoints}–${awayPoints}. Il conto dell'incontro diventa ${homeScore}–${awayScore}.`;
+
+  if (!isLastGame) {
+    return [
+      resultLine,
+      `Il tavolo viene preparato per la prova successiva: il risultato è cambiato, ma la sfida tra le due squadre è ancora aperta.`,
+    ];
+  }
+
+  const verdict =
+    homeScore === awayScore
+      ? `Le sei prove terminano in parità: ${homeClubName} e ${awayClubName} si dividono l'incontro.`
+      : `${homeScore > awayScore ? homeClubName : awayClubName} completa le sei prove e vince l'incontro ${homeScore}–${awayScore}.`;
+
+  return [resultLine, verdict];
+}
+
+function buildLastLeagueGameCommentary({
+  shot,
+  winnerName,
+  homeScore,
+  awayScore,
+}: {
+  shot: {
+    playerOneTotal: number;
+    playerTwoTotal: number;
+    technicalCommentary: string;
+  };
+  winnerName: string;
+  homeScore: number;
+  awayScore: number;
+}) {
+  return `Sul ${shot.playerOneTotal}–${shot.playerTwoTotal}, ${winnerName} completa la prova. ${shot.technicalCommentary} Il punto chiude il programma delle sei partite e fissa l'incontro sul ${homeScore}–${awayScore}.`;
+}
+
+function average(values: number[], fallback = 0) {
+  if (values.length === 0) return fallback;
+  return values.reduce((total, value) => total + value, 0) / values.length;
+}
+
+function formatOneDecimal(value: number) {
+  return value.toLocaleString("it-IT", {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 1,
+  });
 }
