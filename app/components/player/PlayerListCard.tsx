@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 
 import type { Player } from "../../types/player";
+import CountryFlag from "./CountryFlag";
 import PlayerPortrait from "./PlayerPortrait";
 import { getNationalityDisplay } from "@/lib/nationalities";
 
@@ -86,7 +87,7 @@ export default function PlayerListCard({
               <p className="mt-0.5 flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-[10px] text-slate-400">
                 <span className="inline-flex items-center gap-1.5 font-semibold text-slate-300">
                   <CountryFlag
-                    flag={nationality.flag}
+                    code={nationality.code}
                     label={nationality.label}
                   />
                   <span title={nationality.label}>{nationality.code}</span>
@@ -175,24 +176,6 @@ export default function PlayerListCard({
         </div>
       </div>
     </article>
-  );
-}
-
-function CountryFlag({
-  flag,
-  label,
-}: {
-  flag: string;
-  label: string;
-}) {
-  return (
-    <span
-      role="img"
-      aria-label={`Bandiera di ${label}`}
-      className="inline-flex h-3 w-5 shrink-0 items-center justify-center text-sm leading-none"
-    >
-      {flag}
-    </span>
   );
 }
 

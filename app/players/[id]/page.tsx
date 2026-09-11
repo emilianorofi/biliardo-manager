@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 
 import PlayerCareerSection from "@/app/components/player/PlayerCareerSection";
+import CountryFlag from "@/app/components/player/CountryFlag";
 import PlayerPortrait from "@/app/components/player/PlayerPortrait";
 import TransferListingForm from "@/app/components/player/TransferListingForm";
 import type { Player } from "@/app/types/player";
@@ -289,13 +290,10 @@ const player: Player = {
               </h1>
 
               <p className="mt-0.5 flex items-center gap-1.5 text-xs text-slate-400">
-                <span
-                  role="img"
-                  aria-label={`Bandiera di ${nationality.label}`}
-                  className="text-sm leading-none"
-                >
-                  {nationality.flag}
-                </span>
+                <CountryFlag
+                  code={nationality.code}
+                  label={nationality.label}
+                />
                 <span className="font-bold text-slate-300">
                   {nationality.code}
                 </span>
@@ -438,7 +436,15 @@ const player: Player = {
             />
             <InfoRow
               label="Nazionalità"
-              value={`${nationality.flag} ${nationality.code}`}
+              value={
+                <span className="inline-flex items-center gap-1.5">
+                  <CountryFlag
+                    code={nationality.code}
+                    label={nationality.label}
+                  />
+                  {nationality.code}
+                </span>
+              }
               last
             />
           </div>
@@ -534,7 +540,7 @@ function InfoRow({
   last = false,
 }: {
   label: string;
-  value: string;
+  value: React.ReactNode;
   highlight?: boolean;
   last?: boolean;
 }) {
