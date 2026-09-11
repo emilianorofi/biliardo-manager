@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { getCurrentClubId } from "@/lib/current-club";
 
 import {
@@ -143,8 +145,16 @@ export default async function DashboardHeader() {
           </p>
 
           <h1 className="mt-1 text-2xl font-black text-white sm:text-3xl">
-            {club?.name ??
-              "Squadra non disponibile"}
+            {club ? (
+              <Link
+                href={`/clubs/${clubId}`}
+                className="transition hover:text-amber-200 hover:underline"
+              >
+                {club.name}
+              </Link>
+            ) : (
+              "Squadra non disponibile"
+            )}
           </h1>
 
           <div className="mt-2 flex flex-wrap items-center gap-x-5 gap-y-1 text-xs text-zinc-400">
@@ -172,8 +182,16 @@ export default async function DashboardHeader() {
           </div>
 
           <div className="mt-1 text-lg font-bold text-white">
-            {opponent?.name ??
-              "Nessun avversario"}
+            {opponent ? (
+              <Link
+                href={`/clubs/${opponent.id}`}
+                className="transition hover:text-amber-200 hover:underline"
+              >
+                {opponent.name}
+              </Link>
+            ) : (
+              "Nessun avversario"
+            )}
           </div>
 
           <div className="mt-1 text-sm text-zinc-400">

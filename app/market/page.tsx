@@ -65,6 +65,7 @@ export default async function MarketPage() {
           player: true,
           sellerClub: {
             select: {
+              id: true,
               name: true,
             },
           },
@@ -72,6 +73,7 @@ export default async function MarketPage() {
             include: {
               bidderClub: {
                 select: {
+                  id: true,
                   name: true,
                 },
               },
@@ -174,11 +176,13 @@ export default async function MarketPage() {
           },
           sellerClub: {
             select: {
+              id: true,
               name: true,
             },
           },
           winnerClub: {
             select: {
+              id: true,
               name: true,
             },
           },
@@ -234,10 +238,13 @@ export default async function MarketPage() {
           highestBid?.amount ?? listing.openingPrice,
         bidCount: listing.bids.length,
         sellerClub: listing.sellerClub?.name ?? null,
+        sellerClubId: listing.sellerClub?.id ?? null,
         isUserListing:
           listing.sellerClubId === clubId,
         lastBidClub:
           highestBid?.bidderClub.name ?? null,
+        lastBidClubId:
+          highestBid?.bidderClub.id ?? null,
         expiresAt:
           listing.endsAt?.toISOString() ?? null,
         expiresAtLabel: formatDeadline(
@@ -304,6 +311,12 @@ export default async function MarketPage() {
             ? listing.winnerClub?.name ?? null
             : kind === "PURCHASE"
               ? listing.sellerClub?.name ?? null
+              : null,
+        counterpartClubId:
+          kind === "SALE"
+            ? listing.winnerClub?.id ?? null
+            : kind === "PURCHASE"
+              ? listing.sellerClub?.id ?? null
               : null,
         completedAtLabel: formatHistoryDate(
           listing.completedAt

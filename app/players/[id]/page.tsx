@@ -1,17 +1,21 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, EyeOff } from "lucide-react";
 
 import PlayerCareerSection from "@/app/components/player/PlayerCareerSection";
 import CountryFlag from "@/app/components/player/CountryFlag";
 import PlayerPortrait from "@/app/components/player/PlayerPortrait";
 import TransferListingForm from "@/app/components/player/TransferListingForm";
 import type { Player } from "@/app/types/player";
-import { getCurrentClubId } from "@/lib/current-club";
+import {
+  getCurrentClubId,
+  getTechnicalViewerClubId,
+} from "@/lib/current-club";
 import { MIN_FIRST_TEAM_PLAYERS } from "@/lib/game-config";
 import { getNationalityDisplay } from "@/lib/nationalities";
 import { buildPlayerCareerView } from "@/lib/player-career-stats";
 import { buildGlobalPlayerRanking } from "@/lib/player-ranking";
+import { canViewPlayerTechnicalValues } from "@/lib/player-visibility";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
@@ -40,15 +44,19 @@ export default async function PlayerPage({
     from?: string;
     round?: string;
     stage?: string;
+    club?: string;
   }>;
 }) {
-  const [{ id }, { from, round, stage }] = await Promise.all([
+  const [{ id }, { from, round, stage, club }] = await Promise.all([
     params,
     searchParams,
   ]);
   const playerId = Number(id);
   const comesFromMarket = from === "market";
-  const clubId = await getCurrentClubId();
+  const [clubId, technicalViewerClubId] = await Promise.all([
+    getCurrentClubId(),
+    getTechnicalViewerClubId(),
+  ]);
 
   if (!Number.isInteger(playerId)) {
     notFound();
@@ -61,6 +69,12 @@ export default async function PlayerPage({
           id: playerId,
         },
         include: {
+          club: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
           transferListings: {
             orderBy: {
               createdAt: "desc",
@@ -75,11 +89,13 @@ export default async function PlayerPage({
               completedAt: true,
               sellerClub: {
                 select: {
+                  id: true,
                   name: true,
                 },
               },
               winnerClub: {
                 select: {
+                  id: true,
                   name: true,
                 },
               },
@@ -93,6 +109,8 @@ export default async function PlayerPage({
               fixture: {
                 select: {
                   round: true,
+                  homeClubId: true,
+                  awayClubId: true,
                   league: {
                     select: {
                       name: true,
@@ -168,18 +186,25 @@ export default async function PlayerPage({
   }
 
   const individualRound = Number.parseInt(round ?? "", 10);
+  const sourceClubId = Number.parseInt(club ?? "", 10);
   const comesFromIndividual =
     from === "individuale" && Number.isInteger(individualRound);
+  const comesFromClub =
+    from === "club" && Number.isInteger(sourceClubId);
   const backHref = comesFromMarket
     ? "/market"
     : comesFromIndividual
       ? `/individuale/${individualRound}${stage ? `?stage=${stage}` : ""}`
-      : "/players";
+      : comesFromClub
+        ? `/clubs/${sourceClubId}`
+        : "/players";
   const backLabel = comesFromMarket
     ? "Torna al mercato"
     : comesFromIndividual
       ? "Torna al tabellone"
-      : "Torna alla rosa";
+      : comesFromClub
+        ? "Torna alla squadra"
+        : "Torna alla rosa";
 
 const playerAttributes: Player["attributes"] = {
   precisione: Math.round(databasePlayer.precisione),
@@ -261,7 +286,10 @@ const player: Player = {
     databasePlayer.fixtureAppearances,
     databasePlayer.transferListings
   );
-  const isOwnPlayer = databasePlayer.clubId === clubId;
+  const isOwnPlayer = canViewPlayerTechnicalValues(
+    technicalViewerClubId,
+    databasePlayer.clubId
+  );
 
   return (
     <main className="space-y-3">
@@ -368,51 +396,70 @@ const player: Player = {
       </header>
 
       <div className="grid items-start gap-3 lg:grid-cols-[minmax(0,1.55fr)_minmax(280px,0.65fr)]">
-        <section className="rounded-2xl border border-emerald-900/60 bg-[#15261f] p-3">
-          <CompactHeading
-            eyebrow="Valori tecnici"
-            title="Caratteristiche"
-          />
+        {isOwnPlayer ? (
+          <section className="rounded-2xl border border-emerald-900/60 bg-[#15261f] p-3">
+            <CompactHeading
+              eyebrow="Valori tecnici"
+              title="Caratteristiche"
+            />
 
-          <div className="mt-2 grid gap-1.5 sm:grid-cols-2 md:grid-cols-3">
-            {attributes.map((attribute) => {
-              const value = player.attributes[attribute.key];
+            <div className="mt-2 grid gap-1.5 sm:grid-cols-2 md:grid-cols-3">
+              {attributes.map((attribute) => {
+                const value = player.attributes[attribute.key];
 
-              return (
-                <AttributeValue
-                  key={attribute.key}
-                  label={attribute.label}
-                  value={value}
-                />
-              );
-            })}
-          </div>
-
-          <div className="mt-3 border-t border-emerald-900/50 pt-2.5">
-            <p className="text-[10px] font-black uppercase tracking-[0.16em] text-emerald-400">
-              Rendimento per specialità
-            </p>
-            <div className="mt-1.5 grid gap-1.5 sm:grid-cols-3">
-              {specialties.map((specialty) => (
-                <div
-                  key={specialty.label}
-                  className="flex items-center justify-between rounded-lg border border-emerald-900/50 bg-emerald-950/35 px-2.5 py-1.5"
-                >
-                  <span className="text-xs font-semibold text-slate-300">
-                    {specialty.label}
-                  </span>
-                  <span
-                    className={`text-base font-black ${getValueClass(
-                      specialty.value
-                    )}`}
-                  >
-                    {specialty.value}
-                  </span>
-                </div>
-              ))}
+                return (
+                  <AttributeValue
+                    key={attribute.key}
+                    label={attribute.label}
+                    value={value}
+                  />
+                );
+              })}
             </div>
-          </div>
-        </section>
+
+            <div className="mt-3 border-t border-emerald-900/50 pt-2.5">
+              <p className="text-[10px] font-black uppercase tracking-[0.16em] text-emerald-400">
+                Rendimento per specialità
+              </p>
+              <div className="mt-1.5 grid gap-1.5 sm:grid-cols-3">
+                {specialties.map((specialty) => (
+                  <div
+                    key={specialty.label}
+                    className="flex items-center justify-between rounded-lg border border-emerald-900/50 bg-emerald-950/35 px-2.5 py-1.5"
+                  >
+                    <span className="text-xs font-semibold text-slate-300">
+                      {specialty.label}
+                    </span>
+                    <span
+                      className={`text-base font-black ${getValueClass(
+                        specialty.value
+                      )}`}
+                    >
+                      {specialty.value}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+        ) : (
+          <section className="rounded-2xl border border-sky-400/20 bg-[linear-gradient(145deg,#17262a_0%,#13201d_100%)] p-4">
+            <div className="flex items-start gap-3">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-sky-400/10 text-sky-300">
+                <EyeOff size={20} />
+              </div>
+              <div>
+                <CompactHeading
+                  eyebrow="Profilo tecnico"
+                  title="Valori riservati"
+                />
+                <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-400">
+                  Le caratteristiche e i valori per specialità sono visibili soltanto al manager della squadra di appartenenza.
+                </p>
+              </div>
+            </div>
+          </section>
+        )}
 
         <section className="rounded-2xl border border-emerald-900/60 bg-[#15261f] p-3">
           <CompactHeading
@@ -433,6 +480,21 @@ const player: Player = {
             <InfoRow
               label="Età"
               value={`${player.age} anni`}
+            />
+            <InfoRow
+              label="Squadra"
+              value={
+                databasePlayer.club ? (
+                  <Link
+                    href={`/clubs/${databasePlayer.club.id}`}
+                    className="text-emerald-300 transition hover:text-amber-200 hover:underline"
+                  >
+                    {databasePlayer.club.name}
+                  </Link>
+                ) : (
+                  "Svincolato"
+                )
+              }
             />
             <InfoRow
               label="Nazionalità"

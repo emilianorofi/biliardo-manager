@@ -6,6 +6,9 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 
 import CountryFlag from "../app/components/player/CountryFlag";
+import PlayerListCard from "../app/components/player/PlayerListCard";
+import type { Player } from "../app/types/player";
+import { canViewPlayerTechnicalValues } from "../lib/player-visibility";
 import { getNationalityDisplay } from "../lib/nationalities";
 import {
   getPlayerPortraitIdentity,
@@ -80,5 +83,59 @@ test("distribuisce i giocatori su venti identità grafiche", () => {
       ),
       true
     );
+  }
+});
+
+
+test("mostra i valori tecnici soltanto al club proprietario", () => {
+  assert.equal(canViewPlayerTechnicalValues(12, 12), true);
+  assert.equal(canViewPlayerTechnicalValues(12, 13), false);
+  assert.equal(canViewPlayerTechnicalValues(12, null), false);
+});
+
+test("la rosa pubblica non inserisce i valori tecnici nel markup", () => {
+  const player: Player = {
+    id: 101,
+    firstName: "Luca",
+    lastName: "Riservato",
+    nationality: "ITA",
+    age: 31,
+    overall: 78,
+    form: 7,
+    morale: 8,
+    experience: 44,
+    value: 120000,
+    salary: 8500,
+    image: "",
+    style: ["Preciso"],
+    specialties: {
+      italiana: 86,
+      goriziana: 87,
+      tuttiDoppi: 88,
+    },
+    attributes: {
+      precisione: 91,
+      diretto: 92,
+      sponde: 93,
+      tattica: 94,
+      mentalita: 95,
+      difesa: 96,
+      realizzazione: 97,
+      creativita: 98,
+      misura: 99,
+    },
+  };
+  const markup = renderToStaticMarkup(
+    createElement(PlayerListCard, {
+      player,
+      showTechnicalValues: false,
+    })
+  );
+
+  assert.match(markup, /Valori tecnici riservati/);
+  assert.doesNotMatch(markup, /Precisione/);
+  assert.doesNotMatch(markup, /Tutti Doppi/);
+  for (const value of [91, 92, 93, 94, 95, 96, 97, 98, 99]) {
+    assert.doesNotMatch(markup, new RegExp(`>${value}<`));
   }
 });

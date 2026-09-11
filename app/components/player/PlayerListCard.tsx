@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight, EyeOff } from "lucide-react";
 
 import type { Player } from "../../types/player";
 import CountryFlag from "./CountryFlag";
@@ -23,6 +23,8 @@ type Props = {
   };
   latestPerformance?: LatestPerformance | null;
   globalRanking?: number | null;
+  showTechnicalValues?: boolean;
+  playerHref?: string;
 };
 
 const attributeLabels: {
@@ -48,8 +50,11 @@ export default function PlayerListCard({
   },
   latestPerformance = null,
   globalRanking = null,
+  showTechnicalValues = true,
+  playerHref,
 }: Props) {
   const fullName = `${player.firstName} ${player.lastName}`;
+  const profileHref = playerHref ?? `/players/${player.id}`;
   const nationality = getNationalityDisplay(player.nationality);
 
   return (
@@ -74,7 +79,7 @@ export default function PlayerListCard({
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
                 <Link
-                  href={`/players/${player.id}`}
+                  href={profileHref}
                   className="truncate text-base font-black text-emerald-200 transition hover:text-amber-200 hover:underline"
                 >
                   {fullName}
@@ -111,7 +116,7 @@ export default function PlayerListCard({
                 Ranking {globalRanking ? `#${globalRanking}` : "N.C."}
               </span>
               <Link
-                href={`/players/${player.id}`}
+                href={profileHref}
                 className="flex items-center gap-1 rounded-md border border-emerald-900/50 bg-emerald-950/30 px-2 py-1 text-[10px] font-bold text-slate-400 transition hover:border-amber-400/35 hover:text-amber-200"
               >
                 Scheda
@@ -140,38 +145,59 @@ export default function PlayerListCard({
             </div>
           </section>
 
-          <section>
-            <SectionLabel>Caratteristiche</SectionLabel>
-            <div className="mt-1 grid grid-cols-2 gap-x-2 gap-y-1 sm:grid-cols-3">
-              {attributeLabels.map((attribute) => (
-                <AttributeValue
-                  key={attribute.key}
-                  label={attribute.label}
-                  value={player.attributes[attribute.key]}
-                />
-              ))}
-            </div>
-          </section>
+          {showTechnicalValues ? (
+            <>
+              <section>
+                <SectionLabel>Caratteristiche</SectionLabel>
+                <div className="mt-1 grid grid-cols-2 gap-x-2 gap-y-1 sm:grid-cols-3">
+                  {attributeLabels.map((attribute) => (
+                    <AttributeValue
+                      key={attribute.key}
+                      label={attribute.label}
+                      value={player.attributes[attribute.key]}
+                    />
+                  ))}
+                </div>
+              </section>
 
-          <section>
-            <SectionLabel>Specialità e rendimento</SectionLabel>
-            <div className="mt-1 space-y-0.5">
-              <SpecialityRow
-                label="Italiana"
-                value={player.specialties.italiana}
-              />
-              <SpecialityRow
-                label="Goriziana"
-                value={player.specialties.goriziana}
-              />
-              <SpecialityRow
-                label="Tutti Doppi"
-                value={player.specialties.tuttiDoppi}
-              />
-            </div>
+              <section>
+                <SectionLabel>Specialità e rendimento</SectionLabel>
+                <div className="mt-1 space-y-0.5">
+                  <SpecialityRow
+                    label="Italiana"
+                    value={player.specialties.italiana}
+                  />
+                  <SpecialityRow
+                    label="Goriziana"
+                    value={player.specialties.goriziana}
+                  />
+                  <SpecialityRow
+                    label="Tutti Doppi"
+                    value={player.specialties.tuttiDoppi}
+                  />
+                </div>
 
-            <LatestPerformance performance={latestPerformance} />
-          </section>
+                <LatestPerformance performance={latestPerformance} />
+              </section>
+            </>
+          ) : (
+            <section className="lg:col-span-2">
+              <SectionLabel>Profilo tecnico</SectionLabel>
+              <div className="mt-1 flex items-start gap-3 rounded-lg border border-sky-400/15 bg-sky-400/5 px-3 py-2.5">
+                <EyeOff className="mt-0.5 shrink-0 text-sky-300" size={17} />
+                <div>
+                  <p className="text-xs font-black text-white">
+                    Valori tecnici riservati
+                  </p>
+                  <p className="mt-0.5 text-[10px] leading-4 text-slate-400">
+                    Caratteristiche e rendimento per specialità sono visibili soltanto al manager di questa squadra.
+                  </p>
+                </div>
+              </div>
+
+              <LatestPerformance performance={latestPerformance} />
+            </section>
+          )}
           </div>
         </div>
       </div>

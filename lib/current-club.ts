@@ -33,3 +33,11 @@ export const getCurrentClubId = cache(async () => {
 
   return authenticatedClubId ?? USER_CLUB_ID;
 });
+
+export const getTechnicalViewerClubId = cache(async () => {
+  if (!readSupabasePublicConfig()) {
+    return USER_CLUB_ID;
+  }
+
+  return getAuthenticatedClubId();
+});
