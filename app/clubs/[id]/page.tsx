@@ -20,10 +20,14 @@ export const dynamic = "force-dynamic";
 
 export default async function ClubPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ from?: string }>;
 }) {
-  const clubId = Number.parseInt((await params).id, 10);
+  const [{ id }, { from }] = await Promise.all([params, searchParams]);
+  const clubId = Number.parseInt(id, 10);
+  const comesFromRanking = from === "ranking";
 
   if (!Number.isInteger(clubId)) {
     notFound();
@@ -160,11 +164,11 @@ export default async function ClubPage({
   return (
     <main className="space-y-4">
       <Link
-        href="/campionato"
+        href={comesFromRanking ? "/ranking" : "/campionato"}
         className="inline-flex items-center gap-2 text-xs font-bold text-slate-400 transition hover:text-amber-300"
       >
         <ArrowLeft size={15} />
-        Torna al campionato
+        {comesFromRanking ? "Torna al ranking" : "Torna al campionato"}
       </Link>
 
       <header className="relative overflow-hidden rounded-3xl border border-emerald-900/60 bg-[linear-gradient(135deg,#183129_0%,#12231d_68%,#101e19_100%)] p-5 shadow-xl shadow-black/10 sm:px-6 sm:py-5">

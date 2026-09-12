@@ -15,7 +15,10 @@ import {
   getPlayerPortraitIdentity,
   PLAYER_PORTRAIT_IDENTITIES,
 } from "../lib/player-portraits";
-import { buildGlobalPlayerRanking } from "../lib/player-ranking";
+import {
+  buildGlobalPlayerRanking,
+  rankGlobalPlayers,
+} from "../lib/player-ranking";
 
 const values = {
   precisione: 70,
@@ -39,6 +42,26 @@ test("calcola il ranking globale per overall e usa l'id a parità", () => {
   assert.equal(ranking.get(5)?.position, 1);
   assert.equal(ranking.get(3)?.position, 2);
   assert.equal(ranking.get(8)?.position, 3);
+});
+
+test("restituisce la graduatoria ufficiale completa nello stesso ordine", () => {
+  const rankedPlayers = rankGlobalPlayers([
+    { id: 8, ...values },
+    { id: 3, ...values },
+    { id: 5, ...values, precisione: 88 },
+  ]);
+
+  assert.deepEqual(
+    rankedPlayers.map(({ player, position }) => ({
+      id: player.id,
+      position,
+    })),
+    [
+      { id: 5, position: 1 },
+      { id: 3, position: 2 },
+      { id: 8, position: 3 },
+    ]
+  );
 });
 
 test("riconosce sigla, nome e bandiera della nazionalità", () => {

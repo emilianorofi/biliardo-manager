@@ -8,6 +8,7 @@ import {
   User,
   Trophy,
   Medal,
+  ListOrdered,
   ArrowRightLeft,
   Euro,
   Dumbbell,
@@ -46,6 +47,11 @@ const menu = [
     label: "Individuale",
     href: "/individuale",
     icon: Medal,
+  },
+  {
+    label: "Ranking",
+    href: "/ranking",
+    icon: ListOrdered,
   },
   {
     label: "Mercato",
