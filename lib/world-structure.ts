@@ -49,32 +49,45 @@ export const TOTAL_INITIAL_PLAYERS =
   TOTAL_WORLD_CLUBS * INITIAL_PLAYERS_PER_CLUB;
 
 export const WORLD_NATIONALITY_ALLOCATION = [
-  { country: "Italia", code: "ITA", flag: "🇮🇹", count: 390 },
-  { country: "Argentina", code: "ARG", flag: "🇦🇷", count: 75 },
-  { country: "Germania", code: "GER", flag: "🇩🇪", count: 39 },
-  { country: "Uruguay", code: "URU", flag: "🇺🇾", count: 24 },
-  { country: "Francia", code: "FRA", flag: "🇫🇷", count: 24 },
-  { country: "Danimarca", code: "DEN", flag: "🇩🇰", count: 18 },
-  { country: "Belgio", code: "BEL", flag: "🇧🇪", count: 12 },
-  { country: "Lussemburgo", code: "LUX", flag: "🇱🇺", count: 1 },
-  { country: "Svizzera", code: "SUI", flag: "🇨🇭", count: 1 },
-  { country: "Repubblica Ceca", code: "CZE", flag: "🇨🇿", count: 1 },
-  { country: "Austria", code: "AUT", flag: "🇦🇹", count: 1 },
-  { country: "San Marino", code: "SMR", flag: "🇸🇲", count: 1 },
-  { country: "Brasile", code: "BRA", flag: "🇧🇷", count: 1 },
-  { country: "Paesi Bassi", code: "NED", flag: "🇳🇱", count: 1 },
-  { country: "Spagna", code: "ESP", flag: "🇪🇸", count: 1 },
-  { country: "Norvegia", code: "NOR", flag: "🇳🇴", count: 1 },
-  { country: "Portogallo", code: "POR", flag: "🇵🇹", count: 1 },
-  { country: "Svezia", code: "SWE", flag: "🇸🇪", count: 1 },
-  { country: "Albania", code: "ALB", flag: "🇦🇱", count: 1 },
-  { country: "Liechtenstein", code: "LIE", flag: "🇱🇮", count: 1 },
-  { country: "Turchia", code: "TUR", flag: "🇹🇷", count: 1 },
-  { country: "Colombia", code: "COL", flag: "🇨🇴", count: 1 },
-  { country: "Corea del Sud", code: "KOR", flag: "🇰🇷", count: 1 },
-  { country: "Giappone", code: "JPN", flag: "🇯🇵", count: 1 },
+  { country: "Italia", code: "ITA", flag: "🇮🇹", count: 330 },
+  { country: "Argentina", code: "ARG", flag: "🇦🇷", count: 70 },
+  { country: "Germania", code: "GER", flag: "🇩🇪", count: 40 },
+  { country: "Uruguay", code: "URU", flag: "🇺🇾", count: 25 },
+  { country: "Francia", code: "FRA", flag: "🇫🇷", count: 25 },
+  { country: "Danimarca", code: "DEN", flag: "🇩🇰", count: 20 },
+  { country: "Belgio", code: "BEL", flag: "🇧🇪", count: 15 },
+  { country: "Brasile", code: "BRA", flag: "🇧🇷", count: 10 },
+  { country: "Spagna", code: "ESP", flag: "🇪🇸", count: 10 },
+  { country: "Paesi Bassi", code: "NED", flag: "🇳🇱", count: 8 },
+  { country: "Svizzera", code: "SUI", flag: "🇨🇭", count: 7 },
+  { country: "Repubblica Ceca", code: "CZE", flag: "🇨🇿", count: 6 },
+  { country: "Austria", code: "AUT", flag: "🇦🇹", count: 5 },
+  { country: "Turchia", code: "TUR", flag: "🇹🇷", count: 4 },
+  { country: "Colombia", code: "COL", flag: "🇨🇴", count: 4 },
+  { country: "Giappone", code: "JPN", flag: "🇯🇵", count: 4 },
+  { country: "Lussemburgo", code: "LUX", flag: "🇱🇺", count: 2 },
+  { country: "San Marino", code: "SMR", flag: "🇸🇲", count: 2 },
+  { country: "Norvegia", code: "NOR", flag: "🇳🇴", count: 2 },
+  { country: "Portogallo", code: "POR", flag: "🇵🇹", count: 2 },
+  { country: "Svezia", code: "SWE", flag: "🇸🇪", count: 2 },
+  { country: "Albania", code: "ALB", flag: "🇦🇱", count: 2 },
+  { country: "Liechtenstein", code: "LIE", flag: "🇱🇮", count: 2 },
+  { country: "Corea del Sud", code: "KOR", flag: "🇰🇷", count: 2 },
   { country: "Egitto", code: "EGY", flag: "🇪🇬", count: 1 },
 ] as const;
+
+export const NATIONS_CUP_TEAM_COUNT = 16;
+export const NATIONS_CUP_PLAYERS_PER_TEAM = 3;
+
+const nationsCupEligibleAllocations = WORLD_NATIONALITY_ALLOCATION.filter(
+  (nationality) => nationality.count >= NATIONS_CUP_PLAYERS_PER_TEAM
+).length;
+
+if (nationsCupEligibleAllocations < NATIONS_CUP_TEAM_COUNT) {
+  throw new Error(
+    `Servono almeno ${NATIONS_CUP_TEAM_COUNT} nazioni con ${NATIONS_CUP_PLAYERS_PER_TEAM} giocatori.`
+  );
+}
 
 const allocatedPlayers =
   WORLD_NATIONALITY_ALLOCATION.reduce(

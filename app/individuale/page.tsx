@@ -71,7 +71,7 @@ export default async function IndividualePage() {
     }
   }
 
-  if (roundDates.size !== 14) {
+  if (roundDates.size < 14) {
     return <IndividualUnavailable />;
   }
 
@@ -107,14 +107,14 @@ export default async function IndividualePage() {
             </h1>
 
             <p className="mt-1 max-w-2xl text-sm leading-6 text-zinc-400">
-              I migliori 256 giocatori del mondo si affrontano in quattordici
+              I migliori 256 giocatori del mondo si affrontano in tredici
               appuntamenti collegati alle giornate di campionato.
             </p>
           </div>
 
           <div className="grid grid-cols-3 gap-2 sm:min-w-[390px]">
             <HeroStat label="Partecipanti" value="256" />
-            <HeroStat label="Tornei" value="14" />
+            <HeroStat label="Tornei" value="13" />
             <HeroStat label="Formula" value="2 su 3" highlight />
           </div>
         </div>
@@ -215,7 +215,7 @@ export default async function IndividualePage() {
             />
             <RuleRow
               icon={<Globe2 size={18} />}
-              title="Europeo e Mondiale"
+              title="Mondiale"
               description="Le prime due specialità sono sorteggiate; l'eventuale terza è quella mancante."
             />
           </div>
@@ -467,7 +467,7 @@ function TournamentCard({
 }
 
 function TournamentMark({ type }: { type: IndividualTournamentType }) {
-  const international = type === "EUROPEO" || type === "MONDIALE";
+  const international = type === "MONDIALE";
 
   return (
     <div

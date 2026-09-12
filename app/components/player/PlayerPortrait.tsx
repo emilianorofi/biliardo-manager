@@ -30,8 +30,8 @@ export default function PlayerPortrait({
       )}
       style={{
         backgroundImage: `url('/players/billiards-player-identity-${identity}.webp')`,
-        backgroundSize: "400% auto",
-        backgroundPosition: `${column * (100 / 3)}% ${row * 80}%`,
+        backgroundSize: "400% 200%",
+        backgroundPosition: `${column * (100 / 3)}% ${row * 100}%`,
       }}
     />
   );

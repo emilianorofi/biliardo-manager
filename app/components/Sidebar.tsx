@@ -14,6 +14,7 @@ import {
   Dumbbell,
   GraduationCap,
   Target,
+  Flag,
   Settings,
 } from "lucide-react";
 
@@ -47,6 +48,11 @@ const menu = [
     label: "Individuale",
     href: "/individuale",
     icon: Medal,
+  },
+  {
+    label: "Coppa Nazioni",
+    href: "/coppa-nazioni",
+    icon: Flag,
   },
   {
     label: "Ranking",

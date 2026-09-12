@@ -23,6 +23,11 @@ import {
 import {
   processClubWeeklyUpdate,
 } from "@/lib/weekly-club-update";
+import {
+  drawNationsCup,
+  initializeNationsCup,
+  playNationsCupStage,
+} from "@/lib/nations-cup-service";
 
 const MAX_EVENTS_PER_RUN = 256;
 
@@ -31,6 +36,8 @@ type ClockCandidate = {
     | "LEAGUE"
     | "TOURNAMENT_DRAW"
     | "TOURNAMENT_STAGE"
+    | "NATIONS_CUP_DRAW"
+    | "NATIONS_CUP_STAGE"
     | "WEEKLY_UPDATE"
     | "ACADEMY"
     | "WEEKLY_NEWS";
@@ -45,6 +52,7 @@ export async function processGameClock(
   await Promise.all([
     initializeWeeklyUpdates(now),
     initializeIndividualTournaments(),
+    initializeNationsCup(),
   ]);
 
   const events = [];
@@ -114,6 +122,8 @@ async function findNextDueEvent(
     weeklyNews,
     tournamentDraw,
     tournamentMatch,
+    nationsCupDraw,
+    nationsCupMatch,
   ] = await Promise.all([
     prisma.leagueFixture.findFirst({
       where: {
@@ -224,6 +234,20 @@ async function findNextDueEvent(
         { id: "asc" },
       ],
     }),
+    prisma.nationsCupTournament.findFirst({
+      where: { status: "SCHEDULED", drawAt: { lte: now } },
+      select: { id: true, drawAt: true },
+      orderBy: [{ drawAt: "asc" }, { id: "asc" }],
+    }),
+    prisma.nationsCupMatch.findFirst({
+      where: {
+        status: "SCHEDULED",
+        scheduledAt: { lte: now },
+        tournament: { status: { in: ["DRAWN", "IN_PROGRESS"] } },
+      },
+      select: { id: true, scheduledAt: true },
+      orderBy: [{ scheduledAt: "asc" }, { id: "asc" }],
+    }),
   ]);
   const candidates: ClockCandidate[] = [];
 
@@ -282,6 +306,13 @@ async function findNextDueEvent(
     });
   }
 
+  if (nationsCupDraw) {
+    candidates.push({ type: "NATIONS_CUP_DRAW", id: nationsCupDraw.id, scheduledAt: nationsCupDraw.drawAt });
+  }
+  if (nationsCupMatch) {
+    candidates.push({ type: "NATIONS_CUP_STAGE", id: nationsCupMatch.id, scheduledAt: nationsCupMatch.scheduledAt });
+  }
+
   candidates.sort(
     (first, second) =>
       first.scheduledAt.getTime() -
@@ -329,6 +360,16 @@ async function processCandidate(
         scheduledAt: candidate.scheduledAt,
         ...result,
       };
+    }
+
+    case "NATIONS_CUP_DRAW": {
+      const result = await drawNationsCup(candidate.id, candidate.scheduledAt);
+      return { type: candidate.type, id: candidate.id, scheduledAt: candidate.scheduledAt, ...result };
+    }
+
+    case "NATIONS_CUP_STAGE": {
+      const result = await playNationsCupStage(candidate.id, candidate.scheduledAt);
+      return { type: candidate.type, id: candidate.id, scheduledAt: candidate.scheduledAt, ...result };
     }
 
     case "WEEKLY_UPDATE": {

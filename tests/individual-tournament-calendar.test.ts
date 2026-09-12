@@ -7,7 +7,7 @@ import {
 } from "../lib/individual-tournament-calendar";
 import { getRomeParts } from "../lib/rome-calendar";
 
-test("distribuisce le quattordici prove nella sequenza concordata", () => {
+test("rimuove l'Europeo e sposta il Mondiale alla giornata quindici", () => {
   assert.deepEqual(
     INDIVIDUAL_TOURNAMENT_DEFINITIONS.map(
       (tournament) => tournament.type
@@ -19,7 +19,6 @@ test("distribuisce le quattordici prove nella sequenza concordata", () => {
       "ITALIANA",
       "GORIZIANA",
       "TUTTI_DOPPI",
-      "EUROPEO",
       "ITALIANA",
       "GORIZIANA",
       "TUTTI_DOPPI",
@@ -29,13 +28,14 @@ test("distribuisce le quattordici prove nella sequenza concordata", () => {
       "MONDIALE",
     ]
   );
+  assert.equal(INDIVIDUAL_TOURNAMENT_DEFINITIONS.at(-1)?.leagueRound, 15);
 });
 
 test("programma sorteggio e turni nel fine settimana anche al cambio dell'ora", () => {
   const fridayAtNineInRome = new Date("2026-10-23T19:00:00.000Z");
   const calendar = buildIndividualTournamentCalendar(
     new Map(
-      Array.from({ length: 14 }, (_, index) => [
+      Array.from({ length: 15 }, (_, index) => [
         index + 1,
         new Date(
           fridayAtNineInRome.getTime() +

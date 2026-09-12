@@ -313,6 +313,47 @@ export function buildNationalityQueue(
   return deterministicShuffle(queue, 20260822).slice(0, requiredPlayers);
 }
 
+export function buildNationalityRebalancing(
+  players: ReadonlyArray<{ id: number; nationality: string }>
+) {
+  const normalizedPlayers = players.map((player) => ({
+    ...player,
+    nationality: normalizeNationalityFlag(player.nationality),
+  }));
+  const target = new Map<string, number>(
+    WORLD_NATIONALITY_ALLOCATION.map((nation) => [nation.flag, nation.count])
+  );
+  const counts = new Map<string, number>();
+  for (const player of normalizedPlayers) {
+    counts.set(player.nationality, (counts.get(player.nationality) ?? 0) + 1);
+  }
+  const deficits = WORLD_NATIONALITY_ALLOCATION.flatMap((nation) =>
+    Array.from(
+      { length: Math.max(0, nation.count - (counts.get(nation.flag) ?? 0)) },
+      () => nation.flag
+    )
+  );
+  const remaining = new Map(counts);
+  const donors = [...normalizedPlayers]
+    .sort((first, second) => second.id - first.id)
+    .filter((player) => {
+      const available = remaining.get(player.nationality) ?? 0;
+      const minimum = target.get(player.nationality) ?? 0;
+      if (available <= minimum) return false;
+      remaining.set(player.nationality, available - 1);
+      return true;
+    });
+
+  if (donors.length < deficits.length) {
+    throw new Error("WORLD_NATIONALITY_REBALANCING_INCOMPLETE");
+  }
+
+  return deficits.map((nationality, index) => ({
+    playerId: donors[index].id,
+    nationality,
+  }));
+}
+
 export function createGeneratedWorldPlayer({
   leagueLevel,
   rosterIndex,

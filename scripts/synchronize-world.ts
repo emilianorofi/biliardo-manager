@@ -3,11 +3,28 @@ import "dotenv/config";
 import { prisma } from "../lib/prisma";
 import { bootstrapWorld } from "../lib/world-bootstrap";
 import { synchronizeWorldLeagueProgress } from "../lib/world-league-synchronization";
+import { buildNationalityRebalancing } from "../lib/world-generation";
 
 async function main() {
   console.log("Aggiornamento dei club IA...");
   const world = await bootstrapWorld();
   console.log(`Club IA rinominati: ${world.renamedClubs}`);
+
+  console.log("Bilanciamento delle nazionalità per la Coppa delle Nazioni...");
+  const activePlayers = await prisma.player.findMany({
+    where: { careerStatus: "ACTIVE" },
+    select: { id: true, nationality: true },
+  });
+  const nationalityUpdates = buildNationalityRebalancing(activePlayers);
+  await prisma.$transaction(
+    nationalityUpdates.map((update) =>
+      prisma.player.update({
+        where: { id: update.playerId },
+        data: { nationality: update.nationality },
+      })
+    )
+  );
+  console.log(`Nazionalità riallineate: ${nationalityUpdates.length}`);
 
   console.log("Allineamento dei campionati alla Prima Serie...");
   const result = await synchronizeWorldLeagueProgress();

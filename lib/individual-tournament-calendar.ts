@@ -4,7 +4,6 @@ export type IndividualTournamentType =
   | "ITALIANA"
   | "GORIZIANA"
   | "TUTTI_DOPPI"
-  | "EUROPEO"
   | "MONDIALE";
 
 export type IndividualTournamentStageKey =
@@ -48,14 +47,13 @@ export const INDIVIDUAL_TOURNAMENT_DEFINITIONS = [
   createSpecialtyTournament(4, "ITALIANA", 2),
   createSpecialtyTournament(5, "GORIZIANA", 2),
   createSpecialtyTournament(6, "TUTTI_DOPPI", 2),
-  createInternationalTournament(7, "EUROPEO"),
   createSpecialtyTournament(8, "ITALIANA", 3),
   createSpecialtyTournament(9, "GORIZIANA", 3),
   createSpecialtyTournament(10, "TUTTI_DOPPI", 3),
   createSpecialtyTournament(11, "ITALIANA", 4),
   createSpecialtyTournament(12, "GORIZIANA", 4),
   createSpecialtyTournament(13, "TUTTI_DOPPI", 4),
-  createInternationalTournament(14, "MONDIALE"),
+  createInternationalTournament(15, "MONDIALE"),
 ] satisfies IndividualTournamentDefinition[];
 
 export const INDIVIDUAL_TOURNAMENT_STAGES = [
@@ -116,7 +114,7 @@ function createSpecialtyTournament(
   leagueRound: number,
   type: Exclude<
     IndividualTournamentType,
-    "EUROPEO" | "MONDIALE"
+    "MONDIALE"
   >,
   edition: number
 ): IndividualTournamentDefinition {
@@ -134,15 +132,15 @@ function createSpecialtyTournament(
 
 function createInternationalTournament(
   leagueRound: number,
-  type: "EUROPEO" | "MONDIALE"
+  type: "MONDIALE"
 ): IndividualTournamentDefinition {
-  const name = type === "EUROPEO" ? "Campionato Europeo" : "Campionato Mondiale";
+  const name = "Campionato Mondiale";
 
   return {
     leagueRound,
     type,
     name,
-    shortName: type === "EUROPEO" ? "Europeo" : "Mondiale",
+    shortName: "Mondiale",
     specialty: "Tre specialità",
     international: true,
   };

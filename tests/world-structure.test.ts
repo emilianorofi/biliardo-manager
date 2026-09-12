@@ -3,6 +3,7 @@ import test from "node:test";
 
 import {
   buildNationalityQueue,
+  buildNationalityRebalancing,
   createAiClubBlueprint,
   createGeneratedWorldPlayer,
 } from "../lib/world-generation";
@@ -42,13 +43,17 @@ test("distribuisce 600 giocatori tra 25 nazioni", () => {
       nationality.count,
     ])
   );
-  assert.equal(allocation.get("Italia"), 390);
-  assert.equal(allocation.get("Argentina"), 75);
-  assert.equal(allocation.get("Germania"), 39);
-  assert.equal(allocation.get("Uruguay"), 24);
-  assert.equal(allocation.get("Francia"), 24);
-  assert.equal(allocation.get("Danimarca"), 18);
-  assert.equal(allocation.get("Belgio"), 12);
+  assert.equal(allocation.get("Italia"), 330);
+  assert.equal(allocation.get("Argentina"), 70);
+  assert.equal(allocation.get("Germania"), 40);
+  assert.equal(allocation.get("Uruguay"), 25);
+  assert.equal(allocation.get("Francia"), 25);
+  assert.equal(allocation.get("Danimarca"), 20);
+  assert.equal(allocation.get("Belgio"), 15);
+  assert.equal(
+    WORLD_NATIONALITY_ALLOCATION.filter((nationality) => nationality.count >= 3).length,
+    16
+  );
 });
 
 test("genera 120 identità di club differenti", () => {
@@ -86,10 +91,27 @@ test("la coda delle nazionalità conserva tutte le quote iniziali", () => {
   }
 });
 
-test("i nomi dei 390 giocatori italiani iniziali non si ripetono", () => {
+test("riallinea soltanto i giocatori delle nazioni in surplus", () => {
+  const previousAllocation = [
+    ...Array.from({ length: 390 }, (_, index) => ({ id: index + 1, nationality: "🇮🇹" })),
+    ...WORLD_NATIONALITY_ALLOCATION.slice(1).flatMap((nation, nationIndex) =>
+      Array.from({ length: Math.max(1, nation.count - 1) }, (_, index) => ({
+        id: 1000 + nationIndex * 100 + index,
+        nationality: nation.flag,
+      }))
+    ),
+  ];
+  const updates = buildNationalityRebalancing(previousAllocation);
+
+  assert.ok(updates.length > 0);
+  assert.equal(new Set(updates.map((update) => update.playerId)).size, updates.length);
+  assert.ok(updates.every((update) => update.nationality !== "🇮🇹"));
+});
+
+test("i nomi dei 330 giocatori italiani iniziali non si ripetono", () => {
   const names = new Set<string>();
 
-  for (let index = 0; index < 390; index += 1) {
+  for (let index = 0; index < 330; index += 1) {
     const player = createGeneratedWorldPlayer({
       leagueLevel: 1,
       rosterIndex: index % 5,
@@ -100,5 +122,5 @@ test("i nomi dei 390 giocatori italiani iniziali non si ripetono", () => {
     names.add(`${player.firstName} ${player.lastName}`);
   }
 
-  assert.equal(names.size, 390);
+  assert.equal(names.size, 330);
 });
