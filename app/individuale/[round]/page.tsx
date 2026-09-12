@@ -151,7 +151,9 @@ export default async function IndividualBracketPage({
     tournament.entries.map((entry) => [entry.playerId, entry])
   );
   const playedMatches = tournament.matches.filter(
-    (match) => match.status === "PLAYED"
+    (match) =>
+      match.status === "PLAYED" ||
+      match.status === "WALKOVER"
   ).length;
 
   return (
@@ -400,6 +402,14 @@ function BracketMatchCard({
 }) {
   const playerReturnQuery =
     `from=individuale&round=${leagueRound}&stage=${selectedStage}`;
+  const concluded =
+    match.status === "PLAYED" || match.status === "WALKOVER";
+  const statusLabel =
+    match.status === "WALKOVER"
+      ? "Passaggio del turno"
+      : match.status === "PLAYED"
+        ? "Concluso"
+        : formatTime(match.scheduledAt);
 
   return (
     <article className="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950/25">
@@ -409,10 +419,10 @@ function BracketMatchCard({
         </span>
         <span
           className={`text-[9px] font-black uppercase tracking-wider ${
-            match.status === "PLAYED" ? "text-emerald-400" : "text-amber-300"
+            concluded ? "text-emerald-400" : "text-amber-300"
           }`}
         >
-          {match.status === "PLAYED" ? "Concluso" : formatTime(match.scheduledAt)}
+          {statusLabel}
         </span>
       </div>
 
@@ -421,7 +431,11 @@ function BracketMatchCard({
           player={match.playerOne}
           entry={playerOneEntry}
           score={match.playerOneWins}
-          winner={match.winnerPlayerId === match.playerOneId}
+          winner={
+            match.winnerPlayerId !== null &&
+            match.winnerPlayerId === match.playerOneId
+          }
+          vacant={match.status === "WALKOVER" && !match.playerOne}
           currentClubId={currentClubId}
           returnQuery={playerReturnQuery}
         />
@@ -429,7 +443,11 @@ function BracketMatchCard({
           player={match.playerTwo}
           entry={playerTwoEntry}
           score={match.playerTwoWins}
-          winner={match.winnerPlayerId === match.playerTwoId}
+          winner={
+            match.winnerPlayerId !== null &&
+            match.winnerPlayerId === match.playerTwoId
+          }
+          vacant={match.status === "WALKOVER" && !match.playerTwo}
           currentClubId={currentClubId}
           returnQuery={playerReturnQuery}
         />
@@ -452,6 +470,7 @@ function BracketPlayerRow({
   entry,
   score,
   winner,
+  vacant,
   currentClubId,
   returnQuery,
 }: {
@@ -459,6 +478,7 @@ function BracketPlayerRow({
   entry?: BracketEntry;
   score: number;
   winner: boolean;
+  vacant: boolean;
   currentClubId: number;
   returnQuery: string;
 }) {
@@ -486,7 +506,7 @@ function BracketPlayerRow({
             </Link>
           ) : (
             <p className="truncate text-xs font-black text-zinc-300">
-              Da definire
+              {vacant ? "Posto vacante" : "Da definire"}
             </p>
           )}
           {entry && (

@@ -8,6 +8,11 @@ import type { ClubOnboardingActionState } from "@/app/onboarding/action-state";
 import { getNextAcademyScoutingAt } from "@/lib/academy-scouting";
 import { getAuthenticatedUser } from "@/lib/auth";
 import {
+  INDIVIDUAL_TOURNAMENT_SIZE,
+  planIndividualTournamentRosterReplacements,
+  rankIndividualTournamentPlayers,
+} from "@/lib/individual-match-engine";
+import {
   CLUB_CITY_MAX_LENGTH,
   CLUB_CITY_MIN_LENGTH,
   CLUB_CITY_PATTERN,
@@ -29,6 +34,24 @@ type TakeoverCandidate = {
   clubId: number;
   leagueLevel: number;
 };
+
+const onboardingTournamentPlayerSelect = {
+  id: true,
+  firstName: true,
+  lastName: true,
+  precisione: true,
+  diretto: true,
+  sponde: true,
+  tattica: true,
+  mentalita: true,
+  difesa: true,
+  realizzazione: true,
+  creativita: true,
+  misura: true,
+  form: true,
+  morale: true,
+  experience: true,
+} as const;
 
 export async function createManagerClub(
   _previousState: ClubOnboardingActionState,
@@ -328,26 +351,26 @@ async function replaceAiClub({
         playerId: {
           in: previousPlayerIds,
         },
-      },
-    });
-    await transaction.individualTournamentEntry.deleteMany({
-      where: {
-        playerId: {
-          in: previousPlayerIds,
+        status: {
+          in: ["ACTIVE", "PENDING_TRANSFER"],
         },
       },
     });
 
-    const deletedPlayers = await transaction.player.deleteMany({
+    const removedPlayers = await transaction.player.updateMany({
       where: {
         clubId,
         id: {
           in: previousPlayerIds,
         },
       },
+      data: {
+        clubId: null,
+        careerStatus: "REMOVED",
+      },
     });
 
-    if (deletedPlayers.count !== previousPlayerIds.length) {
+    if (removedPlayers.count !== previousPlayerIds.length) {
       throw new ClubCreationError(
         "La rosa precedente è cambiata durante l'assegnazione del club. Riprova."
       );
@@ -398,6 +421,11 @@ async function replaceAiClub({
     })),
   });
 
+  await reconcileIndividualTournamentsAfterTakeover(
+    transaction,
+    previousPlayerIds
+  );
+
   await transaction.academyPlayer.createMany({
     data: initialAcademy.map((player) => ({
       ...player,
@@ -414,6 +442,159 @@ async function replaceAiClub({
         "Il nuovo manager ha preso il comando del club.",
     },
   });
+}
+
+async function reconcileIndividualTournamentsAfterTakeover(
+  transaction: Prisma.TransactionClient,
+  removedPlayerIds: number[]
+) {
+  if (removedPlayerIds.length === 0) {
+    return;
+  }
+
+  const tournamentsInProgress =
+    await transaction.individualTournament.findMany({
+      where: {
+        status: "IN_PROGRESS",
+        entries: {
+          some: {
+            playerId: {
+              in: removedPlayerIds,
+            },
+            status: "ACTIVE",
+          },
+        },
+      },
+      select: {
+        id: true,
+        currentStage: true,
+      },
+    });
+
+  for (const tournament of tournamentsInProgress) {
+    await transaction.individualTournamentMatch.updateMany({
+      where: {
+        tournamentId: tournament.id,
+        status: "SCHEDULED",
+        playerOneId: {
+          in: removedPlayerIds,
+        },
+      },
+      data: {
+        playerOneId: null,
+      },
+    });
+    await transaction.individualTournamentMatch.updateMany({
+      where: {
+        tournamentId: tournament.id,
+        status: "SCHEDULED",
+        playerTwoId: {
+          in: removedPlayerIds,
+        },
+      },
+      data: {
+        playerTwoId: null,
+      },
+    });
+    await transaction.individualTournamentEntry.updateMany({
+      where: {
+        tournamentId: tournament.id,
+        playerId: {
+          in: removedPlayerIds,
+        },
+        status: "ACTIVE",
+      },
+      data: {
+        status: "WITHDRAWN",
+        eliminatedStage:
+          tournament.currentStage ?? "WITHDRAWAL",
+      },
+    });
+  }
+
+  const drawnTournaments =
+    await transaction.individualTournament.findMany({
+      where: {
+        status: "DRAWN",
+      },
+      select: {
+        id: true,
+        entries: {
+          select: {
+            id: true,
+            playerId: true,
+            drawPosition: true,
+          },
+        },
+      },
+    });
+
+  if (drawnTournaments.length === 0) {
+    return;
+  }
+
+  const activePlayers = await transaction.player.findMany({
+    where: {
+      careerStatus: "ACTIVE",
+    },
+    select: onboardingTournamentPlayerSelect,
+  });
+  const qualified = rankIndividualTournamentPlayers(activePlayers);
+
+  if (qualified.length !== INDIVIDUAL_TOURNAMENT_SIZE) {
+    throw new ClubCreationError(
+      "Non ci sono abbastanza giocatori attivi per aggiornare il torneo individuale."
+    );
+  }
+
+  for (const tournament of drawnTournaments) {
+    if (tournament.entries.length !== INDIVIDUAL_TOURNAMENT_SIZE) {
+      throw new ClubCreationError(
+        "Il tabellone individuale non contiene tutti i partecipanti previsti."
+      );
+    }
+
+    const replacements =
+      planIndividualTournamentRosterReplacements(
+        tournament.entries,
+        qualified
+      );
+
+    for (const replacement of replacements) {
+      await transaction.individualTournamentMatch.updateMany({
+        where: {
+          tournamentId: tournament.id,
+          status: "SCHEDULED",
+          playerOneId: replacement.previousPlayerId,
+        },
+        data: {
+          playerOneId: replacement.replacementPlayerId,
+        },
+      });
+      await transaction.individualTournamentMatch.updateMany({
+        where: {
+          tournamentId: tournament.id,
+          status: "SCHEDULED",
+          playerTwoId: replacement.previousPlayerId,
+        },
+        data: {
+          playerTwoId: replacement.replacementPlayerId,
+        },
+      });
+      await transaction.individualTournamentEntry.update({
+        where: {
+          id: replacement.entryId,
+        },
+        data: {
+          playerId: replacement.replacementPlayerId,
+          rankingAtDraw: replacement.rankingAtDraw,
+          overallAtDraw: replacement.overallAtDraw,
+          status: "ACTIVE",
+          eliminatedStage: null,
+        },
+      });
+    }
+  }
 }
 
 function validateClubIdentity(input: {

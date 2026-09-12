@@ -25,9 +25,30 @@ export type IndividualMatchPlayer = MatchPerformancePlayerValues & {
   misura: number;
 };
 
+export type RankedIndividualTournamentPlayer = {
+  player: IndividualMatchPlayer;
+  overall: number;
+  ranking: number;
+};
+
+export type IndividualTournamentEntrySlot = {
+  id: number;
+  playerId: number;
+  drawPosition: number;
+};
+
+export type IndividualTournamentRosterReplacement = {
+  entryId: number;
+  drawPosition: number;
+  previousPlayerId: number;
+  replacementPlayerId: number;
+  rankingAtDraw: number;
+  overallAtDraw: number;
+};
+
 export function rankIndividualTournamentPlayers(
   players: IndividualMatchPlayer[]
-) {
+): RankedIndividualTournamentPlayer[] {
   return players
     .map((player) => ({
       player,
@@ -43,6 +64,57 @@ export function rankIndividualTournamentPlayers(
       ...qualified,
       ranking: index + 1,
     }));
+}
+
+export function planIndividualTournamentRosterReplacements(
+  entries: IndividualTournamentEntrySlot[],
+  qualified: RankedIndividualTournamentPlayer[]
+): IndividualTournamentRosterReplacement[] {
+  const qualifiedIds = new Set(
+    qualified.map((candidate) => candidate.player.id)
+  );
+  const enteredIds = new Set(
+    entries.map((entry) => entry.playerId)
+  );
+  const outgoing = entries
+    .filter((entry) => !qualifiedIds.has(entry.playerId))
+    .sort(
+      (first, second) =>
+        first.drawPosition - second.drawPosition
+    );
+  const incoming = qualified.filter(
+    (candidate) => !enteredIds.has(candidate.player.id)
+  );
+
+  if (outgoing.length !== incoming.length) {
+    throw new Error(
+      "INDIVIDUAL_TOURNAMENT_REPLACEMENTS_INCOMPLETE"
+    );
+  }
+
+  return outgoing.map((entry, index) => ({
+    entryId: entry.id,
+    drawPosition: entry.drawPosition,
+    previousPlayerId: entry.playerId,
+    replacementPlayerId: incoming[index].player.id,
+    rankingAtDraw: incoming[index].ranking,
+    overallAtDraw: incoming[index].overall,
+  }));
+}
+
+export function getIndividualTournamentWalkover(
+  playerOneId: number | null,
+  playerTwoId: number | null
+) {
+  if (playerOneId !== null && playerTwoId !== null) {
+    return null;
+  }
+
+  return {
+    winnerPlayerId: playerOneId ?? playerTwoId,
+    playerOneWins: playerOneId === null ? 0 : 2,
+    playerTwoWins: playerTwoId === null ? 0 : 2,
+  };
 }
 
 export function shuffleIndividualDraw<T>(

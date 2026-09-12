@@ -3,6 +3,7 @@ import "server-only";
 import type { Prisma } from "@/generated/prisma/client";
 
 import {
+  getIndividualTournamentWalkover,
   INDIVIDUAL_TOURNAMENT_SIZE,
   rankIndividualTournamentPlayers,
   shuffleIndividualDraw,
@@ -289,22 +290,35 @@ export async function playIndividualTournamentStage(
         },
       });
 
-      if (
-        matches.length === 0 ||
-        matches.some((match) => !match.playerOne || !match.playerTwo)
-      ) {
+      if (matches.length === 0) {
         throw new Error("INDIVIDUAL_TOURNAMENT_STAGE_INCOMPLETE");
       }
 
       const tournamentType = tournament.type as IndividualTournamentType;
-      const results = matches.map((match) => ({
-        match,
-        result: simulateIndividualBestOfThree(
-          match.playerOne!,
-          match.playerTwo!,
-          tournamentType
-        ),
-      }));
+      const results = matches.flatMap((match) => {
+        if (!match.playerOne || !match.playerTwo) {
+          return [];
+        }
+
+        return [
+          {
+            match,
+            result: simulateIndividualBestOfThree(
+              match.playerOne,
+              match.playerTwo,
+              tournamentType
+            ),
+          },
+        ];
+      });
+      const walkovers = matches.flatMap((match) => {
+        const walkover = getIndividualTournamentWalkover(
+          match.playerOneId,
+          match.playerTwoId
+        );
+
+        return walkover ? [{ match, ...walkover }] : [];
+      });
       const values = results
         .map(
           ({ match, result }) =>
@@ -313,75 +327,108 @@ export async function playIndividualTournamentStage(
         )
         .join(", ");
 
-      await transaction.individualTournamentGame.createMany({
-        data: results.flatMap(({ match, result }) =>
-          result.games.map((game) => ({
-            matchId: match.id,
-            order: game.order,
-            specialty: game.specialty,
-            winnerSide: game.winnerSide,
-            playerOnePerformanceRating:
-              game.playerOnePerformanceRating,
-            playerTwoPerformanceRating:
-              game.playerTwoPerformanceRating,
-            playerOneScore: game.playerOneScore,
-            playerTwoScore: game.playerTwoScore,
-          }))
-        ),
-      });
+      if (results.length > 0) {
+        await transaction.individualTournamentGame.createMany({
+          data: results.flatMap(({ match, result }) =>
+            result.games.map((game) => ({
+              matchId: match.id,
+              order: game.order,
+              specialty: game.specialty,
+              winnerSide: game.winnerSide,
+              playerOnePerformanceRating:
+                game.playerOnePerformanceRating,
+              playerTwoPerformanceRating:
+                game.playerTwoPerformanceRating,
+              playerOneScore: game.playerOneScore,
+              playerTwoScore: game.playerTwoScore,
+            }))
+          ),
+        });
 
-      await transaction.$executeRawUnsafe(`
-        UPDATE "IndividualTournamentMatch" AS tournament_match
-        SET
-          "winnerPlayerId" = result."winnerPlayerId",
-          "playerOneWins" = result."playerOneWins",
-          "playerTwoWins" = result."playerTwoWins",
-          status = 'PLAYED',
-          "playedAt" = tournament_match."scheduledAt",
-          "updatedAt" = CURRENT_TIMESTAMP
-        FROM (
-          VALUES ${values}
-        ) AS result(id, "winnerPlayerId", "playerOneWins", "playerTwoWins")
-        WHERE tournament_match.id = result.id
-      `);
+        await transaction.$executeRawUnsafe(`
+          UPDATE "IndividualTournamentMatch" AS tournament_match
+          SET
+            "winnerPlayerId" = result."winnerPlayerId",
+            "playerOneWins" = result."playerOneWins",
+            "playerTwoWins" = result."playerTwoWins",
+            status = 'PLAYED',
+            "playedAt" = tournament_match."scheduledAt",
+            "updatedAt" = CURRENT_TIMESTAMP
+          FROM (
+            VALUES ${values}
+          ) AS result(id, "winnerPlayerId", "playerOneWins", "playerTwoWins")
+          WHERE tournament_match.id = result.id
+        `);
 
-      await transaction.individualTournamentEntry.updateMany({
-        where: {
-          tournamentId: tournament.id,
-          playerId: {
-            in: results.map(({ result }) => result.loserPlayerId),
+        await transaction.individualTournamentEntry.updateMany({
+          where: {
+            tournamentId: tournament.id,
+            playerId: {
+              in: results.map(({ result }) => result.loserPlayerId),
+            },
           },
-        },
-        data: {
-          status: "ELIMINATED",
-          eliminatedStage: candidate.stage,
-        },
-      });
+          data: {
+            status: "ELIMINATED",
+            eliminatedStage: candidate.stage,
+          },
+        });
+      }
 
-      const winnerPlayerIds = results.map(
-        ({ result }) => result.winnerPlayerId
+      for (const walkover of walkovers) {
+        await transaction.individualTournamentMatch.update({
+          where: {
+            id: walkover.match.id,
+          },
+          data: {
+            winnerPlayerId: walkover.winnerPlayerId,
+            playerOneWins: walkover.playerOneWins,
+            playerTwoWins: walkover.playerTwoWins,
+            status: "WALKOVER",
+            playedAt: walkover.match.scheduledAt,
+          },
+        });
+      }
+
+      const winnerByMatchId = new Map<number, number | null>(
+        results.map(({ match, result }) => [
+          match.id,
+          result.winnerPlayerId,
+        ])
+      );
+
+      for (const walkover of walkovers) {
+        winnerByMatchId.set(
+          walkover.match.id,
+          walkover.winnerPlayerId
+        );
+      }
+
+      const winnerPlayerIds = matches.map(
+        (match) => winnerByMatchId.get(match.id) ?? null
       );
       const nextStage = INDIVIDUAL_MATCH_STAGES[candidate.stageOrder];
 
       if (!nextStage) {
-        const championPlayerId = winnerPlayerIds[0];
-        const finalMatch = results[0].match;
+        const championPlayerId = winnerPlayerIds[0] ?? null;
+        const finalMatch = matches[0];
         const champion =
-          finalMatch.playerOne?.id === championPlayerId
-            ? finalMatch.playerOne
-            : finalMatch.playerTwo;
+          [finalMatch.playerOne, finalMatch.playerTwo].find(
+            (player) => player?.id === championPlayerId
+          ) ?? null;
 
-        await transaction.individualTournamentEntry.update({
-          where: {
-            tournamentId_playerId: {
-              tournamentId: tournament.id,
-              playerId: championPlayerId,
+        if (championPlayerId !== null) {
+          await transaction.individualTournamentEntry.update({
+            where: {
+              tournamentId_playerId: {
+                tournamentId: tournament.id,
+                playerId: championPlayerId,
+              },
             },
-          },
-          data: {
-            status: "WINNER",
-          },
-        });
+            data: {
+              status: "WINNER",
+            },
+          });
+        }
         await transaction.individualTournament.update({
           where: {
             id: tournament.id,
@@ -396,8 +443,12 @@ export async function playIndividualTournamentStage(
           data: {
             clubId: null,
             type: "Individuale",
-            title: `${champion?.firstName} ${champion?.lastName} vince ${tournament.name}`,
-            description: "Finale conclusa e tabellone completato.",
+            title: champion
+              ? `${champion.firstName} ${champion.lastName} vince ${tournament.name}`
+              : `${tournament.name} si conclude senza vincitore`,
+            description: champion
+              ? "Finale conclusa e tabellone completato."
+              : "Il tabellone si è concluso dopo il ritiro di entrambi i finalisti.",
             createdAt: scheduledAt,
           },
         });
@@ -416,8 +467,8 @@ export async function playIndividualTournamentStage(
               stageOrder: nextStage.order,
               position: index + 1,
               scheduledAt: nextStageDate,
-              playerOneId: winnerPlayerIds[index * 2],
-              playerTwoId: winnerPlayerIds[index * 2 + 1],
+              playerOneId: winnerPlayerIds[index * 2] ?? null,
+              playerTwoId: winnerPlayerIds[index * 2 + 1] ?? null,
               status: "SCHEDULED",
             })
           ),
@@ -436,6 +487,7 @@ export async function playIndividualTournamentStage(
       return {
         status: "PROCESSED" as const,
         matches: matches.length,
+        walkovers: walkovers.length,
         stage: candidate.stage,
       };
     },

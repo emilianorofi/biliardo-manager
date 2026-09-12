@@ -484,7 +484,9 @@ const player: Player = {
             <InfoRow
               label="Squadra"
               value={
-                databasePlayer.club ? (
+                databasePlayer.careerStatus === "REMOVED" ? (
+                  "Fuori attività"
+                ) : databasePlayer.club ? (
                   <Link
                     href={`/clubs/${databasePlayer.club.id}`}
                     className="text-emerald-300 transition hover:text-amber-200 hover:underline"
