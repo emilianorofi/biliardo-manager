@@ -110,6 +110,35 @@ test("distribuisce i giocatori su venti identità grafiche", () => {
   }
 });
 
+test("assegna identità coerenti con l'area geografica", () => {
+  const italianIdentities = new Set(
+    Array.from({ length: 60 }, (_, id) =>
+      getPlayerPortraitIdentity(id, "ITA")
+    )
+  );
+  const germanIdentities = new Set(
+    Array.from({ length: 60 }, (_, id) =>
+      getPlayerPortraitIdentity(id, "Germania")
+    )
+  );
+  const japaneseIdentities = new Set(
+    Array.from({ length: 20 }, (_, id) =>
+      getPlayerPortraitIdentity(id, "🇯🇵")
+    )
+  );
+
+  for (const identity of [4, 10, 14, 15] as const) {
+    assert.equal(italianIdentities.has(identity), false);
+    assert.equal(germanIdentities.has(identity), false);
+  }
+
+  assert.deepEqual([...japaneseIdentities].sort((a, b) => a - b), [4, 14]);
+  assert.equal(
+    getPlayerPortraitIdentity(37, "JPN"),
+    getPlayerPortraitIdentity(37, "Giappone")
+  );
+});
+
 
 test("mostra i valori tecnici soltanto al club proprietario", () => {
   assert.equal(canViewPlayerTechnicalValues(12, 12), true);

@@ -16,9 +16,9 @@ export default async function NationsCupPage() {
       entries: {
         orderBy: [{ groupCode: "asc" }, { points: "desc" }, { pointsFor: "desc" }, { seed: "asc" }],
         include: {
-          firstPlayer: { select: { id: true, firstName: true, lastName: true, age: true } },
-          secondPlayer: { select: { id: true, firstName: true, lastName: true, age: true } },
-          thirdPlayer: { select: { id: true, firstName: true, lastName: true, age: true } },
+          firstPlayer: { select: { id: true, firstName: true, lastName: true, nationality: true, age: true } },
+          secondPlayer: { select: { id: true, firstName: true, lastName: true, nationality: true, age: true } },
+          thirdPlayer: { select: { id: true, firstName: true, lastName: true, nationality: true, age: true } },
         },
       },
       matches: {
@@ -67,7 +67,7 @@ export default async function NationsCupPage() {
                         <div className="mt-2 flex flex-wrap gap-2">
                           {[entry.firstPlayer, entry.secondPlayer, entry.thirdPlayer].map((player) => (
                             <Link key={player.id} href={`/players/${player.id}`} className="flex items-center gap-1.5 rounded-lg bg-black/15 p-1.5 text-[10px] text-zinc-400 transition hover:text-amber-300">
-                              <PlayerPortrait player={player} className="h-14 w-11" />
+                              <PlayerPortrait player={player} className="aspect-[4/5] w-11" />
                               <span>{player.firstName} {player.lastName}</span>
                             </Link>
                           ))}

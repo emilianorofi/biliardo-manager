@@ -69,7 +69,7 @@ export default function FormationSlot({
         <div className="p-3">
           <div className="flex items-center gap-3 rounded-xl bg-[#10231c] p-3">
             <Link href={`/players/${player.id}`} aria-label={`Apri la scheda di ${player.firstName} ${player.lastName}`}>
-              <PlayerPortrait player={player} className="h-20 w-16 shrink-0" />
+              <PlayerPortrait player={player} className="aspect-[4/5] w-16 shrink-0" />
             </Link>
 
             <div className="min-w-0 flex-1">

@@ -60,6 +60,13 @@ export async function GET() {
 
         include: {
           results: {
+            include: {
+              player: {
+                select: {
+                  nationality: true,
+                },
+              },
+            },
             orderBy: [
               {
                 playerLastName:
@@ -114,6 +121,9 @@ export async function GET() {
 
                   lastName:
                     result.playerLastName,
+
+                  nationality:
+                    result.player?.nationality ?? "",
 
                   age:
                     result.playerAge,

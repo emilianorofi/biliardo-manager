@@ -495,7 +495,7 @@ function AcademyPlayerCard({
     <article className={`rounded-xl border p-3 ${player.decisionRequired ? "border-orange-400/35 bg-orange-400/[0.04]" : canPromote ? "border-yellow-400/25 bg-yellow-400/[0.025]" : "border-white/10 bg-[#101010]"}`}>
       <div className="flex items-start justify-between gap-3">
         <div className="flex min-w-0 items-center gap-3">
-          <PlayerPortrait player={player} className="h-24 w-20 shrink-0" />
+          <PlayerPortrait player={player} className="aspect-[4/5] w-20 shrink-0" />
           <div className="min-w-0">
           <p className="truncate font-black text-white">
             {player.firstName} {player.lastName}

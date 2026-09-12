@@ -402,7 +402,7 @@ function RankingTableRows({
         <td className="px-3 py-2.5">
           <div className="flex items-center gap-2.5">
             <Link href={`/players/${player.id}?from=ranking`} aria-label={`Apri la scheda di ${player.firstName} ${player.lastName}`}>
-              <PlayerPortrait player={player} className="h-20 w-16 shrink-0" />
+              <PlayerPortrait player={player} className="aspect-[4/5] w-16 shrink-0" />
             </Link>
             <div className="min-w-0">
               <Link
@@ -458,7 +458,7 @@ function RankingMobileCard({
         <div className="flex items-center gap-3">
           <RankingPosition position={player.position} />
           <Link href={`/players/${player.id}?from=ranking`} aria-label={`Apri la scheda di ${player.firstName} ${player.lastName}`}>
-            <PlayerPortrait player={player} className="h-20 w-16 shrink-0" />
+            <PlayerPortrait player={player} className="aspect-[4/5] w-16 shrink-0" />
           </Link>
           <div className="min-w-0 flex-1">
             <Link

@@ -93,7 +93,7 @@ export default function MarketSidebar({
                 className="rounded-xl bg-zinc-800 p-2.5 text-sm"
               >
                 <div className="flex items-center gap-3">
-                  <Link href={`/players/${listing.playerId}?from=market`}><PlayerPortrait player={{ id: listing.playerId, firstName: listing.firstName, lastName: listing.lastName, age: listing.age }} className="h-20 w-16" /></Link>
+                  <Link href={`/players/${listing.playerId}?from=market`}><PlayerPortrait player={{ id: listing.playerId, firstName: listing.firstName, lastName: listing.lastName, nationality: listing.nationality, age: listing.age }} className="aspect-[4/5] w-16" /></Link>
                   <Link href={`/players/${listing.playerId}?from=market`} className="font-medium text-white transition hover:text-amber-200 hover:underline hover:underline-offset-4">{listing.playerName}</Link>
                 </div>
 
@@ -165,7 +165,7 @@ export default function MarketSidebar({
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <div className="flex items-center gap-3">
-                    <Link href={`/players/${bid.playerId}?from=market`}><PlayerPortrait player={{ id: bid.playerId, firstName: bid.firstName, lastName: bid.lastName, age: bid.age }} className="h-20 w-16" /></Link>
+                    <Link href={`/players/${bid.playerId}?from=market`}><PlayerPortrait player={{ id: bid.playerId, firstName: bid.firstName, lastName: bid.lastName, nationality: bid.nationality, age: bid.age }} className="aspect-[4/5] w-16" /></Link>
                     <Link href={`/players/${bid.playerId}?from=market`} className="font-medium text-white transition hover:text-amber-200 hover:underline">{bid.playerName}</Link>
                   </div>
                   <p className="mt-1 text-xs text-zinc-500">

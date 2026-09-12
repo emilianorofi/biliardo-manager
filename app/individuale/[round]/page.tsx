@@ -201,7 +201,7 @@ export default async function IndividualBracketPage({
         <section className="flex flex-col justify-between gap-4 rounded-2xl border border-amber-400/30 bg-amber-400/5 p-4 sm:flex-row sm:items-center">
           <div className="flex items-center gap-3">
             <Link href={`/players/${tournament.championPlayer.id}`}>
-              <PlayerPortrait player={tournament.championPlayer} className="h-28 w-24" />
+              <PlayerPortrait player={tournament.championPlayer} className="aspect-[4/5] w-24" />
             </Link>
             <div>
               <p className="text-[10px] font-black uppercase tracking-wider text-amber-300">
@@ -495,7 +495,7 @@ function BracketPlayerRow({
       <div className="flex min-w-0 items-center gap-2.5">
         {player ? (
           <Link href={`/players/${player.id}?${returnQuery}`} aria-label={`Apri la scheda di ${player.firstName} ${player.lastName}`}>
-            <PlayerPortrait player={player} className="h-14 w-11 shrink-0" />
+            <PlayerPortrait player={player} className="aspect-[4/5] w-11 shrink-0" />
           </Link>
         ) : <span className="w-11 text-center text-sm">·</span>}
         <div className="min-w-0">

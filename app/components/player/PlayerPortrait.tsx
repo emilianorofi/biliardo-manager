@@ -6,7 +6,7 @@ import { getPlayerPortraitIdentity } from "@/lib/player-portraits";
 type PortraitPlayer = Pick<
   Player,
   "id" | "firstName" | "lastName" | "age"
->;
+> & Partial<Pick<Player, "nationality">>;
 
 export default function PlayerPortrait({
   player,
@@ -15,7 +15,10 @@ export default function PlayerPortrait({
   player: PortraitPlayer;
   className?: string;
 }) {
-  const identity = getPlayerPortraitIdentity(player.id);
+  const identity = getPlayerPortraitIdentity(
+    player.id,
+    player.nationality
+  );
   const agePhase = getAgePhaseIndex(player.age);
   const column = agePhase % 4;
   const row = Math.floor(agePhase / 4);
@@ -31,7 +34,11 @@ export default function PlayerPortrait({
       style={{
         backgroundImage: `url('/players/billiards-player-identity-${identity}.webp')`,
         backgroundSize: "400% auto",
-        backgroundPosition: `${column * (100 / 3)}% ${row * 100}%`,
+        backgroundPositionX: `${column * (100 / 3)}%`,
+        // Ogni sorgente contiene due righe di quattro ritratti alti.
+        // Il 72,75% porta l'inizio della seconda riga nel riquadro 4:5,
+        // evitando di tagliare fronte e capelli nelle età più avanzate.
+        backgroundPositionY: row === 0 ? "0%" : "72.75%",
       }}
     />
   );

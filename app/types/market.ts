@@ -58,6 +58,7 @@ export interface MarketUserBid {
   playerName: string;
   firstName: string;
   lastName: string;
+  nationality: string;
   age: number;
   amount: number;
   salary: number;
@@ -73,6 +74,7 @@ export interface MarketUserListing {
   playerName: string;
   firstName: string;
   lastName: string;
+  nationality: string;
   age: number;
   openingPrice: number;
   currentPrice: number;
@@ -87,6 +89,7 @@ export interface MarketHistoryItem {
   playerName: string;
   firstName: string;
   lastName: string;
+  nationality: string;
   age: number;
   kind: MarketHistoryKind;
   finalPrice: number | null;
