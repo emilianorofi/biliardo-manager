@@ -12,25 +12,42 @@ export type GlobalPlayerRanking = {
   position: number;
 };
 
-export function buildGlobalPlayerRanking(
-  players: RankablePlayer[]
-) {
-  const rankedPlayers = players
+export type RankedGlobalPlayer<T extends RankablePlayer> = {
+  player: T;
+  overall: number;
+  position: number;
+};
+
+export function rankGlobalPlayers<T extends RankablePlayer>(
+  players: T[]
+): RankedGlobalPlayer<T>[] {
+  return players
     .map((player) => ({
-      id: player.id,
+      player,
       overall: calculateOverall(player),
     }))
     .sort(
       (first, second) =>
-        second.overall - first.overall || first.id - second.id
-    );
+        second.overall - first.overall ||
+        first.player.id - second.player.id
+    )
+    .map((rankedPlayer, index) => ({
+      ...rankedPlayer,
+      position: index + 1,
+    }));
+}
+
+export function buildGlobalPlayerRanking(
+  players: RankablePlayer[]
+) {
+  const rankedPlayers = rankGlobalPlayers(players);
 
   return new Map<number, GlobalPlayerRanking>(
-    rankedPlayers.map((player, index) => [
-      player.id,
+    rankedPlayers.map((rankedPlayer) => [
+      rankedPlayer.player.id,
       {
-        overall: player.overall,
-        position: index + 1,
+        overall: rankedPlayer.overall,
+        position: rankedPlayer.position,
       },
     ])
   );

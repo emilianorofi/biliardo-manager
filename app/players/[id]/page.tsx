@@ -187,24 +187,29 @@ export default async function PlayerPage({
 
   const individualRound = Number.parseInt(round ?? "", 10);
   const sourceClubId = Number.parseInt(club ?? "", 10);
+  const comesFromRanking = from === "ranking";
   const comesFromIndividual =
     from === "individuale" && Number.isInteger(individualRound);
   const comesFromClub =
     from === "club" && Number.isInteger(sourceClubId);
   const backHref = comesFromMarket
     ? "/market"
-    : comesFromIndividual
-      ? `/individuale/${individualRound}${stage ? `?stage=${stage}` : ""}`
-      : comesFromClub
-        ? `/clubs/${sourceClubId}`
-        : "/players";
+    : comesFromRanking
+      ? "/ranking"
+      : comesFromIndividual
+        ? `/individuale/${individualRound}${stage ? `?stage=${stage}` : ""}`
+        : comesFromClub
+          ? `/clubs/${sourceClubId}`
+          : "/players";
   const backLabel = comesFromMarket
     ? "Torna al mercato"
-    : comesFromIndividual
-      ? "Torna al tabellone"
-      : comesFromClub
-        ? "Torna alla squadra"
-        : "Torna alla rosa";
+    : comesFromRanking
+      ? "Torna al ranking"
+      : comesFromIndividual
+        ? "Torna al tabellone"
+        : comesFromClub
+          ? "Torna alla squadra"
+          : "Torna alla rosa";
 
 const playerAttributes: Player["attributes"] = {
   precisione: Math.round(databasePlayer.precisione),
