@@ -454,7 +454,7 @@ const player: Player = {
                   title="Valori riservati"
                 />
                 <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-400">
-                  Le caratteristiche e i valori per specialità sono visibili soltanto al manager della squadra di appartenenza.
+                  Soltanto le caratteristiche e i valori per specialità sono riservati al manager della squadra di appartenenza. Ranking, forma, morale, partite, prove, trasferimenti e carriera restano consultabili.
                 </p>
               </div>
             </div>

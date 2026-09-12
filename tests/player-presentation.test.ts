@@ -6,6 +6,7 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 
 import CountryFlag from "../app/components/player/CountryFlag";
+import PlayerCareerSection from "../app/components/player/PlayerCareerSection";
 import PlayerListCard from "../app/components/player/PlayerListCard";
 import type { Player } from "../app/types/player";
 import { canViewPlayerTechnicalValues } from "../lib/player-visibility";
@@ -138,4 +139,45 @@ test("la rosa pubblica non inserisce i valori tecnici nel markup", () => {
   for (const value of [91, 92, 93, 94, 95, 96, 97, 98, 99]) {
     assert.doesNotMatch(markup, new RegExp(`>${value}<`));
   }
+});
+
+test("la carriera pubblica mostra partite, prove e trasferimenti", () => {
+  const markup = renderToStaticMarkup(
+    createElement(PlayerCareerSection, {
+      career: {
+        summary: {
+          appearances: 4,
+          clubs: 2,
+          played: 12,
+          wins: 7,
+          losses: 5,
+          winRate: 58.3,
+          averagePerformance: 74.2,
+        },
+        specialties: [],
+        gameTypes: [],
+        seasons: [],
+        recentAppearances: [],
+        transfers: [
+          {
+            id: 1,
+            completedAt: "2026-09-12T00:00:00.000Z",
+            type: "AUCTION",
+            fromClubName: "Club Uno",
+            fromClubId: 1,
+            toClubName: "Club Due",
+            toClubId: 2,
+            amount: 120000,
+          },
+        ],
+      },
+    })
+  );
+
+  assert.match(markup, /Carriera e partite/);
+  assert.match(markup, /Presenze/);
+  assert.match(markup, /Prove/);
+  assert.match(markup, /Trasferimenti/);
+  assert.match(markup, /Club Uno/);
+  assert.match(markup, /Club Due/);
 });
