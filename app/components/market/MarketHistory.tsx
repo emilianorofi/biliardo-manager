@@ -7,6 +7,7 @@ import {
   Clock3,
   UserPlus,
 } from "lucide-react";
+import PlayerPortrait from "@/app/components/player/PlayerPortrait";
 
 import type {
   MarketHistoryItem,
@@ -87,25 +88,19 @@ export default function MarketHistory({
       <div className="divide-y divide-zinc-800">
         {items.map((item) => {
           const appearance = appearances[item.kind];
-          const Icon = appearance.icon;
-
           return (
             <div
               key={item.listingId}
               className="flex flex-col gap-4 py-4 first:pt-0 last:pb-0 sm:flex-row sm:items-center sm:justify-between"
             >
               <div className="flex items-start gap-3">
-                <div
-                  className={`mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border ${appearance.colors}`}
-                >
-                  <Icon size={18} />
-                </div>
+                <Link href={`/players/${item.playerId}?from=market`}>
+                  <PlayerPortrait player={{ id: item.playerId, firstName: item.firstName, lastName: item.lastName, age: item.age }} className="h-24 w-20 shrink-0" />
+                </Link>
 
                 <div>
                   <div className="flex flex-wrap items-center gap-2">
-                    <p className="font-semibold text-white">
-                      {item.playerName}
-                    </p>
+                    <Link href={`/players/${item.playerId}?from=market`} className="font-semibold text-white transition hover:text-amber-200 hover:underline">{item.playerName}</Link>
                     <span
                       className={`rounded-full border px-2.5 py-1 text-xs font-semibold ${appearance.colors}`}
                     >

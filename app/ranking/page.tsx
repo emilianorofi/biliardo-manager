@@ -401,10 +401,9 @@ function RankingTableRows({
         </td>
         <td className="px-3 py-2.5">
           <div className="flex items-center gap-2.5">
-            <PlayerPortrait
-              player={player}
-              className="h-10 w-10 shrink-0"
-            />
+            <Link href={`/players/${player.id}?from=ranking`} aria-label={`Apri la scheda di ${player.firstName} ${player.lastName}`}>
+              <PlayerPortrait player={player} className="h-20 w-16 shrink-0" />
+            </Link>
             <div className="min-w-0">
               <Link
                 href={`/players/${player.id}?from=ranking`}
@@ -458,10 +457,9 @@ function RankingMobileCard({
       >
         <div className="flex items-center gap-3">
           <RankingPosition position={player.position} />
-          <PlayerPortrait
-            player={player}
-            className="h-11 w-11 shrink-0"
-          />
+          <Link href={`/players/${player.id}?from=ranking`} aria-label={`Apri la scheda di ${player.firstName} ${player.lastName}`}>
+            <PlayerPortrait player={player} className="h-20 w-16 shrink-0" />
+          </Link>
           <div className="min-w-0 flex-1">
             <Link
               href={`/players/${player.id}?from=ranking`}

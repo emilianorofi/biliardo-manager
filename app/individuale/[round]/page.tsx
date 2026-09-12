@@ -4,10 +4,10 @@ import {
   ChevronRight,
   Clock3,
   Medal,
-  Trophy,
 } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import PlayerPortrait from "@/app/components/player/PlayerPortrait";
 
 import { getCurrentClubId } from "@/lib/current-club";
 import {
@@ -77,6 +77,7 @@ export default async function IndividualBracketPage({
           firstName: true,
           lastName: true,
           nationality: true,
+          age: true,
           clubId: true,
         },
       },
@@ -100,6 +101,7 @@ export default async function IndividualBracketPage({
               firstName: true,
               lastName: true,
               nationality: true,
+              age: true,
               clubId: true,
             },
           },
@@ -109,6 +111,7 @@ export default async function IndividualBracketPage({
               firstName: true,
               lastName: true,
               nationality: true,
+              age: true,
               clubId: true,
             },
           },
@@ -197,18 +200,16 @@ export default async function IndividualBracketPage({
       {tournament.championPlayer && (
         <section className="flex flex-col justify-between gap-4 rounded-2xl border border-amber-400/30 bg-amber-400/5 p-4 sm:flex-row sm:items-center">
           <div className="flex items-center gap-3">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-400/15 text-amber-300">
-              <Trophy size={24} />
-            </div>
+            <Link href={`/players/${tournament.championPlayer.id}`}>
+              <PlayerPortrait player={tournament.championPlayer} className="h-28 w-24" />
+            </Link>
             <div>
               <p className="text-[10px] font-black uppercase tracking-wider text-amber-300">
                 Campione
               </p>
-              <p className="mt-1 text-lg font-black text-white">
-                {tournament.championPlayer.nationality}{" "}
-                {tournament.championPlayer.firstName}{" "}
-                {tournament.championPlayer.lastName}
-              </p>
+              <Link href={`/players/${tournament.championPlayer.id}`} className="mt-1 block text-lg font-black text-white transition hover:text-amber-200 hover:underline">
+                {tournament.championPlayer.nationality} {tournament.championPlayer.firstName} {tournament.championPlayer.lastName}
+              </Link>
             </div>
           </div>
 
@@ -362,6 +363,7 @@ type BracketPlayer = {
   firstName: string;
   lastName: string;
   nationality: string;
+  age: number;
   clubId: number | null;
 };
 
@@ -491,9 +493,11 @@ function BracketPlayerRow({
       }`}
     >
       <div className="flex min-w-0 items-center gap-2.5">
-        <span className="w-5 shrink-0 text-center text-sm">
-          {player?.nationality ?? "·"}
-        </span>
+        {player ? (
+          <Link href={`/players/${player.id}?${returnQuery}`} aria-label={`Apri la scheda di ${player.firstName} ${player.lastName}`}>
+            <PlayerPortrait player={player} className="h-14 w-11 shrink-0" />
+          </Link>
+        ) : <span className="w-11 text-center text-sm">·</span>}
         <div className="min-w-0">
           {player ? (
             <Link

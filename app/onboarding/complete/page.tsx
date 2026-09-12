@@ -11,6 +11,7 @@ import {
 
 import { logoutManager } from "@/app/auth/actions";
 import ClubCrest from "@/app/components/onboarding/ClubCrest";
+import PlayerPortrait from "@/app/components/player/PlayerPortrait";
 import { requireAuthenticatedManager } from "@/lib/auth";
 import { createLeagueTable } from "@/lib/league-table";
 import {
@@ -184,16 +185,17 @@ export default async function ClubCreatedPage() {
                 className="rounded-2xl border border-white/10 bg-black/20 p-4"
               >
                 <div className="flex items-start justify-between gap-3">
-                  <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-400/10 text-sm font-black text-emerald-300">
-                    {player.firstName.charAt(0)}
-                    {player.lastName.charAt(0)}
-                  </span>
+                  <Link href={`/players/${player.id}`} aria-label={`Apri la scheda di ${player.firstName} ${player.lastName}`}>
+                    <PlayerPortrait player={player} className="h-24 w-20" />
+                  </Link>
                   <span className="flex h-10 w-10 items-center justify-center rounded-xl border border-amber-400/25 bg-amber-400/10 font-black text-amber-300">
                     {player.overall}
                   </span>
                 </div>
                 <p className="mt-4 font-black text-white">
-                  {player.firstName} {player.lastName}
+                  <Link href={`/players/${player.id}`} className="transition hover:text-amber-200 hover:underline">
+                    {player.firstName} {player.lastName}
+                  </Link>
                 </p>
                 <p className="mt-1 text-xs text-zinc-500">
                   {player.age} anni · {player.style[0]}

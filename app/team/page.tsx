@@ -13,6 +13,7 @@ import {
 
 import { getCurrentClubId } from "@/lib/current-club";
 import { prisma } from "@/lib/prisma";
+import PlayerPortrait from "@/app/components/player/PlayerPortrait";
 
 export const dynamic = "force-dynamic";
 
@@ -356,15 +357,7 @@ function RosterPlayerCard({
         }}
       />
 
-      <div
-        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-white/10 text-xs font-black text-white"
-        style={{
-          background: `linear-gradient(145deg, ${primaryColor}, ${secondaryColor})`,
-        }}
-      >
-        {player.firstName.charAt(0)}
-        {player.lastName.charAt(0)}
-      </div>
+      <PlayerPortrait player={player} className="h-20 w-16 shrink-0" />
 
       <div className="min-w-0 flex-1">
         <p className="truncate text-sm font-black text-white transition group-hover:text-amber-200">

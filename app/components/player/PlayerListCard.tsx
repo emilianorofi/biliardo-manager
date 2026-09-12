@@ -66,12 +66,11 @@ export default function PlayerListCard({
         }}
       />
 
-      <div className="grid grid-cols-[88px_minmax(0,1fr)] sm:grid-cols-[110px_minmax(0,1fr)] lg:grid-cols-[124px_minmax(0,1fr)]">
+      <div className="grid grid-cols-[112px_minmax(0,1fr)] sm:grid-cols-[140px_minmax(0,1fr)] lg:grid-cols-[160px_minmax(0,1fr)]">
         <div className="flex items-start justify-center border-r border-emerald-900/45 bg-[linear-gradient(180deg,rgba(16,185,129,0.08),rgba(0,0,0,0.18))] p-2">
-          <PlayerPortrait
-            player={player}
-            className="aspect-[2/3] w-full"
-          />
+          <Link href={profileHref} aria-label={`Apri la scheda di ${fullName}`} className="block w-full">
+            <PlayerPortrait player={player} className="aspect-[4/5] w-full transition group-hover:scale-[1.02]" />
+          </Link>
         </div>
 
         <div className="min-w-0 px-3 py-2.5">

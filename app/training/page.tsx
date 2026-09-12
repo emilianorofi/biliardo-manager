@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import PlayerPortrait from "@/app/components/player/PlayerPortrait";
 import {
   useEffect,
   useState,
@@ -758,28 +759,19 @@ export default function TrainingPage() {
                         className="border-b border-white/5 last:border-0"
                       >
                         <td className="px-4 py-2.5">
-                          <p className="text-sm font-semibold text-white">
-                            {
-                              player.firstName
-                            }{" "}
-                            {
-                              player.lastName
-                            }
-                          </p>
-
-                          <p className="mt-0.5 text-[10px] text-zinc-500">
-                            Overall{" "}
-                            {
-                              player.overall
-                            }{" "}
-                            · Forma{" "}
-                            {player.form}/10 ·
-                            Morale{" "}
-                            {
-                              player.morale
-                            }
-                            /10
-                          </p>
+                          <div className="flex items-center gap-3">
+                            <Link href={`/players/${player.id}`} aria-label={`Apri la scheda di ${player.firstName} ${player.lastName}`}>
+                              <PlayerPortrait player={player} className="h-20 w-16 shrink-0" />
+                            </Link>
+                            <div>
+                              <Link href={`/players/${player.id}`} className="text-sm font-semibold text-white transition hover:text-yellow-300 hover:underline">
+                                {player.firstName} {player.lastName}
+                              </Link>
+                              <p className="mt-0.5 text-[10px] text-zinc-500">
+                                Overall {player.overall} · Forma {player.form}/10 · Morale {player.morale}/10
+                              </p>
+                            </div>
+                          </div>
                         </td>
 
                         <td className="px-3 py-2.5 text-xs text-zinc-300">

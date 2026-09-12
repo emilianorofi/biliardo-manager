@@ -5,6 +5,8 @@ import {
   useMemo,
   useState,
 } from "react";
+import Link from "next/link";
+import PlayerPortrait from "@/app/components/player/PlayerPortrait";
 
 import {
   BarChart3,
@@ -738,14 +740,14 @@ function MatchCard({
       <div className="mt-4 rounded-xl border border-emerald-900/60 bg-[#10231c] px-4 py-3">
         {complete ? (
           <div>
-            <p className="font-bold text-white">
-              {validPlayers
-                .map(
-                  (player) =>
-                    `${player.firstName} ${player.lastName}`
-                )
-                .join(" + ")}
-            </p>
+            <div className="flex flex-wrap gap-3">
+              {validPlayers.map((player) => (
+                <Link key={player.id} href={`/players/${player.id}`} className="flex items-center gap-2 font-bold text-white transition hover:text-amber-200 hover:underline">
+                  <PlayerPortrait player={player} className="h-16 w-12" />
+                  <span>{player.firstName} {player.lastName}</span>
+                </Link>
+              ))}
+            </div>
 
             <div className="mt-2 flex flex-wrap gap-2">
               {validPlayers.map(

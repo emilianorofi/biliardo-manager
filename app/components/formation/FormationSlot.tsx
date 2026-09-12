@@ -1,6 +1,8 @@
 "use client";
 
 import type { Player } from "@/app/types/player";
+import Link from "next/link";
+import PlayerPortrait from "@/app/components/player/PlayerPortrait";
 
 interface FormationSlotProps {
   slot: "A" | "B" | "C";
@@ -66,14 +68,15 @@ export default function FormationSlot({
       {player ? (
         <div className="p-3">
           <div className="flex items-center gap-3 rounded-xl bg-[#10231c] p-3">
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-amber-400 to-yellow-300 text-sm font-black text-[#122018]">
-              {player.firstName.charAt(0)}
-              {player.lastName.charAt(0)}
-            </div>
+            <Link href={`/players/${player.id}`} aria-label={`Apri la scheda di ${player.firstName} ${player.lastName}`}>
+              <PlayerPortrait player={player} className="h-20 w-16 shrink-0" />
+            </Link>
 
             <div className="min-w-0 flex-1">
               <h3 className="truncate text-sm font-black text-white">
-                {player.firstName} {player.lastName}
+                <Link href={`/players/${player.id}`} className="transition hover:text-amber-200 hover:underline">
+                  {player.firstName} {player.lastName}
+                </Link>
               </h3>
 
               <p className="mt-0.5 text-[11px] text-slate-500">

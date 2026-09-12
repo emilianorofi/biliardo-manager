@@ -7,6 +7,7 @@ import type {
   AcademyAttributes,
   AcademyPlayer,
 } from "@/app/types/academyPlayer";
+import PlayerPortrait from "@/app/components/player/PlayerPortrait";
 
 const characteristics: {
   key: keyof AcademyAttributes;
@@ -493,13 +494,16 @@ function AcademyPlayerCard({
   return (
     <article className={`rounded-xl border p-3 ${player.decisionRequired ? "border-orange-400/35 bg-orange-400/[0.04]" : canPromote ? "border-yellow-400/25 bg-yellow-400/[0.025]" : "border-white/10 bg-[#101010]"}`}>
       <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
+        <div className="flex min-w-0 items-center gap-3">
+          <PlayerPortrait player={player} className="h-24 w-20 shrink-0" />
+          <div className="min-w-0">
           <p className="truncate font-black text-white">
             {player.firstName} {player.lastName}
           </p>
           <p className="mt-0.5 text-[11px] text-zinc-500">
             {player.nationality} · {player.age} anni
           </p>
+          </div>
         </div>
 
         <span className={`shrink-0 rounded-full border px-2 py-1 text-[9px] font-black uppercase ${player.decisionRequired ? "border-orange-400/40 bg-orange-400/10 text-orange-200" : canPromote ? "border-yellow-400/30 bg-yellow-400/10 text-yellow-300" : "border-white/10 bg-white/[0.03] text-zinc-500"}`}>

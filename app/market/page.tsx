@@ -116,6 +116,7 @@ export default async function MarketPage() {
               id: true,
               firstName: true,
               lastName: true,
+              age: true,
             },
           },
           bids: {
@@ -169,8 +170,10 @@ export default async function MarketPage() {
           winnerClubId: true,
           player: {
             select: {
+              id: true,
               firstName: true,
               lastName: true,
+              age: true,
               salary: true,
             },
           },
@@ -218,7 +221,8 @@ export default async function MarketPage() {
         listingId: listing.id,
         listingType,
         name: `${player.firstName} ${player.lastName}`,
-        initials: `${player.firstName.charAt(0)}${player.lastName.charAt(0)}`,
+        firstName: player.firstName,
+        lastName: player.lastName,
         nationality: player.nationality,
         age: player.age,
         overall: calculateOverall(player),
@@ -263,7 +267,11 @@ export default async function MarketPage() {
     )
     .map((player) => ({
       listingId: player.listingId,
+      playerId: player.id,
       playerName: player.name,
+      firstName: player.firstName,
+      lastName: player.lastName,
+      age: player.age,
       amount: player.userBid as number,
       salary: player.salary,
       totalCommitment:
@@ -278,6 +286,9 @@ export default async function MarketPage() {
       listingId: listing.id,
       playerId: listing.player.id,
       playerName: `${listing.player.firstName} ${listing.player.lastName}`,
+      firstName: listing.player.firstName,
+      lastName: listing.player.lastName,
+      age: listing.player.age,
       openingPrice: listing.openingPrice,
       currentPrice:
         listing.bids[0]?.amount ??
@@ -301,7 +312,11 @@ export default async function MarketPage() {
 
       return {
         listingId: listing.id,
+        playerId: listing.player.id,
         playerName: `${listing.player.firstName} ${listing.player.lastName}`,
+        firstName: listing.player.firstName,
+        lastName: listing.player.lastName,
+        age: listing.player.age,
         kind,
         finalPrice: listing.finalPrice,
         openingPrice: listing.openingPrice,

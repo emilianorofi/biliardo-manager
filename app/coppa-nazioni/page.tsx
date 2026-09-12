@@ -2,6 +2,7 @@ import { Flag, Trophy, Users } from "lucide-react";
 import Link from "next/link";
 
 import CountryFlag from "@/app/components/player/CountryFlag";
+import PlayerPortrait from "@/app/components/player/PlayerPortrait";
 import { NATIONS_CUP_GROUPS } from "@/lib/nations-cup";
 import { prisma } from "@/lib/prisma";
 
@@ -15,9 +16,9 @@ export default async function NationsCupPage() {
       entries: {
         orderBy: [{ groupCode: "asc" }, { points: "desc" }, { pointsFor: "desc" }, { seed: "asc" }],
         include: {
-          firstPlayer: { select: { id: true, firstName: true, lastName: true } },
-          secondPlayer: { select: { id: true, firstName: true, lastName: true } },
-          thirdPlayer: { select: { id: true, firstName: true, lastName: true } },
+          firstPlayer: { select: { id: true, firstName: true, lastName: true, age: true } },
+          secondPlayer: { select: { id: true, firstName: true, lastName: true, age: true } },
+          thirdPlayer: { select: { id: true, firstName: true, lastName: true, age: true } },
         },
       },
       matches: {
@@ -26,7 +27,7 @@ export default async function NationsCupPage() {
           homeEntry: true,
           awayEntry: true,
           winnerEntry: true,
-          tieBreakWinnerPlayer: { select: { firstName: true, lastName: true } },
+          tieBreakWinnerPlayer: { select: { id: true, firstName: true, lastName: true, age: true } },
         },
       },
     },
@@ -63,11 +64,14 @@ export default async function NationsCupPage() {
                     <div key={entry.id} className="grid grid-cols-[1fr_repeat(4,42px)] items-center gap-2 px-4 py-3 text-xs">
                       <div>
                         <div className="flex items-center gap-2 font-black text-white"><CountryFlag code={entry.nationCode} label={entry.nationName} className="h-4 w-6" />{entry.nationName}</div>
-                        <p className="mt-1 text-[10px] text-zinc-500">
+                        <div className="mt-2 flex flex-wrap gap-2">
                           {[entry.firstPlayer, entry.secondPlayer, entry.thirdPlayer].map((player) => (
-                            <Link key={player.id} href={`/players/${player.id}`} className="mr-2 hover:text-amber-300">{player.firstName} {player.lastName}</Link>
+                            <Link key={player.id} href={`/players/${player.id}`} className="flex items-center gap-1.5 rounded-lg bg-black/15 p-1.5 text-[10px] text-zinc-400 transition hover:text-amber-300">
+                              <PlayerPortrait player={player} className="h-14 w-11" />
+                              <span>{player.firstName} {player.lastName}</span>
+                            </Link>
                           ))}
-                        </p>
+                        </div>
                       </div>
                       <Cell label="G" value={entry.played} /><Cell label="PF" value={entry.pointsFor} /><Cell label="PS" value={entry.pointsAgainst} /><Cell label="PT" value={entry.points} strong />
                     </div>
@@ -86,7 +90,7 @@ export default async function NationsCupPage() {
                   <span className="font-bold text-white">{match.homeEntry.nationName}</span>
                   <span className="font-black text-amber-300">{match.homeScore ?? "–"} : {match.awayScore ?? "–"}</span>
                   <span className="font-bold text-white sm:text-right">{match.awayEntry.nationName}</span>
-                  {match.tieBreakWinnerPlayer ? <p className="sm:col-span-4 text-[10px] text-sky-300">Spareggio {match.tieBreakSpecialty}: {match.tieBreakWinnerPlayer.firstName} {match.tieBreakWinnerPlayer.lastName}</p> : null}
+                  {match.tieBreakWinnerPlayer ? <p className="sm:col-span-4 text-[10px] text-sky-300">Spareggio {match.tieBreakSpecialty}: <Link href={`/players/${match.tieBreakWinnerPlayer.id}`} className="font-bold hover:text-amber-200 hover:underline">{match.tieBreakWinnerPlayer.firstName} {match.tieBreakWinnerPlayer.lastName}</Link></p> : null}
                 </div>
               ))}
             </div>

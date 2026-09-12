@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import PlayerPortrait from "@/app/components/player/PlayerPortrait";
 import {
   ArrowUpRight,
   Clock3,
@@ -91,12 +92,10 @@ export default function MarketSidebar({
                 key={listing.listingId}
                 className="rounded-xl bg-zinc-800 p-2.5 text-sm"
               >
-                <Link
-                  href={`/players/${listing.playerId}?from=market`}
-                  className="font-medium text-white transition hover:text-amber-200 hover:underline hover:underline-offset-4"
-                >
-                  {listing.playerName}
-                </Link>
+                <div className="flex items-center gap-3">
+                  <Link href={`/players/${listing.playerId}?from=market`}><PlayerPortrait player={{ id: listing.playerId, firstName: listing.firstName, lastName: listing.lastName, age: listing.age }} className="h-20 w-16" /></Link>
+                  <Link href={`/players/${listing.playerId}?from=market`} className="font-medium text-white transition hover:text-amber-200 hover:underline hover:underline-offset-4">{listing.playerName}</Link>
+                </div>
 
                 <p className="mt-1 text-xs text-zinc-500">
                   Prezzo iniziale: {formatCurrency(
@@ -165,9 +164,10 @@ export default function MarketSidebar({
             >
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <p className="font-medium text-white">
-                    {bid.playerName}
-                  </p>
+                  <div className="flex items-center gap-3">
+                    <Link href={`/players/${bid.playerId}?from=market`}><PlayerPortrait player={{ id: bid.playerId, firstName: bid.firstName, lastName: bid.lastName, age: bid.age }} className="h-20 w-16" /></Link>
+                    <Link href={`/players/${bid.playerId}?from=market`} className="font-medium text-white transition hover:text-amber-200 hover:underline">{bid.playerName}</Link>
+                  </div>
                   <p className="mt-1 text-xs text-zinc-500">
                     La tua offerta: {formatCurrency(
                       bid.amount

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import PlayerPortrait from "@/app/components/player/PlayerPortrait";
 import {
   useEffect,
   useState,
@@ -342,21 +343,23 @@ export default function TrainingHistoryPage() {
                               className="border-b border-white/5 last:border-0"
                             >
                               <td className="px-4 py-2.5">
-                                <p className="font-semibold">
-                                  {
-                                    result.firstName
-                                  }{" "}
-                                  {
-                                    result.lastName
-                                  }
-                                </p>
-
-                                <p className="text-[10px] text-zinc-500">
-                                  {
-                                    result.age
-                                  }{" "}
-                                  anni
-                                </p>
+                                <div className="flex items-center gap-3">
+                                  {result.playerId ? (
+                                    <Link href={`/players/${result.playerId}`}>
+                                      <PlayerPortrait player={{ id: result.playerId, firstName: result.firstName, lastName: result.lastName, age: result.age }} className="h-20 w-16 shrink-0" />
+                                    </Link>
+                                  ) : null}
+                                  <div>
+                                    {result.playerId ? (
+                                      <Link href={`/players/${result.playerId}`} className="font-semibold transition hover:text-yellow-300 hover:underline">
+                                        {result.firstName} {result.lastName}
+                                      </Link>
+                                    ) : (
+                                      <p className="font-semibold">{result.firstName} {result.lastName}</p>
+                                    )}
+                                    <p className="text-[10px] text-zinc-500">{result.age} anni</p>
+                                  </div>
+                                </div>
                               </td>
 
                               <td className="px-3 py-2.5 text-xs text-zinc-300">

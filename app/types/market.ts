@@ -21,7 +21,8 @@ export interface MarketPlayer {
   listingType: MarketListingType;
 
   name: string;
-  initials: string;
+  firstName: string;
+  lastName: string;
   nationality: string;
   age: number;
 
@@ -53,7 +54,11 @@ export interface MarketPlayer {
 
 export interface MarketUserBid {
   listingId: number;
+  playerId: number;
   playerName: string;
+  firstName: string;
+  lastName: string;
+  age: number;
   amount: number;
   salary: number;
   totalCommitment: number;
@@ -66,6 +71,9 @@ export interface MarketUserListing {
   listingId: number;
   playerId: number;
   playerName: string;
+  firstName: string;
+  lastName: string;
+  age: number;
   openingPrice: number;
   currentPrice: number;
   bidCount: number;
@@ -75,7 +83,11 @@ export interface MarketUserListing {
 
 export interface MarketHistoryItem {
   listingId: number;
+  playerId: number;
   playerName: string;
+  firstName: string;
+  lastName: string;
+  age: number;
   kind: MarketHistoryKind;
   finalPrice: number | null;
   openingPrice: number;

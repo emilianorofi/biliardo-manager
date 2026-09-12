@@ -1,6 +1,7 @@
 import { ArrowLeft, ChevronDown, CircleDot, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import PlayerPortrait from "@/app/components/player/PlayerPortrait";
 
 import {
   buildIndividualGameClosing,
@@ -82,6 +83,7 @@ export default async function IndividualMatchDetailPage({
           id: true,
           firstName: true,
           lastName: true,
+          age: true,
           precisione: true,
           diretto: true,
           sponde: true,
@@ -101,6 +103,7 @@ export default async function IndividualMatchDetailPage({
           id: true,
           firstName: true,
           lastName: true,
+          age: true,
           precisione: true,
           diretto: true,
           sponde: true,
@@ -158,6 +161,9 @@ export default async function IndividualMatchDetailPage({
                 {match.tournament.season.name} · {formatStage(match.stage)}
               </p>
               <h1 className="mt-2 flex flex-wrap items-baseline gap-x-2 gap-y-1 text-2xl font-black text-white sm:text-3xl">
+                <Link href={`/players/${playerOne.id}?${playerReturnQuery}`} className="self-center">
+                  <PlayerPortrait player={playerOne} className="h-24 w-20" />
+                </Link>
                 <Link
                   href={`/players/${playerOne.id}?${playerReturnQuery}`}
                   className="transition hover:text-amber-200"
@@ -167,6 +173,9 @@ export default async function IndividualMatchDetailPage({
                 <span className="text-base font-bold text-zinc-500">
                   contro
                 </span>
+                <Link href={`/players/${playerTwo.id}?${playerReturnQuery}`} className="self-center">
+                  <PlayerPortrait player={playerTwo} className="h-24 w-20" />
+                </Link>
                 <Link
                   href={`/players/${playerTwo.id}?${playerReturnQuery}`}
                   className="transition hover:text-amber-200"

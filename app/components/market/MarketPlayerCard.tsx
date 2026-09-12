@@ -19,6 +19,7 @@ import type {
 import { getMinimumBid } from "@/lib/market-rules";
 import FreeAgentCountdown from "./FreeAgentCountdown";
 import OverallBadge from "../ui/OverallBadge";
+import PlayerPortrait from "../player/PlayerPortrait";
 
 interface MarketPlayerCardProps {
   player: MarketPlayer;
@@ -230,9 +231,9 @@ export default function MarketPlayerCard({
           <Link
             href={`/players/${player.id}?from=market`}
             aria-label={`Apri la scheda di ${player.name}`}
-            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-zinc-700 bg-zinc-800 text-sm font-black text-green-300 transition duration-200 hover:scale-105 hover:border-green-500 hover:bg-zinc-700"
+            className="block shrink-0 transition duration-200 hover:scale-[1.03]"
           >
-            {player.initials}
+            <PlayerPortrait player={player} className="h-24 w-20" />
           </Link>
 
           <div className="min-w-0">
