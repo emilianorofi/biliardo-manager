@@ -761,7 +761,7 @@ export default function TrainingPage() {
                         <td className="px-4 py-2.5">
                           <div className="flex items-center gap-3">
                             <Link href={`/players/${player.id}`} aria-label={`Apri la scheda di ${player.firstName} ${player.lastName}`}>
-                              <PlayerPortrait player={player} className="aspect-[4/5] w-16 shrink-0" />
+                              <PlayerPortrait player={player} className="aspect-[2/3] w-16 shrink-0" />
                             </Link>
                             <div>
                               <Link href={`/players/${player.id}`} className="text-sm font-semibold text-white transition hover:text-yellow-300 hover:underline">

@@ -95,7 +95,7 @@ export default function MarketHistory({
             >
               <div className="flex items-start gap-3">
                 <Link href={`/players/${item.playerId}?from=market`}>
-                  <PlayerPortrait player={{ id: item.playerId, firstName: item.firstName, lastName: item.lastName, nationality: item.nationality, age: item.age }} className="aspect-[4/5] w-20 shrink-0" />
+                  <PlayerPortrait player={{ id: item.playerId, firstName: item.firstName, lastName: item.lastName, nationality: item.nationality, age: item.age }} className="aspect-[2/3] w-20 shrink-0" />
                 </Link>
 
                 <div>

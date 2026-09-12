@@ -311,7 +311,7 @@ const player: Player = {
           <div className="flex min-w-0 items-center gap-3">
             <PlayerPortrait
               player={player}
-              className="aspect-[4/5] w-28 shrink-0 sm:w-32"
+              className="aspect-[2/3] w-28 shrink-0 sm:w-32"
             />
 
             <div className="min-w-0">

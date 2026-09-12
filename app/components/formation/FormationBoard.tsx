@@ -743,7 +743,7 @@ function MatchCard({
             <div className="flex flex-wrap gap-3">
               {validPlayers.map((player) => (
                 <Link key={player.id} href={`/players/${player.id}`} className="flex items-center gap-2 font-bold text-white transition hover:text-amber-200 hover:underline">
-                  <PlayerPortrait player={player} className="aspect-[4/5] w-12" />
+                  <PlayerPortrait player={player} className="aspect-[2/3] w-12" />
                   <span>{player.firstName} {player.lastName}</span>
                 </Link>
               ))}

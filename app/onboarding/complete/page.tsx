@@ -186,7 +186,7 @@ export default async function ClubCreatedPage() {
               >
                 <div className="flex items-start justify-between gap-3">
                   <Link href={`/players/${player.id}`} aria-label={`Apri la scheda di ${player.firstName} ${player.lastName}`}>
-                    <PlayerPortrait player={player} className="aspect-[4/5] w-20" />
+                    <PlayerPortrait player={player} className="aspect-[2/3] w-20" />
                   </Link>
                   <span className="flex h-10 w-10 items-center justify-center rounded-xl border border-amber-400/25 bg-amber-400/10 font-black text-amber-300">
                     {player.overall}

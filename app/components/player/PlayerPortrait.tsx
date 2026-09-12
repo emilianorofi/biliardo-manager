@@ -36,9 +36,9 @@ export default function PlayerPortrait({
         backgroundSize: "400% auto",
         backgroundPositionX: `${column * (100 / 3)}%`,
         // Ogni sorgente contiene due righe di quattro ritratti alti.
-        // Il 72,75% porta l'inizio della seconda riga nel riquadro 4:5,
+        // L'80% porta l'inizio della seconda riga nel riquadro 2:3,
         // evitando di tagliare fronte e capelli nelle età più avanzate.
-        backgroundPositionY: row === 0 ? "0%" : "72.75%",
+        backgroundPositionY: row === 0 ? "0%" : "80%",
       }}
     />
   );

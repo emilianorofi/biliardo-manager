@@ -347,7 +347,7 @@ export default function TrainingHistoryPage() {
                                 <div className="flex items-center gap-3">
                                   {result.playerId ? (
                                     <Link href={`/players/${result.playerId}`}>
-                                      <PlayerPortrait player={{ id: result.playerId, firstName: result.firstName, lastName: result.lastName, nationality: result.nationality, age: result.age }} className="aspect-[4/5] w-16 shrink-0" />
+                                      <PlayerPortrait player={{ id: result.playerId, firstName: result.firstName, lastName: result.lastName, nationality: result.nationality, age: result.age }} className="aspect-[2/3] w-16 shrink-0" />
                                     </Link>
                                   ) : null}
                                   <div>

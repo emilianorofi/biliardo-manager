@@ -357,7 +357,7 @@ function RosterPlayerCard({
         }}
       />
 
-      <PlayerPortrait player={player} className="aspect-[4/5] w-16 shrink-0" />
+      <PlayerPortrait player={player} className="aspect-[2/3] w-16 shrink-0" />
 
       <div className="min-w-0 flex-1">
         <p className="truncate text-sm font-black text-white transition group-hover:text-amber-200">

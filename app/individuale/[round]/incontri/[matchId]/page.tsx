@@ -164,7 +164,7 @@ export default async function IndividualMatchDetailPage({
               </p>
               <h1 className="mt-2 flex flex-wrap items-baseline gap-x-2 gap-y-1 text-2xl font-black text-white sm:text-3xl">
                 <Link href={`/players/${playerOne.id}?${playerReturnQuery}`} className="self-center">
-                  <PlayerPortrait player={playerOne} className="aspect-[4/5] w-20" />
+                  <PlayerPortrait player={playerOne} className="aspect-[2/3] w-20" />
                 </Link>
                 <Link
                   href={`/players/${playerOne.id}?${playerReturnQuery}`}
@@ -176,7 +176,7 @@ export default async function IndividualMatchDetailPage({
                   contro
                 </span>
                 <Link href={`/players/${playerTwo.id}?${playerReturnQuery}`} className="self-center">
-                  <PlayerPortrait player={playerTwo} className="aspect-[4/5] w-20" />
+                  <PlayerPortrait player={playerTwo} className="aspect-[2/3] w-20" />
                 </Link>
                 <Link
                   href={`/players/${playerTwo.id}?${playerReturnQuery}`}

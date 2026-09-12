@@ -233,7 +233,7 @@ export default function MarketPlayerCard({
             aria-label={`Apri la scheda di ${player.name}`}
             className="block shrink-0 transition duration-200 hover:scale-[1.03]"
           >
-            <PlayerPortrait player={player} className="aspect-[4/5] w-20" />
+            <PlayerPortrait player={player} className="aspect-[2/3] w-20" />
           </Link>
 
           <div className="min-w-0">
