@@ -7,7 +7,6 @@ import type { Prisma } from "@/generated/prisma/client";
 import type { ClubOnboardingActionState } from "@/app/onboarding/action-state";
 import { getNextAcademyScoutingAt } from "@/lib/academy-scouting";
 import { getAuthenticatedUser } from "@/lib/auth";
-import { getFreeAgentDeadline } from "@/lib/market-rules";
 import {
   CLUB_CITY_MAX_LENGTH,
   CLUB_CITY_MIN_LENGTH,
@@ -306,21 +305,6 @@ async function replaceAiClub({
     },
   });
 
-  if (previousPlayerIds.length > 0) {
-    await transaction.transferListing.updateMany({
-      where: {
-        playerId: {
-          in: previousPlayerIds,
-        },
-        status: "ACTIVE",
-      },
-      data: {
-        status: "CANCELLED",
-        completedAt: now,
-      },
-    });
-  }
-
   await transaction.transferListing.updateMany({
     where: {
       sellerClubId: clubId,
@@ -338,28 +322,36 @@ async function replaceAiClub({
     },
   });
 
-  await transaction.player.updateMany({
-    where: {
-      clubId,
-    },
-    data: {
-      clubId: null,
-    },
-  });
-
   if (previousPlayerIds.length > 0) {
-    await transaction.transferListing.createMany({
-      data: previousPlayerIds.map((playerId) => ({
-        playerId,
-        sellerClubId: null,
-        winnerClubId: null,
-        listingType: "FREE_AGENT",
-        status: "ACTIVE",
-        openingPrice: 0,
-        startsAt: now,
-        endsAt: getFreeAgentDeadline(now),
-      })),
+    await transaction.transferListing.deleteMany({
+      where: {
+        playerId: {
+          in: previousPlayerIds,
+        },
+      },
     });
+    await transaction.individualTournamentEntry.deleteMany({
+      where: {
+        playerId: {
+          in: previousPlayerIds,
+        },
+      },
+    });
+
+    const deletedPlayers = await transaction.player.deleteMany({
+      where: {
+        clubId,
+        id: {
+          in: previousPlayerIds,
+        },
+      },
+    });
+
+    if (deletedPlayers.count !== previousPlayerIds.length) {
+      throw new ClubCreationError(
+        "La rosa precedente è cambiata durante l'assegnazione del club. Riprova."
+      );
+    }
   }
 
   await transaction.club.update({
