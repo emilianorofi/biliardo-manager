@@ -209,12 +209,6 @@ async function findNextDueEvent(
         scheduledAt: {
           lte: now,
         },
-        playerOneId: {
-          not: null,
-        },
-        playerTwoId: {
-          not: null,
-        },
         tournament: {
           status: {
             in: ["DRAWN", "IN_PROGRESS"],

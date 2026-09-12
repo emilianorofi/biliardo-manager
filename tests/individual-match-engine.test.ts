@@ -3,6 +3,8 @@ import test from "node:test";
 
 import {
   calculateIndividualGameScore,
+  getIndividualTournamentWalkover,
+  planIndividualTournamentRosterReplacements,
   rankIndividualTournamentPlayers,
   shuffleIndividualDraw,
   simulateIndividualBestOfThree,
@@ -33,6 +35,53 @@ test("qualifica esattamente i primi 256 giocatori per overall", () => {
   assert.equal(qualified[0].player.id, 260);
   assert.equal(qualified[0].ranking, 1);
   assert.equal(qualified[255].player.id, 5);
+});
+
+test("aggiorna il tabellone non iniziato con il nuovo ranking", () => {
+  const qualified = rankIndividualTournamentPlayers([
+    createPlayer(4, 90),
+    createPlayer(3, 80),
+    createPlayer(1, 70),
+  ]);
+  const replacements =
+    planIndividualTournamentRosterReplacements(
+      [
+        { id: 11, playerId: 1, drawPosition: 8 },
+        { id: 12, playerId: 2, drawPosition: 3 },
+        { id: 13, playerId: 3, drawPosition: 5 },
+      ],
+      qualified
+    );
+
+  assert.deepEqual(replacements, [
+    {
+      entryId: 12,
+      drawPosition: 3,
+      previousPlayerId: 2,
+      replacementPlayerId: 4,
+      rankingAtDraw: 1,
+      overallAtDraw: 90,
+    },
+  ]);
+});
+
+test("assegna il passaggio del turno quando un posto resta vuoto", () => {
+  assert.equal(getIndividualTournamentWalkover(1, 2), null);
+  assert.deepEqual(getIndividualTournamentWalkover(1, null), {
+    winnerPlayerId: 1,
+    playerOneWins: 2,
+    playerTwoWins: 0,
+  });
+  assert.deepEqual(getIndividualTournamentWalkover(null, 2), {
+    winnerPlayerId: 2,
+    playerOneWins: 0,
+    playerTwoWins: 2,
+  });
+  assert.deepEqual(getIndividualTournamentWalkover(null, null), {
+    winnerPlayerId: null,
+    playerOneWins: 0,
+    playerTwoWins: 0,
+  });
 });
 
 test("il sorteggio cambia l'ordine senza perdere partecipanti", () => {

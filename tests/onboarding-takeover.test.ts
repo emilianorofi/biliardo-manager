@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import test from "node:test";
 
-test("elimina la vecchia rosa quando un utente prende un club IA", () => {
+test("rimuove la vecchia rosa conservandone lo storico", () => {
   const source = readFileSync(
     path.join(process.cwd(), "app", "onboarding", "actions.ts"),
     "utf8"
@@ -14,8 +14,11 @@ test("elimina la vecchia rosa quando un utente prende un club IA", () => {
   );
 
   assert.match(takeover, /transferListing\.deleteMany/);
-  assert.match(takeover, /individualTournamentEntry\.deleteMany/);
-  assert.match(takeover, /player\.deleteMany/);
-  assert.doesNotMatch(takeover, /player\.updateMany/);
+  assert.match(takeover, /player\.updateMany/);
+  assert.match(takeover, /careerStatus:\s*"REMOVED"/);
+  assert.match(takeover, /status:\s*"WITHDRAWN"/);
+  assert.match(takeover, /planIndividualTournamentRosterReplacements/);
+  assert.doesNotMatch(takeover, /individualTournamentEntry\.deleteMany/);
+  assert.doesNotMatch(takeover, /player\.deleteMany/);
   assert.doesNotMatch(takeover, /listingType:\s*"FREE_AGENT"/);
 });
