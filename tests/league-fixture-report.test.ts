@@ -76,9 +76,35 @@ test("racconta le sei prove con i nomi dei giocatori e il verdetto finale", () =
   assert.match(story.passages[0].text, /Casa1 Test/);
   assert.match(story.passages[0].text, /Ospite1 Test/);
   assert.match(story.passages[0].text, /80–62/);
-  assert.match(story.closing, /Club Casa e Club Ospite/);
+  assert.match(story.passages[0].text, /La serata si apre/);
+  assert.doesNotMatch(story.passages[0].text, /contro .*Vittoria/);
+  assert.match(story.passages[1].title, /rimettono tutto in equilibrio/);
+  assert.match(story.passages[5].title, /salvano il pareggio/);
+  assert.match(story.closing, /Club Casa/);
+  assert.match(story.closing, /Club Ospite/);
   assert.match(story.closing, /3–3/);
-  assert.match(story.closing, /firmano l'ultimo punto/);
+  assert.match(story.closing, /rimasta viva fino all'ultimo tavolo/);
+
+  const consolationWinners = ["HOME", "HOME", "HOME", "AWAY", "HOME", "AWAY"];
+  const consolationStory = buildFixtureStory({
+    homeName: "Club Casa",
+    awayName: "Club Ospite",
+    homeScore: 4,
+    awayScore: 2,
+    games: games.map((game, index) => ({
+      ...game,
+      winnerSide: consolationWinners[index],
+      homePoints: consolationWinners[index] === "HOME" ? 80 : 62,
+      awayPoints: consolationWinners[index] === "AWAY" ? 80 : 62,
+    })),
+  });
+
+  assert.match(consolationStory.passages[5].title, /firmano l'ultimo punto/);
+  assert.match(
+    consolationStory.passages[5].text,
+    /lascia l'incontro a Club Casa/
+  );
+  assert.match(consolationStory.closing, /prova 5/);
 });
 
 function createStoryPerformance(side: string, firstName: string, lastName: string) {
