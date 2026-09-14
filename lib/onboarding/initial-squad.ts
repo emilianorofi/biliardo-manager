@@ -1,38 +1,4 @@
-const FIRST_NAMES = [
-  "Alessandro",
-  "Andrea",
-  "Davide",
-  "Fabio",
-  "Francesco",
-  "Gabriele",
-  "Lorenzo",
-  "Luca",
-  "Marco",
-  "Matteo",
-  "Nicola",
-  "Paolo",
-  "Riccardo",
-  "Roberto",
-  "Simone",
-] as const;
-
-const LAST_NAMES = [
-  "Barbieri",
-  "Benedetti",
-  "Bianchi",
-  "Conti",
-  "De Luca",
-  "Ferrari",
-  "Fontana",
-  "Galli",
-  "Marchetti",
-  "Moretti",
-  "Ricci",
-  "Rinaldi",
-  "Romano",
-  "Serra",
-  "Villa",
-] as const;
+import { getGeneratedPlayerName } from "@/lib/player-names";
 
 const STYLES = [
   "Regolare",
@@ -43,17 +9,7 @@ const STYLES = [
   "Offensivo",
 ] as const;
 
-const ATTRIBUTE_DEVIATIONS = [
-  -4,
-  -3,
-  -2,
-  -1,
-  0,
-  1,
-  2,
-  3,
-  4,
-] as const;
+const ATTRIBUTE_DEVIATIONS = [-4, -3, -2, -1, 0, 1, 2, 3, 4] as const;
 
 type PlayerProfile = {
   age: [number, number];
@@ -63,59 +19,30 @@ type PlayerProfile = {
 };
 
 const INITIAL_PROFILES: PlayerProfile[] = [
-  {
-    age: [35, 45],
-    overall: 64,
-    experience: [45, 63],
-    talent: [62, 68],
-  },
-  {
-    age: [35, 45],
-    overall: 65,
-    experience: [48, 66],
-    talent: [63, 69],
-  },
-  {
-    age: [35, 45],
-    overall: 66,
-    experience: [50, 68],
-    talent: [64, 70],
-  },
-  {
-    age: [55, 65],
-    overall: 62,
-    experience: [76, 90],
-    talent: [59, 64],
-  },
-  {
-    age: [20, 25],
-    overall: 60,
-    experience: [12, 28],
-    talent: [72, 80],
-  },
+  { age: [35, 45], overall: 64, experience: [45, 63], talent: [62, 68] },
+  { age: [35, 45], overall: 65, experience: [48, 66], talent: [63, 69] },
+  { age: [35, 45], overall: 66, experience: [50, 68], talent: [64, 70] },
+  { age: [55, 65], overall: 62, experience: [76, 90], talent: [59, 64] },
+  { age: [20, 25], overall: 60, experience: [12, 28], talent: [72, 80] },
 ];
 
-export type InitialPlayer = ReturnType<
-  typeof createInitialPlayer
->;
+export type InitialPlayer = ReturnType<typeof createInitialPlayer>;
 
 export function createInitialSquad(leagueLevel = 1) {
-  const firstNames = shuffle([...FIRST_NAMES]);
-  const lastNames = shuffle([...LAST_NAMES]);
-  const levelPenalty =
-    Math.max(1, Math.min(4, leagueLevel)) - 1;
+  const levelPenalty = Math.max(1, Math.min(4, leagueLevel)) - 1;
+  const nameSequence = randomInteger(0, 100000);
 
-  return INITIAL_PROFILES.map((profile, index) =>
-    createInitialPlayer(
+  return INITIAL_PROFILES.map((profile, index) => {
+    const name = getGeneratedPlayerName("🇮🇹", nameSequence + index);
+    return createInitialPlayer(
       {
         ...profile,
-        overall:
-          profile.overall - levelPenalty * 3,
+        overall: profile.overall - levelPenalty * 3,
       },
-      firstNames[index],
-      lastNames[index]
-    )
-  );
+      name.firstName,
+      name.lastName
+    );
+  });
 }
 
 function createInitialPlayer(
@@ -123,9 +50,9 @@ function createInitialPlayer(
   firstName: string,
   lastName: string
 ) {
-  const attributes = shuffle([
-    ...ATTRIBUTE_DEVIATIONS,
-  ]).map((deviation) => profile.overall + deviation);
+  const attributes = shuffle([...ATTRIBUTE_DEVIATIONS]).map(
+    (deviation) => profile.overall + deviation
+  );
 
   return {
     firstName,
@@ -137,10 +64,7 @@ function createInitialPlayer(
     experience: randomInteger(...profile.experience),
     talent: randomInteger(...profile.talent),
     value: Math.pow(profile.overall - 50, 2) * 100,
-    salary: Math.max(
-      350,
-      (profile.overall - 50) * 40
-    ),
+    salary: Math.max(350, (profile.overall - 50) * 40),
     image: "",
     style: [STYLES[randomInteger(0, STYLES.length - 1)]],
     precisione: attributes[0],
@@ -156,18 +80,13 @@ function createInitialPlayer(
 }
 
 function randomInteger(minimum: number, maximum: number) {
-  return Math.floor(
-    Math.random() * (maximum - minimum + 1) + minimum
-  );
+  return Math.floor(Math.random() * (maximum - minimum + 1) + minimum);
 }
 
 function shuffle<T>(values: T[]) {
   for (let index = values.length - 1; index > 0; index -= 1) {
     const randomIndex = randomInteger(0, index);
-    [values[index], values[randomIndex]] = [
-      values[randomIndex],
-      values[index],
-    ];
+    [values[index], values[randomIndex]] = [values[randomIndex], values[index]];
   }
 
   return values;
