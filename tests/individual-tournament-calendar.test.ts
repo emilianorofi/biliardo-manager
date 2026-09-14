@@ -5,7 +5,7 @@ import {
   buildIndividualTournamentCalendar,
   INDIVIDUAL_TOURNAMENT_DEFINITIONS,
 } from "../lib/individual-tournament-calendar";
-import { getRomeParts } from "../lib/rome-calendar";
+import { addRomeWeeks, getRomeParts } from "../lib/rome-calendar";
 
 test("rimuove l'Europeo e sposta il Mondiale alla giornata quindici", () => {
   assert.deepEqual(
@@ -64,4 +64,26 @@ test("programma sorteggio e turni nel fine settimana anche al cambio dell'ora", 
       { label: "Finale", day: 25, hour: 16 },
     ]
   );
+});
+
+test("calcola la settimana quindici dopo le quattordici giornate di campionato", () => {
+  const firstLeagueFriday = new Date("2026-09-18T19:00:00.000Z");
+  const roundDates = new Map(
+    Array.from({ length: 14 }, (_, index) => [
+      index + 1,
+      addRomeWeeks(firstLeagueFriday, index),
+    ])
+  );
+  const calendar = buildIndividualTournamentCalendar(roundDates);
+  const worldChampionship = calendar.at(-1)!;
+
+  assert.equal(worldChampionship.leagueRound, 15);
+  assert.deepEqual(getRomeParts(worldChampionship.leagueDate), {
+    year: 2026,
+    month: 12,
+    day: 25,
+    hour: 21,
+    minute: 0,
+    second: 0,
+  });
 });

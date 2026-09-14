@@ -15,6 +15,7 @@ import {
   GraduationCap,
   Target,
   Flag,
+  CalendarDays,
   Settings,
 } from "lucide-react";
 
@@ -53,6 +54,11 @@ const menu = [
     label: "Coppa Nazioni",
     href: "/coppa-nazioni",
     icon: Flag,
+  },
+  {
+    label: "Calendario",
+    href: "/calendario",
+    icon: CalendarDays,
   },
   {
     label: "Ranking",

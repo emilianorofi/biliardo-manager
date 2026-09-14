@@ -1,4 +1,4 @@
-import { addRomeDaysAtTime } from "@/lib/rome-calendar";
+import { addRomeDaysAtTime, addRomeWeeks } from "@/lib/rome-calendar";
 
 export type IndividualTournamentType =
   | "ITALIANA"
@@ -82,7 +82,10 @@ export function buildIndividualTournamentCalendar(
   roundDates: ReadonlyMap<number, Date>
 ) {
   return INDIVIDUAL_TOURNAMENT_DEFINITIONS.map((definition) => {
-    const leagueDate = roundDates.get(definition.leagueRound);
+    const leagueDate = getSeasonWeekDate(
+      roundDates,
+      definition.leagueRound
+    );
 
     if (!leagueDate) {
       throw new Error(
@@ -108,6 +111,45 @@ export function buildIndividualTournamentCalendar(
       stages,
     };
   });
+}
+
+/**
+ * The league has fourteen playing rounds, while the season has a fifteenth
+ * closing week reserved for the World Championship. Derive dates for season
+ * weeks without a league fixture from the closest known Friday instead of
+ * treating them as missing league rounds.
+ */
+export function getSeasonWeekDate(
+  roundDates: ReadonlyMap<number, Date>,
+  week: number
+) {
+  const exactDate = roundDates.get(week);
+
+  if (exactDate) return exactDate;
+
+  const closestPreviousWeek = [...roundDates.keys()]
+    .filter((candidate) => candidate < week)
+    .sort((left, right) => right - left)[0];
+
+  if (closestPreviousWeek !== undefined) {
+    return addRomeWeeks(
+      roundDates.get(closestPreviousWeek)!,
+      week - closestPreviousWeek
+    );
+  }
+
+  const closestNextWeek = [...roundDates.keys()]
+    .filter((candidate) => candidate > week)
+    .sort((left, right) => left - right)[0];
+
+  if (closestNextWeek !== undefined) {
+    return addRomeWeeks(
+      roundDates.get(closestNextWeek)!,
+      week - closestNextWeek
+    );
+  }
+
+  return null;
 }
 
 function createSpecialtyTournament(
