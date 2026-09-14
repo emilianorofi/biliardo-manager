@@ -1,3 +1,4 @@
+import { getGeneratedPlayerName } from "@/lib/player-names";
 import type { WorldLeagueLevel } from "@/lib/world-structure";
 import {
   TOTAL_WORLD_CLUBS,
@@ -5,126 +6,36 @@ import {
 } from "@/lib/world-structure";
 
 const CLUB_THEMES = [
-  {
-    city: "Torino",
-    names: ["Mole Granata", "Cavalieri Sabaudi", "Draghi del Po", "Reale Torino"],
-  },
-  {
-    city: "Milano",
-    names: ["Navigli Milano", "Ambrosiana Stecca", "Visconti Milano", "Duomo d'Oro"],
-  },
-  {
-    city: "Bergamo",
-    names: ["Orobici Bergamo", "Mura Venete", "Falchi Bergamaschi", "Città Alta"],
-  },
-  {
-    city: "Brescia",
-    names: ["Leonessa Brescia", "Mille Miglia", "Rondinelle d'Oro", "Capitolium"],
-  },
-  {
-    city: "Verona",
-    names: ["Arena Verona", "Scaligeri", "Draghi dell'Adige", "Mastini Veronesi"],
-  },
-  {
-    city: "Padova",
-    names: ["Santo Padova", "Carraresi", "Prato della Valle", "Antenore"],
-  },
-  {
-    city: "Bologna",
-    names: ["Due Torri", "Petroniana", "Nettuno Bologna", "Felsinea"],
-  },
-  {
-    city: "Parma",
-    names: ["Ducale Parma", "Crociati", "Farnese", "Leoni Gialloblù"],
-  },
-  {
-    city: "Modena",
-    names: ["Ghirlandina", "Estense Modena", "Canarini", "Via Emilia"],
-  },
-  {
-    city: "Genova",
-    names: ["Lanterna Genova", "Dogi Liguri", "Grifoni", "La Superba"],
-  },
-  {
-    city: "Firenze",
-    names: ["Giglio Firenze", "Medicea", "Signori dell'Arno", "Rinascimento"],
-  },
-  {
-    city: "Prato",
-    names: ["Cavalieri Prato", "Draghi del Bisenzio", "Arte Tessile", "Etrusca Prato"],
-  },
-  {
-    city: "Pisa",
-    names: ["Torre Pendente", "Repubblica Marinara", "Lungarno", "Campo dei Miracoli"],
-  },
-  {
-    city: "Livorno",
-    names: ["Quattro Mori", "Labronica", "Fortezza Livorno", "Corsari del Tirreno"],
-  },
-  {
-    city: "Roma",
-    names: ["Lupa Capitolina", "Cesari Roma", "Gladiatori", "Trastevere"],
-  },
-  {
-    city: "Viterbo",
-    names: ["Tuscia", "Città dei Papi", "Falchi Cimini", "Etruria Viterbo"],
-  },
-  {
-    city: "Perugia",
-    names: ["Grifo Perugia", "Augusta", "Signori del Trasimeno", "Etrusca Perugia"],
-  },
-  {
-    city: "Ancona",
-    names: ["Dorica", "Falchi del Conero", "Adriatica Ancona", "Mole Vanvitelliana"],
-  },
-  {
-    city: "Pescara",
-    names: ["Delfini Pescara", "Adriatico", "D'Annunzio", "Lupi del Gran Sasso"],
-  },
-  {
-    city: "Napoli",
-    names: ["Vesuvio", "Partenope", "Maschio Angioino", "Golfo d'Oro"],
-  },
-  {
-    city: "Caserta",
-    names: ["Reggia Caserta", "Borbonica", "Volturno", "Campania Felix"],
-  },
-  {
-    city: "Bari",
-    names: ["Levante Bari", "San Nicola", "Petruzzelli", "Leoni della Muraglia"],
-  },
-  {
-    city: "Lecce",
-    names: ["Barocco Lecce", "Lupi del Salento", "Messapi", "Porta Napoli"],
-  },
-  {
-    city: "Cosenza",
-    names: ["Bruzi Cosenza", "Lupi della Sila", "Draghi del Crati", "Consentia"],
-  },
-  {
-    city: "Reggio Calabria",
-    names: ["Bronzi dello Stretto", "Magna Grecia", "Fata Morgana", "Reghion"],
-  },
-  {
-    city: "Palermo",
-    names: ["Aquile Palermo", "Conca d'Oro", "Normanna", "Monte Pellegrino"],
-  },
-  {
-    city: "Catania",
-    names: ["Etna Catania", "Elefanti Etnei", "Liotru", "Ciclopi di Aci"],
-  },
-  {
-    city: "Cagliari",
-    names: ["Fenicotteri", "Castello Cagliari", "Golfo degli Angeli", "Nuragici"],
-  },
-  {
-    city: "Sassari",
-    names: ["Torres Sassari", "Logudoro", "Monte d'Accoddi", "Turritana"],
-  },
-  {
-    city: "Olbia",
-    names: ["Gallura", "Tavolara", "Costa Smeralda", "Guerrieri Nuragici"],
-  },
+  { city: "Torino", names: ["Mole Granata", "Cavalieri Sabaudi", "Draghi del Po", "Reale Torino"] },
+  { city: "Milano", names: ["Navigli Milano", "Ambrosiana Stecca", "Visconti Milano", "Duomo d'Oro"] },
+  { city: "Bergamo", names: ["Orobici Bergamo", "Mura Venete", "Falchi Bergamaschi", "Città Alta"] },
+  { city: "Brescia", names: ["Leonessa Brescia", "Mille Miglia", "Rondinelle d'Oro", "Capitolium"] },
+  { city: "Verona", names: ["Arena Verona", "Scaligeri", "Draghi dell'Adige", "Mastini Veronesi"] },
+  { city: "Padova", names: ["Santo Padova", "Carraresi", "Prato della Valle", "Antenore"] },
+  { city: "Bologna", names: ["Due Torri", "Petroniana", "Nettuno Bologna", "Felsinea"] },
+  { city: "Parma", names: ["Ducale Parma", "Crociati", "Farnese", "Leoni Gialloblù"] },
+  { city: "Modena", names: ["Ghirlandina", "Estense Modena", "Canarini", "Via Emilia"] },
+  { city: "Genova", names: ["Lanterna Genova", "Dogi Liguri", "Grifoni", "La Superba"] },
+  { city: "Firenze", names: ["Giglio Firenze", "Medicea", "Signori dell'Arno", "Rinascimento"] },
+  { city: "Prato", names: ["Cavalieri Prato", "Draghi del Bisenzio", "Arte Tessile", "Etrusca Prato"] },
+  { city: "Pisa", names: ["Torre Pendente", "Repubblica Marinara", "Lungarno", "Campo dei Miracoli"] },
+  { city: "Livorno", names: ["Quattro Mori", "Labronica", "Fortezza Livorno", "Corsari del Tirreno"] },
+  { city: "Roma", names: ["Lupa Capitolina", "Cesari Roma", "Gladiatori", "Trastevere"] },
+  { city: "Viterbo", names: ["Tuscia", "Città dei Papi", "Falchi Cimini", "Etruria Viterbo"] },
+  { city: "Perugia", names: ["Grifo Perugia", "Augusta", "Signori del Trasimeno", "Etrusca Perugia"] },
+  { city: "Ancona", names: ["Dorica", "Falchi del Conero", "Adriatica Ancona", "Mole Vanvitelliana"] },
+  { city: "Pescara", names: ["Delfini Pescara", "Adriatico", "D'Annunzio", "Lupi del Gran Sasso"] },
+  { city: "Napoli", names: ["Vesuvio", "Partenope", "Maschio Angioino", "Golfo d'Oro"] },
+  { city: "Caserta", names: ["Reggia Caserta", "Borbonica", "Volturno", "Campania Felix"] },
+  { city: "Bari", names: ["Levante Bari", "San Nicola", "Petruzzelli", "Leoni della Muraglia"] },
+  { city: "Lecce", names: ["Barocco Lecce", "Lupi del Salento", "Messapi", "Porta Napoli"] },
+  { city: "Cosenza", names: ["Bruzi Cosenza", "Lupi della Sila", "Draghi del Crati", "Consentia"] },
+  { city: "Reggio Calabria", names: ["Bronzi dello Stretto", "Magna Grecia", "Fata Morgana", "Reghion"] },
+  { city: "Palermo", names: ["Aquile Palermo", "Conca d'Oro", "Normanna", "Monte Pellegrino"] },
+  { city: "Catania", names: ["Etna Catania", "Elefanti Etnei", "Liotru", "Ciclopi di Aci"] },
+  { city: "Cagliari", names: ["Fenicotteri", "Castello Cagliari", "Golfo degli Angeli", "Nuragici"] },
+  { city: "Sassari", names: ["Torres Sassari", "Logudoro", "Monte d'Accoddi", "Turritana"] },
+  { city: "Olbia", names: ["Gallura", "Tavolara", "Costa Smeralda", "Guerrieri Nuragici"] },
 ] as const;
 
 const CLUB_COLORS = [
@@ -134,103 +45,16 @@ const CLUB_COLORS = [
   ["#3F3F46", "#22C55E"],
 ] as const;
 
-const STYLES = [
-  "Regolare",
-  "Tecnico",
-  "Tattico",
-  "Creativo",
-  "Difensivo",
-  "Offensivo",
-] as const;
+const STYLES = ["Regolare", "Tecnico", "Tattico", "Creativo", "Difensivo", "Offensivo"] as const;
 
-const LEVEL_OVERALLS: Record<
-  WorldLeagueLevel,
-  readonly number[]
-> = {
+const LEVEL_OVERALLS: Record<WorldLeagueLevel, readonly number[]> = {
   1: [66, 65, 64, 62, 60],
   2: [63, 62, 61, 59, 57],
   3: [60, 59, 58, 56, 54],
   4: [57, 56, 55, 53, 51],
 };
 
-type NamePool = {
-  firstNames: readonly string[];
-  lastNames: readonly string[];
-};
-
-const NAME_POOLS: Record<string, NamePool> = {
-  "🇮🇹": {
-    firstNames: [
-      "Alessandro", "Andrea", "Antonio", "Carlo", "Claudio",
-      "Daniele", "Davide", "Enrico", "Fabio", "Federico",
-      "Francesco", "Gabriele", "Giovanni", "Lorenzo", "Luca",
-      "Marco", "Matteo", "Michele", "Nicola", "Paolo",
-    ],
-    lastNames: [
-      "Barbieri", "Benedetti", "Bianchi", "Colombo", "Conti",
-      "Costa", "De Luca", "Ferrari", "Fontana", "Galli",
-      "Greco", "Marchetti", "Marino", "Moretti", "Ricci",
-      "Rinaldi", "Romano", "Rossi", "Serra", "Villa",
-    ],
-  },
-  "🇦🇷": {
-    firstNames: [
-      "Alejandro", "Carlos", "Diego", "Emiliano", "Federico",
-      "Gonzalo", "Guillermo", "Javier", "Juan", "Lautaro",
-    ],
-    lastNames: [
-      "Acosta", "Alvarez", "Benitez", "Cabrera", "Diaz",
-      "Fernandez", "Garcia", "Gimenez", "Gomez", "Lopez",
-      "Martinez", "Pereyra", "Romero",
-    ],
-  },
-  "🇩🇪": {
-    firstNames: [
-      "Christian", "Felix", "Florian", "Jan", "Lukas", "Max", "Tobias",
-    ],
-    lastNames: [
-      "Bauer", "Becker", "Fischer", "Hoffmann", "Klein", "Schneider",
-    ],
-  },
-  "🇺🇾": {
-    firstNames: ["Alejandro", "Diego", "Eliomar", "Federico", "Martin", "Robert"],
-    lastNames: ["Berrutti", "Capote", "Larrosa", "Mendez"],
-  },
-  "🇫🇷": {
-    firstNames: ["Alexis", "Florian", "Guillaume", "Julien", "Michael", "Pierre"],
-    lastNames: ["Carreau", "Guerin", "Lambert", "Martin"],
-  },
-  "🇩🇰": {
-    firstNames: ["Anders", "Henrik", "Jonas", "Kasper", "Mikkel", "Tejs"],
-    lastNames: ["Jensen", "Kristoffersen", "Sondergaard"],
-  },
-  "🇧🇪": {
-    firstNames: ["Gianluca", "Ismaele", "Miguel", "Rohnny"],
-    lastNames: ["Bustos", "Degreef", "Trentino"],
-  },
-  "🇱🇺": { firstNames: ["David"], lastNames: ["Pereira"] },
-  "🇨🇭": { firstNames: ["Ulisse"], lastNames: ["Calzi"] },
-  "🇨🇿": { firstNames: ["Jan"], lastNames: ["Dvoracek"] },
-  "🇦🇹": { firstNames: ["Andreas"], lastNames: ["Felser"] },
-  "🇸🇲": { firstNames: ["Maurizio"], lastNames: ["Gobbi"] },
-  "🇧🇷": { firstNames: ["Gonzalo"], lastNames: ["Camio"] },
-  "🇳🇱": { firstNames: ["Marco"], lastNames: ["Wolfs"] },
-  "🇪🇸": { firstNames: ["Antonio"], lastNames: ["Sanchez"] },
-  "🇳🇴": { firstNames: ["Erling"], lastNames: ["Hansen"] },
-  "🇵🇹": { firstNames: ["Tiago"], lastNames: ["Silva"] },
-  "🇸🇪": { firstNames: ["Erik"], lastNames: ["Lindberg"] },
-  "🇦🇱": { firstNames: ["Arben"], lastNames: ["Hoxha"] },
-  "🇱🇮": { firstNames: ["Noah"], lastNames: ["Buechel"] },
-  "🇹🇷": { firstNames: ["Emre"], lastNames: ["Yilmaz"] },
-  "🇨🇴": { firstNames: ["Santiago"], lastNames: ["Ramirez"] },
-  "🇰🇷": { firstNames: ["Min-jun"], lastNames: ["Kim"] },
-  "🇯🇵": { firstNames: ["Haruto"], lastNames: ["Sato"] },
-  "🇪🇬": { firstNames: ["Omar"], lastNames: ["Hassan"] },
-};
-
-export type GeneratedWorldPlayer = ReturnType<
-  typeof createGeneratedWorldPlayer
->;
+export type GeneratedWorldPlayer = ReturnType<typeof createGeneratedWorldPlayer>;
 
 export function createAiClubBlueprint(sequence: number) {
   if (sequence < 0 || sequence >= TOTAL_WORLD_CLUBS) {
@@ -296,12 +120,8 @@ export function buildNationalityQueue(
     }
   }
 
-  const fallbackFlags = WORLD_NATIONALITY_ALLOCATION.flatMap(
-    (nationality) =>
-      Array.from(
-        { length: nationality.count },
-        () => nationality.flag
-      )
+  const fallbackFlags = WORLD_NATIONALITY_ALLOCATION.flatMap((nationality) =>
+    Array.from({ length: nationality.count }, () => nationality.flag)
   );
 
   let fallbackIndex = 0;
@@ -368,14 +188,10 @@ export function createGeneratedWorldPlayer({
   seed: number;
 }) {
   const random = createSeededRandom(seed);
-  const pool = NAME_POOLS[nationality] ?? NAME_POOLS["🇮🇹"];
-  const firstName =
-    pool.firstNames[nationalitySequence % pool.firstNames.length];
-  const lastName =
-    pool.lastNames[
-      Math.floor(nationalitySequence / pool.firstNames.length) %
-        pool.lastNames.length
-    ];
+  const { firstName, lastName } = getGeneratedPlayerName(
+    nationality,
+    nationalitySequence
+  );
   const targetOverall =
     LEVEL_OVERALLS[leagueLevel][rosterIndex % 5] + randomInteger(-2, 2, random);
   const deviations = deterministicShuffle(
