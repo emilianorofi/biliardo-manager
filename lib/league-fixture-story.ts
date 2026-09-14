@@ -59,10 +59,15 @@ export function buildFixtureStory({
   const lastWinnerNames = finalGame
     ? getSideNames(finalGame, finalGame.winnerSide === "HOME" ? "HOME" : "AWAY")
     : null;
+  const lastWinnerIsPair = finalGame
+    ? finalGame.playerPerformances.filter(
+        (performance) => performance.appearance.side === finalGame.winnerSide
+      ).length > 1
+    : false;
   const closing =
     homeScore === awayScore
-      ? `Dopo tutte le sei prove, ${homeName} e ${awayName} chiudono sul ${homeScore}–${awayScore}. ${lastWinnerNames ?? "I protagonisti dell'ultima prova"} firma l'ultimo punto e completa un incontro nel quale nessuna delle due squadre riesce a prendere definitivamente il comando.`
-      : `${homeScore > awayScore ? homeName : awayName} vince l'incontro ${homeScore}–${awayScore}. Le sei prove raccontano il successo attraverso i giocatori che hanno conquistato ogni punto, fino al verdetto definitivo.`;
+      ? `Dopo tutte le sei prove, ${homeName} e ${awayName} chiudono sul ${homeScore}–${awayScore}. ${lastWinnerNames ?? "I protagonisti dell'ultima prova"} ${lastWinnerIsPair ? "firmano" : "firma"} l'ultimo punto e ${lastWinnerIsPair ? "completano" : "completa"} un incontro nel quale nessuna delle due squadre riesce a prendere definitivamente il comando.`
+      : `${homeScore > awayScore ? homeName : awayName} vince l'incontro ${homeScore}–${awayScore}. L'ultimo punto porta la firma di ${lastWinnerNames ?? "chi ha vinto la sesta prova"} e chiude il racconto delle sei prove sul verdetto definitivo.`;
 
   return { passages, closing };
 }

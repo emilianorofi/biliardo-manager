@@ -52,6 +52,12 @@ test("racconta le sei prove con i nomi dei giocatori e il verdetto finale", () =
     playerPerformances: [
       createStoryPerformance("HOME", `Casa${index + 1}`, "Test"),
       createStoryPerformance("AWAY", `Ospite${index + 1}`, "Test"),
+      ...(index % 2 === 1
+        ? [
+            createStoryPerformance("HOME", `Casa${index + 1}B`, "Test"),
+            createStoryPerformance("AWAY", `Ospite${index + 1}B`, "Test"),
+          ]
+        : []),
     ],
   }));
   const story = buildFixtureStory({
@@ -72,6 +78,7 @@ test("racconta le sei prove con i nomi dei giocatori e il verdetto finale", () =
   assert.match(story.passages[0].text, /80–62/);
   assert.match(story.closing, /Club Casa e Club Ospite/);
   assert.match(story.closing, /3–3/);
+  assert.match(story.closing, /firmano l'ultimo punto/);
 });
 
 function createStoryPerformance(side: string, firstName: string, lastName: string) {
