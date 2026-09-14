@@ -10,6 +10,7 @@ import {
   MATCH_TOTAL_SCORE_STEP,
   MATCH_TARGET_POINTS,
 } from "../lib/match-engine";
+import { buildFixtureStory } from "../lib/league-fixture-story";
 
 test("registra un punteggio completo e valido per le sei prove di campionato", () => {
   const home = createFormation(1, 72);
@@ -38,6 +39,50 @@ test("registra un punteggio completo e valido per le sei prove di campionato", (
     assert.equal(game.awayPoints % step, 0);
   }
 });
+
+test("racconta le sei prove con i nomi dei giocatori e il verdetto finale", () => {
+  const games = Array.from({ length: 6 }, (_, index) => ({
+    order: index + 1,
+    specialty:
+      index < 2 ? "ITALIANA" : index < 4 ? "GORIZIANA" : "TUTTI_DOPPI",
+    gameType: index % 2 === 0 ? "SINGLES" : "DOUBLES",
+    winnerSide: index % 2 === 0 ? "HOME" : "AWAY",
+    homePoints: index % 2 === 0 ? 80 : 70,
+    awayPoints: index % 2 === 0 ? 62 : 80,
+    playerPerformances: [
+      createStoryPerformance("HOME", `Casa${index + 1}`, "Test"),
+      createStoryPerformance("AWAY", `Ospite${index + 1}`, "Test"),
+    ],
+  }));
+  const story = buildFixtureStory({
+    homeName: "Club Casa",
+    awayName: "Club Ospite",
+    homeScore: 3,
+    awayScore: 3,
+    games,
+  });
+
+  assert.equal(story.passages.length, 6);
+  assert.deepEqual(
+    story.passages.map((passage) => passage.score),
+    ["1–0", "1–1", "2–1", "2–2", "3–2", "3–3"]
+  );
+  assert.match(story.passages[0].text, /Casa1 Test/);
+  assert.match(story.passages[0].text, /Ospite1 Test/);
+  assert.match(story.passages[0].text, /80–62/);
+  assert.match(story.closing, /Club Casa e Club Ospite/);
+  assert.match(story.closing, /3–3/);
+});
+
+function createStoryPerformance(side: string, firstName: string, lastName: string) {
+  return {
+    appearance: {
+      side,
+      playerFirstName: firstName,
+      playerLastName: lastName,
+    },
+  };
+}
 
 function createFormation(
   firstId: number,

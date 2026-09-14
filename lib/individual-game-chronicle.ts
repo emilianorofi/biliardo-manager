@@ -1323,10 +1323,12 @@ export function buildIndividualGameSummary({
 
 export function selectIndividualChronicleHighlights({
   chronicle,
+  gameId,
 }: {
   chronicle: IndividualChronicleShot[];
+  gameId: number;
 }) {
-  const targetCount = Math.min(chronicle.length, 6);
+  const targetCount = Math.min(chronicle.length, 5 + Math.abs(gameId) % 3);
 
   if (chronicle.length <= targetCount) return chronicle;
 
@@ -1464,6 +1466,7 @@ export function buildIndividualGameBroadcast({
 }) {
   const selectedShots = selectIndividualChronicleHighlights({
     chronicle,
+    gameId,
   });
   const templateOffset = Math.floor(
     createSeededRandom(gameId * 7_919 + 113)() * 997

@@ -17,6 +17,7 @@ import {
   type IndividualChroniclePlayerValues,
 } from "@/lib/individual-game-chronicle";
 import { createLeagueTable } from "@/lib/league-table";
+import { buildFixtureStory } from "@/lib/league-fixture-story";
 import type { MatchSpecialty } from "@/lib/match-engine";
 import { prisma } from "@/lib/prisma";
 import { ROME_TIME_ZONE } from "@/lib/rome-calendar";
@@ -261,15 +262,18 @@ export default async function LeagueFixtureDetailPage({
                 </h2>
               </div>
               <p className="mt-1 text-xs text-zinc-500">
-                Tre passaggi per seguire come è cambiato il confronto tra le due squadre.
+                Sei passaggi, uno per ogni prova, con i giocatori e il punto conquistato.
               </p>
             </div>
 
-            <div className="grid divide-y divide-zinc-800 lg:grid-cols-3 lg:divide-x lg:divide-y-0">
-              {story.map((passage, index) => (
-                <article key={passage.title} className="p-4">
+            <div className="grid gap-px bg-zinc-800 md:grid-cols-2 xl:grid-cols-3">
+              {story.passages.map((passage, index) => (
+                <article key={`${passage.label}-${passage.score}`} className="bg-zinc-900 p-4">
                   <p className="text-[9px] font-black uppercase tracking-[0.18em] text-amber-300">
                     Passaggio {index + 1} · {passage.score}
+                  </p>
+                  <p className="mt-1 text-[9px] font-black uppercase tracking-wider text-emerald-400/80">
+                    {passage.label}
                   </p>
                   <h3 className="mt-1 text-base font-black text-white">
                     {passage.title}
@@ -279,6 +283,15 @@ export default async function LeagueFixtureDetailPage({
                   </p>
                 </article>
               ))}
+            </div>
+
+            <div className="border-t border-emerald-400/20 bg-emerald-300/[0.04] px-5 py-4">
+              <p className="text-[9px] font-black uppercase tracking-[0.18em] text-emerald-300">
+                Il verdetto dell&apos;incontro · {homeScore}–{awayScore}
+              </p>
+              <p className="mt-2 text-sm font-medium leading-7 text-zinc-300">
+                {story.closing}
+              </p>
             </div>
           </section>
 
@@ -835,69 +848,6 @@ function Stat({ label, value }: { label: string; value: string }) {
       <p className="mt-1 text-lg font-black text-amber-300">{value}</p>
     </div>
   );
-}
-
-type StoryGame = {
-  order: number;
-  specialty: string;
-  winnerSide: string;
-};
-
-function buildFixtureStory({
-  homeName,
-  awayName,
-  homeScore,
-  awayScore,
-  games,
-}: {
-  homeName: string;
-  awayName: string;
-  homeScore: number;
-  awayScore: number;
-  games: StoryGame[];
-}) {
-  const scoreAfter = (count: number) => {
-    const played = games.slice(0, count);
-    return {
-      home: played.filter((game) => game.winnerSide === "HOME").length,
-      away: played.filter((game) => game.winnerSide === "AWAY").length,
-    };
-  };
-  const opening = scoreAfter(2);
-  const middle = scoreAfter(4);
-  const finalWinner = homeScore === awayScore ? null : homeScore > awayScore ? "HOME" : "AWAY";
-  const winningName = finalWinner === "HOME" ? homeName : awayName;
-  const losingName = finalWinner === "HOME" ? awayName : homeName;
-  const decisiveGame = finalWinner
-    ? [...games].reverse().find((game) => game.winnerSide === finalWinner)
-    : games.at(-1);
-
-  return [
-    {
-      title: "L'avvio",
-      score: `${opening.home}–${opening.away}`,
-      text:
-        opening.home === opening.away
-          ? `${homeName} e ${awayName} si dividono le prime due prove. Nessuno prende subito il comando: l'incontro nasce in equilibrio.`
-          : `${opening.home > opening.away ? homeName : awayName} parte meglio e conquista entrambe le prove iniziali. L'altra formazione è costretta a inseguire già dal primo cambio di specialità.`,
-    },
-    {
-      title: "Il centro dell'incontro",
-      score: `${middle.home}–${middle.away}`,
-      text:
-        middle.home === middle.away
-          ? `Dopo Italiana e Goriziana il conto torna in parità. Le formazioni arrivano alle due prove di Tutti Doppi sapendo che il margine di errore si è quasi esaurito.`
-          : `${middle.home > middle.away ? homeName : awayName} conserva il vantaggio dopo le prove di Goriziana. ${middle.home > middle.away ? awayName : homeName} deve cambiare il finale nelle due sfide di Tutti Doppi.`,
-    },
-    {
-      title: homeScore === awayScore ? "Nessun padrone" : "La prova decisiva",
-      score: `${homeScore}–${awayScore}`,
-      text:
-        finalWinner && decisiveGame
-          ? `${winningName} trova nella prova ${decisiveGame.order}, a ${formatSpecialty(decisiveGame.specialty)}, il punto che mette al sicuro il risultato. ${losingName} resta dentro l'incontro fino al finale, ma il ${homeScore}–${awayScore} premia la squadra più concreta nei passaggi decisivi.`
-          : `Le ultime due prove non spezzano l'equilibrio. Il ${homeScore}–${awayScore} racconta un incontro senza un vero padrone, nel quale ogni tentativo di fuga trova una risposta.`,
-    },
-  ];
 }
 
 function countWins(appearance: Appearance) {

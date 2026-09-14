@@ -1144,7 +1144,7 @@ test("racconta il tiro decisivo senza lasciare aperta la partita", () => {
   );
 });
 
-test("seleziona sei passaggi della partita", () => {
+test("seleziona da cinque a sette passaggi della partita", () => {
   const chronicle = buildIndividualGameChronicle(
     withChroniclePlayers({
       gameId: 1301,
@@ -1156,9 +1156,11 @@ test("seleziona sei passaggi della partita", () => {
   );
   const highlights = selectIndividualChronicleHighlights({
     chronicle,
+    gameId: 1301,
   });
 
-  assert.equal(highlights.length, 6);
+  assert.ok(highlights.length >= 5);
+  assert.ok(highlights.length <= 7);
   assert.equal(highlights.at(-1)!.order, chronicle.at(-1)!.order);
   assert.equal(highlights.at(-1)!.highlight, "WINNER");
 
@@ -1212,7 +1214,8 @@ test("trasforma i momenti chiave in un racconto della partita", () => {
   const technicalChapters = broadcast.filter((shot) => shot.showShotDetail);
   const narrativeChapters = broadcast.filter((shot) => !shot.showShotDetail);
 
-  assert.equal(broadcast.length, 6);
+  assert.ok(broadcast.length >= 5);
+  assert.ok(broadcast.length <= 7);
   assert.ok(broadcast.every((shot) => shot.technicalCommentary.length > 0));
   assert.ok(broadcast.every((shot) => shot.storyTitle));
   assert.ok(technicalChapters.length > 0);

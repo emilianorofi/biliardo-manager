@@ -336,11 +336,7 @@ export default async function IndividualMatchDetailPage({
                   : `Verso la partita ${game.order + 1}`;
 
                 return (
-                  <details
-                    key={game.id}
-                    className="group"
-                    open={isDecisiveGame}
-                  >
+                  <details key={game.id} className="group">
                     <summary className="grid cursor-pointer list-none grid-cols-[minmax(0,1fr)_96px_minmax(0,1fr)] items-center gap-3 px-4 py-4 marker:content-none sm:grid-cols-[minmax(0,1fr)_130px_minmax(0,1fr)] [&::-webkit-details-marker]:hidden">
                       <p
                         className={`whitespace-nowrap text-right text-3xl font-black tabular-nums ${
