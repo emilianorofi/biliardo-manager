@@ -15,10 +15,10 @@ import {
   WORLD_NATIONALITY_ALLOCATION,
 } from "../lib/world-structure";
 
-test("crea una piramide di 15 gironi, 120 squadre e 600 giocatori", () => {
+test("crea una piramide di 15 gironi, 120 squadre e 720 giocatori", () => {
   assert.equal(TOTAL_WORLD_LEAGUES, 15);
   assert.equal(TOTAL_WORLD_CLUBS, 120);
-  assert.equal(TOTAL_INITIAL_PLAYERS, 600);
+  assert.equal(TOTAL_INITIAL_PLAYERS, 720);
 
   const definitions = getWorldLeagueDefinitions();
   assert.deepEqual(
@@ -27,14 +27,14 @@ test("crea una piramide di 15 gironi, 120 squadre e 600 giocatori", () => {
   );
 });
 
-test("distribuisce 600 giocatori tra 25 nazioni", () => {
+test("distribuisce 720 giocatori tra 25 nazioni e dà profondità a tutte", () => {
   assert.equal(WORLD_NATIONALITY_ALLOCATION.length, 25);
   assert.equal(
     WORLD_NATIONALITY_ALLOCATION.reduce(
       (total, nationality) => total + nationality.count,
       0
     ),
-    600
+    720
   );
 
   const allocation = new Map(
@@ -43,16 +43,15 @@ test("distribuisce 600 giocatori tra 25 nazioni", () => {
       nationality.count,
     ])
   );
-  assert.equal(allocation.get("Italia"), 330);
-  assert.equal(allocation.get("Argentina"), 70);
-  assert.equal(allocation.get("Germania"), 40);
-  assert.equal(allocation.get("Uruguay"), 25);
-  assert.equal(allocation.get("Francia"), 25);
-  assert.equal(allocation.get("Danimarca"), 20);
-  assert.equal(allocation.get("Belgio"), 15);
-  assert.equal(
-    WORLD_NATIONALITY_ALLOCATION.filter((nationality) => nationality.count >= 3).length,
-    16
+  assert.equal(allocation.get("Italia"), 350);
+  assert.equal(allocation.get("Argentina"), 80);
+  assert.equal(allocation.get("Germania"), 50);
+  assert.equal(allocation.get("Uruguay"), 30);
+  assert.equal(allocation.get("Francia"), 30);
+  assert.equal(allocation.get("Danimarca"), 24);
+  assert.equal(allocation.get("Belgio"), 20);
+  assert.ok(
+    WORLD_NATIONALITY_ALLOCATION.every((nationality) => nationality.count >= 6)
   );
 });
 
@@ -79,7 +78,7 @@ test("genera 120 identità di club differenti", () => {
 });
 
 test("la coda delle nazionalità conserva tutte le quote iniziali", () => {
-  const queue = buildNationalityQueue(new Map(), 600);
+  const queue = buildNationalityQueue(new Map(), 720);
   const counts = new Map<string, number>();
 
   for (const nationality of queue) {
@@ -93,7 +92,7 @@ test("la coda delle nazionalità conserva tutte le quote iniziali", () => {
 
 test("riallinea soltanto i giocatori delle nazioni in surplus", () => {
   const previousAllocation = [
-    ...Array.from({ length: 390 }, (_, index) => ({ id: index + 1, nationality: "🇮🇹" })),
+    ...Array.from({ length: 410 }, (_, index) => ({ id: index + 1, nationality: "🇮🇹" })),
     ...WORLD_NATIONALITY_ALLOCATION.slice(1).flatMap((nation, nationIndex) =>
       Array.from({ length: Math.max(1, nation.count - 1) }, (_, index) => ({
         id: 1000 + nationIndex * 100 + index,
@@ -108,13 +107,13 @@ test("riallinea soltanto i giocatori delle nazioni in surplus", () => {
   assert.ok(updates.every((update) => update.nationality !== "🇮🇹"));
 });
 
-test("i nomi dei 330 giocatori italiani iniziali non si ripetono", () => {
+test("i nomi dei 350 giocatori italiani iniziali non si ripetono", () => {
   const names = new Set<string>();
 
-  for (let index = 0; index < 330; index += 1) {
+  for (let index = 0; index < 350; index += 1) {
     const player = createGeneratedWorldPlayer({
       leagueLevel: 1,
-      rosterIndex: index % 5,
+      rosterIndex: index % 6,
       nationality: "🇮🇹",
       nationalitySequence: index,
       seed: index + 1,
@@ -122,5 +121,5 @@ test("i nomi dei 330 giocatori italiani iniziali non si ripetono", () => {
     names.add(`${player.firstName} ${player.lastName}`);
   }
 
-  assert.equal(names.size, 330);
+  assert.equal(names.size, 350);
 });

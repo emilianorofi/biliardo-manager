@@ -24,6 +24,7 @@ const INITIAL_PROFILES: PlayerProfile[] = [
   { age: [35, 45], overall: 66, experience: [50, 68], talent: [64, 70] },
   { age: [55, 65], overall: 62, experience: [76, 90], talent: [59, 64] },
   { age: [20, 25], overall: 60, experience: [12, 28], talent: [72, 80] },
+  { age: [27, 36], overall: 61, experience: [30, 48], talent: [65, 72] },
 ];
 
 export type InitialPlayer = ReturnType<typeof createInitialPlayer>;

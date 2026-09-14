@@ -1,8 +1,5 @@
 import { getNationalityDisplay } from "@/lib/nationalities";
-import {
-  getPlayerSurnamePoolSize,
-  getStablePlayerSurname,
-} from "@/lib/player-names";
+import { getGeneratedPlayerName } from "@/lib/player-names";
 import { prisma } from "@/lib/prisma";
 
 type NamedPlayer = {
@@ -12,12 +9,14 @@ type NamedPlayer = {
   nationality: string;
 };
 
-type SurnameAssignment = NamedPlayer & {
+type NameAssignment = NamedPlayer & {
+  nextFirstName: string;
   nextLastName: string;
   nationalityCode: string;
 };
 
 const DEFAULT_BATCH_SIZE = 40;
+const MAX_UNIQUENESS_ATTEMPTS = 2000;
 
 export async function synchronizePlayerSurnamesBatch(
   batchSize = DEFAULT_BATCH_SIZE
@@ -47,10 +46,14 @@ export async function synchronizePlayerSurnamesBatch(
   const playerAssignments = buildSurnameAssignments(players);
   const academyAssignments = buildSurnameAssignments(academyPlayers);
   const changedPlayers = playerAssignments.filter(
-    (assignment) => assignment.lastName !== assignment.nextLastName
+    (assignment) =>
+      assignment.firstName !== assignment.nextFirstName ||
+      assignment.lastName !== assignment.nextLastName
   );
   const changedAcademyPlayers = academyAssignments.filter(
-    (assignment) => assignment.lastName !== assignment.nextLastName
+    (assignment) =>
+      assignment.firstName !== assignment.nextFirstName ||
+      assignment.lastName !== assignment.nextLastName
   );
   const playerBatch = changedPlayers.slice(0, safeBatchSize);
   const academyBatch = changedAcademyPlayers.slice(0, safeBatchSize);
@@ -59,15 +62,24 @@ export async function synchronizePlayerSurnamesBatch(
     await prisma.$transaction([
       prisma.player.update({
         where: { id: assignment.id },
-        data: { lastName: assignment.nextLastName },
+        data: {
+          firstName: assignment.nextFirstName,
+          lastName: assignment.nextLastName,
+        },
       }),
       prisma.playerFixtureAppearance.updateMany({
         where: { playerId: assignment.id },
-        data: { playerLastName: assignment.nextLastName },
+        data: {
+          playerFirstName: assignment.nextFirstName,
+          playerLastName: assignment.nextLastName,
+        },
       }),
       prisma.trainingResult.updateMany({
         where: { playerId: assignment.id },
-        data: { playerLastName: assignment.nextLastName },
+        data: {
+          playerFirstName: assignment.nextFirstName,
+          playerLastName: assignment.nextLastName,
+        },
       }),
     ]);
   }
@@ -75,7 +87,10 @@ export async function synchronizePlayerSurnamesBatch(
   for (const assignment of academyBatch) {
     await prisma.academyPlayer.update({
       where: { id: assignment.id },
-      data: { lastName: assignment.nextLastName },
+      data: {
+        firstName: assignment.nextFirstName,
+        lastName: assignment.nextLastName,
+      },
     });
   }
 
@@ -95,7 +110,7 @@ export async function synchronizePlayerSurnamesBatch(
 
 export function buildSurnameAssignments(
   players: readonly NamedPlayer[]
-): SurnameAssignment[] {
+): NameAssignment[] {
   const usedNamesByNationality = new Map<string, Set<string>>();
 
   return players.map((player) => {
@@ -103,6 +118,7 @@ export function buildSurnameAssignments(
     if (nationality.code === "---") {
       return {
         ...player,
+        nextFirstName: player.firstName,
         nextLastName: player.lastName,
         nationalityCode: nationality.code,
       };
@@ -110,18 +126,18 @@ export function buildSurnameAssignments(
 
     const usedNames =
       usedNamesByNationality.get(nationality.code) ?? new Set<string>();
-    const poolSize = getPlayerSurnamePoolSize(player.nationality);
-    let nextLastName = getStablePlayerSurname(player.nationality, player.id);
+    let selected = getGeneratedPlayerName(player.nationality, player.id);
 
-    for (let offset = 0; offset < poolSize; offset += 1) {
-      const candidate = getStablePlayerSurname(
+    for (let offset = 0; offset < MAX_UNIQUENESS_ATTEMPTS; offset += 1) {
+      const candidate = getGeneratedPlayerName(
         player.nationality,
-        player.id,
-        offset
+        player.id + offset
       );
-      const fullNameKey = normalizeName(`${player.firstName} ${candidate}`);
+      const fullNameKey = normalizeName(
+        `${candidate.firstName} ${candidate.lastName}`
+      );
       if (!usedNames.has(fullNameKey)) {
-        nextLastName = candidate;
+        selected = candidate;
         usedNames.add(fullNameKey);
         break;
       }
@@ -131,13 +147,14 @@ export function buildSurnameAssignments(
 
     return {
       ...player,
-      nextLastName,
+      nextFirstName: selected.firstName,
+      nextLastName: selected.lastName,
       nationalityCode: nationality.code,
     };
   });
 }
 
-function buildSurnameDiversity(assignments: readonly SurnameAssignment[]) {
+function buildSurnameDiversity(assignments: readonly NameAssignment[]) {
   const byNationality = new Map<string, Set<string>>();
 
   for (const assignment of assignments) {
