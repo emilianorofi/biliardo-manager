@@ -6,7 +6,10 @@ import { getPlayerPortraitIdentity } from "@/lib/player-portraits";
 type PortraitPlayer = Pick<
   Player,
   "id" | "firstName" | "lastName" | "age"
-> & Partial<Pick<Player, "nationality">>;
+> &
+  Partial<Pick<Player, "nationality">> & {
+    nationalityCode?: string;
+  };
 
 export default function PlayerPortrait({
   player,
@@ -15,10 +18,8 @@ export default function PlayerPortrait({
   player: PortraitPlayer;
   className?: string;
 }) {
-  const identity = getPlayerPortraitIdentity(
-    player.id,
-    player.nationality
-  );
+  const nationality = player.nationality ?? player.nationalityCode;
+  const identity = getPlayerPortraitIdentity(player.id, nationality);
   const agePhase = getAgePhaseIndex(player.age);
   const column = agePhase % 4;
   const row = Math.floor(agePhase / 4);
