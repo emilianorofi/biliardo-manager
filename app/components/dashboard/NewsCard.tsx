@@ -1,3 +1,4 @@
+import Link from "next/link";
 import {
   GraduationCap,
   Newspaper,
@@ -67,11 +68,13 @@ export default async function NewsCard() {
               getEventAppearance(
                 event.type
               );
+            const href = getEventHref(event.type, event.clubId, clubId);
 
             return (
-              <div
+              <Link
                 key={event.id}
-                className="rounded-xl border border-zinc-800 bg-zinc-800/40 p-3 transition hover:border-zinc-700 hover:bg-zinc-800"
+                href={href}
+                className="group block rounded-xl border border-zinc-800 bg-zinc-800/40 p-3 transition hover:border-amber-400/30 hover:bg-zinc-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/60"
               >
                 <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
                   <div
@@ -79,9 +82,7 @@ export default async function NewsCard() {
                   >
                     {appearance.icon}
 
-                    {event.type.startsWith("TRANSFER_")
-                      ? "Mercato"
-                      : event.type}
+                    {getEventLabel(event.type)}
                   </div>
 
                   <span className="text-xs text-zinc-500">
@@ -91,7 +92,7 @@ export default async function NewsCard() {
                   </span>
                 </div>
 
-                <p className="text-sm font-semibold leading-5 text-zinc-200">
+                <p className="text-sm font-semibold leading-5 text-zinc-200 transition group-hover:text-amber-100">
                   {event.title}
                 </p>
 
@@ -100,7 +101,11 @@ export default async function NewsCard() {
                     {event.description}
                   </p>
                 ) : null}
-              </div>
+
+                <p className="mt-2 text-[10px] font-black uppercase tracking-[0.16em] text-zinc-600 transition group-hover:text-amber-300">
+                  Apri dettaglio →
+                </p>
+              </Link>
             );
           })}
         </div>
@@ -109,10 +114,84 @@ export default async function NewsCard() {
   );
 }
 
+function getEventHref(
+  type: string,
+  eventClubId: number | null,
+  currentClubId: number
+) {
+  if (type.startsWith("TRANSFER_") || type === "Mercato") {
+    return "/market";
+  }
+
+  if (
+    type === "Individuale" ||
+    type === "PREMIO_INDIVIDUALE"
+  ) {
+    return "/individuale";
+  }
+
+  if (
+    type === "Campionato" ||
+    type === "Lega"
+  ) {
+    return "/campionato";
+  }
+
+  if (
+    type === "Accademia" ||
+    type.startsWith("ACADEMY_")
+  ) {
+    return "/academy";
+  }
+
+  if (
+    type === "Allenamento" ||
+    type === "Aggiornamento"
+  ) {
+    return "/training";
+  }
+
+  if (type === "PLAYER_RETIRED") {
+    return "/players";
+  }
+
+  if (type === "CLUB_CREATED") {
+    return `/clubs/${eventClubId ?? currentClubId}`;
+  }
+
+  return eventClubId
+    ? `/clubs/${eventClubId}`
+    : "/calendario";
+}
+
+function getEventLabel(type: string) {
+  if (type.startsWith("TRANSFER_") || type === "Mercato") {
+    return "Mercato";
+  }
+
+  if (type === "PREMIO_INDIVIDUALE") {
+    return "Individuale";
+  }
+
+  if (type.startsWith("ACADEMY_")) {
+    return "Accademia";
+  }
+
+  if (type === "PLAYER_RETIRED") {
+    return "Carriera";
+  }
+
+  if (type === "CLUB_CREATED") {
+    return "Club";
+  }
+
+  return type;
+}
+
 function getEventAppearance(
   type: string
 ) {
-  if (type.startsWith("TRANSFER_")) {
+  if (type.startsWith("TRANSFER_") || type === "Mercato") {
     return {
       icon: (
         <Search
@@ -122,6 +201,35 @@ function getEventAppearance(
 
       colors:
         "border-yellow-500/20 bg-yellow-500/15 text-yellow-400",
+    };
+  }
+
+  if (
+    type === "Individuale" ||
+    type === "PREMIO_INDIVIDUALE"
+  ) {
+    return {
+      icon: (
+        <Trophy
+          size={16}
+        />
+      ),
+
+      colors:
+        "border-amber-500/20 bg-amber-500/15 text-amber-300",
+    };
+  }
+
+  if (type.startsWith("ACADEMY_")) {
+    return {
+      icon: (
+        <GraduationCap
+          size={16}
+        />
+      ),
+
+      colors:
+        "border-violet-500/20 bg-violet-500/15 text-violet-400",
     };
   }
 
@@ -137,18 +245,6 @@ function getEventAppearance(
 
         colors:
           "border-green-500/20 bg-green-500/15 text-green-400",
-      };
-
-    case "Mercato":
-      return {
-        icon: (
-          <Search
-            size={16}
-          />
-        ),
-
-        colors:
-          "border-yellow-500/20 bg-yellow-500/15 text-yellow-400",
       };
 
     case "Lega":
