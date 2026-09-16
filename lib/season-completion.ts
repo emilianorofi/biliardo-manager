@@ -1,9 +1,8 @@
 import "server-only";
 
 import type { Prisma } from "@/generated/prisma/client";
-import {
-  calculateEndOfSeasonPlayerOutcome,
-} from "@/lib/player-aging";
+import { calculateEndOfSeasonPlayerOutcome } from "@/lib/player-aging";
+import { limitClubRetirements } from "@/lib/roster-integrity";
 
 type CompleteSeasonOptions = {
   now?: Date;
@@ -39,86 +38,52 @@ export async function completeSeasonIfReady(
     random = Math.random,
   }: CompleteSeasonOptions = {}
 ): Promise<SeasonCompletionResult> {
-  const lockedSeason = await transaction.$queryRaw<
-    { id: number }[]
-  >`
+  const lockedSeason = await transaction.$queryRaw<{ id: number }[]>`
     SELECT "id"
     FROM "Season"
     WHERE "id" = ${seasonId}
     FOR UPDATE
   `;
 
-  if (lockedSeason.length === 0) {
-    throw new Error("SEASON_NOT_FOUND");
-  }
+  if (lockedSeason.length === 0) throw new Error("SEASON_NOT_FOUND");
 
   const season = await transaction.season.findUnique({
-    where: {
-      id: seasonId,
-    },
-    select: {
-      status: true,
-    },
+    where: { id: seasonId },
+    select: { status: true },
   });
 
-  if (!season) {
-    throw new Error("SEASON_NOT_FOUND");
-  }
-
-  if (season.status === "COMPLETED") {
-    return createEmptyResult(seasonId, true);
-  }
-
-  if (season.status !== "ACTIVE") {
-    return createEmptyResult(seasonId, false);
-  }
+  if (!season) throw new Error("SEASON_NOT_FOUND");
+  if (season.status === "COMPLETED") return createEmptyResult(seasonId, true);
+  if (season.status !== "ACTIVE") return createEmptyResult(seasonId, false);
 
   const [leagues, individualTournaments, nationsCupTournaments] =
     await Promise.all([
       transaction.league.findMany({
-        where: {
-          seasonId,
-        },
-        select: {
-          status: true,
-        },
+        where: { seasonId },
+        select: { status: true },
       }),
       transaction.individualTournament.findMany({
-        where: {
-          seasonId,
-        },
-        select: {
-          status: true,
-        },
+        where: { seasonId },
+        select: { status: true },
       }),
       transaction.nationsCupTournament.findMany({
-        where: {
-          seasonId,
-        },
-        select: {
-          status: true,
-        },
+        where: { seasonId },
+        select: { status: true },
       }),
     ]);
 
   if (
     leagues.length === 0 ||
     leagues.some((league) => league.status !== "COMPLETED") ||
-    individualTournaments.some(
-      (tournament) => tournament.status !== "COMPLETED"
-    ) ||
-    nationsCupTournaments.some(
-      (tournament) => tournament.status !== "COMPLETED"
-    )
+    individualTournaments.some((tournament) => tournament.status !== "COMPLETED") ||
+    nationsCupTournaments.some((tournament) => tournament.status !== "COMPLETED")
   ) {
     return createEmptyResult(seasonId, false);
   }
 
   const [players, academyPlayers] = await Promise.all([
     transaction.player.findMany({
-      where: {
-        careerStatus: "ACTIVE",
-      },
+      where: { careerStatus: "ACTIVE" },
       select: {
         id: true,
         clubId: true,
@@ -126,9 +91,7 @@ export async function completeSeasonIfReady(
         lastName: true,
         age: true,
       },
-      orderBy: {
-        id: "asc",
-      },
+      orderBy: { id: "asc" },
     }),
     transaction.academyPlayer.findMany({
       select: {
@@ -138,70 +101,54 @@ export async function completeSeasonIfReady(
         lastName: true,
         age: true,
       },
-      orderBy: {
-        id: "asc",
-      },
+      orderBy: { id: "asc" },
     }),
   ]);
+
   const outcomes = players.map((player) => ({
     player,
-    outcome: calculateEndOfSeasonPlayerOutcome(
-      player.age,
-      random()
-    ),
+    outcome: calculateEndOfSeasonPlayerOutcome(player.age, random()),
   }));
-  const retirements = outcomes.filter(
+  const requestedRetirements = outcomes.filter(
     ({ outcome }) => outcome.retired
   );
-  const retiredPlayerIds = retirements.map(
-    ({ player }) => player.id
+  const acceptedRetirementPlayers = limitClubRetirements(
+    players,
+    requestedRetirements.map(({ player }) => player)
   );
+  const acceptedRetirementIds = new Set(
+    acceptedRetirementPlayers.map((player) => player.id)
+  );
+  const retirements = requestedRetirements.filter(({ player }) =>
+    acceptedRetirementIds.has(player.id)
+  );
+  const retiredPlayerIds = retirements.map(({ player }) => player.id);
+
   const releasedAcademyPlayers = academyPlayers
     .filter((player) => player.age >= 17)
-    .map((player) => ({
-      ...player,
-      age: player.age + 1,
-    }));
+    .map((player) => ({ ...player, age: player.age + 1 }));
 
   if (players.length > 0) {
     await transaction.player.updateMany({
       where: {
-        id: {
-          in: players.map((player) => player.id),
-        },
+        id: { in: players.map((player) => player.id) },
         careerStatus: "ACTIVE",
       },
-      data: {
-        age: {
-          increment: 1,
-        },
-      },
+      data: { age: { increment: 1 } },
     });
   }
 
   if (academyPlayers.length > 0) {
     await transaction.academyPlayer.updateMany({
-      where: {
-        id: {
-          in: academyPlayers.map((player) => player.id),
-        },
-      },
-      data: {
-        age: {
-          increment: 1,
-        },
-      },
+      where: { id: { in: academyPlayers.map((player) => player.id) } },
+      data: { age: { increment: 1 } },
     });
   }
 
   if (releasedAcademyPlayers.length > 0) {
     await transaction.academyPlayer.deleteMany({
       where: {
-        id: {
-          in: releasedAcademyPlayers.map(
-            (player) => player.id
-          ),
-        },
+        id: { in: releasedAcademyPlayers.map((player) => player.id) },
       },
     });
 
@@ -217,19 +164,12 @@ export async function completeSeasonIfReady(
   }
 
   if (retiredPlayerIds.length > 0) {
-    await clearRetiredPlayersFromFormations(
-      transaction,
-      retiredPlayerIds
-    );
+    await clearRetiredPlayersFromFormations(transaction, retiredPlayerIds);
 
     await transaction.transferListing.updateMany({
       where: {
-        playerId: {
-          in: retiredPlayerIds,
-        },
-        status: {
-          in: ["ACTIVE", "PENDING_TRANSFER"],
-        },
+        playerId: { in: retiredPlayerIds },
+        status: { in: ["ACTIVE", "PENDING_TRANSFER"] },
       },
       data: {
         status: "CANCELLED",
@@ -239,9 +179,7 @@ export async function completeSeasonIfReady(
 
     await transaction.player.updateMany({
       where: {
-        id: {
-          in: retiredPlayerIds,
-        },
+        id: { in: retiredPlayerIds },
         careerStatus: "ACTIVE",
       },
       data: {
@@ -263,10 +201,22 @@ export async function completeSeasonIfReady(
     });
   }
 
+  const deferredRetirements = requestedRetirements.length - retirements.length;
+  if (deferredRetirements > 0) {
+    await transaction.gameEvent.create({
+      data: {
+        clubId: null,
+        type: "ROSTER_INTEGRITY",
+        title: "Ritiri rinviati per garantire le rose minime",
+        description:
+          `${deferredRetirements} ritiri sono stati rinviati per evitare club con meno di tre giocatori attivi.`,
+        createdAt: now,
+      },
+    });
+  }
+
   await transaction.season.update({
-    where: {
-      id: seasonId,
-    },
+    where: { id: seasonId },
     data: {
       status: "COMPLETED",
       endsAt: now,
@@ -289,22 +239,19 @@ export async function completeSeasonIfReady(
     alreadyCompleted: false,
     agedPlayers: players.length,
     agedAcademyPlayers: academyPlayers.length,
-    retiredPlayers: retirements.map(
-      ({ player, outcome }) => ({
-        id: player.id,
-        firstName: player.firstName,
-        lastName: player.lastName,
-        age: outcome.age,
-        retirementChance: outcome.retirementChance,
-      })
-    ),
-    releasedAcademyPlayers:
-      releasedAcademyPlayers.map((player) => ({
-        id: player.id,
-        firstName: player.firstName,
-        lastName: player.lastName,
-        age: player.age,
-      })),
+    retiredPlayers: retirements.map(({ player, outcome }) => ({
+      id: player.id,
+      firstName: player.firstName,
+      lastName: player.lastName,
+      age: outcome.age,
+      retirementChance: outcome.retirementChance,
+    })),
+    releasedAcademyPlayers: releasedAcademyPlayers.map((player) => ({
+      id: player.id,
+      firstName: player.firstName,
+      lastName: player.lastName,
+      age: player.age,
+    })),
   };
 }
 
@@ -328,36 +275,15 @@ async function clearRetiredPlayersFromFormations(
   retiredPlayerIds: number[]
 ) {
   await transaction.formation.updateMany({
-    where: {
-      slotAPlayerId: {
-        in: retiredPlayerIds,
-      },
-    },
-    data: {
-      slotAPlayerId: null,
-      savedAt: null,
-    },
+    where: { slotAPlayerId: { in: retiredPlayerIds } },
+    data: { slotAPlayerId: null, savedAt: null },
   });
   await transaction.formation.updateMany({
-    where: {
-      slotBPlayerId: {
-        in: retiredPlayerIds,
-      },
-    },
-    data: {
-      slotBPlayerId: null,
-      savedAt: null,
-    },
+    where: { slotBPlayerId: { in: retiredPlayerIds } },
+    data: { slotBPlayerId: null, savedAt: null },
   });
   await transaction.formation.updateMany({
-    where: {
-      slotCPlayerId: {
-        in: retiredPlayerIds,
-      },
-    },
-    data: {
-      slotCPlayerId: null,
-      savedAt: null,
-    },
+    where: { slotCPlayerId: { in: retiredPlayerIds } },
+    data: { slotCPlayerId: null, savedAt: null },
   });
 }
