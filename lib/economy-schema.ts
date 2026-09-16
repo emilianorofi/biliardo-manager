@@ -6,19 +6,14 @@ import { prisma } from "@/lib/prisma";
 const ECONOMY_SCHEMA_LOCK = 2026091601;
 let economySchemaReady = false;
 
-type ColumnExistsRow = {
-  exists: boolean;
-};
+type ColumnExistsRow = { exists: boolean };
 
 export async function ensureEconomySchema() {
-  if (economySchemaReady) {
-    return;
-  }
+  if (economySchemaReady) return;
 
   const [{ exists }] = await prisma.$queryRaw<ColumnExistsRow[]>`
     SELECT EXISTS (
-      SELECT 1
-      FROM information_schema.columns
+      SELECT 1 FROM information_schema.columns
       WHERE table_schema = current_schema()
         AND table_name = 'Club'
         AND column_name = 'trainingCenterLevel'
@@ -26,6 +21,7 @@ export async function ensureEconomySchema() {
   `;
 
   if (exists) {
+    await ensureEconomyMarkers(prisma);
     economySchemaReady = true;
     return;
   }
@@ -37,20 +33,19 @@ export async function ensureEconomySchema() {
 
     const [lockedCheck] = await transaction.$queryRaw<ColumnExistsRow[]>`
       SELECT EXISTS (
-        SELECT 1
-        FROM information_schema.columns
+        SELECT 1 FROM information_schema.columns
         WHERE table_schema = current_schema()
           AND table_name = 'Club'
           AND column_name = 'trainingCenterLevel'
       ) AS "exists"
     `;
 
-    if (lockedCheck.exists) {
-      return;
+    if (!lockedCheck.exists) {
+      await applyEconomySchema(transaction);
+      await alignExistingEconomyData(transaction);
     }
 
-    await applyEconomySchema(transaction);
-    await alignExistingEconomyData(transaction);
+    await ensureEconomyMarkers(transaction);
   });
 
   economySchemaReady = true;
@@ -81,9 +76,29 @@ async function applyEconomySchema(transaction: Prisma.TransactionClient) {
   `);
 }
 
-async function alignExistingEconomyData(
-  transaction: Prisma.TransactionClient
-) {
+async function ensureEconomyMarkers(client: Prisma.TransactionClient | typeof prisma) {
+  await client.$executeRawUnsafe(`
+    ALTER TABLE "ClubWeeklyUpdate"
+      ADD COLUMN IF NOT EXISTS "economyAppliedAt" TIMESTAMP(3)
+  `);
+
+  await client.$executeRawUnsafe(`
+    ALTER TABLE "TransferListing"
+      ADD COLUMN IF NOT EXISTS "economyAdjustedAt" TIMESTAMP(3)
+  `);
+
+  await client.$executeRawUnsafe(`
+    ALTER TABLE "Season"
+      ADD COLUMN IF NOT EXISTS "economySettledAt" TIMESTAMP(3)
+  `);
+
+  await client.$executeRawUnsafe(`
+    ALTER TABLE "IndividualTournament"
+      ADD COLUMN IF NOT EXISTS "prizesPaidAt" TIMESTAMP(3)
+  `);
+}
+
+async function alignExistingEconomyData(transaction: Prisma.TransactionClient) {
   await transaction.$executeRawUnsafe(`
     UPDATE "Club"
     SET "fans" = CASE
@@ -97,48 +112,36 @@ async function alignExistingEconomyData(
     WITH calculated AS (
       SELECT
         "id",
-        LEAST(
-          100.0,
-          GREATEST(
-            0.0,
-            (
-              "precisione" + "diretto" + "sponde" + "tattica" +
-              "mentalita" + "difesa" + "realizzazione" +
-              "creativita" + "misura"
-            ) / 9.0
-          )
-        ) AS overall
+        LEAST(100.0, GREATEST(0.0,
+          ("precisione" + "diretto" + "sponde" + "tattica" +
+           "mentalita" + "difesa" + "realizzazione" +
+           "creativita" + "misura") / 9.0
+        )) AS overall
       FROM "Player"
     )
     UPDATE "Player" AS player
     SET
-      "salary" = GREATEST(
-        250,
-        ROUND(250 * POWER(1.105, calculated.overall - 50))::INTEGER
-      ),
+      "salary" = GREATEST(250, ROUND(250 * POWER(1.105, calculated.overall - 50))::INTEGER),
       "value" = (
-        ROUND(
-          (
-            30000 *
-            POWER(1.075, calculated.overall - 60) *
-            CASE
-              WHEN player."age" <= 20 THEN 2.30
-              WHEN player."age" <= 25 THEN 2.10
-              WHEN player."age" <= 30 THEN 1.80
-              WHEN player."age" <= 35 THEN 1.55
-              WHEN player."age" <= 40 THEN 1.30
-              WHEN player."age" <= 45 THEN 1.15
-              WHEN player."age" <= 50 THEN 0.95
-              WHEN player."age" <= 55 THEN 0.75
-              WHEN player."age" <= 60 THEN 0.55
-              WHEN player."age" <= 65 THEN 0.40
-              WHEN player."age" <= 70 THEN 0.28
-              WHEN player."age" <= 75 THEN 0.18
-              ELSE 0.10
-            END *
-            (0.70 + LEAST(100.0, GREATEST(0.0, player."talent")) / 180.0)
-          ) / 100.0
-        ) * 100
+        ROUND((
+          30000 * POWER(1.075, calculated.overall - 60) *
+          CASE
+            WHEN player."age" <= 20 THEN 2.30
+            WHEN player."age" <= 25 THEN 2.10
+            WHEN player."age" <= 30 THEN 1.80
+            WHEN player."age" <= 35 THEN 1.55
+            WHEN player."age" <= 40 THEN 1.30
+            WHEN player."age" <= 45 THEN 1.15
+            WHEN player."age" <= 50 THEN 0.95
+            WHEN player."age" <= 55 THEN 0.75
+            WHEN player."age" <= 60 THEN 0.55
+            WHEN player."age" <= 65 THEN 0.40
+            WHEN player."age" <= 70 THEN 0.28
+            WHEN player."age" <= 75 THEN 0.18
+            ELSE 0.10
+          END *
+          (0.70 + LEAST(100.0, GREATEST(0.0, player."talent")) / 180.0)
+        ) / 100.0) * 100
       )::INTEGER
     FROM calculated
     WHERE player."id" = calculated."id"
