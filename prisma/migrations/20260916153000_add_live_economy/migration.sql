@@ -14,6 +14,18 @@ ALTER TABLE "IndividualTournament" ADD COLUMN IF NOT EXISTS "prizesPaidAt" TIMES
 ALTER TABLE "ClubWeeklyUpdate" ADD COLUMN IF NOT EXISTS "economyAppliedAt" TIMESTAMP(3);
 ALTER TABLE "TransferListing" ADD COLUMN IF NOT EXISTS "economyAdjustedAt" TIMESTAMP(3);
 
+UPDATE "ClubWeeklyUpdate"
+SET "economyAppliedAt" = COALESCE("processedAt", "createdAt")
+WHERE "economyAppliedAt" IS NULL;
+
+UPDATE "TransferListing"
+SET "economyAdjustedAt" = COALESCE("completedAt", "createdAt")
+WHERE "status" = 'COMPLETED' AND "economyAdjustedAt" IS NULL;
+
+UPDATE "IndividualTournament"
+SET "prizesPaidAt" = COALESCE("finalAt", "updatedAt")
+WHERE "status" = 'COMPLETED' AND "prizesPaidAt" IS NULL;
+
 UPDATE "Club"
 SET "fans" = CASE
   WHEN "fans" < 10 THEN 90

@@ -1,11 +1,13 @@
 import type { Prisma } from "@/generated/prisma/client";
 import { getNextAcademyScoutingAt } from "@/lib/academy-scouting";
+import { ensureEconomySchema } from "@/lib/economy-schema";
 import { createWeeklyAcademyPlayer } from "@/lib/onboarding/initial-academy";
 
 export const MAX_ACADEMY_PLAYERS = 10;
 
 type LockedAcademyClub = {
   id: number;
+  academyLevel: number;
 };
 
 export type AcademyIntakeResult = {
@@ -20,10 +22,10 @@ export async function advanceAcademyIntake(
   now = new Date(),
   random = Math.random
 ): Promise<AcademyIntakeResult> {
-  const lockedClub = await transaction.$queryRaw<
-    LockedAcademyClub[]
-  >`
-    SELECT "id"
+  await ensureEconomySchema();
+
+  const lockedClub = await transaction.$queryRaw<LockedAcademyClub[]>`
+    SELECT "id", "academyLevel"
     FROM "Club"
     WHERE "id" = ${clubId}
     FOR UPDATE
@@ -33,33 +35,21 @@ export async function advanceAcademyIntake(
     throw new Error("CLUB_NOT_FOUND");
   }
 
+  const academyLevel = lockedClub[0].academyLevel;
   const club = await transaction.club.findUnique({
-    where: {
-      id: clubId,
-    },
-    select: {
-      nextAcademyCandidateAt: true,
-    },
+    where: { id: clubId },
+    select: { nextAcademyCandidateAt: true },
   });
 
-  if (!club) {
-    throw new Error("CLUB_NOT_FOUND");
-  }
+  if (!club) throw new Error("CLUB_NOT_FOUND");
 
-  let nextAcademyCandidateAt =
-    club.nextAcademyCandidateAt;
+  let nextAcademyCandidateAt = club.nextAcademyCandidateAt;
 
   if (!nextAcademyCandidateAt) {
-    nextAcademyCandidateAt =
-      getNextAcademyScoutingAt(now);
-
+    nextAcademyCandidateAt = getNextAcademyScoutingAt(now);
     await transaction.club.update({
-      where: {
-        id: clubId,
-      },
-      data: {
-        nextAcademyCandidateAt,
-      },
+      where: { id: clubId },
+      data: { nextAcademyCandidateAt },
     });
 
     return {
@@ -69,50 +59,38 @@ export async function advanceAcademyIntake(
     };
   }
 
-  let academyPlayers =
-    await transaction.academyPlayer.count({
-      where: {
-        clubId,
-      },
-    });
+  let academyPlayers = await transaction.academyPlayer.count({
+    where: { clubId },
+  });
   let createdPlayers = 0;
   let missedCandidates = 0;
 
-  while (
-    nextAcademyCandidateAt.getTime() <= now.getTime()
-  ) {
+  while (nextAcademyCandidateAt.getTime() <= now.getTime()) {
     if (academyPlayers < MAX_ACADEMY_PLAYERS) {
       await transaction.academyPlayer.create({
         data: {
           ...createWeeklyAcademyPlayer({
             from: nextAcademyCandidateAt,
             random,
+            academyLevel,
           }),
           clubId,
         },
       });
-
       academyPlayers += 1;
       createdPlayers += 1;
     } else {
       missedCandidates += 1;
     }
 
-    nextAcademyCandidateAt =
-      getNextAcademyScoutingAt(
-        new Date(
-          nextAcademyCandidateAt.getTime() + 1000
-        )
-      );
+    nextAcademyCandidateAt = getNextAcademyScoutingAt(
+      new Date(nextAcademyCandidateAt.getTime() + 1000)
+    );
   }
 
   await transaction.club.update({
-    where: {
-      id: clubId,
-    },
-    data: {
-      nextAcademyCandidateAt,
-    },
+    where: { id: clubId },
+    data: { nextAcademyCandidateAt },
   });
 
   return {

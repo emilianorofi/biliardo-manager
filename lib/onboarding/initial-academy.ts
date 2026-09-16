@@ -1,5 +1,9 @@
 import type { TrainingFocus } from "@/lib/training-engine";
 import { getNextAcademyScoutingAt } from "@/lib/academy-scouting";
+import {
+  getAcademyLevel,
+  getAcademyTalentBands,
+} from "@/lib/economy-rules";
 import { getGeneratedPlayerName } from "@/lib/player-names";
 
 const ATTRIBUTE_KEYS: TrainingFocus[] = [
@@ -48,24 +52,57 @@ export function createInitialAcademy() {
 export function createWeeklyAcademyPlayer({
   from = new Date(),
   random = Math.random,
+  academyLevel = 1,
 }: {
   from?: Date;
   random?: () => number;
+  academyLevel?: number;
 } = {}) {
   const age = randomInteger(14, 16, random) as AcademyProfile["age"];
   const profile = WEEKLY_PROFILE_BY_AGE[age];
   const nameSequence = randomInteger(0, 100000, random);
   const name = getGeneratedPlayerName("🇮🇹", nameSequence);
+  const academy = getAcademyLevel(academyLevel);
+  const overallBonus = randomInteger(
+    academy.overallBonus[0],
+    academy.overallBonus[1],
+    random
+  );
+  const talent = rollAcademyTalent(academyLevel, random);
 
   return createAcademyPlayer(
     {
       ...profile,
+      overall: [
+        profile.overall[0] + overallBonus,
+        profile.overall[1] + overallBonus,
+      ],
+      talent: [talent, talent],
       estimatedAttributes: 3,
     },
     name.firstName,
     name.lastName,
     { from, random }
   );
+}
+
+function rollAcademyTalent(
+  academyLevel: number,
+  random: () => number
+) {
+  const bands = getAcademyTalentBands(academyLevel);
+  const roll = normalizedRandom(random);
+  let cumulative = 0;
+
+  for (const band of bands) {
+    cumulative += band.probability;
+    if (roll < cumulative) {
+      return randomInteger(band.minimum, band.maximum, random);
+    }
+  }
+
+  const fallback = bands[bands.length - 1];
+  return randomInteger(fallback.minimum, fallback.maximum, random);
 }
 
 function createAcademyPlayer(
@@ -117,8 +154,12 @@ function randomInteger(
   maximum: number,
   random = Math.random
 ) {
-  const randomValue = Math.min(0.999999999999, Math.max(0, random()));
+  const randomValue = normalizedRandom(random);
   return Math.floor(randomValue * (maximum - minimum + 1) + minimum);
+}
+
+function normalizedRandom(random: () => number) {
+  return Math.min(0.999999999999, Math.max(0, random()));
 }
 
 function shuffle<T>(values: T[], random = Math.random) {

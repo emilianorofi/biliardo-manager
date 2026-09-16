@@ -7,20 +7,18 @@ const ECONOMY_SCHEMA_LOCK = 2026091601;
 let economySchemaReady = false;
 
 type ColumnExistsRow = { exists: boolean };
+type SchemaClient = Prisma.TransactionClient | typeof prisma;
 
 export async function ensureEconomySchema() {
   if (economySchemaReady) return;
 
-  const [{ exists }] = await prisma.$queryRaw<ColumnExistsRow[]>`
-    SELECT EXISTS (
-      SELECT 1 FROM information_schema.columns
-      WHERE table_schema = current_schema()
-        AND table_name = 'Club'
-        AND column_name = 'trainingCenterLevel'
-    ) AS "exists"
-  `;
+  const structureExists = await hasColumn(
+    prisma,
+    "Club",
+    "trainingCenterLevel"
+  );
 
-  if (exists) {
+  if (structureExists) {
     await ensureEconomyMarkers(prisma);
     economySchemaReady = true;
     return;
@@ -31,16 +29,13 @@ export async function ensureEconomySchema() {
       SELECT pg_advisory_xact_lock(${ECONOMY_SCHEMA_LOCK})
     `;
 
-    const [lockedCheck] = await transaction.$queryRaw<ColumnExistsRow[]>`
-      SELECT EXISTS (
-        SELECT 1 FROM information_schema.columns
-        WHERE table_schema = current_schema()
-          AND table_name = 'Club'
-          AND column_name = 'trainingCenterLevel'
-      ) AS "exists"
-    `;
+    const lockedCheck = await hasColumn(
+      transaction,
+      "Club",
+      "trainingCenterLevel"
+    );
 
-    if (!lockedCheck.exists) {
+    if (!lockedCheck) {
       await applyEconomySchema(transaction);
       await alignExistingEconomyData(transaction);
     }
@@ -76,26 +71,91 @@ async function applyEconomySchema(transaction: Prisma.TransactionClient) {
   `);
 }
 
-async function ensureEconomyMarkers(client: Prisma.TransactionClient | typeof prisma) {
-  await client.$executeRawUnsafe(`
-    ALTER TABLE "ClubWeeklyUpdate"
-      ADD COLUMN IF NOT EXISTS "economyAppliedAt" TIMESTAMP(3)
-  `);
+async function ensureEconomyMarkers(client: SchemaClient) {
+  const weeklyMarkerExists = await hasColumn(
+    client,
+    "ClubWeeklyUpdate",
+    "economyAppliedAt"
+  );
+  if (!weeklyMarkerExists) {
+    await client.$executeRawUnsafe(`
+      ALTER TABLE "ClubWeeklyUpdate"
+        ADD COLUMN "economyAppliedAt" TIMESTAMP(3)
+    `);
+    await client.$executeRawUnsafe(`
+      UPDATE "ClubWeeklyUpdate"
+      SET "economyAppliedAt" = COALESCE("processedAt", "createdAt")
+      WHERE "economyAppliedAt" IS NULL
+    `);
+  }
 
-  await client.$executeRawUnsafe(`
-    ALTER TABLE "TransferListing"
-      ADD COLUMN IF NOT EXISTS "economyAdjustedAt" TIMESTAMP(3)
-  `);
+  const transferMarkerExists = await hasColumn(
+    client,
+    "TransferListing",
+    "economyAdjustedAt"
+  );
+  if (!transferMarkerExists) {
+    await client.$executeRawUnsafe(`
+      ALTER TABLE "TransferListing"
+        ADD COLUMN "economyAdjustedAt" TIMESTAMP(3)
+    `);
+    await client.$executeRawUnsafe(`
+      UPDATE "TransferListing"
+      SET "economyAdjustedAt" = COALESCE("completedAt", "createdAt")
+      WHERE "status" = 'COMPLETED'
+        AND "economyAdjustedAt" IS NULL
+    `);
+  }
 
-  await client.$executeRawUnsafe(`
-    ALTER TABLE "Season"
-      ADD COLUMN IF NOT EXISTS "economySettledAt" TIMESTAMP(3)
-  `);
+  const tournamentMarkerExists = await hasColumn(
+    client,
+    "IndividualTournament",
+    "prizesPaidAt"
+  );
+  if (!tournamentMarkerExists) {
+    await client.$executeRawUnsafe(`
+      ALTER TABLE "IndividualTournament"
+        ADD COLUMN "prizesPaidAt" TIMESTAMP(3)
+    `);
+    await client.$executeRawUnsafe(`
+      UPDATE "IndividualTournament"
+      SET "prizesPaidAt" = COALESCE("finalAt", "updatedAt")
+      WHERE "status" = 'COMPLETED'
+        AND "prizesPaidAt" IS NULL
+    `);
+  }
 
-  await client.$executeRawUnsafe(`
-    ALTER TABLE "IndividualTournament"
-      ADD COLUMN IF NOT EXISTS "prizesPaidAt" TIMESTAMP(3)
-  `);
+  const seasonMarkerExists = await hasColumn(
+    client,
+    "Season",
+    "economySettledAt"
+  );
+  if (!seasonMarkerExists) {
+    await client.$executeRawUnsafe(`
+      ALTER TABLE "Season"
+        ADD COLUMN "economySettledAt" TIMESTAMP(3)
+    `);
+  }
+}
+
+async function hasColumn(
+  client: SchemaClient,
+  tableName: string,
+  columnName: string
+) {
+  const rows = await client.$queryRawUnsafe<ColumnExistsRow[]>(
+    `SELECT EXISTS (
+      SELECT 1
+      FROM information_schema.columns
+      WHERE table_schema = current_schema()
+        AND table_name = $1
+        AND column_name = $2
+    ) AS "exists"`,
+    tableName,
+    columnName
+  );
+
+  return rows[0]?.exists ?? false;
 }
 
 async function alignExistingEconomyData(transaction: Prisma.TransactionClient) {

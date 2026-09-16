@@ -16,80 +16,26 @@ import {
   Target,
   Flag,
   CalendarDays,
+  Building2,
   Settings,
 } from "lucide-react";
 
 const menu = [
-  {
-    label: "Dashboard",
-    href: "/dashboard",
-    icon: LayoutDashboard,
-  },
-  {
-    label: "Squadra",
-    href: "/team",
-    icon: Users,
-  },
-  {
-    label: "Giocatori",
-    href: "/players",
-    icon: User,
-  },
-  {
-    label: "Formazione",
-    href: "/formation",
-    icon: Target,
-  },
-  {
-    label: "Lega",
-    href: "/campionato",
-    icon: Trophy,
-  },
-  {
-    label: "Individuale",
-    href: "/individuale",
-    icon: Medal,
-  },
-  {
-    label: "Coppa Nazioni",
-    href: "/coppa-nazioni",
-    icon: Flag,
-  },
-  {
-    label: "Calendario",
-    href: "/calendario",
-    icon: CalendarDays,
-  },
-  {
-    label: "Ranking",
-    href: "/ranking",
-    icon: ListOrdered,
-  },
-  {
-    label: "Mercato",
-    href: "/market",
-    icon: ArrowRightLeft,
-  },
-  {
-    label: "Finanze",
-    href: "/finance",
-    icon: Euro,
-  },
-  {
-    label: "Allenamento",
-    href: "/training",
-    icon: Dumbbell,
-  },
-  {
-    label: "Accademia",
-    href: "/academy",
-    icon: GraduationCap,
-  },
-  {
-    label: "Impostazioni",
-    href: "/settings",
-    icon: Settings,
-  },
+  { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { label: "Squadra", href: "/team", icon: Users },
+  { label: "Giocatori", href: "/players", icon: User },
+  { label: "Formazione", href: "/formation", icon: Target },
+  { label: "Lega", href: "/campionato", icon: Trophy },
+  { label: "Individuale", href: "/individuale", icon: Medal },
+  { label: "Coppa Nazioni", href: "/coppa-nazioni", icon: Flag },
+  { label: "Calendario", href: "/calendario", icon: CalendarDays },
+  { label: "Ranking", href: "/ranking", icon: ListOrdered },
+  { label: "Mercato", href: "/market", icon: ArrowRightLeft },
+  { label: "Finanze", href: "/finance", icon: Euro },
+  { label: "Strutture", href: "/structures", icon: Building2 },
+  { label: "Allenamento", href: "/training", icon: Dumbbell },
+  { label: "Accademia", href: "/academy", icon: GraduationCap },
+  { label: "Impostazioni", href: "/settings", icon: Settings },
 ];
 
 export default function Sidebar() {
@@ -100,14 +46,11 @@ export default function Sidebar() {
       <div className="p-6 text-2xl font-bold text-yellow-400">
         🎱 Biliardo Manager
       </div>
-
       <nav className="flex flex-col gap-2 px-3">
         {menu.map((item) => {
           const Icon = item.icon;
-
           const isActive =
-            pathname === item.href ||
-            pathname.startsWith(`${item.href}/`);
+            pathname === item.href || pathname.startsWith(`${item.href}/`);
 
           return (
             <Link
