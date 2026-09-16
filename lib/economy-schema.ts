@@ -25,7 +25,7 @@ export async function ensureEconomySchema() {
   }
 
   await prisma.$transaction(async (transaction) => {
-    await transaction.$executeRaw`
+    await transaction.$queryRaw`
       SELECT pg_advisory_xact_lock(${ECONOMY_SCHEMA_LOCK})
     `;
 
