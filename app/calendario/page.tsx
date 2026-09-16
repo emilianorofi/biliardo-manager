@@ -153,9 +153,11 @@ export default async function CalendarioPage() {
                   href={
                     item.isNationsCup
                       ? "/coppa-nazioni"
-                      : item.tournament
-                        ? `/individuale/${item.week}`
-                        : undefined
+                      : item.isSpecialtyCup
+                        ? "/coppa-specialita"
+                        : item.tournament
+                          ? `/individuale/${item.week}`
+                          : undefined
                   }
                   highlight={Boolean(
                     item.isNationsCup || item.isSpecialtyCup || item.tournament
