@@ -17,70 +17,32 @@ export async function getMarketCommitments(
   clubId: number,
   excludeListingId?: number
 ): Promise<MarketCommitments> {
-  const auctions =
-    await client.transferListing.findMany({
-      where: {
-        ...(excludeListingId
-          ? {
-              id: {
-                not: excludeListingId,
-              },
-            }
-          : {}),
-        listingType: "AUCTION",
-        status: {
-          in: ["ACTIVE", "PENDING_TRANSFER"],
-        },
-        bids: {
-          some: {
-            bidderClubId: clubId,
-          },
-        },
+  const auctions = await client.transferListing.findMany({
+    where: {
+      ...(excludeListingId ? { id: { not: excludeListingId } } : {}),
+      listingType: "AUCTION",
+      status: { in: ["ACTIVE", "PENDING_TRANSFER"] },
+      bids: { some: { bidderClubId: clubId } },
+    },
+    select: {
+      bids: {
+        orderBy: [{ amount: "desc" }, { createdAt: "asc" }],
+        take: 1,
+        select: { amount: true, bidderClubId: true },
       },
-      select: {
-        player: {
-          select: {
-            salary: true,
-          },
-        },
-        bids: {
-          orderBy: [
-            {
-              amount: "desc",
-            },
-            {
-              createdAt: "asc",
-            },
-          ],
-          take: 1,
-          select: {
-            amount: true,
-            bidderClubId: true,
-          },
-        },
-      },
-    });
+    },
+  });
 
   return auctions.reduce<MarketCommitments>(
     (commitments, auction) => {
       const leadingBid = auction.bids[0];
-
-      if (leadingBid?.bidderClubId !== clubId) {
-        return commitments;
-      }
+      if (leadingBid?.bidderClubId !== clubId) return commitments;
 
       return {
-        reservedCredits:
-          commitments.reservedCredits +
-          leadingBid.amount +
-          auction.player.salary,
-        reservedRosterPlaces:
-          commitments.reservedRosterPlaces + 1,
+        reservedCredits: commitments.reservedCredits + leadingBid.amount,
+        reservedRosterPlaces: commitments.reservedRosterPlaces + 1,
       };
     },
-    {
-      reservedCredits: 0,
-      reservedRosterPlaces: 0,
-    }
+    { reservedCredits: 0, reservedRosterPlaces: 0 }
   );
 }
