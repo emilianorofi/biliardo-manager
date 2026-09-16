@@ -15,6 +15,10 @@ import {
 import { NATIONS_CUP_LEAGUE_ROUND } from "@/lib/nations-cup";
 import { prisma } from "@/lib/prisma";
 import { addRomeDaysAtTime, ROME_TIME_ZONE } from "@/lib/rome-calendar";
+import {
+  SPECIALTY_CUP_NAME,
+  SPECIALTY_CUP_SEASON_WEEK,
+} from "@/lib/specialty-cup-calendar";
 
 export const dynamic = "force-dynamic";
 
@@ -62,6 +66,7 @@ export default async function CalendarioPage() {
       (candidate) => candidate.leagueRound === week
     );
     const isNationsCup = week === NATIONS_CUP_LEAGUE_ROUND;
+    const isSpecialtyCup = week === SPECIALTY_CUP_SEASON_WEEK;
 
     return {
       week,
@@ -70,6 +75,7 @@ export default async function CalendarioPage() {
       tuesday: addRomeDaysAtTime(friday, -3, 21),
       tournament,
       isNationsCup,
+      isSpecialtyCup,
     };
   });
 
@@ -97,13 +103,15 @@ export default async function CalendarioPage() {
           const completed = item.week <= league.currentRound;
           const weekendLabel = item.isNationsCup
             ? "Coppa delle Nazioni"
-            : item.tournament?.name ?? "Fine settimana libero";
+            : item.isSpecialtyCup
+              ? SPECIALTY_CUP_NAME
+              : item.tournament?.name ?? "Fine settimana libero";
 
           return (
             <article
               key={item.week}
               className={`overflow-hidden rounded-2xl border bg-zinc-900 ${
-                item.week === 15
+                item.week >= 14
                   ? "border-amber-400/30"
                   : completed
                     ? "border-emerald-500/25"
@@ -149,7 +157,9 @@ export default async function CalendarioPage() {
                         ? `/individuale/${item.week}`
                         : undefined
                   }
-                  highlight={Boolean(item.isNationsCup || item.tournament)}
+                  highlight={Boolean(
+                    item.isNationsCup || item.isSpecialtyCup || item.tournament
+                  )}
                 />
               </div>
             </article>
