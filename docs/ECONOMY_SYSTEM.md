@@ -1,27 +1,31 @@
 # Sistema economico di Biliardo Manager
 
-Questa pagina fissa la baseline economica approvata dopo il primo ciclo di bilanciamento. I valori qui sotto sono la fonte di verita per la prossima implementazione delle finanze.
+Questa pagina raccoglie la baseline economica approvata. I valori qui indicati sono la fonte di verita per l'integrazione in produzione. La validazione a 20 stagioni e documentata in `docs/ECONOMY_SIMULATION.md`.
 
-## Obiettivi di design
+## Principi
 
-- Una societa normale e ben amministrata deve essere vicina al pareggio e conservare un margine ridotto.
-- Una societa competitiva puo permettersi uno o due campioni, ma deve sacrificare risorse in altre aree.
-- Una rosa piena di fuoriclasse deve essere possibile solo come scelta temporanea e molto costosa.
-- Non esiste un salary cap artificiale: il limite e economico.
-- Vincere aiuta, ma non deve generare un ciclo automatico `vinco -> mi arricchisco -> compro tutti -> continuo a vincere`.
-- Le societa deboli devono poter recuperare tramite risparmio, sviluppo dei giovani, allenamento, strutture e mercato.
-- Gli upgrade delle strutture sono money sink principali: costo di costruzione alto e manutenzione piu moderata.
-- Il 5% delle cessioni esce dall'economia come commissione di mercato.
+- nessun salary cap artificiale: il limite e economico;
+- una societa ben amministrata deve stare vicino al pareggio o a un piccolo surplus;
+- uno o due campioni devono essere sostenibili, una rosa interamente elite solo temporaneamente;
+- vincere aiuta ma non deve creare un ciclo automatico di dominio economico;
+- mercato, strutture e commissioni funzionano anche da money sink;
+- un club debole deve poter recuperare tramite sviluppo, giovani, mercato e buona gestione.
 
-## Stipendi dei giocatori
+## Capitale e controllo finanziario
+
+- capitale iniziale nuovo manager: **100.000**;
+- commissione mercato: **5%** del prezzo di cessione;
+- saldo negativo: blocco di nuovi acquisti e nuovi upgrade;
+- sotto **-25.000**: avviso finanziario grave;
+- sotto **-50.000**: amministrazione controllata, senza cancellazione immediata del club.
+
+## Stipendi
 
 Formula settimanale:
 
 `stipendio = max(250, round(250 * 1.105^(overall - 50)))`
 
-Riferimenti:
-
-| Overall | Stipendio settimanale |
+| OVR | Stipendio |
 | ---: | ---: |
 | 50 | 250 |
 | 55 | 412 |
@@ -34,36 +38,15 @@ Riferimenti:
 | 90 | 13.565 |
 | 95 | 22.348 |
 
-Sei giocatori da 85 costano quindi 49.404 a settimana prima di staff, strutture e gestione del club.
+Sei giocatori da 85 costano 49.404 a settimana prima di staff, strutture e gestione.
 
-## Valore di mercato dei giocatori
-
-Il valore non dipende soltanto dalla forza attuale. Un giovane meno forte puo valere piu di un giocatore anziano con overall superiore perche conserva una finestra di crescita molto piu lunga.
-
-Formula definitiva:
+## Valore di mercato
 
 `valore = valore base overall * coefficiente eta * coefficiente talento`
 
-Forma, morale ed esperienza non modificano il valore di mercato.
-
-### Valore base da overall
-
 `valore base = 30.000 * 1,075^(overall - 60)`
 
-| Overall | Valore base |
-| ---: | ---: |
-| 50 | 14.556 |
-| 55 | 20.897 |
-| 60 | 30.000 |
-| 65 | 43.069 |
-| 70 | 61.831 |
-| 75 | 88.766 |
-| 80 | 127.436 |
-| 85 | 182.950 |
-| 90 | 262.649 |
-| 95 | 377.066 |
-
-### Coefficiente eta
+Coefficiente eta:
 
 | Eta | Moltiplicatore |
 | ---: | ---: |
@@ -81,69 +64,38 @@ Forma, morale ed esperienza non modificano il valore di mercato.
 | 71-75 | 0,18 |
 | 76+ | 0,10 |
 
-La curva rispetta il ciclo specifico del biliardo: i giocatori possono continuare a crescere fino alla fascia 40-45 anni, mentre oltre tale soglia il valore futuro cala progressivamente insieme alla finestra residua di sviluppo e al rischio di ritiro.
-
-### Coefficiente talento
-
 `coefficiente talento = 0,70 + talento / 180`
 
-| Talento | Moltiplicatore circa |
-| ---: | ---: |
-| 60 | 1,03 |
-| 70 | 1,09 |
-| 80 | 1,14 |
-| 90 | 1,20 |
-| 100 | 1,26 |
+Forma, morale ed esperienza non modificano il valore. Il risultato viene arrotondato ai 100 piu vicini.
 
-Il valore finale viene arrotondato ai 100 piu vicini.
-
-Esempi fissati:
-
-- 18 anni, overall 60, talento 80: 79.000.
-- 60 anni, overall 75, talento 70: 53.200.
-- 40 anni, overall 90, talento 85: 400.200.
-- 45 anni, overall 95, talento 90: 520.400.
+Esempi fissati: 18 anni/OVR60/talento80 = 79.000; 60 anni/OVR75/talento70 = 53.200; 40 anni/OVR90/talento85 = 400.200; 45 anni/OVR95/talento90 = 520.400.
 
 ## Staff
 
-### Allenatore
+| Livello | Allenatore | Responsabile giovani |
+| ---: | ---: | ---: |
+| 1 | 500 | 250 |
+| 2 | 900 | 450 |
+| 3 | 1.500 | 800 |
+| 4 | 2.400 | 1.300 |
+| 5 | 3.800 | 2.100 |
 
-| Livello | Costo settimanale |
-| ---: | ---: |
-| 1 | 500 |
-| 2 | 900 |
-| 3 | 1.500 |
-| 4 | 2.400 |
-| 5 | 3.800 |
+L'allenatore modifica l'efficienza dell'allenamento. Il Responsabile giovani migliora la precisione delle stime dei giovani gia presenti; non sostituisce il livello Accademia.
 
-### Responsabile giovani
+## Economia per categoria
 
-| Livello | Costo settimanale |
-| ---: | ---: |
-| 1 | 250 |
-| 2 | 450 |
-| 3 | 800 |
-| 4 | 1.300 |
-| 5 | 2.100 |
-
-Il Responsabile giovani resta distinto dall'Accademia: il suo livello migliora la precisione con cui vengono stimate le caratteristiche dei giovani gia presenti, mentre il livello dell'Accademia modifica la qualita media dei nuovi candidati.
-
-## Entrate e costi base per categoria
-
-| Serie | Sponsor/settimana | Incasso base gara in casa | Gestione club/settimana |
+| Serie | Sponsor base/settimana | Incasso base casa | Gestione club/settimana |
 | ---: | ---: | ---: | ---: |
 | 1 | 8.500 | 14.000 | 2.600 |
 | 2 | 7.000 | 11.000 | 1.900 |
 | 3 | 5.800 | 8.400 | 1.350 |
 | 4 | 4.800 | 6.400 | 900 |
 
-## Tifosi, reputazione, sponsor e pubblico
+## Tifosi e reputazione
 
-I tifosi rappresentano una sala da biliardo reale, non uno stadio. La scala definitiva e quindi 10-300, con riferimento economico pari a 90.
+Tifosi: scala **10-300**, riferimento economico **90**.
 
-Variazione tifosi dopo ogni giornata:
-
-| Punti giornata | Variazione |
+| Punti giornata | Variazione tifosi |
 | ---: | ---: |
 | 0 | -3 |
 | 1 | -2 |
@@ -153,9 +105,9 @@ Variazione tifosi dopo ogni giornata:
 | 5 | +2 |
 | 6 | +3 |
 
-A fine stagione:
+Fine stagione:
 
-| Posizione | Variazione tifosi | Variazione reputazione |
+| Posizione | Tifosi | Reputazione |
 | ---: | ---: | ---: |
 | 1 | +12 | +4 |
 | 2 | +7 | +2 |
@@ -166,36 +118,36 @@ A fine stagione:
 | 7 | -6 | -2 |
 | 8 | -9 | -3 |
 
-Promozione: +6 tifosi e +2 reputazione. Retrocessione: -6 tifosi e -2 reputazione. Il campione della Prima Serie riceve inoltre +2 reputazione. La reputazione resta su scala 1-100 e viene aggiornata a fine stagione.
+Promozione: +6 tifosi e +2 reputazione. Retrocessione: -6 tifosi e -2 reputazione. Campione Prima Serie: ulteriore +2 reputazione. Reputazione su scala 1-100.
 
-Sponsor settimanale:
+## Sponsor
 
-`base serie * reputazione * tifosi * andamento recente`
+`base serie * fattore reputazione * fattore tifosi * fattore forma`
 
-- reputazione: `1 + (reputazione - 40) * 0,004`, limitata a 0,92-1,08;
-- tifosi: `1 + (tifosi - 90) / 1.600`, limitata a 0,95-1,05;
-- media punti ultime 5 giornate: `1 + (media - 3) * 0,01`, limitata a 0,97-1,03;
-- moltiplicatore sponsor complessivo limitato a 0,85-1,15.
+- reputazione: `1 + (rep - 40) * 0,004`, limite 0,92-1,08;
+- tifosi: `1 + (tifosi - 90) / 1.600`, limite 0,95-1,05;
+- media punti ultime 5: `1 + (media - 3) * 0,01`, limite 0,97-1,03;
+- moltiplicatore finale sponsor: **0,85-1,15**.
 
-Incasso casalingo:
+## Pubblico
 
-`base serie * interesse partita * bonus Impianto`
+`incasso = base serie * interesse partita * bonus Impianto`
 
-L'interesse partita usa:
+Interesse partita:
 
-- tifosi casa: `1 + (tifosi - 90) / 800`, limitato a 0,90-1,10;
-- reputazione casa: `1 + (reputazione - 40) * 0,0025`, limitata a 0,95-1,05;
-- andamento ultime 5: limitato a 0,95-1,05;
-- reputazione avversario: `1 + (reputazione - 40) * 0,0035`, limitata a 0,95-1,10;
-- interesse complessivo limitato a 0,80-1,25 prima del bonus Impianto.
+- tifosi casa: `1 + (tifosi - 90) / 800`, limite 0,90-1,10;
+- reputazione casa: `1 + (rep - 40) * 0,0025`, limitata a 0,95-1,05;
+- andamento ultime 5: limite 0,95-1,05;
+- reputazione avversario: `1 + (rep avversario - 40) * 0,0035`, limitata a 0,95-1,10;
+- interesse complessivo prima dell'Impianto: **0,80-1,25**.
 
-La posizione in classifica non entra direttamente nella formula, per evitare di moltiplicare troppo il vantaggio di chi e gia in testa.
+La posizione in classifica non entra direttamente nella formula.
 
 ## Strutture
 
 ### Centro Allenamento
 
-| Livello | Costo upgrade | Manutenzione settimanale | Bonus crescita | Tempo upgrade |
+| Livello | Upgrade | Manutenzione | Bonus crescita | Tempo |
 | ---: | ---: | ---: | ---: | ---: |
 | 1 | iniziale | 300 | 0% | - |
 | 2 | 25.000 | 700 | +4% | 7 giorni |
@@ -203,13 +155,13 @@ La posizione in classifica non entra direttamente nella formula, per evitare di 
 | 4 | 130.000 | 2.400 | +13% | 21 giorni |
 | 5 | 260.000 | 3.800 | +18% | 28 giorni |
 
-Il bonus si applica soltanto alla crescita positiva prodotta dall'allenamento e non al decadimento per eta. Durante i lavori resta attivo il livello precedente.
+Il bonus si applica solo alla crescita positiva, non al decadimento per eta. Durante i lavori resta attivo il livello precedente.
 
 ### Accademia
 
-| Livello | Costo upgrade | Manutenzione settimanale | Bonus OVR candidato | Tempo upgrade |
+| Livello | Upgrade | Manutenzione | Bonus OVR candidato | Tempo |
 | ---: | ---: | ---: | ---: | ---: |
-| 1 | iniziale | 150 | nessuno | - |
+| 1 | iniziale | 150 | 0 | - |
 | 2 | 20.000 | 300 | 0-1 | 7 giorni |
 | 3 | 50.000 | 500 | 0-2 | 14 giorni |
 | 4 | 110.000 | 800 | 1-3 | 21 giorni |
@@ -225,11 +177,11 @@ Probabilita talento:
 | 4 | 58% | 25% | 12% | 4% | 1% |
 | 5 | 50% | 27% | 16% | 6% | 1% |
 
-Restano invariati: un candidato ogni settimana, massimo 10 giovani, eta 14-16, tre caratteristiche stimate all'ingresso e nessun aumento del numero di candidati ai livelli superiori.
+Restano invariati: un candidato/settimana, massimo 10, eta 14-16, tre caratteristiche stimate all'ingresso. Il livello non aumenta il numero di candidati.
 
 ### Impianto di gioco
 
-| Livello | Costo upgrade | Manutenzione settimanale | Bonus incasso casa | Tempo upgrade |
+| Livello | Upgrade | Manutenzione | Bonus incasso | Tempo |
 | ---: | ---: | ---: | ---: | ---: |
 | 1 | iniziale | 150 | 0% | - |
 | 2 | 30.000 | 250 | +7% | 7 giorni |
@@ -237,27 +189,11 @@ Restano invariati: un candidato ogni settimana, massimo 10 giovani, eta 14-16, t
 | 4 | 160.000 | 650 | +25% | 21 giorni |
 | 5 | 320.000 | 1.000 | +40% | 28 giorni |
 
-Il bonus Impianto si applica dopo il fattore di interesse della partita. Durante i lavori resta attivo il livello precedente.
-
-## Mercato e liquidita
-
-- Commissione su ogni cessione: 5%.
-- Il venditore incassa il 95% del prezzo finale.
-- Le offerte devono essere coperte dalla liquidita disponibile.
-- Le offerte in cui il club e attualmente primo impegnano denaro e posti rosa.
-- Un saldo negativo blocca nuovi acquisti e nuovi upgrade strutturali.
-- A -25.000 scatta l'avviso finanziario grave.
-- A -50.000 scatta l'amministrazione controllata; non e previsto il fallimento immediato del club.
-
-## Capitale iniziale
-
-Un nuovo manager parte con 100.000 di liquidita, indipendentemente dalla categoria del club ricevuto.
+Il bonus si applica dopo il fattore interesse partita. Durante i lavori resta attivo il livello precedente.
 
 ## Premi
 
-### Campionati
-
-I premi valgono per ogni singolo girone.
+Campionati, per ogni girone:
 
 | Serie | 1° | 2° | 3° |
 | ---: | ---: | ---: | ---: |
@@ -266,55 +202,38 @@ I premi valgono per ogni singolo girone.
 | Terza | 13.000 | 8.000 | 5.000 |
 | Quarta | 8.000 | 5.000 | 3.000 |
 
-Premio promozione aggiuntivo:
+Promozioni: Seconda->Prima 10.000; Terza->Seconda 7.000; Quarta->Terza 5.000. Nessun paracadute retrocessione.
 
-- Seconda -> Prima: 10.000;
-- Terza -> Seconda: 7.000;
-- Quarta -> Terza: 5.000.
+Tornei individuali normali: vincitore 6.000, finalista 3.000, semifinalisti 1.500, quarti 500; montepremi 14.000 per torneo.
 
-Non esiste buonuscita economica per la retrocessione.
+Mondiale individuale: campione 15.000, finalista 8.000, semifinalisti 4.000, quarti 1.500; montepremi 37.000.
 
-### Tornei individuali normali
-
-Il premio viene accreditato al club del giocatore.
-
-| Risultato | Premio |
-| --- | ---: |
-| Vincitore | 6.000 |
-| Finalista | 3.000 |
-| Semifinalista | 1.500 |
-| Quarti | 500 |
-
-Montepremi complessivo per torneo: 14.000.
-
-### Mondiale individuale
-
-| Risultato | Premio |
-| --- | ---: |
-| Campione del Mondo | 15.000 |
-| Finalista | 8.000 |
-| Semifinalista | 4.000 |
-| Quarti | 1.500 |
-
-Montepremi complessivo: 37.000.
-
-### Coppa delle Nazioni
-
-La Coppa delle Nazioni non assegna denaro ai club. Resta una competizione di prestigio, per evitare che il possesso di piu nazionali forti generi ulteriore vantaggio economico automatico.
+Coppa delle Nazioni: nessun premio economico ai club.
 
 ## Target di bilanciamento
 
-- stipendi di una societa normale: 55-60% delle entrate;
+- stipendi societa normale: 55-60% delle entrate;
 - staff: 20-25%;
 - strutture: circa 10%;
 - margine libero: 5-15%;
-- squadra da titolo: spesa pari al 120-150% delle entrate per periodi limitati;
-- super-squadra: spesa pari al 250-300% delle entrate, quindi non sostenibile stabilmente;
-- dopo molte stagioni il saldo mediano ideale deve restare nell'ordine di 50.000-150.000;
-- il divario tecnico tra fascia alta e fascia bassa non dovrebbe superare stabilmente circa 12 punti di overall.
+- squadra da titolo: spesa 120-150% delle entrate per periodi limitati;
+- super-squadra: spesa 250-300%, quindi non sostenibile stabilmente;
+- saldo mediano di lungo periodo desiderato: 50.000-150.000;
+- gap tecnico P90-P10 desiderato: non stabilmente oltre circa 12 OVR.
 
-## Elementi ancora da finalizzare prima dell'attivazione completa
+## Validazione a 20 stagioni
 
-1. Simulatore economico riproducibile su 20 stagioni con promozioni, retrocessioni, crescita, mercato, accademia, strutture, premi e ritiri.
+La baseline e stata stress-testata con un simulatore riproducibile su 30 mondi da 20 stagioni, includendo 120 club, sviluppo, ritiri, Accademia, mercato, strutture, sponsor/pubblico, premi e promozioni/retrocessioni.
 
-Fino alla chiusura del simulatore questa baseline resta bloccata come riferimento e non deve essere sostituita da numeri ad hoc nelle singole pagine o servizi.
+Risultati principali a stagione 20:
+
+- saldo mediano: **82.756**;
+- P10/P90: **14.335 / 191.988**;
+- club con saldo negativo: **2,4 su 120** in media;
+- club sotto -50.000 al checkpoint: **0** in media;
+- gap tecnico P90-P10: **9,19**;
+- campioni diversi della Prima in 20 stagioni: mediana **11**;
+- club iniziali di Quarta arrivati in Prima: media **3,63 su 64**;
+- club iniziali di Quarta diventati campioni di Prima: media **0,77**.
+
+I due target principali risultano rispettati: saldo mediano dentro 50.000-150.000 e gap tecnico sotto 12. La baseline e quindi considerata validata per l'integrazione in produzione. Dettagli, metodologia e assunzioni sono in `docs/ECONOMY_SIMULATION.md`.
