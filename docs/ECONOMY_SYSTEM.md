@@ -141,17 +141,35 @@ Sponsor e pubblico devono poter ricevere variazioni moderate da reputazione, tif
 
 ## Strutture
 
-Il Centro Allenamento usa questa prima curva fissata:
+### Centro Allenamento
 
-| Livello | Costo upgrade | Manutenzione settimanale |
-| ---: | ---: | ---: |
-| 1 | iniziale | 300 |
-| 2 | 25.000 | 700 |
-| 3 | 60.000 | 1.400 |
-| 4 | 130.000 | 2.400 |
-| 5 | 260.000 | 3.800 |
+Il Centro Allenamento aumenta soltanto i guadagni positivi prodotti dall'allenamento. Non riduce il decadimento dovuto all'eta e non sostituisce l'allenatore: i due effetti si combinano.
 
-Accademia e impianto di gioco devono seguire lo stesso principio economico, ma i loro importi definitivi restano da fissare insieme ai bonus prodotti da ciascun livello prima dell'attivazione in produzione.
+| Livello | Costo upgrade | Manutenzione settimanale | Bonus crescita | Tempo upgrade |
+| ---: | ---: | ---: | ---: | ---: |
+| 1 | iniziale | 300 | 0% | - |
+| 2 | 25.000 | 700 | +4% | 7 giorni |
+| 3 | 60.000 | 1.400 | +8% | 14 giorni |
+| 4 | 130.000 | 2.400 | +13% | 21 giorni |
+| 5 | 260.000 | 3.800 | +18% | 28 giorni |
+
+Formula:
+
+`guadagno finale = guadagno allenamento * (1 + bonus Centro Allenamento)`
+
+Esempi con un guadagno base di 0,70:
+
+- livello 1: 0,700;
+- livello 2: 0,728;
+- livello 3: 0,756;
+- livello 4: 0,791;
+- livello 5: 0,826.
+
+Con un guadagno base di 0,90, il livello 5 porta il guadagno a 1,062. Su 15 settimane equivalenti a piena intensita significa circa 2,43 punti aggiuntivi rispetto al livello 1 prima di eventuali limiti della skill.
+
+Durante un upgrade resta attivo il livello precedente fino alla conclusione dei lavori. Gli upgrade non sono quindi istantanei e non permettono di passare dal livello 1 al livello 5 nello stesso momento.
+
+Accademia e Impianto di gioco devono seguire lo stesso principio economico, ma i loro importi definitivi restano da fissare insieme ai bonus prodotti da ciascun livello prima dell'attivazione in produzione.
 
 ## Mercato e liquidita
 

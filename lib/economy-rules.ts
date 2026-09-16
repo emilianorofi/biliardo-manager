@@ -58,22 +58,32 @@ export const TRAINING_CENTER_LEVELS = {
   1: {
     upgradeCost: 0,
     weeklyMaintenance: 300,
+    growthBonus: 0,
+    upgradeDays: 0,
   },
   2: {
     upgradeCost: 25_000,
     weeklyMaintenance: 700,
+    growthBonus: 0.04,
+    upgradeDays: 7,
   },
   3: {
     upgradeCost: 60_000,
     weeklyMaintenance: 1_400,
+    growthBonus: 0.08,
+    upgradeDays: 14,
   },
   4: {
     upgradeCost: 130_000,
     weeklyMaintenance: 2_400,
+    growthBonus: 0.13,
+    upgradeDays: 21,
   },
   5: {
     upgradeCost: 260_000,
     weeklyMaintenance: 3_800,
+    growthBonus: 0.18,
+    upgradeDays: 28,
   },
 } as const;
 
@@ -160,6 +170,23 @@ export function calculatePlayerMarketValue({
     Math.round(rawValue / PLAYER_VALUE_ROUNDING) *
     PLAYER_VALUE_ROUNDING
   );
+}
+
+export function getTrainingCenterLevel(level: number) {
+  const normalizedLevel = Math.max(1, Math.min(5, Math.round(level))) as 1 | 2 | 3 | 4 | 5;
+  return TRAINING_CENTER_LEVELS[normalizedLevel];
+}
+
+export function getTrainingCenterGrowthMultiplier(level: number) {
+  return 1 + getTrainingCenterLevel(level).growthBonus;
+}
+
+export function applyTrainingCenterGrowthBonus(
+  trainingGain: number,
+  level: number
+) {
+  const normalizedGain = Math.max(0, trainingGain);
+  return normalizedGain * getTrainingCenterGrowthMultiplier(level);
 }
 
 export function calculateTransferFee(price: number) {

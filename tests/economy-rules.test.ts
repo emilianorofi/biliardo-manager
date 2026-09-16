@@ -5,6 +5,7 @@ import {
   CONTROLLED_ADMINISTRATION_BALANCE,
   FINANCIAL_WARNING_BALANCE,
   NEW_MANAGER_STARTING_BALANCE,
+  applyTrainingCenterGrowthBonus,
   calculatePlayerBaseMarketValue,
   calculatePlayerMarketValue,
   calculatePlayerWeeklySalary,
@@ -15,6 +16,8 @@ import {
   getPlayerValueAgeMultiplier,
   getPlayerValueTalentMultiplier,
   getTrainerWeeklyCost,
+  getTrainingCenterGrowthMultiplier,
+  getTrainingCenterLevel,
   getYouthCoachWeeklyCost,
 } from "../lib/economy-rules";
 
@@ -95,6 +98,35 @@ test("fissa il valore di mercato su overall, eta e talento", () => {
       talent: 90,
     }),
     520_400
+  );
+});
+
+test("fissa costi, tempi e bonus del centro allenamento", () => {
+  assert.deepEqual(getTrainingCenterLevel(1), {
+    upgradeCost: 0,
+    weeklyMaintenance: 300,
+    growthBonus: 0,
+    upgradeDays: 0,
+  });
+  assert.deepEqual(getTrainingCenterLevel(5), {
+    upgradeCost: 260_000,
+    weeklyMaintenance: 3_800,
+    growthBonus: 0.18,
+    upgradeDays: 28,
+  });
+
+  assert.equal(getTrainingCenterGrowthMultiplier(2), 1.04);
+  assert.equal(getTrainingCenterGrowthMultiplier(3), 1.08);
+  assert.equal(getTrainingCenterGrowthMultiplier(4), 1.13);
+  assert.equal(getTrainingCenterGrowthMultiplier(5), 1.18);
+
+  assert.equal(
+    Number(applyTrainingCenterGrowthBonus(0.7, 5).toFixed(3)),
+    0.826
+  );
+  assert.equal(
+    Number(applyTrainingCenterGrowthBonus(0.9, 5).toFixed(3)),
+    1.062
   );
 });
 
