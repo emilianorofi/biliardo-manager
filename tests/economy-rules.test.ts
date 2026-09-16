@@ -6,6 +6,7 @@ import {
   FINANCIAL_WARNING_BALANCE,
   NEW_MANAGER_STARTING_BALANCE,
   applyTrainingCenterGrowthBonus,
+  applyVenueGateBonus,
   calculatePlayerBaseMarketValue,
   calculatePlayerMarketValue,
   calculatePlayerWeeklySalary,
@@ -20,6 +21,8 @@ import {
   getTrainerWeeklyCost,
   getTrainingCenterGrowthMultiplier,
   getTrainingCenterLevel,
+  getVenueGateMultiplier,
+  getVenueLevel,
   getYouthCoachWeeklyCost,
 } from "../lib/economy-rules";
 
@@ -170,6 +173,32 @@ test("fissa costi, tempi e qualita dei candidati dell'accademia", () => {
     { minimum: 80, maximum: 89, probability: 0.06 },
     { minimum: 90, maximum: 95, probability: 0.01 },
   ]);
+});
+
+test("fissa costi, tempi e bonus dell'impianto di gioco", () => {
+  assert.deepEqual(getVenueLevel(1), {
+    upgradeCost: 0,
+    weeklyMaintenance: 150,
+    gateBonus: 0,
+    upgradeDays: 0,
+  });
+  assert.deepEqual(getVenueLevel(5), {
+    upgradeCost: 320_000,
+    weeklyMaintenance: 1_000,
+    gateBonus: 0.4,
+    upgradeDays: 28,
+  });
+
+  assert.equal(getVenueGateMultiplier(2), 1.07);
+  assert.equal(getVenueGateMultiplier(3), 1.15);
+  assert.equal(getVenueGateMultiplier(4), 1.25);
+  assert.equal(getVenueGateMultiplier(5), 1.4);
+
+  assert.equal(applyVenueGateBonus(14_000, 1), 14_000);
+  assert.equal(applyVenueGateBonus(14_000, 2), 14_980);
+  assert.equal(applyVenueGateBonus(14_000, 3), 16_100);
+  assert.equal(applyVenueGateBonus(14_000, 4), 17_500);
+  assert.equal(applyVenueGateBonus(14_000, 5), 19_600);
 });
 
 test("mantiene staff e costi base per categoria nei valori approvati", () => {

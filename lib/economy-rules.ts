@@ -158,6 +158,39 @@ export const ACADEMY_TALENT_BANDS = {
   ],
 } as const;
 
+export const VENUE_LEVELS = {
+  1: {
+    upgradeCost: 0,
+    weeklyMaintenance: 150,
+    gateBonus: 0,
+    upgradeDays: 0,
+  },
+  2: {
+    upgradeCost: 30_000,
+    weeklyMaintenance: 250,
+    gateBonus: 0.07,
+    upgradeDays: 7,
+  },
+  3: {
+    upgradeCost: 75_000,
+    weeklyMaintenance: 400,
+    gateBonus: 0.15,
+    upgradeDays: 14,
+  },
+  4: {
+    upgradeCost: 160_000,
+    weeklyMaintenance: 650,
+    gateBonus: 0.25,
+    upgradeDays: 21,
+  },
+  5: {
+    upgradeCost: 320_000,
+    weeklyMaintenance: 1_000,
+    gateBonus: 0.4,
+    upgradeDays: 28,
+  },
+} as const;
+
 export const ECONOMY_DESIGN_TARGETS = {
   normalSalaryShare: [0.55, 0.6],
   normalStaffShare: [0.2, 0.25],
@@ -265,6 +298,24 @@ export function getAcademyLevel(level: number) {
 
 export function getAcademyTalentBands(level: number) {
   return ACADEMY_TALENT_BANDS[normalizeStructureLevel(level)];
+}
+
+export function getVenueLevel(level: number) {
+  return VENUE_LEVELS[normalizeStructureLevel(level)];
+}
+
+export function getVenueGateMultiplier(level: number) {
+  return 1 + getVenueLevel(level).gateBonus;
+}
+
+export function applyVenueGateBonus(
+  baseGateIncome: number,
+  level: number
+) {
+  const normalizedBaseGateIncome = Math.max(0, baseGateIncome);
+  return Math.round(
+    normalizedBaseGateIncome * getVenueGateMultiplier(level)
+  );
 }
 
 export function calculateTransferFee(price: number) {

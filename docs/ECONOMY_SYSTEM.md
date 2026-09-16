@@ -219,7 +219,39 @@ Restano invariati i principi gia stabiliti per il vivaio:
 
 L'OVR base continua a dipendere anche dall'eta del candidato: indicativamente 40-42 a 14 anni, 45-47 a 15 anni e 50-52 a 16 anni prima del bonus prodotto dal livello dell'Accademia.
 
-L'Impianto di gioco resta l'ultima struttura da finalizzare per costi, manutenzione e bonus economici.
+### Impianto di gioco
+
+L'Impianto di gioco e una struttura economica pura: aumenta gli incassi delle partite casalinghe ma non modifica direttamente sponsor, reputazione o forza della squadra.
+
+| Livello | Costo upgrade | Manutenzione settimanale | Bonus incasso casa | Tempo upgrade |
+| ---: | ---: | ---: | ---: | ---: |
+| 1 | iniziale | 150 | 0% | - |
+| 2 | 30.000 | 250 | +7% | 7 giorni |
+| 3 | 75.000 | 400 | +15% | 14 giorni |
+| 4 | 160.000 | 650 | +25% | 21 giorni |
+| 5 | 320.000 | 1.000 | +40% | 28 giorni |
+
+Formula:
+
+`incasso partita = incasso base * fattori pubblico * (1 + bonus Impianto)`
+
+Il bonus Impianto si applica quindi dopo la definizione dell'incasso base della categoria e insieme ai futuri fattori di pubblico, reputazione, andamento recente e qualita dell'avversario.
+
+Esempio in Prima Serie con incasso base di 14.000 prima degli altri correttivi:
+
+- livello 1: 14.000;
+- livello 2: 14.980;
+- livello 3: 16.100;
+- livello 4: 17.500;
+- livello 5: 19.600.
+
+Durante i lavori resta attivo il livello precedente fino al completamento dell'upgrade. Il livello 5 richiede un investimento molto elevato e risulta quindi piu remunerativo nelle categorie superiori, dove gli incassi base sono maggiori.
+
+Le tre strutture hanno cosi ruoli separati:
+
+- Centro Allenamento: sviluppo della prima squadra;
+- Accademia: qualita dei nuovi giovani;
+- Impianto di gioco: entrate delle partite casalinghe.
 
 ## Mercato e liquidita
 
@@ -262,9 +294,8 @@ Questi sono target da validare con un simulatore riproducibile, non risultati ce
 
 ## Elementi ancora da finalizzare prima dell'attivazione completa
 
-1. Impianto di gioco: costi, manutenzione e benefici sugli incassi casalinghi.
-2. Premi completi di Seconda, Terza e Quarta Serie, promozioni e tornei individuali.
-3. Formula precisa di sponsor e pubblico per reputazione, tifosi, forma recente e avversario.
-4. Simulatore economico riproducibile su 20 stagioni con promozioni, retrocessioni, crescita, mercato, accademia e ritiri.
+1. Premi completi di Seconda, Terza e Quarta Serie, promozioni e tornei individuali.
+2. Formula precisa di sponsor e pubblico per reputazione, tifosi, forma recente e avversario.
+3. Simulatore economico riproducibile su 20 stagioni con promozioni, retrocessioni, crescita, mercato, accademia e ritiri.
 
-Fino a quando questi quattro punti non sono chiusi, questa baseline resta bloccata come riferimento e non deve essere sostituita da numeri ad hoc nelle singole pagine o servizi.
+Fino a quando questi tre punti non sono chiusi, questa baseline resta bloccata come riferimento e non deve essere sostituita da numeri ad hoc nelle singole pagine o servizi.
