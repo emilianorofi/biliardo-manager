@@ -30,6 +30,7 @@ import {
 import { createLeagueTable } from "@/lib/league-table";
 import { completeSeasonIfReady } from "@/lib/season-completion";
 import { getCompletedRomeWeeklyWindow } from "@/lib/rome-calendar";
+import { refreshClubPlayerEconomy } from "@/lib/player-economy";
 import { prisma } from "@/lib/prisma";
 
 export async function prepareLiveEconomy(now = new Date()) {
@@ -91,10 +92,6 @@ async function settleWeeklyUpdate(updateId: number, now: Date) {
         reputation: true,
         trainerLevel: true,
         youthCoachLevel: true,
-        players: {
-          where: { careerStatus: "ACTIVE" },
-          select: { salary: true },
-        },
       },
     });
     if (!club) throw new Error("CLUB_NOT_FOUND");
@@ -171,13 +168,20 @@ async function settleWeeklyUpdate(updateId: number, now: Date) {
       });
     }
 
-    const salaryExpense = club.players.reduce(
-      (sum, player) => sum + player.salary,
-      0
+    await applyTrainingCenterCorrection(
+      transaction,
+      club.id,
+      update.scheduledAt,
+      structures.trainingCenterLevel
     );
+    const playerEconomy = await refreshClubPlayerEconomy(
+      transaction,
+      club.id
+    );
+
     const leagueEconomy = getLeagueEconomy(leagueLevel);
     const expenses =
-      salaryExpense +
+      playerEconomy.salaryTotal +
       getTrainerWeeklyCost(club.trainerLevel) +
       getYouthCoachWeeklyCost(club.youthCoachLevel) +
       leagueEconomy.clubManagementWeekly +
@@ -189,13 +193,6 @@ async function settleWeeklyUpdate(updateId: number, now: Date) {
     const liveNet = income - expenses;
     const correction = liveNet - previousNet;
     const balanceAfter = update.balanceAfter + correction;
-
-    await applyTrainingCenterCorrection(
-      transaction,
-      club.id,
-      update.scheduledAt,
-      structures.trainingCenterLevel
-    );
 
     let fans = club.fans;
     if (
