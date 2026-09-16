@@ -413,7 +413,9 @@ async function settleMarketAdjustments(now: Date) {
   let adjusted = 0;
 
   for (const listing of listings) {
-    if (listing.finalPrice === null) continue;
+    const finalPrice = listing.finalPrice;
+    if (finalPrice === null) continue;
+
     await prisma.$transaction(async (transaction) => {
       const rows = await transaction.$queryRaw<Array<{ economyAdjustedAt: Date | null }>>`
         SELECT "economyAdjustedAt"
@@ -430,8 +432,8 @@ async function settleMarketAdjustments(now: Date) {
         });
       }
       if (listing.sellerClubId !== null) {
-        const proceeds = calculateSellerProceeds(listing.finalPrice);
-        const fee = listing.finalPrice - proceeds;
+        const proceeds = calculateSellerProceeds(finalPrice);
+        const fee = finalPrice - proceeds;
         if (fee > 0) {
           await transaction.club.update({
             where: { id: listing.sellerClubId },
@@ -456,7 +458,7 @@ async function settleReadySeasons(now: Date) {
   const seasons = await prisma.$queryRaw<Array<{ id: number }>>`
     SELECT season."id"
     FROM "Season" AS season
-    WHERE season."status" = 'ACTIVE'
+    WHERE season."status" IN ('ACTIVE', 'COMPLETED')
       AND season."economySettledAt" IS NULL
       AND NOT EXISTS (
         SELECT 1 FROM "League" AS league
