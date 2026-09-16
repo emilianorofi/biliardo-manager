@@ -26,6 +26,10 @@ UPDATE "IndividualTournament"
 SET "prizesPaidAt" = COALESCE("finalAt", "updatedAt")
 WHERE "status" = 'COMPLETED' AND "prizesPaidAt" IS NULL;
 
+UPDATE "Season"
+SET "economySettledAt" = COALESCE("endsAt", "updatedAt")
+WHERE "status" = 'COMPLETED' AND "economySettledAt" IS NULL;
+
 UPDATE "Club"
 SET "fans" = CASE
   WHEN "fans" < 10 THEN 90
