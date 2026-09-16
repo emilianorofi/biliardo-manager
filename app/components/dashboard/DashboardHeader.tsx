@@ -33,12 +33,23 @@ export default async function DashboardHeader() {
               "COMPLETED",
             ],
           },
+          entries: {
+            some: {
+              clubId,
+            },
+          },
         },
 
-        orderBy: {
-          id:
-            "desc",
-        },
+        orderBy: [
+          {
+            season: {
+              number: "desc",
+            },
+          },
+          {
+            id: "desc",
+          },
+        ],
 
         include: {
           season:
