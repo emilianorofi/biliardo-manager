@@ -12,13 +12,13 @@ import {
 } from "@/lib/academy-scouting";
 import { getApiClubAccess } from "@/lib/api-club-access";
 import {
-  MAX_FIRST_TEAM_PLAYERS,
-} from "@/lib/game-config";
+  calculatePlayerMarketValue,
+  calculatePlayerWeeklySalary,
+} from "@/lib/economy-rules";
+import { MAX_FIRST_TEAM_PLAYERS } from "@/lib/game-config";
+import { processGameClock } from "@/lib/game-clock";
 import { getMarketCommitments } from "@/lib/market-commitments";
 import { prisma } from "@/lib/prisma";
-import {
-  processGameClock,
-} from "@/lib/game-clock";
 
 export const dynamic = "force-dynamic";
 
@@ -35,10 +35,7 @@ class AcademyPromotionError extends Error {
 export async function GET() {
   try {
     const access = await getApiClubAccess();
-
-    if (!access.granted) {
-      return access.response;
-    }
+    if (!access.granted) return access.response;
 
     const { clubId } = access;
     const now = new Date();
@@ -49,80 +46,33 @@ export async function GET() {
       databasePlayers,
       youthCoachLevel,
       nextAcademyCandidateAt,
-    } = await prisma.$transaction(
-      async (transaction) => {
-        await ensureInitialAcademy(transaction, clubId);
-        await advanceAcademyIntake(
-          transaction,
-          clubId,
-          now
-        );
-        await advanceAcademyScouting(
-          transaction,
-          clubId,
-          now
-        );
+    } = await prisma.$transaction(async (transaction) => {
+      await ensureInitialAcademy(transaction, clubId);
+      await advanceAcademyIntake(transaction, clubId, now);
+      await advanceAcademyScouting(transaction, clubId, now);
 
-        const [club, players] = await Promise.all([
-          transaction.club.findUnique({
-            where: {
-              id: clubId,
-            },
-            select: {
-              youthCoachLevel: true,
-              nextAcademyCandidateAt: true,
-            },
-          }),
-          transaction.academyPlayer.findMany({
-            where: {
-              clubId,
-            },
-            orderBy: [
-              {
-                age: "desc",
-              },
-              {
-                lastName: "asc",
-              },
-            ],
-          }),
-        ]);
+      const [club, players] = await Promise.all([
+        transaction.club.findUnique({
+          where: { id: clubId },
+          select: {
+            youthCoachLevel: true,
+            nextAcademyCandidateAt: true,
+          },
+        }),
+        transaction.academyPlayer.findMany({
+          where: { clubId },
+          orderBy: [{ age: "desc" }, { lastName: "asc" }],
+        }),
+      ]);
 
-        return {
-          databasePlayers: players,
-          youthCoachLevel: club?.youthCoachLevel ?? 1,
-          nextAcademyCandidateAt:
-            club?.nextAcademyCandidateAt ??
-            null,
-        };
-      }
-    );
+      return {
+        databasePlayers: players,
+        youthCoachLevel: club?.youthCoachLevel ?? 1,
+        nextAcademyCandidateAt: club?.nextAcademyCandidateAt ?? null,
+      };
+    });
 
     const players = databasePlayers.map((player) => {
-      function getVisibleValue(
-        key: keyof typeof attributeValues,
-        value: number | null
-      ) {
-        if (value === null) {
-          return null;
-        }
-
-        if (player.revealedAttributeKeys.includes(key)) {
-          return Math.round(value);
-        }
-
-        if (player.estimatedAttributeKeys.includes(key)) {
-          return getAcademyEstimatedRange({
-            playerId: player.id,
-            attribute: key,
-            value,
-            youthCoachLevel,
-          });
-        }
-
-        return null;
-      }
-
       const attributeValues = {
         precisione: player.precisione,
         diretto: player.diretto,
@@ -135,65 +85,49 @@ export async function GET() {
         misura: player.misura,
       };
 
+      function getVisibleValue(
+        key: keyof typeof attributeValues,
+        value: number | null
+      ) {
+        if (value === null) return null;
+        if (player.revealedAttributeKeys.includes(key)) {
+          return Math.round(value);
+        }
+        if (player.estimatedAttributeKeys.includes(key)) {
+          return getAcademyEstimatedRange({
+            playerId: player.id,
+            attribute: key,
+            value,
+            youthCoachLevel,
+          });
+        }
+        return null;
+      }
+
       return {
         id: player.id,
         firstName: player.firstName,
         lastName: player.lastName,
         nationality: player.nationality,
         age: player.age,
-
         estimatedAttributes: player.estimatedAttributeKeys.length,
         revealedAttributes: player.revealedAttributeKeys.length,
-
         totalAttributes: player.totalAttributes,
         nextScoutingAt: player.nextScoutingAt?.toISOString() ?? null,
         decisionRequired: player.age >= 17,
-
         attributes: {
-          precisione: getVisibleValue(
-            "precisione",
-            attributeValues.precisione
-          ),
-
-          diretto: getVisibleValue(
-            "diretto",
-            attributeValues.diretto
-          ),
-
-          sponde: getVisibleValue(
-            "sponde",
-            attributeValues.sponde
-          ),
-
-          tattica: getVisibleValue(
-            "tattica",
-            attributeValues.tattica
-          ),
-
-          mentalita: getVisibleValue(
-            "mentalita",
-            attributeValues.mentalita
-          ),
-
-          difesa: getVisibleValue(
-            "difesa",
-            attributeValues.difesa
-          ),
-
+          precisione: getVisibleValue("precisione", attributeValues.precisione),
+          diretto: getVisibleValue("diretto", attributeValues.diretto),
+          sponde: getVisibleValue("sponde", attributeValues.sponde),
+          tattica: getVisibleValue("tattica", attributeValues.tattica),
+          mentalita: getVisibleValue("mentalita", attributeValues.mentalita),
+          difesa: getVisibleValue("difesa", attributeValues.difesa),
           realizzazione: getVisibleValue(
             "realizzazione",
             attributeValues.realizzazione
           ),
-
-          creativita: getVisibleValue(
-            "creativita",
-            attributeValues.creativita
-          ),
-
-          misura: getVisibleValue(
-            "misura",
-            attributeValues.misura
-          ),
+          creativita: getVisibleValue("creativita", attributeValues.creativita),
+          misura: getVisibleValue("misura", attributeValues.misura),
         },
       };
     });
@@ -203,23 +137,13 @@ export async function GET() {
       youthCoachLevel,
       scoutingRangeWidth: getAcademyRangeWidth(youthCoachLevel),
       academyCapacity: MAX_ACADEMY_PLAYERS,
-      nextAcademyCandidateAt:
-        nextAcademyCandidateAt?.toISOString() ?? null,
+      nextAcademyCandidateAt: nextAcademyCandidateAt?.toISOString() ?? null,
     });
   } catch (error) {
-    console.error(
-      "Errore durante il caricamento dell'Accademia:",
-      error
-    );
-
+    console.error("Errore durante il caricamento dell'Accademia:", error);
     return NextResponse.json(
-      {
-        error:
-          "Impossibile caricare i giocatori dell'Accademia.",
-      },
-      {
-        status: 500,
-      }
+      { error: "Impossibile caricare i giocatori dell'Accademia." },
+      { status: 500 }
     );
   }
 }
@@ -227,239 +151,7 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const access = await getApiClubAccess();
-
-    if (!access.granted) {
-      return access.response;
-    }
-
-    const { clubId } = access;
-    const body: unknown = await request.json();
-
-    const playerId =
-      typeof body === "object" &&
-      body !== null &&
-      "playerId" in body
-        ? Number(
-            (body as { playerId: unknown }).playerId
-          )
-        : Number.NaN;
-
-    if (
-      !Number.isInteger(playerId) ||
-      playerId <= 0
-    ) {
-      return NextResponse.json(
-        {
-          error: "Identificativo del giovane non valido.",
-        },
-        {
-          status: 400,
-        }
-      );
-    }
-
-    const academyPlayer =
-      await prisma.academyPlayer.findFirst({
-        where: {
-          id: playerId,
-          clubId,
-        },
-      });
-
-    if (!academyPlayer) {
-      return NextResponse.json(
-        {
-          error:
-            "Il giovane selezionato non è stato trovato.",
-        },
-        {
-          status: 404,
-        }
-      );
-    }
-
-    if (academyPlayer.age < 16) {
-      return NextResponse.json(
-        {
-          error:
-            "Il giovane deve avere almeno 16 anni per essere promosso.",
-        },
-        {
-          status: 400,
-        }
-      );
-    }
-
-    const attributes = [
-      academyPlayer.precisione,
-      academyPlayer.diretto,
-      academyPlayer.sponde,
-      academyPlayer.tattica,
-      academyPlayer.mentalita,
-      academyPlayer.difesa,
-      academyPlayer.realizzazione,
-      academyPlayer.creativita,
-      academyPlayer.misura,
-    ];
-
-    const hasMissingAttributes =
-      attributes.some(
-        (attribute) => attribute === null
-      );
-
-    if (hasMissingAttributes) {
-      return NextResponse.json(
-        {
-          error:
-            "Il giovane non possiede ancora tutti i valori interni necessari.",
-        },
-        {
-          status: 400,
-        }
-      );
-    }
-
-    const promotedPlayer =
-      await prisma.$transaction(async (transaction) => {
-        await transaction.$queryRaw`
-          SELECT "id"
-          FROM "Club"
-          WHERE "id" = ${clubId}
-          FOR UPDATE
-        `;
-
-        const [firstTeamPlayers, commitments] =
-          await Promise.all([
-            transaction.player.count({
-              where: {
-                clubId,
-              },
-            }),
-            getMarketCommitments(
-              transaction,
-              clubId
-            ),
-          ]);
-
-        if (
-          firstTeamPlayers +
-            commitments.reservedRosterPlaces >=
-          MAX_FIRST_TEAM_PLAYERS
-        ) {
-          throw new AcademyPromotionError(
-            `Non puoi superare la quantità massima di ${MAX_FIRST_TEAM_PLAYERS} giocatori considerando anche le aste in cui sei in vantaggio.`,
-            400
-          );
-        }
-
-        const player = await transaction.player.create({
-          data: {
-            clubId: academyPlayer.clubId,
-            firstName: academyPlayer.firstName,
-            lastName: academyPlayer.lastName,
-            nationality:
-              academyPlayer.nationality,
-            age: academyPlayer.age,
-
-            form: 5,
-            morale: 5,
-            experience: 0,
-
-            talent: academyPlayer.talent,
-
-            value: 0,
-            salary: 0,
-            image: "",
-            style: [],
-
-            precisione:
-              academyPlayer.precisione as number,
-
-            diretto:
-              academyPlayer.diretto as number,
-
-            sponde:
-              academyPlayer.sponde as number,
-
-            tattica:
-              academyPlayer.tattica as number,
-
-            mentalita:
-              academyPlayer.mentalita as number,
-
-            difesa:
-              academyPlayer.difesa as number,
-
-            realizzazione:
-              academyPlayer.realizzazione as number,
-
-            creativita:
-              academyPlayer.creativita as number,
-
-            misura:
-              academyPlayer.misura as number,
-          },
-        });
-
-        await transaction.academyPlayer.delete({
-          where: {
-            id: academyPlayer.id,
-          },
-        });
-
-        return player;
-      });
-
-    return NextResponse.json(
-      {
-        message: `${promotedPlayer.firstName} ${promotedPlayer.lastName} è stato promosso in prima squadra.`,
-
-        player: {
-          id: promotedPlayer.id,
-          firstName: promotedPlayer.firstName,
-          lastName: promotedPlayer.lastName,
-        },
-      },
-      {
-        status: 201,
-      }
-    );
-  } catch (error: unknown) {
-    if (error instanceof AcademyPromotionError) {
-      return NextResponse.json(
-        {
-          error: error.message,
-        },
-        {
-          status: error.status,
-        }
-      );
-    }
-
-    console.error(
-      "Errore durante la promozione del giovane:",
-      error
-    );
-
-    return NextResponse.json(
-      {
-        error:
-          "Impossibile completare la promozione in prima squadra.",
-      },
-      {
-        status: 500,
-      }
-    );
-  }
-}
-
-export async function DELETE(request: Request) {
-  try {
-    const access = await getApiClubAccess();
-
-    if (!access.granted) {
-      return access.response;
-    }
+    if (!access.granted) return access.response;
 
     const { clubId } = access;
     const body: unknown = await request.json();
@@ -467,57 +159,195 @@ export async function DELETE(request: Request) {
 
     if (!Number.isInteger(playerId) || playerId <= 0) {
       return NextResponse.json(
-        {
-          error: "Identificativo del giovane non valido.",
-        },
-        {
-          status: 400,
-        }
+        { error: "Identificativo del giovane non valido." },
+        { status: 400 }
       );
     }
 
-    const academyPlayer =
-      await prisma.academyPlayer.findFirst({
-        where: {
-          id: playerId,
-          clubId,
-        },
-        select: {
-          id: true,
-          firstName: true,
-          lastName: true,
+    const promotedPlayer = await prisma.$transaction(async (transaction) => {
+      await transaction.$queryRaw`
+        SELECT "id"
+        FROM "Club"
+        WHERE "id" = ${clubId}
+        FOR UPDATE
+      `;
+
+      const academyPlayer = await transaction.academyPlayer.findFirst({
+        where: { id: playerId, clubId },
+      });
+
+      if (!academyPlayer) {
+        throw new AcademyPromotionError(
+          "Il giovane selezionato non è stato trovato.",
+          404
+        );
+      }
+      if (academyPlayer.age < 16) {
+        throw new AcademyPromotionError(
+          "Il giovane deve avere almeno 16 anni per essere promosso.",
+          400
+        );
+      }
+
+      const attributes = [
+        academyPlayer.precisione,
+        academyPlayer.diretto,
+        academyPlayer.sponde,
+        academyPlayer.tattica,
+        academyPlayer.mentalita,
+        academyPlayer.difesa,
+        academyPlayer.realizzazione,
+        academyPlayer.creativita,
+        academyPlayer.misura,
+      ];
+
+      if (attributes.some((attribute) => attribute === null)) {
+        throw new AcademyPromotionError(
+          "Il giovane non possiede ancora tutti i valori interni necessari.",
+          400
+        );
+      }
+
+      const [firstTeamPlayers, commitments] = await Promise.all([
+        transaction.player.count({
+          where: {
+            clubId,
+            careerStatus: "ACTIVE",
+          },
+        }),
+        getMarketCommitments(transaction, clubId),
+      ]);
+
+      if (
+        firstTeamPlayers + commitments.reservedRosterPlaces >=
+        MAX_FIRST_TEAM_PLAYERS
+      ) {
+        throw new AcademyPromotionError(
+          `Non puoi superare la quantità massima di ${MAX_FIRST_TEAM_PLAYERS} giocatori considerando anche le aste in cui sei in vantaggio.`,
+          400
+        );
+      }
+
+      const numericAttributes = attributes as number[];
+      const overall =
+        numericAttributes.reduce((total, value) => total + value, 0) /
+        numericAttributes.length;
+      const salary = calculatePlayerWeeklySalary(overall);
+      const value = calculatePlayerMarketValue({
+        overall,
+        age: academyPlayer.age,
+        talent: academyPlayer.talent,
+      });
+
+      const player = await transaction.player.create({
+        data: {
+          clubId: academyPlayer.clubId,
+          firstName: academyPlayer.firstName,
+          lastName: academyPlayer.lastName,
+          nationality: academyPlayer.nationality,
+          age: academyPlayer.age,
+          careerStatus: "ACTIVE",
+          form: 5,
+          morale: 5,
+          experience: 0,
+          talent: academyPlayer.talent,
+          value,
+          salary,
+          image: "",
+          style: [],
+          precisione: academyPlayer.precisione as number,
+          diretto: academyPlayer.diretto as number,
+          sponde: academyPlayer.sponde as number,
+          tattica: academyPlayer.tattica as number,
+          mentalita: academyPlayer.mentalita as number,
+          difesa: academyPlayer.difesa as number,
+          realizzazione: academyPlayer.realizzazione as number,
+          creativita: academyPlayer.creativita as number,
+          misura: academyPlayer.misura as number,
         },
       });
+
+      await transaction.academyPlayer.delete({
+        where: { id: academyPlayer.id },
+      });
+
+      await transaction.gameEvent.create({
+        data: {
+          clubId,
+          type: "ACADEMY_PLAYER_PROMOTED",
+          title: `Promosso: ${player.firstName} ${player.lastName}`,
+          description:
+            `${player.firstName} ${player.lastName} entra in prima squadra. ` +
+            `Valore ${formatCurrency(value)}, stipendio ${formatCurrency(salary)} a settimana.`,
+        },
+      });
+
+      return player;
+    });
+
+    return NextResponse.json(
+      {
+        message: `${promotedPlayer.firstName} ${promotedPlayer.lastName} è stato promosso in prima squadra.`,
+        player: {
+          id: promotedPlayer.id,
+          firstName: promotedPlayer.firstName,
+          lastName: promotedPlayer.lastName,
+        },
+      },
+      { status: 201 }
+    );
+  } catch (error: unknown) {
+    if (error instanceof AcademyPromotionError) {
+      return NextResponse.json(
+        { error: error.message },
+        { status: error.status }
+      );
+    }
+
+    console.error("Errore durante la promozione del giovane:", error);
+    return NextResponse.json(
+      { error: "Impossibile completare la promozione in prima squadra." },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(request: Request) {
+  try {
+    const access = await getApiClubAccess();
+    if (!access.granted) return access.response;
+
+    const { clubId } = access;
+    const body: unknown = await request.json();
+    const playerId = readPlayerId(body);
+
+    if (!Number.isInteger(playerId) || playerId <= 0) {
+      return NextResponse.json(
+        { error: "Identificativo del giovane non valido." },
+        { status: 400 }
+      );
+    }
+
+    const academyPlayer = await prisma.academyPlayer.findFirst({
+      where: { id: playerId, clubId },
+      select: { id: true, firstName: true, lastName: true },
+    });
 
     if (!academyPlayer) {
       return NextResponse.json(
-        {
-          error:
-            "Il giovane selezionato non è stato trovato.",
-        },
-        {
-          status: 404,
-        }
+        { error: "Il giovane selezionato non è stato trovato." },
+        { status: 404 }
       );
     }
 
-    const deletion =
-      await prisma.academyPlayer.deleteMany({
-        where: {
-          id: academyPlayer.id,
-          clubId,
-        },
-      });
+    const deletion = await prisma.academyPlayer.deleteMany({
+      where: { id: academyPlayer.id, clubId },
+    });
 
     if (deletion.count === 0) {
       return NextResponse.json(
-        {
-          error:
-            "Il giovane non è più presente in Accademia.",
-        },
-        {
-          status: 409,
-        }
+        { error: "Il giovane non è più presente in Accademia." },
+        { status: 409 }
       );
     }
 
@@ -525,27 +355,24 @@ export async function DELETE(request: Request) {
       message: `${academyPlayer.firstName} ${academyPlayer.lastName} è stato allontanato dall'Accademia.`,
     });
   } catch (error) {
-    console.error(
-      "Errore durante l'allontanamento del giovane:",
-      error
-    );
-
+    console.error("Errore durante l'allontanamento del giovane:", error);
     return NextResponse.json(
-      {
-        error:
-          "Impossibile allontanare il giovane dall'Accademia.",
-      },
-      {
-        status: 500,
-      }
+      { error: "Impossibile allontanare il giovane dall'Accademia." },
+      { status: 500 }
     );
   }
 }
 
 function readPlayerId(body: unknown) {
-  return typeof body === "object" &&
-    body !== null &&
-    "playerId" in body
+  return typeof body === "object" && body !== null && "playerId" in body
     ? Number((body as { playerId: unknown }).playerId)
     : Number.NaN;
+}
+
+function formatCurrency(value: number) {
+  return new Intl.NumberFormat("it-IT", {
+    style: "currency",
+    currency: "EUR",
+    maximumFractionDigits: 0,
+  }).format(value);
 }
