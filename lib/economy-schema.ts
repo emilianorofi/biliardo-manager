@@ -20,9 +20,9 @@ export async function ensureEconomySchema() {
 
   if (structureExists) {
     await prisma.$transaction(async (transaction) => {
-      await transaction.$queryRaw`
-        SELECT pg_advisory_xact_lock(${ECONOMY_SCHEMA_LOCK})
-      `;
+      await transaction.$executeRawUnsafe(
+        `SELECT pg_advisory_xact_lock(${ECONOMY_SCHEMA_LOCK})`
+      );
       await ensureEconomyMarkers(transaction);
       await ensurePlayerLifecycleState(transaction);
     });
@@ -31,9 +31,9 @@ export async function ensureEconomySchema() {
   }
 
   await prisma.$transaction(async (transaction) => {
-    await transaction.$queryRaw`
-      SELECT pg_advisory_xact_lock(${ECONOMY_SCHEMA_LOCK})
-    `;
+    await transaction.$executeRawUnsafe(
+      `SELECT pg_advisory_xact_lock(${ECONOMY_SCHEMA_LOCK})`
+    );
 
     const lockedCheck = await hasColumn(
       transaction,
