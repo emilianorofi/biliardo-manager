@@ -28,6 +28,7 @@ const menu = [
   { label: "Lega", href: "/campionato", icon: Trophy },
   { label: "Individuale", href: "/individuale", icon: Medal },
   { label: "Coppa Nazioni", href: "/coppa-nazioni", icon: Flag },
+  { label: "Coppa Specialità", href: "/coppa-specialita", icon: Trophy },
   { label: "Calendario", href: "/calendario", icon: CalendarDays },
   { label: "Ranking", href: "/ranking", icon: ListOrdered },
   { label: "Mercato", href: "/market", icon: ArrowRightLeft },
@@ -42,11 +43,11 @@ export default function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="flex min-h-screen w-64 shrink-0 flex-col border-r border-yellow-700 bg-[#121212]">
-      <div className="p-6 text-2xl font-bold text-yellow-400">
+    <aside className="flex min-h-screen w-56 shrink-0 flex-col border-r border-yellow-700 bg-[#121212]">
+      <div className="px-4 py-4 text-xl font-bold text-yellow-400">
         🎱 Biliardo Manager
       </div>
-      <nav className="flex flex-col gap-2 px-3">
+      <nav className="flex flex-col gap-1 px-2 pb-3">
         {menu.map((item) => {
           const Icon = item.icon;
           const isActive =
@@ -56,13 +57,13 @@ export default function Sidebar() {
             <Link
               key={item.href}
               href={item.href}
-              className={`flex items-center gap-3 rounded-xl px-4 py-3 transition-all ${
+              className={`flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-all ${
                 isActive
                   ? "bg-yellow-500 font-semibold text-black"
                   : "text-gray-300 hover:bg-zinc-800 hover:text-yellow-400"
               }`}
             >
-              <Icon size={20} />
+              <Icon size={17} className="shrink-0" />
               <span>{item.label}</span>
             </Link>
           );
