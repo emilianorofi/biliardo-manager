@@ -14,12 +14,26 @@ export default async function NextMatchCard() {
     await Promise.all([
       prisma.league.findFirst({
         where: {
-          status: "ACTIVE",
+          status: {
+            in: ["PREPARATION", "ACTIVE", "COMPLETED"],
+          },
+          entries: {
+            some: {
+              clubId,
+            },
+          },
         },
 
-        orderBy: {
-          id: "desc",
-        },
+        orderBy: [
+          {
+            season: {
+              number: "desc",
+            },
+          },
+          {
+            id: "desc",
+          },
+        ],
 
         include: {
           fixtures: {
@@ -83,7 +97,7 @@ export default async function NextMatchCard() {
         </h2>
 
         <p className="mt-3 text-sm text-slate-400">
-          Non esiste ancora un campionato attivo.
+          La tua squadra non è ancora iscritta a un campionato.
         </p>
       </section>
     );
@@ -103,12 +117,12 @@ export default async function NextMatchCard() {
     );
 
   const playableRound =
-    totalRounds > 0
-      ? getNextPlayableRound(
+    league.status === "COMPLETED" || totalRounds === 0
+      ? null
+      : getNextPlayableRound(
           league.currentRound,
           totalRounds
-        )
-      : null;
+        );
 
   const fixture =
     playableRound === null
@@ -131,6 +145,8 @@ export default async function NextMatchCard() {
     formation?.slotCPlayerId !== undefined;
 
   if (!fixture) {
+    const isCompleted = league.status === "COMPLETED";
+
     return (
       <section className="flex h-full flex-col rounded-2xl border border-emerald-900/60 bg-[#15261f] p-4">
         <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-400">
@@ -138,18 +154,20 @@ export default async function NextMatchCard() {
         </p>
 
         <h2 className="mt-2 text-2xl font-black text-white">
-          Campionato concluso
+          {isCompleted ? "Campionato concluso" : "Calendario in preparazione"}
         </h2>
 
         <p className="mt-3 text-sm text-slate-400">
-          Tutte le giornate del campionato sono state completate.
+          {isCompleted
+            ? "Tutte le giornate del tuo girone sono state completate."
+            : "Il prossimo incontro del tuo girone non è ancora disponibile."}
         </p>
 
         <Link
           href="/campionato"
           className="mt-6 inline-flex w-fit rounded-xl border border-amber-400/30 bg-amber-400/10 px-4 py-2.5 text-sm font-black text-amber-300 transition hover:bg-amber-400/20"
         >
-          Vedi la classifica finale
+          {isCompleted ? "Vedi la classifica finale" : "Vai al campionato"}
         </Link>
 
         {latestPlayedFixture && (
@@ -174,7 +192,7 @@ export default async function NextMatchCard() {
 
   return (
     <section className="flex h-full flex-col overflow-hidden rounded-2xl border border-emerald-900/60 bg-[#15261f]">
-        <div className="flex flex-col justify-between gap-3 border-b border-emerald-900/60 p-4 sm:flex-row sm:items-center">
+      <div className="flex flex-col justify-between gap-3 border-b border-emerald-900/60 p-4 sm:flex-row sm:items-center">
         <div>
           <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-400">
             {league.name}
