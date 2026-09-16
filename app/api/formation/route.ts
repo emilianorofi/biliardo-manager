@@ -1,14 +1,10 @@
 import { NextResponse } from "next/server";
 
 import { getApiClubAccess } from "@/lib/api-club-access";
-
+import { processGameClock } from "@/lib/game-clock";
 import { prisma } from "@/lib/prisma";
-import {
-  processGameClock,
-} from "@/lib/game-clock";
 
-export const dynamic =
-  "force-dynamic";
+export const dynamic = "force-dynamic";
 
 function calculateOverall(player: {
   precisione: number;
@@ -32,458 +28,207 @@ function calculateOverall(player: {
     player.creativita +
     player.misura;
 
-  return Math.round(
-    total / 9
-  );
+  return Math.round(total / 9);
 }
 
 export async function GET() {
   try {
     const access = await getApiClubAccess();
-
-    if (!access.granted) {
-      return access.response;
-    }
+    if (!access.granted) return access.response;
 
     const { clubId } = access;
-    const [
-      databasePlayers,
-      databaseFormation,
-    ] = await Promise.all([
+    const [databasePlayers, databaseFormation] = await Promise.all([
       prisma.player.findMany({
         where: {
-          clubId:
-            clubId,
+          clubId,
+          careerStatus: "ACTIVE",
         },
-
-        orderBy: [
-          {
-            lastName:
-              "asc",
-          },
-          {
-            firstName:
-              "asc",
-          },
-        ],
+        orderBy: [{ lastName: "asc" }, { firstName: "asc" }],
       }),
-
       prisma.formation.findUnique({
-        where: {
-          clubId:
-            clubId,
-        },
+        where: { clubId },
       }),
     ]);
 
-    const players =
-      databasePlayers.map(
-        (player) => ({
-          id:
-            player.id,
-
-          firstName:
-            player.firstName,
-
-          lastName:
-            player.lastName,
-
-          nationality:
-            player.nationality,
-
-          age:
-            player.age,
-
-          overall:
-            calculateOverall(
-              player
-            ),
-
-          form:
-            player.form,
-
-          morale:
-            player.morale,
-
-          experience:
-            player.experience,
-
-          value:
-            player.value,
-
-          salary:
-            player.salary,
-
-          image:
-            player.image,
-
-          style:
-            player.style,
-
-          specialties: {
-            italiana:
-              Math.round(
-                (
-                  player.precisione +
-                  player.diretto
-                ) / 2
-              ),
-
-            goriziana:
-              Math.round(
-                (
-                  player.precisione +
-                  player.sponde
-                ) / 2
-              ),
-
-            tuttiDoppi:
-              Math.round(
-                (
-                  player.diretto +
-                  player.sponde
-                ) / 2
-              ),
-          },
-
-          attributes: {
-            precisione:
-              Math.round(
-                player.precisione
-              ),
-
-            diretto:
-              Math.round(
-                player.diretto
-              ),
-
-            sponde:
-              Math.round(
-                player.sponde
-              ),
-
-            tattica:
-              Math.round(
-                player.tattica
-              ),
-
-            mentalita:
-              Math.round(
-                player.mentalita
-              ),
-
-            difesa:
-              Math.round(
-                player.difesa
-              ),
-
-            realizzazione:
-              Math.round(
-                player.realizzazione
-              ),
-
-            creativita:
-              Math.round(
-                player.creativita
-              ),
-
-            misura:
-              Math.round(
-                player.misura
-              ),
-          },
-        })
-      );
+    const activePlayerIds = new Set(databasePlayers.map((player) => player.id));
+    const players = databasePlayers.map((player) => ({
+      id: player.id,
+      firstName: player.firstName,
+      lastName: player.lastName,
+      nationality: player.nationality,
+      age: player.age,
+      overall: calculateOverall(player),
+      form: player.form,
+      morale: player.morale,
+      experience: player.experience,
+      value: player.value,
+      salary: player.salary,
+      image: player.image,
+      style: player.style,
+      specialties: {
+        italiana: Math.round((player.precisione + player.diretto) / 2),
+        goriziana: Math.round((player.precisione + player.sponde) / 2),
+        tuttiDoppi: Math.round((player.diretto + player.sponde) / 2),
+      },
+      attributes: {
+        precisione: Math.round(player.precisione),
+        diretto: Math.round(player.diretto),
+        sponde: Math.round(player.sponde),
+        tattica: Math.round(player.tattica),
+        mentalita: Math.round(player.mentalita),
+        difesa: Math.round(player.difesa),
+        realizzazione: Math.round(player.realizzazione),
+        creativita: Math.round(player.creativita),
+        misura: Math.round(player.misura),
+      },
+    }));
 
     const formation = {
       slotAPlayerId:
-        databaseFormation
-          ?.slotAPlayerId ??
-        null,
-
+        databaseFormation?.slotAPlayerId &&
+        activePlayerIds.has(databaseFormation.slotAPlayerId)
+          ? databaseFormation.slotAPlayerId
+          : null,
       slotBPlayerId:
-        databaseFormation
-          ?.slotBPlayerId ??
-        null,
-
+        databaseFormation?.slotBPlayerId &&
+        activePlayerIds.has(databaseFormation.slotBPlayerId)
+          ? databaseFormation.slotBPlayerId
+          : null,
       slotCPlayerId:
-        databaseFormation
-          ?.slotCPlayerId ??
-        null,
-
-      savedAt:
-        databaseFormation
-          ?.savedAt
-          ?.toISOString() ??
-        null,
+        databaseFormation?.slotCPlayerId &&
+        activePlayerIds.has(databaseFormation.slotCPlayerId)
+          ? databaseFormation.slotCPlayerId
+          : null,
+      savedAt: databaseFormation?.savedAt?.toISOString() ?? null,
     };
 
-    return NextResponse.json({
-      players,
-      formation,
-    });
+    return NextResponse.json({ players, formation });
   } catch (error) {
-    console.error(
-      "Errore durante il caricamento della formazione:",
-      error
-    );
-
+    console.error("Errore durante il caricamento della formazione:", error);
     return NextResponse.json(
-      {
-        error:
-          "Impossibile caricare la formazione.",
-      },
-      {
-        status: 500,
-      }
+      { error: "Impossibile caricare la formazione." },
+      { status: 500 }
     );
   }
 }
 
-export async function POST(
-  request: Request
-) {
+export async function POST(request: Request) {
   try {
     const access = await getApiClubAccess();
-
-    if (!access.granted) {
-      return access.response;
-    }
+    if (!access.granted) return access.response;
 
     const { clubId } = access;
     const now = new Date();
 
     await processGameClock(now);
 
-    const nextFixture =
-      await prisma.leagueFixture.findFirst({
-        where: {
-          status: "SCHEDULED",
-          league: {
-            status: "ACTIVE",
-          },
-          OR: [
-            {
-              homeClubId: clubId,
-            },
-            {
-              awayClubId: clubId,
-            },
-          ],
+    const nextFixture = await prisma.leagueFixture.findFirst({
+      where: {
+        status: "SCHEDULED",
+        league: {
+          status: "ACTIVE",
+          entries: { some: { clubId } },
         },
-        select: {
-          scheduledAt: true,
-        },
-        orderBy: {
-          scheduledAt: "asc",
-        },
-      });
-    const millisecondsToFixture =
-      nextFixture
-        ? nextFixture.scheduledAt.getTime() -
-          now.getTime()
-        : Number.POSITIVE_INFINITY;
+        OR: [{ homeClubId: clubId }, { awayClubId: clubId }],
+      },
+      select: { scheduledAt: true },
+      orderBy: { scheduledAt: "asc" },
+    });
+    const millisecondsToFixture = nextFixture
+      ? nextFixture.scheduledAt.getTime() - now.getTime()
+      : Number.POSITIVE_INFINITY;
 
-    if (
-      millisecondsToFixture > 0 &&
-      millisecondsToFixture <=
-        60 * 1000
-    ) {
+    if (millisecondsToFixture > 0 && millisecondsToFixture <= 60 * 1000) {
       return NextResponse.json(
-        {
-          error:
-            "La formazione è bloccata nell'ultimo minuto prima della partita.",
-        },
-        {
-          status: 409,
-        }
+        { error: "La formazione è bloccata nell'ultimo minuto prima della partita." },
+        { status: 409 }
       );
     }
 
-    const body: unknown =
-      await request.json();
-
-    if (
-      typeof body !==
-        "object" ||
-      body === null
-    ) {
+    const body: unknown = await request.json();
+    if (typeof body !== "object" || body === null) {
       return NextResponse.json(
-        {
-          error:
-            "Dati della formazione non validi.",
-        },
-        {
-          status: 400,
-        }
+        { error: "Dati della formazione non validi." },
+        { status: 400 }
       );
     }
 
-    const formationData =
-      body as {
-        slotAPlayerId?: unknown;
-        slotBPlayerId?: unknown;
-        slotCPlayerId?: unknown;
-      };
+    const formationData = body as {
+      slotAPlayerId?: unknown;
+      slotBPlayerId?: unknown;
+      slotCPlayerId?: unknown;
+    };
+    const selectedPlayerIds = [
+      Number(formationData.slotAPlayerId),
+      Number(formationData.slotBPlayerId),
+      Number(formationData.slotCPlayerId),
+    ];
 
-    const slotAPlayerId =
-      Number(
-        formationData.slotAPlayerId
+    if (
+      selectedPlayerIds.some(
+        (playerId) => !Number.isInteger(playerId) || playerId <= 0
+      )
+    ) {
+      return NextResponse.json(
+        { error: "Devi selezionare un giocatore valido per gli slot A, B e C." },
+        { status: 400 }
       );
+    }
 
-    const slotBPlayerId =
-      Number(
-        formationData.slotBPlayerId
+    if (new Set(selectedPlayerIds).size !== 3) {
+      return NextResponse.json(
+        { error: "Gli slot A, B e C devono contenere tre giocatori diversi." },
+        { status: 400 }
       );
+    }
 
-    const slotCPlayerId =
-      Number(
-        formationData.slotCPlayerId
+    const validPlayersCount = await prisma.player.count({
+      where: {
+        clubId,
+        careerStatus: "ACTIVE",
+        id: { in: selectedPlayerIds },
+      },
+    });
+
+    if (validPlayersCount !== 3) {
+      return NextResponse.json(
+        { error: "Uno o più giocatori selezionati non sono attivi nella tua squadra." },
+        { status: 400 }
       );
+    }
 
-    const selectedPlayerIds =
-      [
+    const [slotAPlayerId, slotBPlayerId, slotCPlayerId] = selectedPlayerIds;
+    const savedFormation = await prisma.formation.upsert({
+      where: { clubId },
+      update: {
         slotAPlayerId,
         slotBPlayerId,
         slotCPlayerId,
-      ];
-
-    const hasInvalidPlayerId =
-      selectedPlayerIds.some(
-        (playerId) =>
-          !Number.isInteger(
-            playerId
-          ) ||
-          playerId <= 0
-      );
-
-    if (
-      hasInvalidPlayerId
-    ) {
-      return NextResponse.json(
-        {
-          error:
-            "Devi selezionare un giocatore valido per gli slot A, B e C.",
-        },
-        {
-          status: 400,
-        }
-      );
-    }
-
-    const uniquePlayerIds =
-      new Set(
-        selectedPlayerIds
-      );
-
-    if (
-      uniquePlayerIds.size !==
-      3
-    ) {
-      return NextResponse.json(
-        {
-          error:
-            "Gli slot A, B e C devono contenere tre giocatori diversi.",
-        },
-        {
-          status: 400,
-        }
-      );
-    }
-
-    const validPlayersCount =
-      await prisma.player.count({
-        where: {
-          clubId:
-            clubId,
-
-          id: {
-            in:
-              selectedPlayerIds,
-          },
-        },
-      });
-
-    if (
-      validPlayersCount !==
-      3
-    ) {
-      return NextResponse.json(
-        {
-          error:
-            "Uno o più giocatori selezionati non appartengono alla tua squadra.",
-        },
-        {
-          status: 400,
-        }
-      );
-    }
-
-    const savedAt = now;
-
-    const savedFormation =
-      await prisma.formation.upsert({
-        where: {
-          clubId:
-            clubId,
-        },
-
-        update: {
-          slotAPlayerId,
-          slotBPlayerId,
-          slotCPlayerId,
-          savedAt,
-        },
-
-        create: {
-          clubId:
-            clubId,
-
-          slotAPlayerId,
-          slotBPlayerId,
-          slotCPlayerId,
-          savedAt,
-        },
-      });
+        savedAt: now,
+      },
+      create: {
+        clubId,
+        slotAPlayerId,
+        slotBPlayerId,
+        slotCPlayerId,
+        savedAt: now,
+      },
+    });
 
     return NextResponse.json({
-      message:
-        "Formazione salvata correttamente.",
-
+      message: "Formazione salvata correttamente.",
       formation: {
-        slotAPlayerId:
-          savedFormation
-            .slotAPlayerId,
-
-        slotBPlayerId:
-          savedFormation
-            .slotBPlayerId,
-
-        slotCPlayerId:
-          savedFormation
-            .slotCPlayerId,
-
-        savedAt:
-          savedFormation
-            .savedAt
-            ?.toISOString() ??
-          null,
+        slotAPlayerId: savedFormation.slotAPlayerId,
+        slotBPlayerId: savedFormation.slotBPlayerId,
+        slotCPlayerId: savedFormation.slotCPlayerId,
+        savedAt: savedFormation.savedAt?.toISOString() ?? null,
       },
     });
   } catch (error) {
-    console.error(
-      "Errore durante il salvataggio della formazione:",
-      error
-    );
-
+    console.error("Errore durante il salvataggio della formazione:", error);
     return NextResponse.json(
-      {
-        error:
-          "Impossibile salvare la formazione.",
-      },
-      {
-        status: 500,
-      }
+      { error: "Impossibile salvare la formazione." },
+      { status: 500 }
     );
   }
 }
