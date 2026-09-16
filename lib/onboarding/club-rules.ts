@@ -1,4 +1,6 @@
-export const STARTING_BALANCE = 10_000;
+import { NEW_MANAGER_STARTING_BALANCE } from "@/lib/economy-rules";
+
+export const STARTING_BALANCE = NEW_MANAGER_STARTING_BALANCE;
 
 export const CLUB_NAME_MIN_LENGTH = 3;
 export const CLUB_NAME_MAX_LENGTH = 36;

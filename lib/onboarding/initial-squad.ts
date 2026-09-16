@@ -1,3 +1,7 @@
+import {
+  calculatePlayerMarketValue,
+  calculatePlayerWeeklySalary,
+} from "@/lib/economy-rules";
 import { getGeneratedPlayerName } from "@/lib/player-names";
 
 const STYLES = [
@@ -54,18 +58,27 @@ function createInitialPlayer(
   const attributes = shuffle([...ATTRIBUTE_DEVIATIONS]).map(
     (deviation) => profile.overall + deviation
   );
+  const age = randomInteger(...profile.age);
+  const talent = randomInteger(...profile.talent);
+  const overall =
+    attributes.reduce((total, value) => total + value, 0) /
+    attributes.length;
 
   return {
     firstName,
     lastName,
     nationality: "🇮🇹",
-    age: randomInteger(...profile.age),
+    age,
     form: randomInteger(5, 7),
     morale: randomInteger(5, 7),
     experience: randomInteger(...profile.experience),
-    talent: randomInteger(...profile.talent),
-    value: Math.pow(profile.overall - 50, 2) * 100,
-    salary: Math.max(350, (profile.overall - 50) * 40),
+    talent,
+    value: calculatePlayerMarketValue({
+      overall,
+      age,
+      talent,
+    }),
+    salary: calculatePlayerWeeklySalary(overall),
     image: "",
     style: [STYLES[randomInteger(0, STYLES.length - 1)]],
     precisione: attributes[0],

@@ -1,3 +1,8 @@
+import {
+  calculatePlayerMarketValue,
+  calculatePlayerWeeklySalary,
+  NEW_MANAGER_STARTING_BALANCE,
+} from "@/lib/economy-rules";
 import { getGeneratedPlayerName } from "@/lib/player-names";
 import type { WorldLeagueLevel } from "@/lib/world-structure";
 import {
@@ -77,8 +82,8 @@ export function createAiClubBlueprint(sequence: number) {
     secondaryColor: colors[1],
     crestStyle: "CLASSIC",
     reputation: Math.max(1, 55 - Math.floor(sequence / 8) * 2),
-    fans: Math.max(100, 1400 - sequence * 8),
-    balance: 50000,
+    fans: Math.max(10, Math.round(Math.max(100, 1400 - sequence * 8) / 10)),
+    balance: NEW_MANAGER_STARTING_BALANCE,
     weeklyExpenses: 0,
     weeklyIncome: 0,
     trainerLevel: Math.max(1, 4 - Math.floor(sequence / 32)),
@@ -215,6 +220,9 @@ export function createGeneratedWorldPlayer({
     rosterIndex === 4 ? 88 : 78,
     random
   );
+  const overall =
+    attributes.reduce((total, value) => total + value, 0) /
+    attributes.length;
 
   return {
     firstName,
@@ -228,8 +236,12 @@ export function createGeneratedWorldPlayer({
       Math.max(5, (age - 16) * 1.5 + randomInteger(0, 12, random))
     ),
     talent,
-    value: Math.max(1000, Math.pow(targetOverall - 45, 2) * 120),
-    salary: Math.max(300, (targetOverall - 45) * 45),
+    value: calculatePlayerMarketValue({
+      overall,
+      age,
+      talent,
+    }),
+    salary: calculatePlayerWeeklySalary(overall),
     image: "",
     style: [STYLES[randomInteger(0, STYLES.length - 1, random)]],
     precisione: attributes[0],
