@@ -73,18 +73,43 @@ export async function completeSeasonIfReady(
     return createEmptyResult(seasonId, false);
   }
 
-  const leagues = await transaction.league.findMany({
-    where: {
-      seasonId,
-    },
-    select: {
-      status: true,
-    },
-  });
+  const [leagues, individualTournaments, nationsCupTournaments] =
+    await Promise.all([
+      transaction.league.findMany({
+        where: {
+          seasonId,
+        },
+        select: {
+          status: true,
+        },
+      }),
+      transaction.individualTournament.findMany({
+        where: {
+          seasonId,
+        },
+        select: {
+          status: true,
+        },
+      }),
+      transaction.nationsCupTournament.findMany({
+        where: {
+          seasonId,
+        },
+        select: {
+          status: true,
+        },
+      }),
+    ]);
 
   if (
     leagues.length === 0 ||
-    leagues.some((league) => league.status !== "COMPLETED")
+    leagues.some((league) => league.status !== "COMPLETED") ||
+    individualTournaments.some(
+      (tournament) => tournament.status !== "COMPLETED"
+    ) ||
+    nationsCupTournaments.some(
+      (tournament) => tournament.status !== "COMPLETED"
+    )
   ) {
     return createEmptyResult(seasonId, false);
   }
