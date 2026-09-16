@@ -3,21 +3,36 @@ import test from "node:test";
 
 import {
   CONTROLLED_ADMINISTRATION_BALANCE,
+  FAN_LIMITS,
   FINANCIAL_WARNING_BALANCE,
   NEW_MANAGER_STARTING_BALANCE,
+  REPUTATION_LIMITS,
+  applyFanMatchChange,
+  applyFanSeasonChange,
+  applyReputationSeasonChange,
   applyTrainingCenterGrowthBonus,
   applyVenueGateBonus,
+  calculateHomeGateIncome,
   calculatePlayerBaseMarketValue,
   calculatePlayerMarketValue,
   calculatePlayerWeeklySalary,
   calculateSellerProceeds,
   calculateSquadWeeklySalary,
   calculateTransferFee,
+  calculateWeeklySponsorIncome,
   getAcademyLevel,
   getAcademyTalentBands,
+  getFanMatchChange,
+  getGateFanMultiplier,
+  getGateFormMultiplier,
+  getGateHomeReputationMultiplier,
+  getGateOpponentReputationMultiplier,
   getLeagueEconomy,
   getPlayerValueAgeMultiplier,
   getPlayerValueTalentMultiplier,
+  getSponsorFanMultiplier,
+  getSponsorFormMultiplier,
+  getSponsorReputationMultiplier,
   getTrainerWeeklyCost,
   getTrainingCenterGrowthMultiplier,
   getTrainingCenterLevel,
@@ -199,6 +214,137 @@ test("fissa costi, tempi e bonus dell'impianto di gioco", () => {
   assert.equal(applyVenueGateBonus(14_000, 3), 16_100);
   assert.equal(applyVenueGateBonus(14_000, 4), 17_500);
   assert.equal(applyVenueGateBonus(14_000, 5), 19_600);
+});
+
+test("usa una scala tifosi coerente con una sala biliardo", () => {
+  assert.deepEqual(FAN_LIMITS, {
+    minimum: 10,
+    reference: 90,
+    maximum: 300,
+  });
+
+  assert.equal(getFanMatchChange(0), -3);
+  assert.equal(getFanMatchChange(3), 0);
+  assert.equal(getFanMatchChange(6), 3);
+  assert.equal(applyFanMatchChange(90, 6), 93);
+  assert.equal(applyFanMatchChange(10, 0), 10);
+
+  assert.equal(
+    applyFanSeasonChange({
+      fans: 90,
+      position: 1,
+      promoted: true,
+    }),
+    108
+  );
+  assert.equal(
+    applyFanSeasonChange({
+      fans: 90,
+      position: 8,
+      relegated: true,
+    }),
+    75
+  );
+});
+
+test("aggiorna la reputazione lentamente a fine stagione", () => {
+  assert.deepEqual(REPUTATION_LIMITS, {
+    minimum: 1,
+    reference: 40,
+    maximum: 100,
+  });
+
+  assert.equal(
+    applyReputationSeasonChange({
+      reputation: 40,
+      position: 1,
+      firstLeagueChampion: true,
+    }),
+    46
+  );
+  assert.equal(
+    applyReputationSeasonChange({
+      reputation: 40,
+      position: 8,
+      relegated: true,
+    }),
+    35
+  );
+});
+
+test("calcola sponsor settimanale con variazioni moderate", () => {
+  assert.equal(getSponsorReputationMultiplier(40), 1);
+  assert.equal(getSponsorFanMultiplier(90), 1);
+  assert.equal(getSponsorFormMultiplier(3), 1);
+
+  assert.equal(
+    calculateWeeklySponsorIncome({
+      leagueLevel: 1,
+      reputation: 40,
+      fans: 90,
+      recentAveragePoints: 3,
+    }),
+    8_500
+  );
+  assert.equal(
+    calculateWeeklySponsorIncome({
+      leagueLevel: 1,
+      reputation: 1,
+      fans: 10,
+      recentAveragePoints: 0,
+    }),
+    7_225
+  );
+  assert.equal(
+    calculateWeeklySponsorIncome({
+      leagueLevel: 1,
+      reputation: 100,
+      fans: 300,
+      recentAveragePoints: 6,
+    }),
+    9_775
+  );
+});
+
+test("calcola il pubblico con interesse partita e bonus impianto", () => {
+  assert.equal(getGateFanMultiplier(90), 1);
+  assert.equal(getGateHomeReputationMultiplier(40), 1);
+  assert.equal(getGateFormMultiplier(3), 1);
+  assert.equal(getGateOpponentReputationMultiplier(40), 1);
+
+  assert.equal(
+    calculateHomeGateIncome({
+      leagueLevel: 1,
+      fans: 90,
+      homeReputation: 40,
+      opponentReputation: 40,
+      recentAveragePoints: 3,
+      venueLevel: 1,
+    }),
+    14_000
+  );
+  assert.equal(
+    calculateHomeGateIncome({
+      leagueLevel: 1,
+      fans: 10,
+      homeReputation: 1,
+      opponentReputation: 1,
+      recentAveragePoints: 0,
+      venueLevel: 1,
+    }),
+    11_200
+  );
+  assert.equal(
+    calculateHomeGateIncome({
+      leagueLevel: 1,
+      fans: 300,
+      homeReputation: 100,
+      opponentReputation: 100,
+      recentAveragePoints: 6,
+      venueLevel: 5,
+    }),
+    24_500
+  );
 });
 
 test("mantiene staff e costi base per categoria nei valori approvati", () => {

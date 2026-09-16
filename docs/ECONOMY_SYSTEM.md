@@ -139,7 +139,94 @@ Il Responsabile giovani resta distinto dall'Accademia: il suo livello migliora l
 | 3 | 5.800 | 8.400 | 1.350 |
 | 4 | 4.800 | 6.400 | 900 |
 
-Sponsor e pubblico devono poter ricevere variazioni moderate da reputazione, tifosi, andamento e qualita dell'avversario, senza far dipendere la sopravvivenza del club dai risultati sportivi.
+## Tifosi, reputazione, sponsor e pubblico
+
+### Tifosi
+
+La scala dei tifosi e volutamente ridotta per essere coerente con una sala biliardo e non con uno stadio: minimo 10, riferimento 90, massimo 300.
+
+Dopo ogni giornata di campionato:
+
+| Punti giornata | Variazione tifosi |
+| ---: | ---: |
+| 0 | -3 |
+| 1 | -2 |
+| 2 | -1 |
+| 3 | 0 |
+| 4 | +1 |
+| 5 | +2 |
+| 6 | +3 |
+
+A fine stagione:
+
+| Posizione | Variazione tifosi |
+| ---: | ---: |
+| 1 | +12 |
+| 2 | +7 |
+| 3 | +4 |
+| 4-5 | 0 |
+| 6 | -3 |
+| 7 | -6 |
+| 8 | -9 |
+
+Promozione: +6 tifosi. Retrocessione: -6 tifosi.
+
+### Reputazione
+
+La reputazione usa una scala 1-100 e rappresenta il prestigio storico del club. Non viene modificata dopo ogni giornata: si aggiorna soltanto a fine stagione.
+
+| Posizione | Variazione reputazione |
+| ---: | ---: |
+| 1 | +4 |
+| 2 | +2 |
+| 3 | +1 |
+| 4-5 | 0 |
+| 6 | -1 |
+| 7 | -2 |
+| 8 | -3 |
+
+Promozione: +2. Retrocessione: -2. Il campione della Prima Serie riceve inoltre +2 reputazione, quindi una stagione chiusa al primo posto in Prima puo produrre +6.
+
+### Sponsor settimanale
+
+Lo sponsor parte dalla base della categoria e riceve tre correttivi moderati.
+
+Reputazione:
+
+`1 + (reputazione - 40) * 0,004`, limitato tra 0,92 e 1,08.
+
+Tifosi:
+
+`1 + (tifosi - 90) / 1.600`, limitato tra 0,95 e 1,05.
+
+Andamento recente, usando la media dei punti nelle ultime 5 giornate:
+
+`1 + (media punti - 3) * 0,01`, limitato tra 0,97 e 1,03.
+
+Formula finale:
+
+`sponsor = sponsor base categoria * reputazione * tifosi * andamento`
+
+Il moltiplicatore complessivo viene comunque limitato tra 0,85 e 1,15. In Prima Serie, con base 8.500, lo sponsor rimane quindi tra circa 7.225 e 9.775 a settimana.
+
+### Incasso casalingo
+
+L'incasso parte dalla base della categoria. L'interesse partita usa:
+
+- tifosi di casa: `1 + (tifosi - 90) / 800`, limitato 0,90-1,10;
+- reputazione di casa: `1 + (reputazione - 40) * 0,0025`, limitato 0,95-1,05;
+- andamento ultime 5 giornate: `1 + (media punti - 3) / 60`, limitato 0,95-1,05;
+- reputazione avversario: `1 + (reputazione avversario - 40) * 0,0035`, limitato 0,95-1,10.
+
+Il prodotto dei fattori di interesse viene limitato tra 0,80 e 1,25. Soltanto dopo si applica il bonus dell'Impianto di gioco.
+
+Formula finale:
+
+`incasso = incasso base categoria * interesse partita * bonus Impianto`
+
+In Prima Serie, prima del bonus Impianto, l'incasso resta quindi tra 11.200 e 17.500. Con Impianto livello 5 la forbice diventa 15.680-24.500.
+
+La posizione in classifica non entra direttamente nelle formule: l'andamento recente, i tifosi e la reputazione sono gia sufficienti. In questo modo si limita il ciclo automatico vittorie -> piu ricavi -> rosa piu forte -> altre vittorie.
 
 ## Strutture
 
@@ -235,7 +322,7 @@ Formula:
 
 `incasso partita = incasso base * fattori pubblico * (1 + bonus Impianto)`
 
-Il bonus Impianto si applica quindi dopo la definizione dell'incasso base della categoria e insieme ai futuri fattori di pubblico, reputazione, andamento recente e qualita dell'avversario.
+Il bonus Impianto si applica quindi dopo la definizione dell'incasso base della categoria e insieme ai fattori di pubblico, reputazione, andamento recente e qualita dell'avversario.
 
 Esempio in Prima Serie con incasso base di 14.000 prima degli altri correttivi:
 
@@ -295,7 +382,6 @@ Questi sono target da validare con un simulatore riproducibile, non risultati ce
 ## Elementi ancora da finalizzare prima dell'attivazione completa
 
 1. Premi completi di Seconda, Terza e Quarta Serie, promozioni e tornei individuali.
-2. Formula precisa di sponsor e pubblico per reputazione, tifosi, forma recente e avversario.
-3. Simulatore economico riproducibile su 20 stagioni con promozioni, retrocessioni, crescita, mercato, accademia e ritiri.
+2. Simulatore economico riproducibile su 20 stagioni con promozioni, retrocessioni, crescita, mercato, accademia e ritiri.
 
-Fino a quando questi tre punti non sono chiusi, questa baseline resta bloccata come riferimento e non deve essere sostituita da numeri ad hoc nelle singole pagine o servizi.
+Fino a quando questi due punti non sono chiusi, questa baseline resta bloccata come riferimento e non deve essere sostituita da numeri ad hoc nelle singole pagine o servizi.

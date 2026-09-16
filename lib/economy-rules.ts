@@ -191,6 +191,67 @@ export const VENUE_LEVELS = {
   },
 } as const;
 
+export const FAN_LIMITS = {
+  minimum: 10,
+  reference: 90,
+  maximum: 300,
+} as const;
+
+export const FAN_MATCH_CHANGES = {
+  0: -3,
+  1: -2,
+  2: -1,
+  3: 0,
+  4: 1,
+  5: 2,
+  6: 3,
+} as const;
+
+export const FAN_SEASON_POSITION_CHANGES = {
+  1: 12,
+  2: 7,
+  3: 4,
+  4: 0,
+  5: 0,
+  6: -3,
+  7: -6,
+  8: -9,
+} as const;
+
+export const FAN_PROMOTION_CHANGE = 6;
+export const FAN_RELEGATION_CHANGE = -6;
+
+export const REPUTATION_LIMITS = {
+  minimum: 1,
+  reference: 40,
+  maximum: 100,
+} as const;
+
+export const REPUTATION_SEASON_POSITION_CHANGES = {
+  1: 4,
+  2: 2,
+  3: 1,
+  4: 0,
+  5: 0,
+  6: -1,
+  7: -2,
+  8: -3,
+} as const;
+
+export const REPUTATION_PROMOTION_CHANGE = 2;
+export const REPUTATION_RELEGATION_CHANGE = -2;
+export const FIRST_LEAGUE_CHAMPION_REPUTATION_BONUS = 2;
+
+export const SPONSOR_MULTIPLIER_LIMITS = {
+  minimum: 0.85,
+  maximum: 1.15,
+} as const;
+
+export const MATCH_INTEREST_MULTIPLIER_LIMITS = {
+  minimum: 0.8,
+  maximum: 1.25,
+} as const;
+
 export const ECONOMY_DESIGN_TARGETS = {
   normalSalaryShare: [0.55, 0.6],
   normalStaffShare: [0.2, 0.25],
@@ -318,6 +379,164 @@ export function applyVenueGateBonus(
   );
 }
 
+export function getFanMatchChange(points: number) {
+  const normalizedPoints = Math.max(0, Math.min(6, Math.round(points))) as 0 | 1 | 2 | 3 | 4 | 5 | 6;
+  return FAN_MATCH_CHANGES[normalizedPoints];
+}
+
+export function applyFanMatchChange(fans: number, points: number) {
+  return normalizeFans(fans + getFanMatchChange(points));
+}
+
+export function applyFanSeasonChange({
+  fans,
+  position,
+  promoted = false,
+  relegated = false,
+}: {
+  fans: number;
+  position: number;
+  promoted?: boolean;
+  relegated?: boolean;
+}) {
+  const normalizedPosition = Math.max(1, Math.min(8, Math.round(position))) as 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
+  const movementChange =
+    (promoted ? FAN_PROMOTION_CHANGE : 0) +
+    (relegated ? FAN_RELEGATION_CHANGE : 0);
+
+  return normalizeFans(
+    fans +
+      FAN_SEASON_POSITION_CHANGES[normalizedPosition] +
+      movementChange
+  );
+}
+
+export function applyReputationSeasonChange({
+  reputation,
+  position,
+  promoted = false,
+  relegated = false,
+  firstLeagueChampion = false,
+}: {
+  reputation: number;
+  position: number;
+  promoted?: boolean;
+  relegated?: boolean;
+  firstLeagueChampion?: boolean;
+}) {
+  const normalizedPosition = Math.max(1, Math.min(8, Math.round(position))) as 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
+  const movementChange =
+    (promoted ? REPUTATION_PROMOTION_CHANGE : 0) +
+    (relegated ? REPUTATION_RELEGATION_CHANGE : 0);
+  const championBonus = firstLeagueChampion
+    ? FIRST_LEAGUE_CHAMPION_REPUTATION_BONUS
+    : 0;
+
+  return normalizeReputation(
+    reputation +
+      REPUTATION_SEASON_POSITION_CHANGES[normalizedPosition] +
+      movementChange +
+      championBonus
+  );
+}
+
+export function getSponsorReputationMultiplier(reputation: number) {
+  const rawMultiplier =
+    1 + (normalizeReputation(reputation) - REPUTATION_LIMITS.reference) * 0.004;
+  return clamp(rawMultiplier, 0.92, 1.08);
+}
+
+export function getSponsorFanMultiplier(fans: number) {
+  const rawMultiplier =
+    1 + (normalizeFans(fans) - FAN_LIMITS.reference) / 1_600;
+  return clamp(rawMultiplier, 0.95, 1.05);
+}
+
+export function getSponsorFormMultiplier(recentAveragePoints: number) {
+  const normalizedAverage = clamp(recentAveragePoints, 0, 6);
+  return clamp(1 + (normalizedAverage - 3) * 0.01, 0.97, 1.03);
+}
+
+export function calculateWeeklySponsorIncome({
+  leagueLevel,
+  reputation,
+  fans,
+  recentAveragePoints,
+}: {
+  leagueLevel: number;
+  reputation: number;
+  fans: number;
+  recentAveragePoints: number;
+}) {
+  const baseSponsor = getLeagueEconomy(leagueLevel).sponsorWeekly;
+  const rawMultiplier =
+    getSponsorReputationMultiplier(reputation) *
+    getSponsorFanMultiplier(fans) *
+    getSponsorFormMultiplier(recentAveragePoints);
+  const multiplier = clamp(
+    rawMultiplier,
+    SPONSOR_MULTIPLIER_LIMITS.minimum,
+    SPONSOR_MULTIPLIER_LIMITS.maximum
+  );
+
+  return Math.round(baseSponsor * multiplier);
+}
+
+export function getGateFanMultiplier(fans: number) {
+  const rawMultiplier =
+    1 + (normalizeFans(fans) - FAN_LIMITS.reference) / 800;
+  return clamp(rawMultiplier, 0.9, 1.1);
+}
+
+export function getGateHomeReputationMultiplier(reputation: number) {
+  const rawMultiplier =
+    1 + (normalizeReputation(reputation) - REPUTATION_LIMITS.reference) * 0.0025;
+  return clamp(rawMultiplier, 0.95, 1.05);
+}
+
+export function getGateFormMultiplier(recentAveragePoints: number) {
+  const normalizedAverage = clamp(recentAveragePoints, 0, 6);
+  return clamp(1 + (normalizedAverage - 3) / 60, 0.95, 1.05);
+}
+
+export function getGateOpponentReputationMultiplier(reputation: number) {
+  const rawMultiplier =
+    1 + (normalizeReputation(reputation) - REPUTATION_LIMITS.reference) * 0.0035;
+  return clamp(rawMultiplier, 0.95, 1.1);
+}
+
+export function calculateHomeGateIncome({
+  leagueLevel,
+  fans,
+  homeReputation,
+  opponentReputation,
+  recentAveragePoints,
+  venueLevel,
+}: {
+  leagueLevel: number;
+  fans: number;
+  homeReputation: number;
+  opponentReputation: number;
+  recentAveragePoints: number;
+  venueLevel: number;
+}) {
+  const baseGate = getLeagueEconomy(leagueLevel).homeGateBase;
+  const rawInterestMultiplier =
+    getGateFanMultiplier(fans) *
+    getGateHomeReputationMultiplier(homeReputation) *
+    getGateFormMultiplier(recentAveragePoints) *
+    getGateOpponentReputationMultiplier(opponentReputation);
+  const interestMultiplier = clamp(
+    rawInterestMultiplier,
+    MATCH_INTEREST_MULTIPLIER_LIMITS.minimum,
+    MATCH_INTEREST_MULTIPLIER_LIMITS.maximum
+  );
+
+  return Math.round(
+    baseGate * interestMultiplier * getVenueGateMultiplier(venueLevel)
+  );
+}
+
 export function calculateTransferFee(price: number) {
   const normalizedPrice = Math.max(0, Math.round(price));
   return Math.round(normalizedPrice * TRANSFER_FEE_RATE);
@@ -341,10 +560,28 @@ export function getLeagueEconomy(level: number) {
   return LEAGUE_ECONOMY[normalizedLevel];
 }
 
+function normalizeFans(fans: number) {
+  return Math.max(
+    FAN_LIMITS.minimum,
+    Math.min(FAN_LIMITS.maximum, Math.round(fans))
+  );
+}
+
+function normalizeReputation(reputation: number) {
+  return Math.max(
+    REPUTATION_LIMITS.minimum,
+    Math.min(REPUTATION_LIMITS.maximum, Math.round(reputation))
+  );
+}
+
 function normalizeStructureLevel(level: number) {
   return Math.max(1, Math.min(5, Math.round(level))) as 1 | 2 | 3 | 4 | 5;
 }
 
 function normalizeStaffLevel(level: number) {
   return Math.max(1, Math.min(5, Math.round(level))) as 1 | 2 | 3 | 4 | 5;
+}
+
+function clamp(value: number, minimum: number, maximum: number) {
+  return Math.max(minimum, Math.min(maximum, value));
 }
