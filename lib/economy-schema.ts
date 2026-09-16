@@ -19,7 +19,13 @@ export async function ensureEconomySchema() {
   );
 
   if (structureExists) {
-    await ensureEconomyMarkers(prisma);
+    await prisma.$transaction(async (transaction) => {
+      await transaction.$queryRaw`
+        SELECT pg_advisory_xact_lock(${ECONOMY_SCHEMA_LOCK})
+      `;
+      await ensureEconomyMarkers(transaction);
+      await ensurePlayerLifecycleState(transaction);
+    });
     economySchemaReady = true;
     return;
   }
@@ -41,6 +47,7 @@ export async function ensureEconomySchema() {
     }
 
     await ensureEconomyMarkers(transaction);
+    await ensurePlayerLifecycleState(transaction);
   });
 
   economySchemaReady = true;
@@ -132,6 +139,54 @@ async function ensureEconomyMarkers(client: SchemaClient) {
         AND "economySettledAt" IS NULL
     `);
   }
+}
+
+async function ensurePlayerLifecycleState(client: SchemaClient) {
+  const rows = await client.$queryRawUnsafe<Array<{ supportsRemoved: boolean }>>(`
+    SELECT EXISTS (
+      SELECT 1
+      FROM pg_constraint
+      WHERE conrelid = '"Player"'::regclass
+        AND conname = 'Player_careerStatus_check'
+        AND pg_get_constraintdef(oid) LIKE '%REMOVED%'
+    ) AS "supportsRemoved"
+  `);
+
+  if (rows[0]?.supportsRemoved) return;
+
+  await client.$executeRawUnsafe(`
+    ALTER TABLE "Player"
+      DROP CONSTRAINT IF EXISTS "Player_retirement_state_check",
+      DROP CONSTRAINT IF EXISTS "Player_careerStatus_check"
+  `);
+
+  await client.$executeRawUnsafe(`
+    ALTER TABLE "Player"
+      ADD CONSTRAINT "Player_careerStatus_check"
+      CHECK ("careerStatus" IN ('ACTIVE', 'RETIRED', 'REMOVED')),
+      ADD CONSTRAINT "Player_retirement_state_check"
+      CHECK (
+        (
+          "careerStatus" = 'ACTIVE'
+          AND "retiredAt" IS NULL
+          AND "retirementSeasonId" IS NULL
+        )
+        OR
+        (
+          "careerStatus" = 'RETIRED'
+          AND "retiredAt" IS NOT NULL
+          AND "retirementSeasonId" IS NOT NULL
+          AND "clubId" IS NULL
+        )
+        OR
+        (
+          "careerStatus" = 'REMOVED'
+          AND "retiredAt" IS NULL
+          AND "retirementSeasonId" IS NULL
+          AND "clubId" IS NULL
+        )
+      )
+  `);
 }
 
 async function hasColumn(
