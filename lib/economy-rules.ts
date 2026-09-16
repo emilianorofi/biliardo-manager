@@ -5,6 +5,10 @@ export const TRANSFER_FEE_RATE = 0.05;
 export const FINANCIAL_WARNING_BALANCE = -25_000;
 export const CONTROLLED_ADMINISTRATION_BALANCE = -50_000;
 
+export const PLAYER_VALUE_BASE_AT_60 = 30_000;
+export const PLAYER_VALUE_OVERALL_GROWTH = 1.075;
+export const PLAYER_VALUE_ROUNDING = 100;
+
 export const TRAINER_WEEKLY_COSTS = {
   1: 500,
   2: 900,
@@ -99,6 +103,62 @@ export function calculateSquadWeeklySalary(overalls: readonly number[]) {
   return overalls.reduce(
     (total, overall) => total + calculatePlayerWeeklySalary(overall),
     0
+  );
+}
+
+export function calculatePlayerBaseMarketValue(overall: number) {
+  const normalizedOverall = Math.max(0, Math.min(100, overall));
+
+  return (
+    PLAYER_VALUE_BASE_AT_60 *
+    Math.pow(
+      PLAYER_VALUE_OVERALL_GROWTH,
+      normalizedOverall - 60
+    )
+  );
+}
+
+export function getPlayerValueAgeMultiplier(age: number) {
+  const normalizedAge = Math.max(0, Math.round(age));
+
+  if (normalizedAge <= 20) return 2.3;
+  if (normalizedAge <= 25) return 2.1;
+  if (normalizedAge <= 30) return 1.8;
+  if (normalizedAge <= 35) return 1.55;
+  if (normalizedAge <= 40) return 1.3;
+  if (normalizedAge <= 45) return 1.15;
+  if (normalizedAge <= 50) return 0.95;
+  if (normalizedAge <= 55) return 0.75;
+  if (normalizedAge <= 60) return 0.55;
+  if (normalizedAge <= 65) return 0.4;
+  if (normalizedAge <= 70) return 0.28;
+  if (normalizedAge <= 75) return 0.18;
+
+  return 0.1;
+}
+
+export function getPlayerValueTalentMultiplier(talent: number) {
+  const normalizedTalent = Math.max(0, Math.min(100, talent));
+  return 0.7 + normalizedTalent / 180;
+}
+
+export function calculatePlayerMarketValue({
+  overall,
+  age,
+  talent,
+}: {
+  overall: number;
+  age: number;
+  talent: number;
+}) {
+  const rawValue =
+    calculatePlayerBaseMarketValue(overall) *
+    getPlayerValueAgeMultiplier(age) *
+    getPlayerValueTalentMultiplier(talent);
+
+  return (
+    Math.round(rawValue / PLAYER_VALUE_ROUNDING) *
+    PLAYER_VALUE_ROUNDING
   );
 }
 
