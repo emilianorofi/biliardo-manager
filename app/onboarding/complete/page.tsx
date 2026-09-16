@@ -168,7 +168,7 @@ export default async function ClubCreatedPage() {
                 Rosa iniziale
               </p>
               <h2 className="mt-1 text-2xl font-black">
-                I tuoi primi cinque giocatori
+                I tuoi primi sei giocatori
               </h2>
             </div>
             {leagueEntry ? (
@@ -205,10 +205,7 @@ export default async function ClubCreatedPage() {
           </div>
 
           <p className="mt-5 rounded-2xl border border-sky-400/15 bg-sky-400/5 p-4 text-sm leading-6 text-sky-200/80">
-            I precedenti giocatori della squadra IA sono stati
-            trasferiti tra gli svincolati con il timer di 105
-            giorni. Tu hai ricevuto una rosa completamente
-            nuova e personale.
+            La precedente rosa della squadra IA viene rimossa dal gioco attivo al momento del subentro. Tu ricevi sei giocatori nuovi e personali, mentre classifica e calendario del club restano invariati.
           </p>
         </section>
 
