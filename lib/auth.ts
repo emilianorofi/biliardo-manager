@@ -3,7 +3,6 @@ import "server-only";
 import { cache } from "react";
 import { redirect } from "next/navigation";
 
-import { ensureEconomySchema } from "@/lib/economy-schema";
 import { prisma } from "@/lib/prisma";
 import { createClient } from "@/lib/supabase/server";
 
@@ -16,8 +15,6 @@ export type AuthenticatedManager = {
 
 export const getAuthenticatedUser = cache(
   async () => {
-    await ensureEconomySchema();
-
     const supabase = await createClient();
     const {
       data: { user },
