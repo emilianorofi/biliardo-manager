@@ -31,6 +31,7 @@ import {
 import {
   drawSpecialtyCup,
   initializeSpecialtyCup,
+  playSpecialtyCupStage,
 } from "@/lib/specialty-cup-service";
 
 const MAX_EVENTS_PER_RUN = 256;
@@ -43,6 +44,7 @@ type ClockCandidate = {
     | "NATIONS_CUP_DRAW"
     | "NATIONS_CUP_STAGE"
     | "SPECIALTY_CUP_DRAW"
+    | "SPECIALTY_CUP_STAGE"
     | "WEEKLY_UPDATE"
     | "ACADEMY"
     | "WEEKLY_NEWS";
@@ -130,7 +132,8 @@ async function findNextDueEvent(
     tournamentMatch,
     nationsCupDraw,
     nationsCupMatch,
-    specialtyCupRows,
+    specialtyCupDrawRows,
+    specialtyCupStageRows,
   ] = await Promise.all([
     prisma.leagueFixture.findFirst({
       where: {
@@ -263,9 +266,19 @@ async function findNextDueEvent(
       ORDER BY "drawAt" ASC, "id" ASC
       LIMIT 1
     `,
+    prisma.$queryRaw<Array<{ id: number; nextStageAt: Date }>>`
+      SELECT "id", "nextStageAt"
+      FROM "SpecialtyCupTournament"
+      WHERE "status" IN ('DRAWN', 'IN_PROGRESS')
+        AND "nextStageAt" IS NOT NULL
+        AND "nextStageAt" <= ${now}
+      ORDER BY "nextStageAt" ASC, "id" ASC
+      LIMIT 1
+    `,
   ]);
   const candidates: ClockCandidate[] = [];
-  const specialtyCupDraw = specialtyCupRows[0];
+  const specialtyCupDraw = specialtyCupDrawRows[0];
+  const specialtyCupStage = specialtyCupStageRows[0];
 
   if (fixture) {
     candidates.push({
@@ -346,6 +359,14 @@ async function findNextDueEvent(
     });
   }
 
+  if (specialtyCupStage) {
+    candidates.push({
+      type: "SPECIALTY_CUP_STAGE",
+      id: specialtyCupStage.id,
+      scheduledAt: specialtyCupStage.nextStageAt,
+    });
+  }
+
   candidates.sort(
     (first, second) =>
       first.scheduledAt.getTime() -
@@ -417,6 +438,19 @@ async function processCandidate(
 
     case "SPECIALTY_CUP_DRAW": {
       const result = await drawSpecialtyCup(
+        candidate.id,
+        candidate.scheduledAt
+      );
+      return {
+        type: candidate.type,
+        id: candidate.id,
+        scheduledAt: candidate.scheduledAt,
+        ...result,
+      };
+    }
+
+    case "SPECIALTY_CUP_STAGE": {
+      const result = await playSpecialtyCupStage(
         candidate.id,
         candidate.scheduledAt
       );
