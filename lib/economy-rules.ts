@@ -87,6 +87,77 @@ export const TRAINING_CENTER_LEVELS = {
   },
 } as const;
 
+export const ACADEMY_LEVELS = {
+  1: {
+    upgradeCost: 0,
+    weeklyMaintenance: 150,
+    overallBonus: [0, 0] as const,
+    upgradeDays: 0,
+  },
+  2: {
+    upgradeCost: 20_000,
+    weeklyMaintenance: 300,
+    overallBonus: [0, 1] as const,
+    upgradeDays: 7,
+  },
+  3: {
+    upgradeCost: 50_000,
+    weeklyMaintenance: 500,
+    overallBonus: [0, 2] as const,
+    upgradeDays: 14,
+  },
+  4: {
+    upgradeCost: 110_000,
+    weeklyMaintenance: 800,
+    overallBonus: [1, 3] as const,
+    upgradeDays: 21,
+  },
+  5: {
+    upgradeCost: 220_000,
+    weeklyMaintenance: 1_200,
+    overallBonus: [2, 4] as const,
+    upgradeDays: 28,
+  },
+} as const;
+
+export const ACADEMY_TALENT_BANDS = {
+  1: [
+    { minimum: 45, maximum: 59, probability: 0.78 },
+    { minimum: 60, maximum: 69, probability: 0.17 },
+    { minimum: 70, maximum: 79, probability: 0.045 },
+    { minimum: 80, maximum: 89, probability: 0.005 },
+    { minimum: 90, maximum: 95, probability: 0 },
+  ],
+  2: [
+    { minimum: 45, maximum: 59, probability: 0.72 },
+    { minimum: 60, maximum: 69, probability: 0.2 },
+    { minimum: 70, maximum: 79, probability: 0.065 },
+    { minimum: 80, maximum: 89, probability: 0.015 },
+    { minimum: 90, maximum: 95, probability: 0 },
+  ],
+  3: [
+    { minimum: 45, maximum: 59, probability: 0.65 },
+    { minimum: 60, maximum: 69, probability: 0.23 },
+    { minimum: 70, maximum: 79, probability: 0.09 },
+    { minimum: 80, maximum: 89, probability: 0.025 },
+    { minimum: 90, maximum: 95, probability: 0.005 },
+  ],
+  4: [
+    { minimum: 45, maximum: 59, probability: 0.58 },
+    { minimum: 60, maximum: 69, probability: 0.25 },
+    { minimum: 70, maximum: 79, probability: 0.12 },
+    { minimum: 80, maximum: 89, probability: 0.04 },
+    { minimum: 90, maximum: 95, probability: 0.01 },
+  ],
+  5: [
+    { minimum: 45, maximum: 59, probability: 0.5 },
+    { minimum: 60, maximum: 69, probability: 0.27 },
+    { minimum: 70, maximum: 79, probability: 0.16 },
+    { minimum: 80, maximum: 89, probability: 0.06 },
+    { minimum: 90, maximum: 95, probability: 0.01 },
+  ],
+} as const;
+
 export const ECONOMY_DESIGN_TARGETS = {
   normalSalaryShare: [0.55, 0.6],
   normalStaffShare: [0.2, 0.25],
@@ -173,8 +244,7 @@ export function calculatePlayerMarketValue({
 }
 
 export function getTrainingCenterLevel(level: number) {
-  const normalizedLevel = Math.max(1, Math.min(5, Math.round(level))) as 1 | 2 | 3 | 4 | 5;
-  return TRAINING_CENTER_LEVELS[normalizedLevel];
+  return TRAINING_CENTER_LEVELS[normalizeStructureLevel(level)];
 }
 
 export function getTrainingCenterGrowthMultiplier(level: number) {
@@ -187,6 +257,14 @@ export function applyTrainingCenterGrowthBonus(
 ) {
   const normalizedGain = Math.max(0, trainingGain);
   return normalizedGain * getTrainingCenterGrowthMultiplier(level);
+}
+
+export function getAcademyLevel(level: number) {
+  return ACADEMY_LEVELS[normalizeStructureLevel(level)];
+}
+
+export function getAcademyTalentBands(level: number) {
+  return ACADEMY_TALENT_BANDS[normalizeStructureLevel(level)];
 }
 
 export function calculateTransferFee(price: number) {
@@ -210,6 +288,10 @@ export function getYouthCoachWeeklyCost(level: number) {
 export function getLeagueEconomy(level: number) {
   const normalizedLevel = Math.max(1, Math.min(4, Math.round(level))) as 1 | 2 | 3 | 4;
   return LEAGUE_ECONOMY[normalizedLevel];
+}
+
+function normalizeStructureLevel(level: number) {
+  return Math.max(1, Math.min(5, Math.round(level))) as 1 | 2 | 3 | 4 | 5;
 }
 
 function normalizeStaffLevel(level: number) {

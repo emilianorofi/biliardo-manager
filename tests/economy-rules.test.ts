@@ -12,6 +12,8 @@ import {
   calculateSellerProceeds,
   calculateSquadWeeklySalary,
   calculateTransferFee,
+  getAcademyLevel,
+  getAcademyTalentBands,
   getLeagueEconomy,
   getPlayerValueAgeMultiplier,
   getPlayerValueTalentMultiplier,
@@ -128,6 +130,46 @@ test("fissa costi, tempi e bonus del centro allenamento", () => {
     Number(applyTrainingCenterGrowthBonus(0.9, 5).toFixed(3)),
     1.062
   );
+});
+
+test("fissa costi, tempi e qualita dei candidati dell'accademia", () => {
+  assert.deepEqual(getAcademyLevel(1), {
+    upgradeCost: 0,
+    weeklyMaintenance: 150,
+    overallBonus: [0, 0],
+    upgradeDays: 0,
+  });
+  assert.deepEqual(getAcademyLevel(5), {
+    upgradeCost: 220_000,
+    weeklyMaintenance: 1_200,
+    overallBonus: [2, 4],
+    upgradeDays: 28,
+  });
+
+  for (let level = 1; level <= 5; level += 1) {
+    const totalProbability = getAcademyTalentBands(level).reduce(
+      (total, band) => total + band.probability,
+      0
+    );
+
+    assert.equal(Number(totalProbability.toFixed(6)), 1);
+  }
+
+  assert.deepEqual(getAcademyTalentBands(1), [
+    { minimum: 45, maximum: 59, probability: 0.78 },
+    { minimum: 60, maximum: 69, probability: 0.17 },
+    { minimum: 70, maximum: 79, probability: 0.045 },
+    { minimum: 80, maximum: 89, probability: 0.005 },
+    { minimum: 90, maximum: 95, probability: 0 },
+  ]);
+
+  assert.deepEqual(getAcademyTalentBands(5), [
+    { minimum: 45, maximum: 59, probability: 0.5 },
+    { minimum: 60, maximum: 69, probability: 0.27 },
+    { minimum: 70, maximum: 79, probability: 0.16 },
+    { minimum: 80, maximum: 89, probability: 0.06 },
+    { minimum: 90, maximum: 95, probability: 0.01 },
+  ]);
 });
 
 test("mantiene staff e costi base per categoria nei valori approvati", () => {

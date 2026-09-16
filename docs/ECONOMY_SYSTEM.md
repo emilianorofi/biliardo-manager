@@ -128,6 +128,8 @@ Quindi un giovane da overall 60 puo valere piu di un sessantenne da overall 75 p
 | 4 | 1.300 |
 | 5 | 2.100 |
 
+Il Responsabile giovani resta distinto dall'Accademia: il suo livello migliora la precisione con cui vengono stimate le caratteristiche dei giovani gia presenti, mentre il livello dell'Accademia modifica la qualita media dei nuovi candidati.
+
 ## Entrate e costi base per categoria
 
 | Serie | Sponsor/settimana | Incasso base gara in casa | Gestione club/settimana |
@@ -169,7 +171,55 @@ Con un guadagno base di 0,90, il livello 5 porta il guadagno a 1,062. Su 15 sett
 
 Durante un upgrade resta attivo il livello precedente fino alla conclusione dei lavori. Gli upgrade non sono quindi istantanei e non permettono di passare dal livello 1 al livello 5 nello stesso momento.
 
-Accademia e Impianto di gioco devono seguire lo stesso principio economico, ma i loro importi definitivi restano da fissare insieme ai bonus prodotti da ciascun livello prima dell'attivazione in produzione.
+### Accademia
+
+L'Accademia non accelera direttamente la crescita dei giovani gia presenti. Il suo compito e aumentare la qualita media dei nuovi candidati, lasciando comunque una componente di fortuna: anche un club con Accademia di livello 1 puo trovare raramente un grande prospetto.
+
+| Livello | Costo upgrade | Manutenzione settimanale | Bonus OVR candidato | Tempo upgrade |
+| ---: | ---: | ---: | ---: | ---: |
+| 1 | iniziale | 150 | nessuno | - |
+| 2 | 20.000 | 300 | 0-1 | 7 giorni |
+| 3 | 50.000 | 500 | 0-2 | 14 giorni |
+| 4 | 110.000 | 800 | 1-3 | 21 giorni |
+| 5 | 220.000 | 1.200 | 2-4 | 28 giorni |
+
+Il bonus di overall si applica alla qualita iniziale del nuovo candidato e non altera direttamente la sua eta. I candidati restano tra 14 e 16 anni con la stessa distribuzione di eta a tutti i livelli dell'Accademia.
+
+Le fasce talento sono:
+
+| Fascia | Talento |
+| --- | ---: |
+| Normale | 45-59 |
+| Interessante | 60-69 |
+| Grande prospetto | 70-79 |
+| Fuoriclasse potenziale | 80-89 |
+| Eccezionale | 90-95 |
+
+Probabilita per livello:
+
+| Livello | 45-59 | 60-69 | 70-79 | 80-89 | 90-95 |
+| ---: | ---: | ---: | ---: | ---: | ---: |
+| 1 | 78% | 17% | 4,5% | 0,5% | 0% |
+| 2 | 72% | 20% | 6,5% | 1,5% | 0% |
+| 3 | 65% | 23% | 9% | 2,5% | 0,5% |
+| 4 | 58% | 25% | 12% | 4% | 1% |
+| 5 | 50% | 27% | 16% | 6% | 1% |
+
+Il livello superiore aumenta quindi soprattutto la continuita con cui arrivano giovani interessanti, senza garantire fenomeni. Un talento da 80+ resta raro anche al livello 5.
+
+Restano invariati i principi gia stabiliti per il vivaio:
+
+- un nuovo candidato ogni settimana;
+- massimo 10 giovani in Accademia;
+- eta 14-16 anni;
+- ogni nuovo candidato entra con 3 caratteristiche stimate;
+- la scoperta progressiva delle caratteristiche continua con il sistema di scouting;
+- salire di livello non aumenta il numero di candidati settimanali;
+- durante un upgrade resta attivo il livello precedente fino al completamento dei lavori.
+
+L'OVR base continua a dipendere anche dall'eta del candidato: indicativamente 40-42 a 14 anni, 45-47 a 15 anni e 50-52 a 16 anni prima del bonus prodotto dal livello dell'Accademia.
+
+L'Impianto di gioco resta l'ultima struttura da finalizzare per costi, manutenzione e bonus economici.
 
 ## Mercato e liquidita
 
@@ -212,7 +262,7 @@ Questi sono target da validare con un simulatore riproducibile, non risultati ce
 
 ## Elementi ancora da finalizzare prima dell'attivazione completa
 
-1. Curva completa di Accademia e Impianto di gioco: costi, manutenzione e benefici.
+1. Impianto di gioco: costi, manutenzione e benefici sugli incassi casalinghi.
 2. Premi completi di Seconda, Terza e Quarta Serie, promozioni e tornei individuali.
 3. Formula precisa di sponsor e pubblico per reputazione, tifosi, forma recente e avversario.
 4. Simulatore economico riproducibile su 20 stagioni con promozioni, retrocessioni, crescita, mercato, accademia e ritiri.
