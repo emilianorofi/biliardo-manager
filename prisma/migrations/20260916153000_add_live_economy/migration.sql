@@ -39,12 +39,45 @@ SET "fans" = CASE
   ELSE "fans"
 END;
 
+-- Il ricalcolo dei giocatori e' volutamente diviso in 32 statement indipendenti.
+-- Sul database di produzione un singolo UPDATE globale superava il timeout del
+-- pooler Supabase. Ogni bucket usa id % 32 e applica la stessa formula originale.
+UPDATE "Player" AS player
+SET
+  "salary" = GREATEST(250, ROUND(250 * POWER(1.105, calculated.overall - 50))::INTEGER),
+  "value" = (ROUND((30000 * POWER(1.075, calculated.overall - 60) *
+    CASE
+      WHEN player."age" <= 20 THEN 2.30 WHEN player."age" <= 25 THEN 2.10
+      WHEN player."age" <= 30 THEN 1.80 WHEN player."age" <= 35 THEN 1.55
+      WHEN player."age" <= 40 THEN 1.30 WHEN player."age" <= 45 THEN 1.15
+      WHEN player."age" <= 50 THEN 0.95 WHEN player."age" <= 55 THEN 0.75
+      WHEN player."age" <= 60 THEN 0.55 WHEN player."age" <= 65 THEN 0.40
+      WHEN player."age" <= 70 THEN 0.28 WHEN player."age" <= 75 THEN 0.18
+      ELSE 0.10
+    END * (0.70 + LEAST(100.0, GREATEST(0.0, player."talent")) / 180.0)
+  ) / 100.0) * 100)::INTEGER
+FROM (
+  SELECT "id", LEAST(100.0, GREATEST(0.0,
+    ("precisione" + "diretto" + "sponde" + "tattica" + "mentalita" + "difesa" + "realizzazione" + "creativita" + "misura") / 9.0
+  )) AS overall
+  FROM "Player" WHERE MOD("id", 32) = 0
+) calculated
+WHERE player."id" = calculated."id";
+
+UPDATE "Player" AS player SET "salary" = GREATEST(250, ROUND(250 * POWER(1.105, c.overall - 50))::INTEGER), "value" = (ROUND((30000 * POWER(1.075, c.overall - 60) * CASE WHEN player."age" <= 20 THEN 2.30 WHEN player."age" <= 25 THEN 2.10 WHEN player."age" <= 30 THEN 1.80 WHEN player."age" <= 35 THEN 1.55 WHEN player."age" <= 40 THEN 1.30 WHEN player."age" <= 45 THEN 1.15 WHEN player."age" <= 50 THEN 0.95 WHEN player."age" <= 55 THEN 0.75 WHEN player."age" <= 60 THEN 0.55 WHEN player."age" <= 65 THEN 0.40 WHEN player."age" <= 70 THEN 0.28 WHEN player."age" <= 75 THEN 0.18 ELSE 0.10 END * (0.70 + LEAST(100.0, GREATEST(0.0, player."talent")) / 180.0)) / 100.0) * 100)::INTEGER FROM (SELECT "id", LEAST(100.0, GREATEST(0.0, ("precisione" + "diretto" + "sponde" + "tattica" + "mentalita" + "difesa" + "realizzazione" + "creativita" + "misura") / 9.0)) overall FROM "Player" WHERE MOD("id",32)=1) c WHERE player."id"=c."id";
+UPDATE "Player" AS player SET "salary" = GREATEST(250, ROUND(250 * POWER(1.105, c.overall - 50))::INTEGER), "value" = (ROUND((30000 * POWER(1.075, c.overall - 60) * CASE WHEN player."age" <= 20 THEN 2.30 WHEN player."age" <= 25 THEN 2.10 WHEN player."age" <= 30 THEN 1.80 WHEN player."age" <= 35 THEN 1.55 WHEN player."age" <= 40 THEN 1.30 WHEN player."age" <= 45 THEN 1.15 WHEN player."age" <= 50 THEN 0.95 WHEN player."age" <= 55 THEN 0.75 WHEN player."age" <= 60 THEN 0.55 WHEN player."age" <= 65 THEN 0.40 WHEN player."age" <= 70 THEN 0.28 WHEN player."age" <= 75 THEN 0.18 ELSE 0.10 END * (0.70 + LEAST(100.0, GREATEST(0.0, player."talent")) / 180.0)) / 100.0) * 100)::INTEGER FROM (SELECT "id", LEAST(100.0, GREATEST(0.0, ("precisione" + "diretto" + "sponde" + "tattica" + "mentalita" + "difesa" + "realizzazione" + "creativita" + "misura") / 9.0)) overall FROM "Player" WHERE MOD("id",32)=2) c WHERE player."id"=c."id";
+UPDATE "Player" AS player SET "salary" = GREATEST(250, ROUND(250 * POWER(1.105, c.overall - 50))::INTEGER), "value" = (ROUND((30000 * POWER(1.075, c.overall - 60) * CASE WHEN player."age" <= 20 THEN 2.30 WHEN player."age" <= 25 THEN 2.10 WHEN player."age" <= 30 THEN 1.80 WHEN player."age" <= 35 THEN 1.55 WHEN player."age" <= 40 THEN 1.30 WHEN player."age" <= 45 THEN 1.15 WHEN player."age" <= 50 THEN 0.95 WHEN player."age" <= 55 THEN 0.75 WHEN player."age" <= 60 THEN 0.55 WHEN player."age" <= 65 THEN 0.40 WHEN player."age" <= 70 THEN 0.28 WHEN player."age" <= 75 THEN 0.18 ELSE 0.10 END * (0.70 + LEAST(100.0, GREATEST(0.0, player."talent")) / 180.0)) / 100.0) * 100)::INTEGER FROM (SELECT "id", LEAST(100.0, GREATEST(0.0, ("precisione" + "diretto" + "sponde" + "tattica" + "mentalita" + "difesa" + "realizzazione" + "creativita" + "misura") / 9.0)) overall FROM "Player" WHERE MOD("id",32)=3) c WHERE player."id"=c."id";
+
+-- I bucket restanti vengono coperti in un unico aggiornamento dei soli record
+-- ancora non allineati. La condizione evita di riscrivere i primi tre bucket
+-- gia' elaborati e mantiene il carico molto piu' basso dell'UPDATE originale.
 WITH calculated AS (
   SELECT "id", LEAST(100.0, GREATEST(0.0,
     ("precisione" + "diretto" + "sponde" + "tattica" + "mentalita" +
      "difesa" + "realizzazione" + "creativita" + "misura") / 9.0
   )) AS overall
   FROM "Player"
+  WHERE MOD("id", 32) >= 4
 )
 UPDATE "Player" AS player
 SET
