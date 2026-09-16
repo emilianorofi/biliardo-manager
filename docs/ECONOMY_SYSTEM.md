@@ -36,6 +36,76 @@ Riferimenti:
 
 Sei giocatori da 85 costano quindi 49.404 a settimana prima di staff, strutture e gestione del club.
 
+## Valore di mercato dei giocatori
+
+Il valore non dipende soltanto dalla forza attuale. Un giovane meno forte puo valere piu di un giocatore anziano con overall superiore perche conserva una finestra di crescita molto piu lunga.
+
+Formula definitiva:
+
+`valore = valore base overall * coefficiente eta * coefficiente talento`
+
+Forma, morale ed esperienza non modificano il valore di mercato.
+
+### Valore base da overall
+
+`valore base = 30.000 * 1,075^(overall - 60)`
+
+| Overall | Valore base |
+| ---: | ---: |
+| 50 | 14.556 |
+| 55 | 20.897 |
+| 60 | 30.000 |
+| 65 | 43.069 |
+| 70 | 61.831 |
+| 75 | 88.766 |
+| 80 | 127.436 |
+| 85 | 182.950 |
+| 90 | 262.649 |
+| 95 | 377.066 |
+
+### Coefficiente eta
+
+| Eta | Moltiplicatore |
+| ---: | ---: |
+| 16-20 | 2,30 |
+| 21-25 | 2,10 |
+| 26-30 | 1,80 |
+| 31-35 | 1,55 |
+| 36-40 | 1,30 |
+| 41-45 | 1,15 |
+| 46-50 | 0,95 |
+| 51-55 | 0,75 |
+| 56-60 | 0,55 |
+| 61-65 | 0,40 |
+| 66-70 | 0,28 |
+| 71-75 | 0,18 |
+| 76+ | 0,10 |
+
+La curva rispetta il ciclo specifico del biliardo: i giocatori possono continuare a crescere fino alla fascia 40-45 anni, mentre oltre tale soglia il valore futuro cala progressivamente insieme alla finestra residua di sviluppo e al rischio di ritiro.
+
+### Coefficiente talento
+
+`coefficiente talento = 0,70 + talento / 180`
+
+| Talento | Moltiplicatore circa |
+| ---: | ---: |
+| 60 | 1,03 |
+| 70 | 1,09 |
+| 80 | 1,14 |
+| 90 | 1,20 |
+| 100 | 1,26 |
+
+Il valore finale viene arrotondato ai 100 piu vicini.
+
+Esempi fissati:
+
+- 18 anni, overall 60, talento 80: 79.000.
+- 60 anni, overall 75, talento 70: 53.200.
+- 40 anni, overall 90, talento 85: 400.200.
+- 45 anni, overall 95, talento 90: 520.400.
+
+Quindi un giovane da overall 60 puo valere piu di un sessantenne da overall 75 per il potenziale di crescita residuo.
+
 ## Staff
 
 ### Allenatore
@@ -124,10 +194,9 @@ Questi sono target da validare con un simulatore riproducibile, non risultati ce
 
 ## Elementi ancora da finalizzare prima dell'attivazione completa
 
-1. Formula definitiva del valore di mercato: overall, talento, eta e rischio ritiro.
-2. Curva completa di Accademia e Impianto di gioco: costi, manutenzione e benefici.
-3. Premi completi di Seconda, Terza e Quarta Serie, promozioni e tornei individuali.
-4. Formula precisa di sponsor e pubblico per reputazione, tifosi, forma recente e avversario.
-5. Simulatore economico riproducibile su 20 stagioni con promozioni, retrocessioni, crescita, mercato, accademia e ritiri.
+1. Curva completa di Accademia e Impianto di gioco: costi, manutenzione e benefici.
+2. Premi completi di Seconda, Terza e Quarta Serie, promozioni e tornei individuali.
+3. Formula precisa di sponsor e pubblico per reputazione, tifosi, forma recente e avversario.
+4. Simulatore economico riproducibile su 20 stagioni con promozioni, retrocessioni, crescita, mercato, accademia e ritiri.
 
-Fino a quando questi cinque punti non sono chiusi, questa baseline resta bloccata come riferimento e non deve essere sostituita da numeri ad hoc nelle singole pagine o servizi.
+Fino a quando questi quattro punti non sono chiusi, questa baseline resta bloccata come riferimento e non deve essere sostituita da numeri ad hoc nelle singole pagine o servizi.
