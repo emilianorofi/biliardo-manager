@@ -41,12 +41,12 @@ export default async function OnboardingPage() {
         <div className="my-8 grid gap-3 sm:grid-cols-3">
           <OnboardingFact
             icon={<Coins size={19} />}
-            value="€10.000"
+            value="€100.000"
             label="Bilancio iniziale"
           />
           <OnboardingFact
             icon={<Users size={19} />}
-            value="5 giocatori"
+            value="6 giocatori"
             label="Nuova rosa personale"
           />
           <OnboardingFact
