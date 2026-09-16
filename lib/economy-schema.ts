@@ -59,16 +59,6 @@ async function applyEconomySchema(transaction: Prisma.TransactionClient) {
       ADD COLUMN IF NOT EXISTS "venueUpgradeLevel" INTEGER,
       ADD COLUMN IF NOT EXISTS "venueUpgradeCompletesAt" TIMESTAMP(3)
   `);
-
-  await transaction.$executeRawUnsafe(`
-    ALTER TABLE "Season"
-      ADD COLUMN IF NOT EXISTS "economySettledAt" TIMESTAMP(3)
-  `);
-
-  await transaction.$executeRawUnsafe(`
-    ALTER TABLE "IndividualTournament"
-      ADD COLUMN IF NOT EXISTS "prizesPaidAt" TIMESTAMP(3)
-  `);
 }
 
 async function ensureEconomyMarkers(client: SchemaClient) {
@@ -134,6 +124,12 @@ async function ensureEconomyMarkers(client: SchemaClient) {
     await client.$executeRawUnsafe(`
       ALTER TABLE "Season"
         ADD COLUMN "economySettledAt" TIMESTAMP(3)
+    `);
+    await client.$executeRawUnsafe(`
+      UPDATE "Season"
+      SET "economySettledAt" = COALESCE("endsAt", "updatedAt")
+      WHERE "status" = 'COMPLETED'
+        AND "economySettledAt" IS NULL
     `);
   }
 }
