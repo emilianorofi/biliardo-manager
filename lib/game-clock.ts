@@ -28,6 +28,10 @@ import {
   initializeNationsCup,
   playNationsCupStage,
 } from "@/lib/nations-cup-service";
+import {
+  drawSpecialtyCup,
+  initializeSpecialtyCup,
+} from "@/lib/specialty-cup-service";
 
 const MAX_EVENTS_PER_RUN = 256;
 
@@ -38,6 +42,7 @@ type ClockCandidate = {
     | "TOURNAMENT_STAGE"
     | "NATIONS_CUP_DRAW"
     | "NATIONS_CUP_STAGE"
+    | "SPECIALTY_CUP_DRAW"
     | "WEEKLY_UPDATE"
     | "ACADEMY"
     | "WEEKLY_NEWS";
@@ -53,6 +58,7 @@ export async function processGameClock(
     initializeWeeklyUpdates(now),
     initializeIndividualTournaments(),
     initializeNationsCup(),
+    initializeSpecialtyCup(),
   ]);
 
   const events = [];
@@ -124,6 +130,7 @@ async function findNextDueEvent(
     tournamentMatch,
     nationsCupDraw,
     nationsCupMatch,
+    specialtyCupRows,
   ] = await Promise.all([
     prisma.leagueFixture.findFirst({
       where: {
@@ -248,8 +255,17 @@ async function findNextDueEvent(
       select: { id: true, scheduledAt: true },
       orderBy: [{ scheduledAt: "asc" }, { id: "asc" }],
     }),
+    prisma.$queryRaw<Array<{ id: number; drawAt: Date }>>`
+      SELECT "id", "drawAt"
+      FROM "SpecialtyCupTournament"
+      WHERE "status" = 'SCHEDULED'
+        AND "drawAt" <= ${now}
+      ORDER BY "drawAt" ASC, "id" ASC
+      LIMIT 1
+    `,
   ]);
   const candidates: ClockCandidate[] = [];
+  const specialtyCupDraw = specialtyCupRows[0];
 
   if (fixture) {
     candidates.push({
@@ -307,10 +323,27 @@ async function findNextDueEvent(
   }
 
   if (nationsCupDraw) {
-    candidates.push({ type: "NATIONS_CUP_DRAW", id: nationsCupDraw.id, scheduledAt: nationsCupDraw.drawAt });
+    candidates.push({
+      type: "NATIONS_CUP_DRAW",
+      id: nationsCupDraw.id,
+      scheduledAt: nationsCupDraw.drawAt,
+    });
   }
+
   if (nationsCupMatch) {
-    candidates.push({ type: "NATIONS_CUP_STAGE", id: nationsCupMatch.id, scheduledAt: nationsCupMatch.scheduledAt });
+    candidates.push({
+      type: "NATIONS_CUP_STAGE",
+      id: nationsCupMatch.id,
+      scheduledAt: nationsCupMatch.scheduledAt,
+    });
+  }
+
+  if (specialtyCupDraw) {
+    candidates.push({
+      type: "SPECIALTY_CUP_DRAW",
+      id: specialtyCupDraw.id,
+      scheduledAt: specialtyCupDraw.drawAt,
+    });
   }
 
   candidates.sort(
@@ -364,12 +397,35 @@ async function processCandidate(
 
     case "NATIONS_CUP_DRAW": {
       const result = await drawNationsCup(candidate.id, candidate.scheduledAt);
-      return { type: candidate.type, id: candidate.id, scheduledAt: candidate.scheduledAt, ...result };
+      return {
+        type: candidate.type,
+        id: candidate.id,
+        scheduledAt: candidate.scheduledAt,
+        ...result,
+      };
     }
 
     case "NATIONS_CUP_STAGE": {
       const result = await playNationsCupStage(candidate.id, candidate.scheduledAt);
-      return { type: candidate.type, id: candidate.id, scheduledAt: candidate.scheduledAt, ...result };
+      return {
+        type: candidate.type,
+        id: candidate.id,
+        scheduledAt: candidate.scheduledAt,
+        ...result,
+      };
+    }
+
+    case "SPECIALTY_CUP_DRAW": {
+      const result = await drawSpecialtyCup(
+        candidate.id,
+        candidate.scheduledAt
+      );
+      return {
+        type: candidate.type,
+        id: candidate.id,
+        scheduledAt: candidate.scheduledAt,
+        ...result,
+      };
     }
 
     case "WEEKLY_UPDATE": {
