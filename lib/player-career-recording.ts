@@ -62,61 +62,47 @@ export async function recordPlayerFixtureCareer(
   let performanceCount = 0;
 
   for (const game of input.simulation.games) {
-    const gameRecord =
-      await transaction.leagueFixtureGame.create({
-        data: {
-          fixtureId: input.fixtureId,
-          order: game.order,
-          specialty: game.specialty,
-          gameType: game.gameType,
-          targetPoints: game.targetPoints,
-          winnerSide: game.result.winner,
-          homePoints: game.homePoints,
-          awayPoints: game.awayPoints,
-          reconstructed: false,
-          homePerformanceRating:
-            game.homePerformanceRating,
-          awayPerformanceRating:
-            game.awayPerformanceRating,
-          homeWinProbability:
-            game.result.probabilities.homeWinProbability,
-          awayWinProbability:
-            game.result.probabilities.awayWinProbability,
-          randomValue: game.result.randomValue,
-          createdAt: input.playedAt,
-        },
-      });
+    const gameRecord = await transaction.leagueFixtureGame.create({
+      data: {
+        fixtureId: input.fixtureId,
+        order: game.order,
+        specialty: game.specialty,
+        gameType: game.gameType,
+        targetPoints: game.targetPoints,
+        winnerSide: game.result.winner,
+        homePoints: game.homePoints,
+        awayPoints: game.awayPoints,
+        reconstructed: false,
+        homePerformanceRating: game.homePerformanceRating,
+        awayPerformanceRating: game.awayPerformanceRating,
+        homeWinProbability: game.result.probabilities.homeWinProbability,
+        awayWinProbability: game.result.probabilities.awayWinProbability,
+        randomValue: game.result.randomValue,
+        createdAt: input.playedAt,
+      },
+    });
 
-    const performances = game.participants.map(
-      (participant) => {
-        const appearanceId = appearanceIds.get(
-          getAppearanceKey(participant.side, participant.slot)
-        );
+    const performances = game.participants.map((participant) => {
+      const appearanceId = appearanceIds.get(
+        getAppearanceKey(participant.side, participant.player.id)
+      );
 
-        if (appearanceId === undefined) {
-          throw new Error(
-            "PLAYER_APPEARANCE_NOT_FOUND"
-          );
-        }
-
-        return {
-          fixtureGameId: gameRecord.id,
-          appearanceId,
-          result: participant.result,
-          specialtyRating:
-            participant.performance.specialtyRating,
-          performanceRating:
-            participant.performance.performanceRating,
-          formModifier:
-            participant.performance.formModifier,
-          moraleModifier:
-            participant.performance.moraleModifier,
-          experienceModifier:
-            participant.performance.experienceModifier,
-          createdAt: input.playedAt,
-        };
+      if (appearanceId === undefined) {
+        throw new Error("PLAYER_APPEARANCE_NOT_FOUND");
       }
-    );
+
+      return {
+        fixtureGameId: gameRecord.id,
+        appearanceId,
+        result: participant.result,
+        specialtyRating: participant.performance.specialtyRating,
+        performanceRating: participant.performance.performanceRating,
+        formModifier: participant.performance.formModifier,
+        moraleModifier: participant.performance.moraleModifier,
+        experienceModifier: participant.performance.experienceModifier,
+        createdAt: input.playedAt,
+      };
+    });
 
     await transaction.playerGamePerformance.createMany({
       data: performances,
@@ -137,30 +123,40 @@ async function createSideAppearances(
   side: FixturePlayerSide,
   club: CareerClubSnapshot,
   opponentClub: CareerClubSnapshot,
-  formation: FixtureCareerFormation,
+  initialFormation: FixtureCareerFormation,
   teamScore: number,
   opponentScore: number,
   appearanceIds: Map<string, number>
 ) {
-  const slots: FormationSlot[] = ["A", "B", "C"];
+  const participants = input.simulation.games.flatMap((game) =>
+    game.participants.filter((participant) => participant.side === side)
+  );
+  const uniquePlayers = new Map<
+    number,
+    {
+      player: (typeof participants)[number]["player"];
+      firstSlot: FormationSlot;
+      performances: typeof participants;
+    }
+  >();
 
-  for (const slot of slots) {
-    const player = formation[slot];
-    const performances = input.simulation.games.flatMap(
-      (game) =>
-        game.participants.filter(
-          (participant) =>
-            participant.side === side &&
-            participant.slot === slot
-        )
-    );
-
-    if (performances.length !== 3) {
-      throw new Error(
-        "Ogni giocatore deve disputare esattamente tre prove."
-      );
+  for (const participant of participants) {
+    const existing = uniquePlayers.get(participant.player.id);
+    if (existing) {
+      existing.performances.push(participant);
+      continue;
     }
 
+    uniquePlayers.set(participant.player.id, {
+      player: participant.player,
+      firstSlot: participant.slot,
+      performances: [participant],
+    });
+  }
+
+  const usedStorageSlots = new Set<string>();
+
+  for (const { player, firstSlot, performances } of uniquePlayers.values()) {
     const performanceRating = roundRating(
       performances.reduce(
         (total, participant) =>
@@ -168,44 +164,63 @@ async function createSideAppearances(
         0
       ) / performances.length
     );
-    const appearance =
-      await transaction.playerFixtureAppearance.create({
-        data: {
-          fixtureId: input.fixtureId,
-          playerId: player.id,
-          clubId: club.id,
-          playerFirstName: player.firstName,
-          playerLastName: player.lastName,
-          playerNationality: player.nationality,
-          playerAge: player.age,
-          clubName: club.name,
-          opponentClubName: opponentClub.name,
-          side,
-          formationSlot: slot,
-          teamScore,
-          opponentScore,
-          overall: calculateOverall(player),
-          form: player.form,
-          morale: player.morale,
-          experience: player.experience,
-          performanceRating,
-          playedAt: input.playedAt,
-          createdAt: input.playedAt,
-        },
-      });
+    const storageSlot = createStorageSlot(
+      firstSlot,
+      player.id,
+      usedStorageSlots,
+      initialFormation
+    );
+    const appearance = await transaction.playerFixtureAppearance.create({
+      data: {
+        fixtureId: input.fixtureId,
+        playerId: player.id,
+        clubId: club.id,
+        playerFirstName: player.firstName,
+        playerLastName: player.lastName,
+        playerNationality: player.nationality,
+        playerAge: player.age,
+        clubName: club.name,
+        opponentClubName: opponentClub.name,
+        side,
+        formationSlot: storageSlot,
+        teamScore,
+        opponentScore,
+        overall: calculateOverall(player),
+        form: player.form,
+        morale: player.morale,
+        experience: player.experience,
+        performanceRating,
+        playedAt: input.playedAt,
+        createdAt: input.playedAt,
+      },
+    });
 
+    usedStorageSlots.add(storageSlot);
     appearanceIds.set(
-      getAppearanceKey(side, slot),
+      getAppearanceKey(side, player.id),
       appearance.id
     );
   }
 }
 
+function createStorageSlot(
+  slot: FormationSlot,
+  playerId: number,
+  usedSlots: Set<string>,
+  initialFormation: FixtureCareerFormation
+) {
+  const isInitialStarter = initialFormation[slot]?.id === playerId;
+  const preferred = isInitialStarter ? slot : `${slot}:${playerId}`;
+
+  if (!usedSlots.has(preferred)) return preferred;
+  return `${slot}:${playerId}`;
+}
+
 function getAppearanceKey(
   side: FixturePlayerSide,
-  slot: FormationSlot
+  playerId: number
 ) {
-  return `${side}:${slot}`;
+  return `${side}:${playerId}`;
 }
 
 function roundRating(value: number) {

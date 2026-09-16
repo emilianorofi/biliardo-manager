@@ -7,6 +7,7 @@ import {
   simulateFixtureWithPlayers,
   type FixtureCareerFormation,
   type FixtureCareerPlayer,
+  type FixtureCareerStrategy,
 } from "@/lib/fixture-player-simulator";
 import {
   calculateCompletedRound,
@@ -22,6 +23,13 @@ import {
   getLeagueMatchDefinitions,
   type FormationSlot,
 } from "@/lib/match-engine";
+import {
+  sanitizeFormationStrategy,
+  type FormationStrategy,
+} from "@/lib/formation-strategy";
+import {
+  loadFormationStrategy,
+} from "@/lib/formation-strategy-store";
 import {
   recordPlayerFixtureCareer,
 } from "@/lib/player-career-recording";
@@ -102,6 +110,9 @@ export async function playLeagueFixture({
           id: true,
           name: true,
           players: {
+            where: {
+              careerStatus: "ACTIVE",
+            },
             select: CAREER_PLAYER_SELECT,
           },
           formation: {
@@ -124,6 +135,9 @@ export async function playLeagueFixture({
           id: true,
           name: true,
           players: {
+            where: {
+              careerStatus: "ACTIVE",
+            },
             select: CAREER_PLAYER_SELECT,
           },
           formation: {
@@ -197,11 +211,24 @@ export async function playLeagueFixture({
     );
   }
 
-  const homeFormation = resolveFormation(fixture.homeClub);
-  const awayFormation = resolveFormation(fixture.awayClub);
+  const [homeStoredStrategy, awayStoredStrategy] = await Promise.all([
+    loadFormationStrategy(fixture.homeClub.id),
+    loadFormationStrategy(fixture.awayClub.id),
+  ]);
+  const homeFormation = resolveFormation(
+    fixture.homeClub,
+    homeStoredStrategy
+  );
+  const awayFormation = resolveFormation(
+    fixture.awayClub,
+    awayStoredStrategy
+  );
   const simulation = simulateFixtureWithPlayers(
     homeFormation.formation,
-    awayFormation.formation
+    awayFormation.formation,
+    undefined,
+    homeFormation.strategy,
+    awayFormation.strategy
   );
   const standingsDeltas =
     calculateFixtureStandingsDeltas(
@@ -402,7 +429,10 @@ export async function playLeagueFixture({
   }
 }
 
-function resolveFormation(club: FixtureClub) {
+function resolveFormation(
+  club: FixtureClub,
+  storedStrategy: FormationStrategy
+) {
   const savedFormation = club.formation;
 
   if (
@@ -413,13 +443,20 @@ function resolveFormation(club: FixtureClub) {
     savedFormation.slotBPlayer.clubId === club.id &&
     savedFormation.slotCPlayer.clubId === club.id
   ) {
+    const formation = {
+      A: savedFormation.slotAPlayer,
+      B: savedFormation.slotBPlayer,
+      C: savedFormation.slotCPlayer,
+    };
+
     return {
       source: "SAVED" as const,
-      formation: {
-        A: savedFormation.slotAPlayer,
-        B: savedFormation.slotBPlayer,
-        C: savedFormation.slotCPlayer,
-      },
+      formation,
+      strategy: resolveFixtureStrategy(
+        club.players,
+        formation,
+        storedStrategy
+      ),
     };
   }
 
@@ -433,6 +470,37 @@ function resolveFormation(club: FixtureClub) {
   return {
     source: "AUTOMATIC" as const,
     formation: findBestAutomaticFormation(club.players),
+    strategy: undefined,
+  };
+}
+
+function resolveFixtureStrategy(
+  players: FixtureCareerPlayer[],
+  formation: FixtureCareerFormation,
+  storedStrategy: FormationStrategy
+): FixtureCareerStrategy | undefined {
+  const validPlayerIds = new Set(players.map((player) => player.id));
+  const strategy = sanitizeFormationStrategy(
+    storedStrategy,
+    [formation.A.id, formation.B.id, formation.C.id],
+    validPlayerIds
+  );
+  const playersById = new Map(players.map((player) => [player.id, player]));
+  const reserves: FixtureCareerStrategy["reserves"] = {};
+
+  for (const reserveSlot of ["R1", "R2", "R3"] as const) {
+    const playerId = strategy.reserves[reserveSlot];
+    const player = playerId === null ? undefined : playersById.get(playerId);
+    if (player) reserves[reserveSlot] = player;
+  }
+
+  if (strategy.substitutions.length === 0) {
+    return undefined;
+  }
+
+  return {
+    reserves,
+    substitutions: strategy.substitutions,
   };
 }
 

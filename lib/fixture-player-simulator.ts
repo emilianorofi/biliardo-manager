@@ -12,6 +12,10 @@ import {
   type SimulatedMatchResult,
 } from "@/lib/match-simulator";
 import { calculateIndividualGameScore } from "@/lib/individual-match-engine";
+import type {
+  FormationSubstitution,
+  ReserveSlot,
+} from "@/lib/formation-strategy";
 
 export type FixtureCareerPlayer =
   MatchPerformancePlayerValues & {
@@ -34,6 +38,11 @@ export type FixtureCareerFormation = Record<
   FormationSlot,
   FixtureCareerPlayer
 >;
+
+export type FixtureCareerStrategy = {
+  reserves: Partial<Record<ReserveSlot, FixtureCareerPlayer>>;
+  substitutions: FormationSubstitution[];
+};
 
 export type FixturePlayerSide = "HOME" | "AWAY";
 export type FixturePlayerResult = "WIN" | "LOSS";
@@ -71,7 +80,9 @@ export type SimulatedPlayerFixture = {
 export function simulateFixtureWithPlayers(
   homeFormation: FixtureCareerFormation,
   awayFormation: FixtureCareerFormation,
-  randomValues?: number[]
+  randomValues?: number[],
+  homeStrategy?: FixtureCareerStrategy,
+  awayStrategy?: FixtureCareerStrategy
 ): SimulatedPlayerFixture {
   const definitions = getLeagueMatchDefinitions();
 
@@ -87,12 +98,17 @@ export function simulateFixtureWithPlayers(
   validateFormation(homeFormation, "casa");
   validateFormation(awayFormation, "trasferta");
 
-  const games = definitions.map((definition, index) => {
+  const currentHomeFormation = { ...homeFormation };
+  const currentAwayFormation = { ...awayFormation };
+  const games: SimulatedPlayerFixtureGame[] = [];
+
+  for (let index = 0; index < definitions.length; index += 1) {
+    const definition = definitions[index];
     const homePlayers = definition.homeSlots.map(
-      (slot) => homeFormation[slot]
+      (slot) => currentHomeFormation[slot]
     );
     const awayPlayers = definition.awaySlots.map(
-      (slot) => awayFormation[slot]
+      (slot) => currentAwayFormation[slot]
     );
     const homePerformanceRating =
       calculateTeamPerformanceRating(
@@ -118,7 +134,7 @@ export function simulateFixtureWithPlayers(
       randomValue: result.randomValue,
     });
 
-    return {
+    games.push({
       order: definition.order,
       specialty: definition.specialty,
       gameType:
@@ -137,20 +153,31 @@ export function simulateFixtureWithPlayers(
         ...createParticipants(
           "HOME",
           definition.homeSlots,
-          homeFormation,
+          currentHomeFormation,
           definition.specialty,
           result.winner
         ),
         ...createParticipants(
           "AWAY",
           definition.awaySlots,
-          awayFormation,
+          currentAwayFormation,
           definition.specialty,
           result.winner
         ),
       ],
-    };
-  });
+    });
+
+    applySubstitutionsAfterGame(
+      currentHomeFormation,
+      homeStrategy,
+      definition.order
+    );
+    applySubstitutionsAfterGame(
+      currentAwayFormation,
+      awayStrategy,
+      definition.order
+    );
+  }
 
   const homeScore = games.filter(
     (game) => game.result.winner === "HOME"
@@ -168,6 +195,25 @@ export function simulateFixtureWithPlayers(
           : "DRAW",
     games,
   };
+}
+
+function applySubstitutionsAfterGame(
+  formation: FixtureCareerFormation,
+  strategy: FixtureCareerStrategy | undefined,
+  completedGame: number
+) {
+  if (!strategy) return;
+
+  const substitutions = strategy.substitutions.filter(
+    (substitution) => substitution.afterGame === completedGame
+  );
+
+  for (const substitution of substitutions) {
+    const reserve = strategy.reserves[substitution.reserveSlot];
+    if (!reserve) continue;
+
+    formation[substitution.slot] = reserve;
+  }
 }
 
 function createParticipants(

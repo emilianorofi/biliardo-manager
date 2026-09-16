@@ -352,8 +352,10 @@ function assertSide(value: string) {
 }
 
 function assertFormationSlot(value: string) {
-  if (value === "A" || value === "B" || value === "C") {
-    return value;
+  const baseSlot = value.split(":", 1)[0];
+
+  if (baseSlot === "A" || baseSlot === "B" || baseSlot === "C") {
+    return baseSlot;
   }
 
   throw new Error(`Slot formazione non valido: ${value}`);
