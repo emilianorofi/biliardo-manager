@@ -1,3 +1,5 @@
+SET statement_timeout = 0;
+
 ALTER TABLE "Club"
   ADD COLUMN IF NOT EXISTS "trainingCenterLevel" INTEGER NOT NULL DEFAULT 1,
   ADD COLUMN IF NOT EXISTS "trainingCenterUpgradeLevel" INTEGER,
