@@ -17,11 +17,23 @@ export default async function FormationPage() {
     await prisma.league.findFirst({
       where: {
         status: "ACTIVE",
+        entries: {
+          some: {
+            clubId,
+          },
+        },
       },
 
-      orderBy: {
-        id: "desc",
-      },
+      orderBy: [
+        {
+          season: {
+            number: "desc",
+          },
+        },
+        {
+          id: "desc",
+        },
+      ],
 
       include: {
         fixtures: {
