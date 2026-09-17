@@ -124,44 +124,7 @@ export async function completeSeasonIfReady(
   );
   const retiredPlayerIds = retirements.map(({ player }) => player.id);
 
-  const releasedAcademyPlayers = academyPlayers
-    .filter((player) => player.age >= 17)
-    .map((player) => ({ ...player, age: player.age + 1 }));
-
-  if (players.length > 0) {
-    await transaction.player.updateMany({
-      where: {
-        id: { in: players.map((player) => player.id) },
-        careerStatus: "ACTIVE",
-      },
-      data: { age: { increment: 1 } },
-    });
-  }
-
-  if (academyPlayers.length > 0) {
-    await transaction.academyPlayer.updateMany({
-      where: { id: { in: academyPlayers.map((player) => player.id) } },
-      data: { age: { increment: 1 } },
-    });
-  }
-
-  if (releasedAcademyPlayers.length > 0) {
-    await transaction.academyPlayer.deleteMany({
-      where: {
-        id: { in: releasedAcademyPlayers.map((player) => player.id) },
-      },
-    });
-
-    await transaction.gameEvent.createMany({
-      data: releasedAcademyPlayers.map((player) => ({
-        clubId: player.clubId,
-        type: "ACADEMY_PLAYER_RELEASED",
-        title: `Uscita dall'Accademia: ${player.firstName} ${player.lastName}`,
-        description: `${player.firstName} ${player.lastName} ha compiuto 18 anni senza essere promosso ed è stato rilasciato.`,
-        createdAt: now,
-      })),
-    });
-  }
+  const releasedAcademyPlayers: SeasonCompletionResult["releasedAcademyPlayers"] = [];
 
   if (retiredPlayerIds.length > 0) {
     await clearRetiredPlayersFromFormations(transaction, retiredPlayerIds);
@@ -228,7 +191,7 @@ export async function completeSeasonIfReady(
       clubId: null,
       type: "Campionato",
       title: "Stagione conclusa",
-      description: `${players.length} giocatori e ${academyPlayers.length} giovani hanno compiuto un anno; ${retirements.length} giocatori si sono ritirati e ${releasedAcademyPlayers.length} giovani hanno lasciato l'Accademia.`,
+      description: `${retirements.length} giocatori si sono ritirati al termine della stagione. L'età continua ad avanzare quotidianamente durante tutto l'anno di gioco.`,
       createdAt: now,
     },
   });
