@@ -264,7 +264,7 @@ export const ECONOMY_DESIGN_TARGETS = {
 } as const;
 
 export function calculatePlayerWeeklySalary(overall: number) {
-  const normalizedOverall = Math.max(0, Math.min(100, overall));
+  const normalizedOverall = Math.max(0, overall);
 
   return Math.max(
     250,
@@ -282,7 +282,7 @@ export function calculateSquadWeeklySalary(overalls: readonly number[]) {
 }
 
 export function calculatePlayerBaseMarketValue(overall: number) {
-  const normalizedOverall = Math.max(0, Math.min(100, overall));
+  const normalizedOverall = Math.max(0, overall);
 
   return (
     PLAYER_VALUE_BASE_AT_60 *
@@ -448,13 +448,13 @@ export function getSponsorReputationMultiplier(reputation: number) {
 
 export function getSponsorFanMultiplier(fans: number) {
   const rawMultiplier =
-    1 + (normalizeFans(fans) - FAN_LIMITS.reference) / 1_600;
-  return clamp(rawMultiplier, 0.95, 1.05);
+    1 + (normalizeFans(fans) - FAN_LIMITS.reference) * 0.0015;
+  return clamp(rawMultiplier, SPONSOR_MULTIPLIER_LIMITS.minimum, SPONSOR_MULTIPLIER_LIMITS.maximum);
 }
 
-export function getSponsorFormMultiplier(recentAveragePoints: number) {
-  const normalizedAverage = clamp(recentAveragePoints, 0, 6);
-  return clamp(1 + (normalizedAverage - 3) * 0.01, 0.97, 1.03);
+export function getRecentFormMultiplier(averagePoints: number) {
+  const normalizedAverage = clamp(averagePoints, 0, 6);
+  return 0.9 + (normalizedAverage / 6) * 0.2;
 }
 
 export function calculateWeeklySponsorIncome({
@@ -468,41 +468,33 @@ export function calculateWeeklySponsorIncome({
   fans: number;
   recentAveragePoints: number;
 }) {
-  const baseSponsor = getLeagueEconomy(leagueLevel).sponsorWeekly;
-  const rawMultiplier =
+  const league = getLeagueEconomy(leagueLevel);
+  const income =
+    league.sponsorWeekly *
     getSponsorReputationMultiplier(reputation) *
     getSponsorFanMultiplier(fans) *
-    getSponsorFormMultiplier(recentAveragePoints);
-  const multiplier = clamp(
-    rawMultiplier,
-    SPONSOR_MULTIPLIER_LIMITS.minimum,
-    SPONSOR_MULTIPLIER_LIMITS.maximum
+    getRecentFormMultiplier(recentAveragePoints);
+
+  return Math.max(0, Math.round(income));
+}
+
+export function getMatchInterestMultiplier({
+  homeReputation,
+  opponentReputation,
+  recentAveragePoints,
+}: {
+  homeReputation: number;
+  opponentReputation: number;
+  recentAveragePoints: number;
+}) {
+  const reputationGap = clamp(opponentReputation - homeReputation, -30, 30);
+  const reputationMultiplier = 1 + reputationGap * 0.004;
+  const formMultiplier = 0.92 + (clamp(recentAveragePoints, 0, 6) / 6) * 0.16;
+  return clamp(
+    reputationMultiplier * formMultiplier,
+    MATCH_INTEREST_MULTIPLIER_LIMITS.minimum,
+    MATCH_INTEREST_MULTIPLIER_LIMITS.maximum
   );
-
-  return Math.round(baseSponsor * multiplier);
-}
-
-export function getGateFanMultiplier(fans: number) {
-  const rawMultiplier =
-    1 + (normalizeFans(fans) - FAN_LIMITS.reference) / 800;
-  return clamp(rawMultiplier, 0.9, 1.1);
-}
-
-export function getGateHomeReputationMultiplier(reputation: number) {
-  const rawMultiplier =
-    1 + (normalizeReputation(reputation) - REPUTATION_LIMITS.reference) * 0.0025;
-  return clamp(rawMultiplier, 0.95, 1.05);
-}
-
-export function getGateFormMultiplier(recentAveragePoints: number) {
-  const normalizedAverage = clamp(recentAveragePoints, 0, 6);
-  return clamp(1 + (normalizedAverage - 3) / 60, 0.95, 1.05);
-}
-
-export function getGateOpponentReputationMultiplier(reputation: number) {
-  const rawMultiplier =
-    1 + (normalizeReputation(reputation) - REPUTATION_LIMITS.reference) * 0.0035;
-  return clamp(rawMultiplier, 0.95, 1.1);
 }
 
 export function calculateHomeGateIncome({
@@ -520,31 +512,30 @@ export function calculateHomeGateIncome({
   recentAveragePoints: number;
   venueLevel: number;
 }) {
-  const baseGate = getLeagueEconomy(leagueLevel).homeGateBase;
-  const rawInterestMultiplier =
-    getGateFanMultiplier(fans) *
-    getGateHomeReputationMultiplier(homeReputation) *
-    getGateFormMultiplier(recentAveragePoints) *
-    getGateOpponentReputationMultiplier(opponentReputation);
-  const interestMultiplier = clamp(
-    rawInterestMultiplier,
-    MATCH_INTEREST_MULTIPLIER_LIMITS.minimum,
-    MATCH_INTEREST_MULTIPLIER_LIMITS.maximum
+  const league = getLeagueEconomy(leagueLevel);
+  const fanMultiplier = clamp(
+    normalizeFans(fans) / FAN_LIMITS.reference,
+    0.55,
+    2.4
   );
+  const baseGate =
+    league.homeGateBase *
+    fanMultiplier *
+    getMatchInterestMultiplier({
+      homeReputation,
+      opponentReputation,
+      recentAveragePoints,
+    });
 
-  return Math.round(
-    baseGate * interestMultiplier * getVenueGateMultiplier(venueLevel)
-  );
+  return applyVenueGateBonus(baseGate, venueLevel);
 }
 
-export function calculateTransferFee(price: number) {
-  const normalizedPrice = Math.max(0, Math.round(price));
-  return Math.round(normalizedPrice * TRANSFER_FEE_RATE);
-}
-
-export function calculateSellerProceeds(price: number) {
-  const normalizedPrice = Math.max(0, Math.round(price));
-  return normalizedPrice - calculateTransferFee(normalizedPrice);
+export function calculateSellerProceeds(finalPrice: number) {
+  const normalizedPrice = Math.max(0, Math.round(finalPrice));
+  return Math.max(
+    0,
+    normalizedPrice - Math.round(normalizedPrice * TRANSFER_FEE_RATE)
+  );
 }
 
 export function getTrainerWeeklyCost(level: number) {
@@ -560,6 +551,14 @@ export function getLeagueEconomy(level: number) {
   return LEAGUE_ECONOMY[normalizedLevel];
 }
 
+function normalizeStaffLevel(level: number) {
+  return Math.max(1, Math.min(5, Math.round(level))) as 1 | 2 | 3 | 4 | 5;
+}
+
+function normalizeStructureLevel(level: number) {
+  return Math.max(1, Math.min(5, Math.round(level))) as 1 | 2 | 3 | 4 | 5;
+}
+
 function normalizeFans(fans: number) {
   return Math.max(
     FAN_LIMITS.minimum,
@@ -572,14 +571,6 @@ function normalizeReputation(reputation: number) {
     REPUTATION_LIMITS.minimum,
     Math.min(REPUTATION_LIMITS.maximum, Math.round(reputation))
   );
-}
-
-function normalizeStructureLevel(level: number) {
-  return Math.max(1, Math.min(5, Math.round(level))) as 1 | 2 | 3 | 4 | 5;
-}
-
-function normalizeStaffLevel(level: number) {
-  return Math.max(1, Math.min(5, Math.round(level))) as 1 | 2 | 3 | 4 | 5;
 }
 
 function clamp(value: number, minimum: number, maximum: number) {
