@@ -229,6 +229,7 @@ export function createGeneratedWorldPlayer({
     lastName,
     nationality,
     age,
+    ageDays: randomInteger(0, 104, random),
     form: randomInteger(5, 7, random),
     morale: randomInteger(5, 7, random),
     experience: Math.min(
