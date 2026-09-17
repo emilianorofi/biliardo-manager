@@ -97,7 +97,7 @@ export default function PlayerListCard({
                   <span title={nationality.label}>{nationality.code}</span>
                 </span>
                 <span aria-hidden="true">·</span>
-                <span>{player.age} anni</span>
+                <span>{formatPlayerAge(player.age, player.ageDays)}</span>
                 <span aria-hidden="true">·</span>
                 <span>
                   {player.style.length > 0
@@ -128,7 +128,7 @@ export default function PlayerListCard({
           <section>
             <SectionLabel>Profilo</SectionLabel>
             <div className="mt-1 grid grid-cols-2 gap-x-3 gap-y-0.5 lg:grid-cols-1">
-              <DataRow label="Età" value={`${player.age} anni`} />
+              <DataRow label="Età" value={formatPlayerAge(player.age, player.ageDays)} />
               <DataRow
                 label="Valore"
                 value={formatCurrency(player.value)}
@@ -346,4 +346,8 @@ function getValueClass(value: number) {
   if (value >= 60) return "text-lime-300";
 
   return "text-slate-300";
+}
+
+function formatPlayerAge(age: number, ageDays?: number) {
+  return `${age}e${ageDays ?? 0}`;
 }
