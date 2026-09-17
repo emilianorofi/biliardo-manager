@@ -132,7 +132,7 @@ export function applyTrainingGain(
   gain: number
 ) {
   return roundToThreeDecimals(
-    clamp(currentValue + gain, 0, 100)
+    Math.max(0, currentValue + gain)
   );
 }
 
@@ -290,13 +290,19 @@ function getTalentMultiplier(
 }
 
 function getSkillLevelMultiplier(currentValue: number) {
-  const normalizedValue = clamp(currentValue, 0, 100) / 100;
+  const normalizedValue = Math.max(0, currentValue) / 100;
 
-  if (normalizedValue >= 1) {
-    return 0;
+  if (normalizedValue <= 1) {
+    return Math.max(
+      0.2,
+      1 - 0.8 * Math.pow(normalizedValue, 2)
+    );
   }
 
-  return 1 - 0.8 * Math.pow(normalizedValue, 2);
+  return Math.max(
+    0.02,
+    0.2 / Math.pow(normalizedValue, 2)
+  );
 }
 
 function clamp(
