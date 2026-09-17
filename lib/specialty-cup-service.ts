@@ -6,13 +6,14 @@ import {
 } from "@/lib/specialty-cup-assignment";
 import { drawSpecialtyCupBracket } from "@/lib/specialty-cup-bracket";
 import { buildSpecialtyCupCalendar } from "@/lib/specialty-cup-calendar";
-import {
-  buildSpecialtyCupStages,
-  specialtyCupGrowthForElimination,
-  specialtyCupWinnerGrowth,
-} from "@/lib/specialty-cup-stages";
+import { buildSpecialtyCupStages } from "@/lib/specialty-cup-stages";
 import { simulateIndividualBestOfThree } from "@/lib/individual-match-engine";
 import { prisma } from "@/lib/prisma";
+import {
+  applyTournamentGrowth,
+  specialtyCupPlacementForElimination,
+  tournamentGrowthValue,
+} from "@/lib/tournament-growth";
 
 const SPECIALTY_CUP_TRANSACTION_TIMEOUT = 120000;
 
@@ -102,9 +103,7 @@ export async function initializeSpecialtyCup() {
     where: {
       level: 1,
       groupCode: "A",
-      season: {
-        status: { in: ["PREPARATION", "ACTIVE"] },
-      },
+      season: { status: { in: ["PREPARATION", "ACTIVE"] } },
     },
     orderBy: { season: { number: "desc" } },
     select: {
@@ -171,18 +170,11 @@ export async function drawSpecialtyCup(
         tournament.payload !== null ||
         tournament.drawAt.getTime() !== scheduledAt.getTime()
       ) {
-        return {
-          status: "SKIPPED" as const,
-          participants: 0,
-          cups: 0,
-        };
+        return { status: "SKIPPED" as const, participants: 0, cups: 0 };
       }
 
       const players = await transaction.player.findMany({
-        where: {
-          careerStatus: "ACTIVE",
-          clubId: { not: null },
-        },
+        where: { careerStatus: "ACTIVE", clubId: { not: null } },
         select: {
           id: true,
           firstName: true,
@@ -312,10 +304,7 @@ export async function drawSpecialtyCup(
         },
       };
     },
-    {
-      isolationLevel: "Serializable",
-      timeout: SPECIALTY_CUP_TRANSACTION_TIMEOUT,
-    }
+    { isolationLevel: "Serializable", timeout: SPECIALTY_CUP_TRANSACTION_TIMEOUT }
   );
 }
 
@@ -430,11 +419,7 @@ export async function playSpecialtyCupStage(
             throw new Error("SPECIALTY_CUP_PLAYER_NOT_FOUND");
           }
 
-          const result = simulateIndividualBestOfThree(
-            playerOne,
-            playerTwo,
-            cupType
-          );
+          const result = simulateIndividualBestOfThree(playerOne, playerTwo, cupType);
           winners.push(result.winnerPlayerId);
           losers.push(result.loserPlayerId);
           matches.push({
@@ -466,11 +451,14 @@ export async function playSpecialtyCupStage(
         cupsProcessed += 1;
 
         if (losers.length > 0) {
-          await applyGrowthToPlayers(
-            transaction,
-            losers,
-            specialtyCupGrowthForElimination(stage.playersAtStart)
-          );
+          const placement = specialtyCupPlacementForElimination(stage.playersAtStart);
+          if (placement) {
+            await applyTournamentGrowth(
+              transaction,
+              losers,
+              tournamentGrowthValue("SPECIALTY_CUP", placement)
+            );
+          }
         }
 
         const nextStageIndex = cup.currentStageIndex + 1;
@@ -481,10 +469,10 @@ export async function playSpecialtyCupStage(
           cup.currentStageIndex = cup.stages.length;
 
           if (championPlayerId !== null) {
-            await applyGrowthToPlayers(
+            await applyTournamentGrowth(
               transaction,
               [championPlayerId],
-              specialtyCupWinnerGrowth()
+              tournamentGrowthValue("SPECIALTY_CUP", "WINNER")
             );
           }
 
@@ -542,10 +530,7 @@ export async function playSpecialtyCupStage(
         completed,
       };
     },
-    {
-      isolationLevel: "Serializable",
-      timeout: SPECIALTY_CUP_TRANSACTION_TIMEOUT,
-    }
+    { isolationLevel: "Serializable", timeout: SPECIALTY_CUP_TRANSACTION_TIMEOUT }
   );
 }
 
@@ -557,46 +542,4 @@ function getNextStageAt(payload: SpecialtyCupDrawPayload) {
 
   if (times.length === 0) return null;
   return new Date(Math.min(...times.map((value) => value.getTime())));
-}
-
-async function applyGrowthToPlayers(
-  transaction: Parameters<Parameters<typeof prisma.$transaction>[0]>[0],
-  playerIds: number[],
-  growth: number
-) {
-  if (growth <= 0 || playerIds.length === 0) return;
-
-  const players = await transaction.player.findMany({
-    where: { id: { in: playerIds } },
-    select: {
-      id: true,
-      precisione: true,
-      diretto: true,
-      sponde: true,
-      tattica: true,
-      mentalita: true,
-      difesa: true,
-      realizzazione: true,
-      creativita: true,
-      misura: true,
-    },
-  });
-
-  for (const player of players) {
-    const grow = (value: number) => Math.min(100, value * (1 + growth));
-    await transaction.player.update({
-      where: { id: player.id },
-      data: {
-        precisione: grow(player.precisione),
-        diretto: grow(player.diretto),
-        sponde: grow(player.sponde),
-        tattica: grow(player.tattica),
-        mentalita: grow(player.mentalita),
-        difesa: grow(player.difesa),
-        realizzazione: grow(player.realizzazione),
-        creativita: grow(player.creativita),
-        misura: grow(player.misura),
-      },
-    });
-  }
 }
