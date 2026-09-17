@@ -131,6 +131,7 @@ function createAcademyPlayer(
     lastName,
     nationality: "🇮🇹",
     age: profile.age,
+    ageDays: randomInteger(0, 104, random),
     talent: randomInteger(...profile.talent, random),
     revealedAttributes: 0,
     totalAttributes: 9,
