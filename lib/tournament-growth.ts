@@ -62,20 +62,27 @@ export async function applyTournamentGrowth(
 ) {
   if (growth <= 0 || playerIds.length === 0) return;
 
-  await transaction.player.updateMany({
-    where: { id: { in: playerIds } },
-    data: {
-      precisione: { increment: growth },
-      diretto: { increment: growth },
-      sponde: { increment: growth },
-      tattica: { increment: growth },
-      mentalita: { increment: growth },
-      difesa: { increment: growth },
-      realizzazione: { increment: growth },
-      creativita: { increment: growth },
-      misura: { increment: growth },
-    },
-  });
+  const uniqueIds = [...new Set(playerIds)].filter(Number.isInteger);
+  if (uniqueIds.length === 0) return;
+
+  const ids = uniqueIds.join(",");
+  const safeGrowth = Number(growth);
+
+  await transaction.$executeRawUnsafe(`
+    UPDATE "Player"
+    SET
+      "precisione" = LEAST(100, "precisione" + ${safeGrowth}),
+      "diretto" = LEAST(100, "diretto" + ${safeGrowth}),
+      "sponde" = LEAST(100, "sponde" + ${safeGrowth}),
+      "tattica" = LEAST(100, "tattica" + ${safeGrowth}),
+      "mentalita" = LEAST(100, "mentalita" + ${safeGrowth}),
+      "difesa" = LEAST(100, "difesa" + ${safeGrowth}),
+      "realizzazione" = LEAST(100, "realizzazione" + ${safeGrowth}),
+      "creativita" = LEAST(100, "creativita" + ${safeGrowth}),
+      "misura" = LEAST(100, "misura" + ${safeGrowth}),
+      "updatedAt" = CURRENT_TIMESTAMP
+    WHERE "id" IN (${ids})
+  `);
 }
 
 export function individualPlacementForElimination(stage: string) {
@@ -108,12 +115,4 @@ export function specialtyCupPlacementForElimination(playersAtStart: number) {
   if (playersAtStart <= 64) return "ROUND_OF_64" as const;
   if (playersAtStart <= 128) return "ROUND_OF_128" as const;
   return null;
-}
-
-export function nationsCupGrowthShare(
-  placement: TournamentPlacement,
-  usedPlayerCount: number
-) {
-  if (usedPlayerCount <= 0) return 0;
-  return tournamentGrowthValue("WORLD", placement) / usedPlayerCount;
 }
