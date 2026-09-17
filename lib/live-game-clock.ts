@@ -5,6 +5,7 @@ import {
   prepareLiveEconomy,
   settlePendingLiveEconomy,
 } from "@/lib/live-economy";
+import { advancePlayerAges } from "@/lib/player-age";
 import { prisma } from "@/lib/prisma";
 
 const GAME_CLOCK_ADVISORY_LOCK = 7302026;
@@ -33,6 +34,7 @@ export async function processGameClock(now = new Date()) {
         };
       }
 
+      const ageProgress = await advancePlayerAges(transaction, now);
       await prepareLiveEconomy(now);
       const result = await processBaseGameClock(now);
       const economy = await settlePendingLiveEconomy(now);
@@ -40,6 +42,7 @@ export async function processGameClock(now = new Date()) {
       return {
         ...result,
         economy,
+        ageProgress,
         skippedBecauseClockBusy: false,
       };
     },
