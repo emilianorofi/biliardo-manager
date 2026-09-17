@@ -41,6 +41,7 @@ export async function advancePlayerAges(
       advancedDays: 0,
       previousKey: null,
       currentKey: todayKey,
+      expiredAcademyPlayers: 0,
     };
   }
 
@@ -50,6 +51,7 @@ export async function advancePlayerAges(
       advancedDays: 0,
       previousKey,
       currentKey: todayKey,
+      expiredAcademyPlayers: 0,
     };
   }
 
@@ -70,6 +72,39 @@ export async function advancePlayerAges(
       "updatedAt" = ${now}
   `;
 
+  const expiredAcademyPlayers = await transaction.academyPlayer.findMany({
+    where: {
+      age: { gte: 18 },
+    },
+    select: {
+      id: true,
+      clubId: true,
+      firstName: true,
+      lastName: true,
+    },
+  });
+
+  if (expiredAcademyPlayers.length > 0) {
+    await transaction.academyPlayer.deleteMany({
+      where: {
+        id: {
+          in: expiredAcademyPlayers.map((player) => player.id),
+        },
+      },
+    });
+
+    await transaction.gameEvent.createMany({
+      data: expiredAcademyPlayers.map((player) => ({
+        clubId: player.clubId,
+        type: "ACADEMY_AGE_LIMIT",
+        title: `Uscita dall'Accademia: ${player.firstName} ${player.lastName}`,
+        description:
+          `${player.firstName} ${player.lastName} ha raggiunto 18e0 senza essere promosso ed è stato automaticamente allontanato dall'Accademia.`,
+        createdAt: now,
+      })),
+    });
+  }
+
   await transaction.$executeRaw`
     UPDATE "GameClockState"
     SET "value" = ${todayKey}, "updatedAt" = ${now}
@@ -80,6 +115,7 @@ export async function advancePlayerAges(
     advancedDays,
     previousKey,
     currentKey: todayKey,
+    expiredAcademyPlayers: expiredAcademyPlayers.length,
   };
 }
 
