@@ -69,6 +69,7 @@ function createInitialPlayer(
     lastName,
     nationality: "🇮🇹",
     age,
+    ageDays: randomInteger(0, 104),
     form: randomInteger(5, 7),
     morale: randomInteger(5, 7),
     experience: randomInteger(...profile.experience),
