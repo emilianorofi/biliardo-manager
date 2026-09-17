@@ -20,6 +20,19 @@ import { addRomeDaysAtTime } from "@/lib/rome-calendar";
 const TOURNAMENT_TRANSACTION_TIMEOUT = 120000;
 const TOURNAMENT_STATEMENT_TIMEOUT = 60000;
 
+const INDIVIDUAL_GROWTH_BY_STAGE: Record<string, number> = {
+  ROUND_OF_256: 0,
+  ROUND_OF_128: 0.02,
+  ROUND_OF_64: 0.05,
+  ROUND_OF_32: 0.08,
+  ROUND_OF_16: 0.11,
+  QUARTER_FINAL: 0.14,
+  SEMI_FINAL: 0.17,
+  FINAL: 0.20,
+};
+
+const INDIVIDUAL_WINNER_GROWTH = 0.23;
+
 const individualPlayerSelect = {
   id: true,
   firstName: true,
@@ -360,11 +373,13 @@ export async function playIndividualTournamentStage(
           WHERE tournament_match.id = result.id
         `);
 
+        const loserPlayerIds = results.map(({ result }) => result.loserPlayerId);
+
         await transaction.individualTournamentEntry.updateMany({
           where: {
             tournamentId: tournament.id,
             playerId: {
-              in: results.map(({ result }) => result.loserPlayerId),
+              in: loserPlayerIds,
             },
           },
           data: {
@@ -372,6 +387,12 @@ export async function playIndividualTournamentStage(
             eliminatedStage: candidate.stage,
           },
         });
+
+        await applyIndividualGrowth(
+          transaction,
+          loserPlayerIds,
+          INDIVIDUAL_GROWTH_BY_STAGE[candidate.stage] ?? 0
+        );
       }
 
       for (const walkover of walkovers) {
@@ -428,6 +449,12 @@ export async function playIndividualTournamentStage(
               status: "WINNER",
             },
           });
+
+          await applyIndividualGrowth(
+            transaction,
+            [championPlayerId],
+            INDIVIDUAL_WINNER_GROWTH
+          );
         }
         await transaction.individualTournament.update({
           where: {
@@ -513,6 +540,49 @@ function getStageDate(drawAt: Date, stageOrder: number) {
     stage.hour,
     stage.minute
   );
+}
+
+async function applyIndividualGrowth(
+  transaction: Prisma.TransactionClient,
+  playerIds: number[],
+  growth: number
+) {
+  if (growth <= 0 || playerIds.length === 0) return;
+
+  const players = await transaction.player.findMany({
+    where: { id: { in: playerIds } },
+    select: {
+      id: true,
+      precisione: true,
+      diretto: true,
+      sponde: true,
+      tattica: true,
+      mentalita: true,
+      difesa: true,
+      realizzazione: true,
+      creativita: true,
+      misura: true,
+    },
+  });
+
+  for (const player of players) {
+    const grow = (value: number) => Math.min(100, value * (1 + growth));
+
+    await transaction.player.update({
+      where: { id: player.id },
+      data: {
+        precisione: grow(player.precisione),
+        diretto: grow(player.diretto),
+        sponde: grow(player.sponde),
+        tattica: grow(player.tattica),
+        mentalita: grow(player.mentalita),
+        difesa: grow(player.difesa),
+        realizzazione: grow(player.realizzazione),
+        creativita: grow(player.creativita),
+        misura: grow(player.misura),
+      },
+    });
+  }
 }
 
 async function setTournamentStatementTimeout(
