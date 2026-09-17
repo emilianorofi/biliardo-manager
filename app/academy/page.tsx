@@ -362,7 +362,7 @@ export default function AcademyPage() {
               : `${decisionPlayers} giovani richiedono una decisione`}
           </p>
           <p className="mt-1 text-xs text-orange-100/70">
-            Promuovili oppure allontanali entro la fine della prossima stagione. A 18 anni saranno rilasciati automaticamente.
+            Promuovili oppure allontanali prima di 18e0. A 18e0 saranno rilasciati automaticamente.
           </p>
         </div>
       )}
@@ -501,7 +501,7 @@ function AcademyPlayerCard({
             {player.firstName} {player.lastName}
           </p>
           <p className="mt-0.5 text-[11px] text-zinc-500">
-            {player.nationality} · {player.age} anni
+            {player.nationality} · {formatPlayerAge(player.age, player.ageDays)}
           </p>
           </div>
         </div>
@@ -514,10 +514,10 @@ function AcademyPlayerCard({
       {player.decisionRequired && (
         <div className="mt-3 rounded-lg border border-orange-400/20 bg-orange-400/[0.07] px-2.5 py-2">
           <p className="text-[10px] font-black uppercase tracking-wider text-orange-200">
-            Scadenza: fine della prossima stagione
+            Scadenza: 18e0
           </p>
           <p className="mt-0.5 text-[10px] text-orange-100/60">
-            Se resta qui fino ai 18 anni verrà rilasciato automaticamente.
+            Se raggiunge 18e0 in Accademia verrà rilasciato automaticamente.
           </p>
         </div>
       )}
@@ -640,4 +640,8 @@ function formatCountdown(
   }
 
   return `${minutes}m`;
+}
+
+function formatPlayerAge(age: number, ageDays?: number) {
+  return `${age}e${ageDays ?? 0}`;
 }
