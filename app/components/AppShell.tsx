@@ -28,10 +28,10 @@ export default function AppShell({
   }
 
   return (
-    <div className="flex min-h-screen">
+    <div className="min-h-screen lg:flex">
       <GameClockPulse />
       <Sidebar />
-      <main className="min-w-0 flex-1 bg-[#0b1712] p-4 lg:p-5">
+      <main className="min-w-0 bg-[#0b1712] px-3 pb-4 pt-[4.25rem] sm:px-4 lg:flex-1 lg:p-5">
         {children}
       </main>
     </div>
