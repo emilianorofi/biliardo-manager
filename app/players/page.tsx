@@ -90,6 +90,7 @@ export default async function PlayersPage() {
         lastName: player.lastName,
         nationality: player.nationality,
         age: player.age,
+        ageDays: player.ageDays,
 
         overall: calculateOverall(attributes),
 
