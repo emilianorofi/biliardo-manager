@@ -29,7 +29,7 @@ export function calculateEndOfSeasonPlayerOutcome(
   validateAge(currentAge);
   validateRetirementRoll(retirementRoll);
 
-  const age = currentAge + 1;
+  const age = currentAge;
   const retirementChance = getRetirementChance(age);
 
   return {
