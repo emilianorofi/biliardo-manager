@@ -85,6 +85,7 @@ model Player {
   lastName    String
   nationality String
   age         Int
+  ageDays     Int @default(0)
 
   careerStatus       String    @default("ACTIVE")
   retiredAt          DateTime?
@@ -207,6 +208,7 @@ model AcademyPlayer {
   lastName    String
   nationality String
   age         Int
+  ageDays     Int @default(0)
 
   talent Float
 
