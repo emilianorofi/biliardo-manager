@@ -40,6 +40,7 @@ type RankingRow = {
   nationalityCode: string;
   nationalityLabel: string;
   age: number;
+  ageDays: number;
   club: {
     id: number;
     name: string;
@@ -73,6 +74,7 @@ export default async function RankingPage({
         lastName: true,
         nationality: true,
         age: true,
+        ageDays: true,
         clubId: true,
         club: {
           select: {
@@ -106,6 +108,7 @@ export default async function RankingPage({
       nationalityCode: nationality.code,
       nationalityLabel: nationality.label,
       age: player.age,
+      ageDays: player.ageDays,
       club: player.club,
     };
   });
@@ -426,7 +429,7 @@ function RankingTableRows({
           <ClubLink club={player.club} />
         </td>
         <td className="px-3 py-2.5 text-center text-sm font-bold text-slate-300">
-          {player.age}
+          {formatPlayerAge(player.age, player.ageDays)}
         </td>
         <td className="px-4 py-2.5 text-right">
           <QualificationBadge position={player.position} />
@@ -469,7 +472,7 @@ function RankingMobileCard({
             </Link>
             <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px] text-slate-500">
               <Nationality player={player} />
-              <span>{player.age} anni</span>
+              <span>{formatPlayerAge(player.age, player.ageDays)}</span>
             </div>
           </div>
           <QualificationBadge position={player.position} compact />
@@ -721,4 +724,8 @@ function buildRankingHref(
 
   const query = parameters.toString();
   return query ? `/ranking?${query}` : "/ranking";
+}
+
+function formatPlayerAge(age: number, ageDays: number) {
+  return `${age}e${ageDays}`;
 }
