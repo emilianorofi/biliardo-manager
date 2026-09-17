@@ -265,14 +265,8 @@ async function applyTrainingCenterCorrection(
 
   for (const result of session.results) {
     if (result.playerId === null) continue;
-    const primaryExtra = Math.max(
-      0,
-      Math.min(100 - result.primaryAfter, result.primaryGain * bonus)
-    );
-    const secondaryExtra = Math.max(
-      0,
-      Math.min(100 - result.secondaryAfter, result.secondaryGain * bonus)
-    );
+    const primaryExtra = Math.max(0, result.primaryGain * bonus);
+    const secondaryExtra = Math.max(0, result.secondaryGain * bonus);
     if (primaryExtra === 0 && secondaryExtra === 0) continue;
 
     const data: Record<string, unknown> = {};
