@@ -25,7 +25,7 @@ export interface AcademyPlayer {
   firstName: string;
   lastName: string;
   age: number;
-  ageDays: number;
+  ageDays?: number;
   nationality: string;
 
   estimatedAttributes: number;
