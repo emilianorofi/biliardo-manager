@@ -59,10 +59,9 @@ export function calculateWeeklyAgeDecline({
     0,
     100
   );
-  const normalizedValue = clamp(
+  const normalizedValue = Math.max(
     currentValue,
-    0,
-    100
+    0
   );
   const talentMultiplier =
     1.1 - normalizedTalent * 0.002;
@@ -103,10 +102,9 @@ export function applyWeeklyDevelopment({
 
     declines[skill] = decline;
     values[skill] = roundToThreeDecimals(
-      clamp(
-        currentValue + gain - decline,
+      Math.max(
         0,
-        100
+        currentValue + gain - decline
       )
     );
   }
@@ -147,11 +145,10 @@ function addGains(
   for (const skill of TRAINING_SKILLS) {
     values[skill] =
       roundToThreeDecimals(
-        clamp(
-          currentValues[skill] +
-            (gains[skill] ?? 0),
+        Math.max(
           0,
-          100
+          currentValues[skill] +
+            (gains[skill] ?? 0)
         )
       );
   }
