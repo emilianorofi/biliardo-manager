@@ -71,15 +71,15 @@ export async function applyTournamentGrowth(
   await transaction.$executeRawUnsafe(`
     UPDATE "Player"
     SET
-      "precisione" = LEAST(100, "precisione" + ${safeGrowth}),
-      "diretto" = LEAST(100, "diretto" + ${safeGrowth}),
-      "sponde" = LEAST(100, "sponde" + ${safeGrowth}),
-      "tattica" = LEAST(100, "tattica" + ${safeGrowth}),
-      "mentalita" = LEAST(100, "mentalita" + ${safeGrowth}),
-      "difesa" = LEAST(100, "difesa" + ${safeGrowth}),
-      "realizzazione" = LEAST(100, "realizzazione" + ${safeGrowth}),
-      "creativita" = LEAST(100, "creativita" + ${safeGrowth}),
-      "misura" = LEAST(100, "misura" + ${safeGrowth}),
+      "precisione" = "precisione" + ${safeGrowth},
+      "diretto" = "diretto" + ${safeGrowth},
+      "sponde" = "sponde" + ${safeGrowth},
+      "tattica" = "tattica" + ${safeGrowth},
+      "mentalita" = "mentalita" + ${safeGrowth},
+      "difesa" = "difesa" + ${safeGrowth},
+      "realizzazione" = "realizzazione" + ${safeGrowth},
+      "creativita" = "creativita" + ${safeGrowth},
+      "misura" = "misura" + ${safeGrowth},
       "updatedAt" = CURRENT_TIMESTAMP
     WHERE "id" IN (${ids})
   `);
