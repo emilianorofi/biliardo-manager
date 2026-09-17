@@ -231,6 +231,7 @@ const player: Player = {
   lastName: databasePlayer.lastName,
   nationality: databasePlayer.nationality,
   age: databasePlayer.age,
+  ageDays: databasePlayer.ageDays,
 
   overall: calculateOverall(playerAttributes),
 
@@ -331,7 +332,7 @@ const player: Player = {
                   {nationality.code}
                 </span>
                 <span aria-hidden="true">·</span>
-                <span>{player.age} anni</span>
+                <span>{formatPlayerAge(player.age, player.ageDays)}</span>
               </p>
 
               <div className="mt-1.5 flex flex-wrap gap-1.5">
@@ -660,4 +661,8 @@ function calculateOverall(
       0
     ) / values.length
   );
+}
+
+function formatPlayerAge(age: number, ageDays?: number) {
+  return `${age}e${ageDays ?? 0}`;
 }
