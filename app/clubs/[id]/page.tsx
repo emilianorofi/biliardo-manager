@@ -112,6 +112,7 @@ export default async function ClubPage({
       lastName: databasePlayer.lastName,
       nationality: databasePlayer.nationality,
       age: databasePlayer.age,
+      ageDays: databasePlayer.ageDays,
       overall: calculateOverall(attributes),
       form: databasePlayer.form,
       morale: databasePlayer.morale,
