@@ -14,6 +14,7 @@ import {
   type NationsCupTeam,
 } from "@/lib/nations-cup";
 import { prisma } from "@/lib/prisma";
+import { applyTournamentGrowth, tournamentGrowthValue } from "@/lib/tournament-growth";
 
 const PLAYER_SELECT = {
   id: true, clubId: true, firstName: true, lastName: true, nationality: true,
@@ -27,6 +28,13 @@ const ENTRY_INCLUDE = {
   firstPlayer: { select: PLAYER_SELECT },
   secondPlayer: { select: PLAYER_SELECT },
   thirdPlayer: { select: PLAYER_SELECT },
+} as const;
+
+const ENTRY_PLAYER_IDS_SELECT = {
+  id: true,
+  firstPlayerId: true,
+  secondPlayerId: true,
+  thirdPlayerId: true,
 } as const;
 
 export async function initializeNationsCup() {
@@ -204,6 +212,8 @@ export async function playNationsCupStage(candidateMatchId: number, scheduledAt:
       }
     }
 
+    await applyNationsCupStageGrowth(tx, cup.id, candidate.stageOrder);
+
     const next = await createNextStage(tx, cup.id, cup.seasonId, candidate.stageOrder);
     await tx.nationsCupTournament.update({
       where: { id: cup.id },
@@ -219,6 +229,78 @@ export async function playNationsCupStage(candidateMatchId: number, scheduledAt:
     });
     return { status: "PROCESSED" as const, matches: matches.length, nextStage: next.cupUpdate.currentStage ?? null };
   }, { isolationLevel: "Serializable", timeout: 120000 });
+}
+
+async function applyNationsCupStageGrowth(
+  tx: Prisma.TransactionClient,
+  tournamentId: number,
+  stageOrder: number
+) {
+  if (stageOrder < 4 || stageOrder > 6) return;
+
+  const matches = await tx.nationsCupMatch.findMany({
+    where: { tournamentId, stageOrder, status: "PLAYED" },
+    select: {
+      homeEntryId: true,
+      awayEntryId: true,
+      winnerEntryId: true,
+    },
+  });
+
+  const loserEntryIds = matches.flatMap((match) => {
+    if (!match.winnerEntryId) return [];
+    return [
+      match.winnerEntryId === match.homeEntryId
+        ? match.awayEntryId
+        : match.homeEntryId,
+    ];
+  });
+
+  const loserPlacement =
+    stageOrder === 4
+      ? "QUARTER_FINAL"
+      : stageOrder === 5
+        ? "SEMI_FINAL"
+        : "FINALIST";
+
+  if (loserEntryIds.length > 0) {
+    const loserPlayerIds = await getEntryPlayerIds(tx, loserEntryIds);
+    await applyTournamentGrowth(
+      tx,
+      loserPlayerIds,
+      tournamentGrowthValue("WORLD", loserPlacement)
+    );
+  }
+
+  if (stageOrder === 6) {
+    const championEntryIds = matches.flatMap((match) =>
+      match.winnerEntryId ? [match.winnerEntryId] : []
+    );
+    const championPlayerIds = await getEntryPlayerIds(tx, championEntryIds);
+    await applyTournamentGrowth(
+      tx,
+      championPlayerIds,
+      tournamentGrowthValue("WORLD", "WINNER")
+    );
+  }
+}
+
+async function getEntryPlayerIds(
+  tx: Prisma.TransactionClient,
+  entryIds: number[]
+) {
+  if (entryIds.length === 0) return [];
+
+  const entries = await tx.nationsCupEntry.findMany({
+    where: { id: { in: entryIds } },
+    select: ENTRY_PLAYER_IDS_SELECT,
+  });
+
+  return entries.flatMap((entry) => [
+    entry.firstPlayerId,
+    entry.secondPlayerId,
+    entry.thirdPlayerId,
+  ]);
 }
 
 async function createNextStage(
