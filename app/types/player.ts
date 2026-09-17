@@ -7,6 +7,7 @@ export interface Player {
   nationality: string;
 
   age: number;
+  ageDays?: number;
 
   overall: number;
 
