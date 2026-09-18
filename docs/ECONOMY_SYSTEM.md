@@ -1,5 +1,6 @@
 # Sistema economico di Biliardo Manager
 
+
 Questa pagina raccoglie la baseline economica approvata. I valori qui indicati sono la fonte di verita per l'integrazione in produzione. La validazione a 20 stagioni e documentata in `docs/ECONOMY_SIMULATION.md`.
 
 ## Principi
