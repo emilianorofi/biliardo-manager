@@ -82,6 +82,29 @@ export async function expireUnavailableFreeAgents(
           return null;
         }
 
+        const retirementSeason =
+          (await transaction.season.findFirst({
+            where: {
+              status: {
+                in: ["ACTIVE", "PREPARATION"],
+              },
+            },
+            orderBy: {
+              number: "desc",
+            },
+            select: {
+              id: true,
+            },
+          })) ??
+          (await transaction.season.findFirst({
+            orderBy: {
+              number: "desc",
+            },
+            select: {
+              id: true,
+            },
+          }));
+
         await transaction.player.update({
           where: {
             id: listing.player.id,
@@ -89,6 +112,7 @@ export async function expireUnavailableFreeAgents(
           data: {
             careerStatus: "RETIRED",
             retiredAt: now,
+            retirementSeasonId: retirementSeason?.id ?? null,
             clubId: null,
           },
         });
