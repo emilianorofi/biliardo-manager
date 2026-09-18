@@ -3,7 +3,6 @@ import "server-only";
 import type { Prisma } from "@/generated/prisma/client";
 import {
   calculatePlayerMarketValue,
-  calculatePlayerWeeklySalary,
 } from "@/lib/economy-rules";
 import { calculateOverall } from "@/lib/training-engine";
 
@@ -39,19 +38,18 @@ export async function refreshClubPlayerEconomy(
 
   for (const player of players) {
     const overall = calculateOverall(player);
-    const salary = calculatePlayerWeeklySalary(overall);
     const value = calculatePlayerMarketValue({
       overall,
       age: player.age,
       talent: player.talent,
     });
 
-    salaryTotal += salary;
+    salaryTotal += player.salary;
 
-    if (salary !== player.salary || value !== player.value) {
+    if (value !== player.value) {
       await transaction.player.update({
         where: { id: player.id },
-        data: { salary, value },
+        data: { value },
       });
       updatedPlayers += 1;
     }
