@@ -331,13 +331,12 @@ export function calculatePlayerPerformance(
 
   const performanceRating =
     roundRating(
-      clamp(
+      Math.max(
+        1,
         specialtyRating +
           formModifier +
           moraleModifier +
-          experienceModifier,
-        1,
-        100
+          experienceModifier
       )
     );
 
@@ -397,20 +396,12 @@ export function calculateMatchWinProbabilities(
 ): MatchWinProbabilities {
   const normalizedHomePerformance =
     roundRating(
-      clamp(
-        homePerformanceRating,
-        1,
-        100
-      )
+      Math.max(1, homePerformanceRating)
     );
 
   const normalizedAwayPerformance =
     roundRating(
-      clamp(
-        awayPerformanceRating,
-        1,
-        100
-      )
+      Math.max(1, awayPerformanceRating)
     );
 
   const performanceDifference =
