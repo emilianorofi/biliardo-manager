@@ -15,9 +15,18 @@ export async function advancePlayerAges(
   transaction: Prisma.TransactionClient,
   now = new Date()
 ) {
-  await transaction.$queryRaw`
-    SELECT pg_advisory_xact_lock(${AGE_CLOCK_ADVISORY_LOCK})
+  const lockRows = await transaction.$queryRaw<Array<{ acquired: boolean }>>`
+    SELECT pg_try_advisory_xact_lock(${AGE_CLOCK_ADVISORY_LOCK}) AS acquired
   `;
+
+  if (lockRows[0]?.acquired !== true) {
+    return {
+      advancedDays: 0,
+      previousKey: null,
+      currentKey: formatRomeDateKey(now),
+      expiredAcademyPlayers: 0,
+    };
+  }
 
   const todayKey = formatRomeDateKey(now);
   const rows = await transaction.$queryRaw<ClockStateRow[]>`
