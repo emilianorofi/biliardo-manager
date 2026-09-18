@@ -3,6 +3,8 @@ import { NextResponse } from "next/server";
 import { MAX_FIRST_TEAM_PLAYERS } from "@/lib/game-config";
 import { getApiClubAccess } from "@/lib/api-club-access";
 import { ensureEconomySchema } from "@/lib/economy-schema";
+import { calculatePlayerWeeklySalary } from "@/lib/economy-rules";
+import { calculateOverall } from "@/lib/training-engine";
 import { getMarketCommitments } from "@/lib/market-commitments";
 import { prisma } from "@/lib/prisma";
 
@@ -61,6 +63,15 @@ export async function POST(request: Request) {
                 firstName: true,
                 lastName: true,
                 salary: true,
+                precisione: true,
+                diretto: true,
+                sponde: true,
+                tattica: true,
+                mentalita: true,
+                difesa: true,
+                realizzazione: true,
+                creativita: true,
+                misura: true,
               },
             },
           },
@@ -103,9 +114,10 @@ export async function POST(request: Request) {
       const playerName = `${listing.player.firstName} ${listing.player.lastName}`;
       const completedAt = new Date();
 
+      const salary = calculatePlayerWeeklySalary(calculateOverall(listing.player));
       await transaction.player.update({
         where: { id: listing.player.id },
-        data: { clubId },
+        data: { clubId, salary },
       });
       await transaction.transferListing.update({
         where: { id: listingId },
@@ -126,14 +138,14 @@ export async function POST(request: Request) {
           clubId,
           type: "TRANSFER_FREE_AGENT_SIGNED",
           title: `Svincolato ingaggiato: ${playerName}`,
-          description: `${playerName} è entrato nella rosa senza costo di cartellino. Lo stipendio di ${formatCurrency(listing.player.salary)} sarà conteggiato nelle spese settimanali.`,
+          description: `${playerName} è entrato nella rosa senza costo di cartellino. Lo stipendio di ${formatCurrency(salary)} sarà conteggiato nelle spese settimanali.`,
         },
       });
 
       return {
         listingId,
         playerName,
-        salary: listing.player.salary,
+        salary,
         completedAt: completedAt.toISOString(),
       };
     });
