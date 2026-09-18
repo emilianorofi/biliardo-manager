@@ -1,9 +1,7 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
-import { expireUnavailableFreeAgents } from "@/lib/free-agent-expiration";
-import { settlePendingLiveEconomy } from "@/lib/live-economy";
-import { settleExpiredAuctions } from "@/lib/market-settlement";
+import { processGameClock } from "@/lib/live-game-clock";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -25,34 +23,19 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const checkedAt = new Date();
-    const [outcomes, expiredFreeAgents] = await Promise.all([
-      settleExpiredAuctions(checkedAt),
-      expireUnavailableFreeAgents(checkedAt),
-    ]);
-    const economy = await settlePendingLiveEconomy(checkedAt);
-    const pendingCount = outcomes.filter(
-      (outcome) => outcome.status === "PENDING_TRANSFER"
-    ).length;
-    const settledCount = outcomes.length - pendingCount;
+    const result = await processGameClock();
 
     return NextResponse.json({
       success: true,
-      checkedAt: checkedAt.toISOString(),
-      settledCount,
-      pendingCount,
-      expiredFreeAgentsCount: expiredFreeAgents.length,
-      outcomes,
-      expiredFreeAgents,
-      economy,
+      ...result,
     });
   } catch (error: unknown) {
     console.error(
-      "Errore durante l'aggiornamento automatico del mercato:",
+      "Errore durante l'avanzamento automatico del gioco:",
       error
     );
     return NextResponse.json(
-      { error: "Impossibile completare l'aggiornamento automatico del mercato." },
+      { error: "Impossibile aggiornare gli eventi automatici." },
       { status: 500 }
     );
   }
