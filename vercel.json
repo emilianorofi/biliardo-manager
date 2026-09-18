@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/game-clock",
+      "schedule": "*/5 * * * *"
+    }
+  ]
+}
