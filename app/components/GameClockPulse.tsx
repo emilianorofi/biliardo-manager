@@ -36,11 +36,19 @@ export default function GameClockPulse() {
         const data =
           (await response.json()) as {
             processedEvents?: number;
+            market?: {
+              settledCount?: number;
+              expiredFreeAgentsCount?: number;
+            };
           };
 
         if (
           !isCancelled &&
-          (data.processedEvents ?? 0) > 0
+          (
+            (data.processedEvents ?? 0) > 0 ||
+            (data.market?.settledCount ?? 0) > 0 ||
+            (data.market?.expiredFreeAgentsCount ?? 0) > 0
+          )
         ) {
           router.refresh();
         }
