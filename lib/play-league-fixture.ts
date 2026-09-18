@@ -34,6 +34,7 @@ import {
   recordPlayerFixtureCareer,
 } from "@/lib/player-career-recording";
 import { prisma } from "@/lib/prisma";
+import { calculateOverall } from "@/lib/training-engine";
 import {
   completeSeasonIfReady,
 } from "@/lib/season-completion";
@@ -69,6 +70,9 @@ type PlayFixtureInput = {
 type FixtureClub = {
   id: number;
   name: string;
+  manager: {
+    id: string;
+  } | null;
   players: FixtureCareerPlayer[];
   formation: {
     slotAPlayer: FixtureCareerPlayer | null;
@@ -109,6 +113,11 @@ export async function playLeagueFixture({
         select: {
           id: true,
           name: true,
+          manager: {
+            select: {
+              id: true,
+            },
+          },
           players: {
             where: {
               careerStatus: "ACTIVE",
@@ -134,6 +143,11 @@ export async function playLeagueFixture({
         select: {
           id: true,
           name: true,
+          manager: {
+            select: {
+              id: true,
+            },
+          },
           players: {
             where: {
               careerStatus: "ACTIVE",
@@ -467,10 +481,43 @@ function resolveFormation(
     );
   }
 
+  if (club.manager !== null) {
+    return {
+      source: "EMERGENCY" as const,
+      formation: findEmergencyHumanFormation(club.players),
+      strategy: undefined,
+    };
+  }
+
   return {
     source: "AUTOMATIC" as const,
     formation: findBestAutomaticFormation(club.players),
     strategy: undefined,
+  };
+}
+
+function findEmergencyHumanFormation(
+  players: FixtureCareerPlayer[]
+): FixtureCareerFormation {
+  const selectedPlayers = [...players]
+    .sort(
+      (first, second) =>
+        calculateOverall(second) - calculateOverall(first) ||
+        first.id - second.id
+    )
+    .slice(0, 3);
+
+  if (selectedPlayers.length < 3) {
+    throw new PlayLeagueFixtureError(
+      "Non è stato possibile creare la formazione di emergenza.",
+      409
+    );
+  }
+
+  return {
+    A: selectedPlayers[0],
+    B: selectedPlayers[1],
+    C: selectedPlayers[2],
   };
 }
 
