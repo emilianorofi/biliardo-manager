@@ -9,6 +9,8 @@ import {
 } from "@/lib/market-rules";
 import { getMarketCommitments } from "@/lib/market-commitments";
 import { prisma } from "@/lib/prisma";
+import { calculatePlayerWeeklySalary } from "@/lib/economy-rules";
+import { calculateOverall } from "@/lib/training-engine";
 
 class MarketBidError extends Error {
   constructor(message: string, public readonly status: number) {
@@ -62,6 +64,15 @@ export async function POST(request: Request) {
                 firstName: true,
                 lastName: true,
                 salary: true,
+                precisione: true,
+                diretto: true,
+                sponde: true,
+                tattica: true,
+                mentalita: true,
+                difesa: true,
+                realizzazione: true,
+                creativita: true,
+                misura: true,
               },
             },
             bids: {
@@ -128,6 +139,9 @@ export async function POST(request: Request) {
       }
 
       const playerName = `${listing.player.firstName} ${listing.player.lastName}`;
+      const projectedSalary = calculatePlayerWeeklySalary(
+        calculateOverall(listing.player)
+      );
       const minimumNextBid = getMinimumBid(amount);
       const bidEvents: Array<{ clubId: number; type: string; title: string; description: string }> = [];
       if (highestBid) {
@@ -151,7 +165,7 @@ export async function POST(request: Request) {
       return {
         playerName,
         amount,
-        salary: listing.player.salary,
+        salary: projectedSalary,
         minimumNextBid,
         endsAt: endsAt.toISOString(),
         wasExtended: shouldExtend,
