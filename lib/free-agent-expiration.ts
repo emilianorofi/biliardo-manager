@@ -64,6 +64,7 @@ export async function expireUnavailableFreeAgents(
                   firstName: true,
                   lastName: true,
                   clubId: true,
+                  careerStatus: true,
                 },
               },
             },
@@ -74,11 +75,23 @@ export async function expireUnavailableFreeAgents(
           listing.listingType !== "FREE_AGENT" ||
           listing.status !== "ACTIVE" ||
           listing.player.clubId !== null ||
+          listing.player.careerStatus !== "ACTIVE" ||
           !listing.endsAt ||
           listing.endsAt.getTime() > now.getTime()
         ) {
           return null;
         }
+
+        await transaction.player.update({
+          where: {
+            id: listing.player.id,
+          },
+          data: {
+            careerStatus: "RETIRED",
+            retiredAt: now,
+            clubId: null,
+          },
+        });
 
         await transaction.transferListing.update({
           where: {
@@ -87,6 +100,17 @@ export async function expireUnavailableFreeAgents(
           data: {
             status: "EXPIRED",
             completedAt: now,
+          },
+        });
+
+        await transaction.gameEvent.create({
+          data: {
+            clubId: null,
+            type: "FREE_AGENT_RETIRED",
+            title: `Ritiro da svincolato: ${listing.player.firstName} ${listing.player.lastName}`,
+            description:
+              `${listing.player.firstName} ${listing.player.lastName} non ha trovato un club entro 105 giorni ed è stato ritirato definitivamente.`,
+            createdAt: now,
           },
         });
 
