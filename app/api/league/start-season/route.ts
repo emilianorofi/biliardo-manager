@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 
 import { prisma } from "@/lib/prisma";
+import { calculatePlayerWeeklySalary } from "@/lib/economy-rules";
+import { calculateOverall } from "@/lib/training-engine";
 import {
   CLUBS_PER_LEAGUE,
   TOTAL_WORLD_LEAGUES,
@@ -90,7 +92,43 @@ export async function POST() {
       );
     }
 
-    await prisma.$transaction(async (transaction) => {
+    const salaryRefresh = await prisma.$transaction(async (transaction) => {
+      const players = await transaction.player.findMany({
+        where: {
+          careerStatus: "ACTIVE",
+          clubId: { not: null },
+        },
+        select: {
+          id: true,
+          salary: true,
+          precisione: true,
+          diretto: true,
+          sponde: true,
+          tattica: true,
+          mentalita: true,
+          difesa: true,
+          realizzazione: true,
+          creativita: true,
+          misura: true,
+        },
+      });
+
+      let updatedPlayers = 0;
+
+      for (const player of players) {
+        const salary = calculatePlayerWeeklySalary(calculateOverall(player));
+
+        if (salary === player.salary) {
+          continue;
+        }
+
+        await transaction.player.update({
+          where: { id: player.id },
+          data: { salary },
+        });
+        updatedPlayers += 1;
+      }
+
       await transaction.season.update({
         where: {
           id: season.id,
@@ -108,6 +146,11 @@ export async function POST() {
           currentRound: 0,
         },
       });
+
+      return {
+        players: players.length,
+        updatedPlayers,
+      };
     });
 
     return NextResponse.json({
@@ -124,6 +167,8 @@ export async function POST() {
         leagues: season.leagues.length,
         clubs: season.leagues.length * CLUBS_PER_LEAGUE,
         fixtures: season.leagues.length * REQUIRED_FIXTURES,
+        salariesChecked: salaryRefresh.players,
+        salariesUpdated: salaryRefresh.updatedPlayers,
       },
     });
   } catch (error) {
