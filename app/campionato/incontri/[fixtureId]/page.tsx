@@ -128,7 +128,13 @@ export default async function LeagueFixtureDetailPage({
 
   const isPlayed = fixture.status === "PLAYED";
   const hasDetailedReport =
-    fixture.games.length === 6 && fixture.playerAppearances.length === 6;
+    fixture.games.length === 6 &&
+    fixture.playerAppearances.length >= 6 &&
+    fixture.games.every(
+      (game) =>
+        game.playerPerformances.length ===
+        (game.gameType === "SINGLES" ? 2 : 4)
+    );
   const homeScore = fixture.homeScore ?? 0;
   const awayScore = fixture.awayScore ?? 0;
   const table = createLeagueTable(
@@ -646,10 +652,13 @@ export default async function LeagueFixtureDetailPage({
                     >
                       {mvp.clubName}
                     </Link>{" "}
-                    · slot {mvp.formationSlot}
+                    · slot {formatFormationSlot(mvp.formationSlot)}
                   </p>
                   <div className="mt-4 grid grid-cols-2 gap-2">
-                    <Stat label="Prove vinte" value={`${countWins(mvp)}/3`} />
+                    <Stat
+                      label="Prove vinte"
+                      value={`${countWins(mvp)}/${mvp.gamePerformances.length}`}
+                    />
                     <Stat label="Rendimento" value={formatRating(mvp.performanceRating)} />
                   </div>
                   <p className="mt-4 text-sm leading-6 text-zinc-400">
@@ -775,7 +784,9 @@ function PlayersLine({
         ))}
       </p>
       <p className="mt-1 text-[10px] uppercase tracking-wider text-zinc-600">
-        {players.map((player) => `Slot ${player.formationSlot}`).join(" + ")}
+        {players
+          .map((player) => `Slot ${formatFormationSlot(player.formationSlot)}`)
+          .join(" + ")}
       </p>
     </div>
   );
@@ -806,7 +817,7 @@ function FormationList({
           >
             <div className="flex min-w-0 items-center gap-3">
               <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-emerald-500/10 text-xs font-black text-emerald-300">
-                {appearance.formationSlot}
+                {formatFormationSlot(appearance.formationSlot)}
               </span>
               <div className="min-w-0">
                 {appearance.playerId ? (
@@ -854,6 +865,12 @@ function countWins(appearance: Appearance) {
   return appearance.gamePerformances.filter(
     (performance) => performance.result === "WIN"
   ).length;
+}
+
+function formatFormationSlot(slot: string) {
+  const [baseSlot, substitutedPlayerId] = slot.split(":");
+
+  return substitutedPlayerId ? `${baseSlot} (cambio)` : baseSlot;
 }
 
 function formatSpecialty(specialty: string) {
