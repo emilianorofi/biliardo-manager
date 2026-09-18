@@ -10,6 +10,8 @@ import {
   MAX_FIRST_TEAM_PLAYERS,
 } from "@/lib/game-config";
 import { getCurrentClubId } from "@/lib/current-club";
+import { calculatePlayerWeeklySalary } from "@/lib/economy-rules";
+import { calculateOverall } from "@/lib/training-engine";
 import { getMarketCommitments } from "@/lib/market-commitments";
 import { prisma } from "@/lib/prisma";
 
@@ -227,7 +229,7 @@ export default async function MarketPage() {
         lastName: player.lastName,
         nationality: player.nationality,
         age: player.age,
-        overall: calculateOverall(player),
+        overall: Math.round(calculateOverall(player)),
         italiana: Math.round(
           (player.precisione + player.diretto) / 2
         ),
@@ -238,7 +240,7 @@ export default async function MarketPage() {
           (player.diretto + player.sponde) / 2
         ),
         estimatedValue: player.value,
-        salary: player.salary,
+        salary: calculatePlayerWeeklySalary(calculateOverall(player)),
         openingPrice: listing.openingPrice,
         currentPrice:
           highestBid?.amount ?? listing.openingPrice,
@@ -390,31 +392,6 @@ function getHistoryKind(listing: {
   }
 
   return "SALE";
-}
-
-function calculateOverall(player: {
-  precisione: number;
-  diretto: number;
-  sponde: number;
-  tattica: number;
-  mentalita: number;
-  difesa: number;
-  realizzazione: number;
-  creativita: number;
-  misura: number;
-}) {
-  return Math.round(
-    (player.precisione +
-      player.diretto +
-      player.sponde +
-      player.tattica +
-      player.mentalita +
-      player.difesa +
-      player.realizzazione +
-      player.creativita +
-      player.misura) /
-      9
-  );
 }
 
 function formatDeadline(value: Date | null) {
