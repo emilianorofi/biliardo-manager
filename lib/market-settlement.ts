@@ -5,7 +5,8 @@ import {
   MIN_FIRST_TEAM_PLAYERS,
 } from "@/lib/game-config";
 import type { Prisma } from "@/generated/prisma/client";
-import { calculateSellerProceeds } from "@/lib/economy-rules";
+import { calculatePlayerWeeklySalary, calculateSellerProceeds } from "@/lib/economy-rules";
+import { calculateOverall } from "@/lib/training-engine";
 import { ensureEconomySchema } from "@/lib/economy-schema";
 import { prisma } from "@/lib/prisma";
 
@@ -102,6 +103,15 @@ async function settleListing(listingId: number, now: Date) {
             lastName: true,
             clubId: true,
             careerStatus: true,
+            precisione: true,
+            diretto: true,
+            sponde: true,
+            tattica: true,
+            mentalita: true,
+            difesa: true,
+            realizzazione: true,
+            creativita: true,
+            misura: true,
           },
         },
         bids: {
@@ -303,9 +313,10 @@ async function settleListing(listingId: number, now: Date) {
         data: { balance: { increment: sellerProceeds } },
       });
     }
+    const newSalary = calculatePlayerWeeklySalary(calculateOverall(listing.player));
     await transaction.player.update({
       where: { id: listing.player.id },
-      data: { clubId: winnerClub.id },
+      data: { clubId: winnerClub.id, salary: newSalary },
     });
 
     if (listing.sellerClubId) {
