@@ -1,5 +1,6 @@
 # Automazione del mercato
 
+
 L'automazione usa Supabase Cron per chiamare ogni minuto l'endpoint
 `GET /api/cron/market-settlement` della produzione Vercel.
 
