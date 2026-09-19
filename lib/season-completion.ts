@@ -56,27 +56,38 @@ export async function completeSeasonIfReady(
   if (season.status === "COMPLETED") return createEmptyResult(seasonId, true);
   if (season.status !== "ACTIVE") return createEmptyResult(seasonId, false);
 
-  const [leagues, individualTournaments, nationsCupTournaments] =
-    await Promise.all([
-      transaction.league.findMany({
-        where: { seasonId },
-        select: { status: true },
-      }),
-      transaction.individualTournament.findMany({
-        where: { seasonId },
-        select: { status: true },
-      }),
-      transaction.nationsCupTournament.findMany({
-        where: { seasonId },
-        select: { status: true },
-      }),
-    ]);
+  const [
+    leagues,
+    individualTournaments,
+    nationsCupTournaments,
+    specialtyCupTournaments,
+  ] = await Promise.all([
+    transaction.league.findMany({
+      where: { seasonId },
+      select: { status: true },
+    }),
+    transaction.individualTournament.findMany({
+      where: { seasonId },
+      select: { status: true },
+    }),
+    transaction.nationsCupTournament.findMany({
+      where: { seasonId },
+      select: { status: true },
+    }),
+    transaction.$queryRaw<Array<{ status: string }>>`
+      SELECT "status"
+      FROM "SpecialtyCupTournament"
+      WHERE "seasonId" = ${seasonId}
+    `,
+  ]);
 
   if (
     leagues.length === 0 ||
     leagues.some((league) => league.status !== "COMPLETED") ||
     individualTournaments.some((tournament) => tournament.status !== "COMPLETED") ||
-    nationsCupTournaments.some((tournament) => tournament.status !== "COMPLETED")
+    nationsCupTournaments.some((tournament) => tournament.status !== "COMPLETED") ||
+    specialtyCupTournaments.length === 0 ||
+    specialtyCupTournaments.some((tournament) => tournament.status !== "COMPLETED")
   ) {
     return createEmptyResult(seasonId, false);
   }
