@@ -463,6 +463,15 @@ async function settleReadySeasons(now: Date) {
         SELECT 1 FROM "NationsCupTournament" AS cup
         WHERE cup."seasonId" = season."id" AND cup."status" <> 'COMPLETED'
       )
+      AND EXISTS (
+        SELECT 1 FROM "SpecialtyCupTournament" AS specialty
+        WHERE specialty."seasonId" = season."id"
+      )
+      AND NOT EXISTS (
+        SELECT 1 FROM "SpecialtyCupTournament" AS specialty
+        WHERE specialty."seasonId" = season."id"
+          AND specialty."status" <> 'COMPLETED'
+      )
     ORDER BY season."number"
   `;
   let settled = 0;
