@@ -29,6 +29,7 @@ import {
 } from "@/lib/club-structures";
 import { createLeagueTable } from "@/lib/league-table";
 import { completeSeasonIfReady } from "@/lib/season-completion";
+import { createNextSeasonFromCompletedSeason } from "@/lib/season-transition";
 import { getCompletedRomeWeeklyWindow } from "@/lib/rome-calendar";
 import { refreshClubPlayerEconomy } from "@/lib/player-economy";
 import { prisma } from "@/lib/prisma";
@@ -573,7 +574,21 @@ async function settleReadySeasons(now: Date) {
         SET "economySettledAt" = ${now}
         WHERE "id" = ${season.id}
       `;
-      await completeSeasonIfReady(transaction, season.id, { now });
+
+      const completion = await completeSeasonIfReady(
+        transaction,
+        season.id,
+        { now }
+      );
+
+      if (completion.completed || completion.alreadyCompleted) {
+        await createNextSeasonFromCompletedSeason(
+          transaction,
+          season.id,
+          now
+        );
+      }
+
       return true;
     }, { timeout: 120000 });
 
