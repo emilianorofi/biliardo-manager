@@ -16,7 +16,9 @@ import {
   PlayLeagueFixtureError,
 } from "@/lib/play-league-fixture";
 import { prisma } from "@/lib/prisma";
+import { getSeasonWeekDate } from "@/lib/individual-tournament-calendar";
 import {
+  addRomeDaysAtTime,
   getNextRomeWeeklyDate,
   WEEKLY_UPDATE_EVENT,
 } from "@/lib/rome-calendar";
@@ -56,6 +58,8 @@ type ClockCandidate = {
 export async function processGameClock(
   now = new Date()
 ) {
+  await ensureActiveSeasonBoundaries();
+
   await Promise.all([
     initializeWeeklyUpdates(now),
     initializeIndividualTournaments(),
@@ -99,6 +103,78 @@ export async function processGameClock(
     reachedLimit: true,
     events,
   };
+}
+
+async function ensureActiveSeasonBoundaries() {
+  const referenceLeague = await prisma.league.findFirst({
+    where: {
+      level: 1,
+      groupCode: "A",
+      season: {
+        status: "ACTIVE",
+      },
+    },
+    orderBy: {
+      season: {
+        number: "desc",
+      },
+    },
+    select: {
+      seasonId: true,
+      season: {
+        select: {
+          startsAt: true,
+          endsAt: true,
+        },
+      },
+      fixtures: {
+        orderBy: [
+          { round: "asc" },
+          { id: "asc" },
+        ],
+        select: {
+          round: true,
+          scheduledAt: true,
+        },
+      },
+    },
+  });
+
+  if (!referenceLeague) return;
+
+  const roundDates = new Map<number, Date>();
+  for (const fixture of referenceLeague.fixtures) {
+    if (!roundDates.has(fixture.round)) {
+      roundDates.set(fixture.round, fixture.scheduledAt);
+    }
+  }
+
+  const firstFriday = roundDates.get(1);
+  const week15Friday = getSeasonWeekDate(roundDates, 15);
+
+  if (!firstFriday || !week15Friday) return;
+
+  const startsAt = addRomeDaysAtTime(firstFriday, -4, 0, 1);
+  const endsAt = new Date(
+    addRomeDaysAtTime(week15Friday, 3, 0, 0).getTime() - 1000
+  );
+
+  if (
+    referenceLeague.season.startsAt?.getTime() === startsAt.getTime() &&
+    referenceLeague.season.endsAt?.getTime() === endsAt.getTime()
+  ) {
+    return;
+  }
+
+  await prisma.season.update({
+    where: {
+      id: referenceLeague.seasonId,
+    },
+    data: {
+      startsAt,
+      endsAt,
+    },
+  });
 }
 
 async function initializeWeeklyUpdates(
