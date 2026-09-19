@@ -189,20 +189,27 @@ export async function createNextSeasonFromCompletedSeason(
 
   const firstRoundDate = getNextLeagueDate(now);
   const roundDates = buildWeeklyRoundDates(firstRoundDate, TOTAL_ROUNDS);
+  const seasonStartsAt = addRomeDaysAtTime(firstRoundDate, -4, 0, 1);
+  const week15Friday = getSeasonWeekDate(
+    new Map(roundDates.map((date, index) => [index + 1, date])),
+    15
+  );
+
+  if (!week15Friday) {
+    throw new Error("SEASON_TRANSITION_WEEK_15_MISSING");
+  }
+
+  const seasonEndsAt = new Date(
+    addRomeDaysAtTime(week15Friday, 3, 0, 0).getTime() - 1000
+  );
+
   const nextSeason = await transaction.season.create({
     data: {
       number: season.number + 1,
       name: `Stagione ${season.number + 1}`,
       status: "ACTIVE",
-      startsAt: roundDates[0],
-      endsAt: addRomeDaysAtTime(
-        getSeasonWeekDate(
-          new Map(roundDates.map((date, index) => [index + 1, date])),
-          15
-        )!,
-        2,
-        16
-      ),
+      startsAt: seasonStartsAt,
+      endsAt: seasonEndsAt,
     },
     select: {
       id: true,
