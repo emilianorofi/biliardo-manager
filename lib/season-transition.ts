@@ -7,8 +7,10 @@ import {
   getNextLeagueDate,
 } from "@/lib/league-calendar";
 import { generateDoubleRoundRobin } from "@/lib/league-scheduler";
+import { getSeasonWeekDate } from "@/lib/individual-tournament-calendar";
 import { createLeagueTable } from "@/lib/league-table";
 import { calculateOverall } from "@/lib/training-engine";
+import { addRomeDaysAtTime } from "@/lib/rome-calendar";
 import {
   CLUBS_PER_LEAGUE,
   getWorldLeagueDefinitions,
@@ -193,7 +195,14 @@ export async function createNextSeasonFromCompletedSeason(
       name: `Stagione ${season.number + 1}`,
       status: "ACTIVE",
       startsAt: roundDates[0],
-      endsAt: roundDates[roundDates.length - 1],
+      endsAt: addRomeDaysAtTime(
+        getSeasonWeekDate(
+          new Map(roundDates.map((date, index) => [index + 1, date])),
+          15
+        )!,
+        2,
+        16
+      ),
     },
     select: {
       id: true,
