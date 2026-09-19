@@ -540,14 +540,17 @@ async function ensureWorldSchedules(
       id: seasonId,
     },
     data: {
-      startsAt: roundDates[0],
-      endsAt: addRomeDaysAtTime(
-        getSeasonWeekDate(
-          new Map(roundDates.map((date, index) => [index + 1, date])),
-          15
-        )!,
-        2,
-        16
+      startsAt: addRomeDaysAtTime(roundDates[0], -4, 0, 1),
+      endsAt: new Date(
+        addRomeDaysAtTime(
+          getSeasonWeekDate(
+            new Map(roundDates.map((date, index) => [index + 1, date])),
+            15
+          )!,
+          3,
+          0,
+          0
+        ).getTime() - 1000
       ),
     },
   });
