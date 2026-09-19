@@ -22,6 +22,7 @@ Il percorso richiede 15 scadenze settimanali:
 ## Decisione ed età
 
 - Dai 16 anni il giovane può essere promosso in prima squadra.
-- A 17 anni il manager deve promuoverlo o usare **Allontana** entro la fine della stagione successiva.
-- Alla chiusura stagionale tutti i giovani compiono un anno.
-- Chi raggiunge i 18 anni senza essere stato promosso viene rilasciato automaticamente e genera un evento per il club.
+- Dai 16 anni il giovane può essere promosso in prima squadra.
+- A 17 anni parte il periodo di decisione: il manager può promuoverlo oppure usare **Allontana**.
+- L'età avanza ogni giorno con il formato anni+giorni: da 0 a 104 giorni, poi scatta l'anno successivo.
+- Chi raggiunge 18e0 senza essere stato promosso viene rilasciato automaticamente e genera un evento per il club.
