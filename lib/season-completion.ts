@@ -2,6 +2,8 @@ import "server-only";
 
 import type { Prisma } from "@/generated/prisma/client";
 import { calculateEndOfSeasonPlayerOutcome } from "@/lib/player-aging";
+import { INDIVIDUAL_TOURNAMENT_DEFINITIONS } from "@/lib/individual-tournament-calendar";
+import { TOTAL_WORLD_LEAGUES } from "@/lib/world-structure";
 import { limitClubRetirements } from "@/lib/roster-integrity";
 
 type CompleteSeasonOptions = {
@@ -90,11 +92,13 @@ export async function completeSeasonIfReady(
   ]);
 
   if (
-    leagues.length === 0 ||
+    leagues.length !== TOTAL_WORLD_LEAGUES ||
     leagues.some((league) => league.status !== "COMPLETED") ||
+    individualTournaments.length !== INDIVIDUAL_TOURNAMENT_DEFINITIONS.length ||
     individualTournaments.some((tournament) => tournament.status !== "COMPLETED") ||
+    nationsCupTournaments.length !== 1 ||
     nationsCupTournaments.some((tournament) => tournament.status !== "COMPLETED") ||
-    specialtyCupTournaments.length === 0 ||
+    specialtyCupTournaments.length !== 1 ||
     specialtyCupTournaments.some((tournament) => tournament.status !== "COMPLETED")
   ) {
     return createEmptyResult(seasonId, false);
