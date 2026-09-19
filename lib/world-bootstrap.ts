@@ -4,7 +4,9 @@ import {
   getNextLeagueDate,
 } from "@/lib/league-calendar";
 import { generateDoubleRoundRobin } from "@/lib/league-scheduler";
+import { getSeasonWeekDate } from "@/lib/individual-tournament-calendar";
 import { prisma } from "@/lib/prisma";
+import { addRomeDaysAtTime } from "@/lib/rome-calendar";
 import {
   buildNationalityQueue,
   createAiClubBlueprint,
@@ -539,7 +541,14 @@ async function ensureWorldSchedules(
     },
     data: {
       startsAt: roundDates[0],
-      endsAt: roundDates[roundDates.length - 1],
+      endsAt: addRomeDaysAtTime(
+        getSeasonWeekDate(
+          new Map(roundDates.map((date, index) => [index + 1, date])),
+          15
+        )!,
+        2,
+        16
+      ),
     },
   });
 
