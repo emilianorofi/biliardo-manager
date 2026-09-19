@@ -49,12 +49,20 @@ export async function completeSeasonIfReady(
 
   const season = await transaction.season.findUnique({
     where: { id: seasonId },
-    select: { status: true },
+    select: { status: true, endsAt: true },
   });
 
   if (!season) throw new Error("SEASON_NOT_FOUND");
   if (season.status === "COMPLETED") return createEmptyResult(seasonId, true);
   if (season.status !== "ACTIVE") return createEmptyResult(seasonId, false);
+
+  const nextSeasonStartsAt = season.endsAt
+    ? new Date(season.endsAt.getTime() + 61000)
+    : null;
+
+  if (!nextSeasonStartsAt || now.getTime() < nextSeasonStartsAt.getTime()) {
+    return createEmptyResult(seasonId, false);
+  }
 
   const [
     leagues,
@@ -193,7 +201,6 @@ export async function completeSeasonIfReady(
     where: { id: seasonId },
     data: {
       status: "COMPLETED",
-      endsAt: now,
     },
   });
 
