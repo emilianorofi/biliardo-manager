@@ -28,9 +28,9 @@ type AcademyProfile = {
 };
 
 const INITIAL_ACADEMY_PROFILES: AcademyProfile[] = [
-  { age: 16, overall: [50, 52], talent: [45, 55], estimatedAttributes: 6 },
-  { age: 15, overall: [45, 47], talent: [48, 58], estimatedAttributes: 4 },
-  { age: 14, overall: [40, 42], talent: [50, 60], estimatedAttributes: 2 },
+  { age: 16, overall: [50, 52], talent: [45, 55], estimatedAttributes: 3 },
+  { age: 15, overall: [45, 47], talent: [48, 58], estimatedAttributes: 3 },
+  { age: 14, overall: [40, 42], talent: [50, 60], estimatedAttributes: 3 },
 ];
 
 const WEEKLY_PROFILE_BY_AGE: Record<AcademyProfile["age"], AcademyProfile> =
