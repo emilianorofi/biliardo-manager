@@ -458,18 +458,29 @@ async function settleReadySeasons(now: Date) {
         SELECT 1 FROM "League" AS league
         WHERE league."seasonId" = season."id" AND league."status" <> 'COMPLETED'
       )
+      AND (
+        SELECT COUNT(*)
+        FROM "IndividualTournament" AS tournament
+        WHERE tournament."seasonId" = season."id"
+      ) = 13
       AND NOT EXISTS (
         SELECT 1 FROM "IndividualTournament" AS tournament
         WHERE tournament."seasonId" = season."id" AND tournament."status" <> 'COMPLETED'
       )
+      AND (
+        SELECT COUNT(*)
+        FROM "NationsCupTournament" AS cup
+        WHERE cup."seasonId" = season."id"
+      ) = 1
       AND NOT EXISTS (
         SELECT 1 FROM "NationsCupTournament" AS cup
         WHERE cup."seasonId" = season."id" AND cup."status" <> 'COMPLETED'
       )
-      AND EXISTS (
-        SELECT 1 FROM "SpecialtyCupTournament" AS specialty
+      AND (
+        SELECT COUNT(*)
+        FROM "SpecialtyCupTournament" AS specialty
         WHERE specialty."seasonId" = season."id"
-      )
+      ) = 1
       AND NOT EXISTS (
         SELECT 1 FROM "SpecialtyCupTournament" AS specialty
         WHERE specialty."seasonId" = season."id"
