@@ -452,6 +452,8 @@ async function settleReadySeasons(now: Date) {
     FROM "Season" AS season
     WHERE season."status" IN ('ACTIVE', 'COMPLETED')
       AND season."economySettledAt" IS NULL
+      AND season."endsAt" IS NOT NULL
+      AND season."endsAt" + INTERVAL '61 seconds' <= ${now}
       AND NOT EXISTS (
         SELECT 1 FROM "League" AS league
         WHERE league."seasonId" = season."id" AND league."status" <> 'COMPLETED'
