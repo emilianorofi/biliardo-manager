@@ -14,6 +14,7 @@ import type {
   PlayerCareerAppearance,
   PlayerCareerBreakdown,
   PlayerCareerGame,
+  PlayerCareerTournament,
   PlayerCareerTransfer,
   PlayerCareerView,
 } from "@/app/types/playerCareer";
@@ -142,6 +143,7 @@ export default function PlayerCareerSection({
         </div>
       </div>
 
+      <TournamentHistoryCard tournaments={career.tournaments} />
       <TransferHistoryCard transfers={career.transfers} />
     </section>
   );
@@ -307,6 +309,99 @@ function AppearanceRow({
               game={game}
             />
           ))}
+      </div>
+    </article>
+  );
+}
+
+function TournamentHistoryCard({
+  tournaments,
+}: {
+  tournaments: PlayerCareerTournament[];
+}) {
+  const visibleTournaments = tournaments.slice(0, 4);
+  const olderTournaments = tournaments.slice(4);
+  const wins = tournaments.filter((tournament) => tournament.winner).length;
+
+  return (
+    <div className="mt-3 rounded-xl border border-amber-400/20 bg-amber-400/[0.04] p-2.5">
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-2">
+          <Trophy className="text-amber-300" size={14} />
+          <h3 className="text-sm font-black text-white">
+            Tornei individuali
+          </h3>
+        </div>
+        <span className="text-[10px] font-semibold text-slate-500">
+          {wins} vittorie · {tournaments.length} partecipazioni
+        </span>
+      </div>
+
+      <div className="mt-2 space-y-1.5">
+        {visibleTournaments.length > 0 ? (
+          visibleTournaments.map((tournament) => (
+            <TournamentRow key={tournament.id} tournament={tournament} />
+          ))
+        ) : (
+          <div className="rounded-lg border border-dashed border-amber-400/20 bg-black/10 px-2.5 py-2">
+            <p className="text-xs font-bold text-white">
+              Nessun torneo individuale registrato
+            </p>
+            <p className="mt-0.5 text-[10px] leading-4 text-slate-500">
+              Qualificazioni, piazzamenti e vittorie compariranno qui.
+            </p>
+          </div>
+        )}
+      </div>
+
+      {olderTournaments.length > 0 && (
+        <details className="mt-2 rounded-lg border border-amber-400/15 bg-black/10 px-2.5 py-2">
+          <summary className="cursor-pointer text-xs font-bold text-amber-200">
+            Altri {olderTournaments.length} tornei
+          </summary>
+          <div className="mt-2 space-y-1.5">
+            {olderTournaments.map((tournament) => (
+              <TournamentRow key={tournament.id} tournament={tournament} />
+            ))}
+          </div>
+        </details>
+      )}
+    </div>
+  );
+}
+
+function TournamentRow({
+  tournament,
+}: {
+  tournament: PlayerCareerTournament;
+}) {
+  return (
+    <article className="grid gap-2 rounded-lg border border-amber-400/15 bg-black/15 px-2.5 py-2 sm:grid-cols-[minmax(0,1fr)_120px_auto] sm:items-center">
+      <div className="min-w-0">
+        <p className="truncate text-xs font-black text-white">
+          {tournament.name}
+        </p>
+        <p className="mt-0.5 text-[9px] uppercase tracking-wide text-slate-500">
+          {tournament.seasonName} · settimana {tournament.leagueRound} · ranking #{tournament.rankingAtDraw}
+        </p>
+      </div>
+
+      <div className="text-left sm:text-center">
+        <p className="text-[9px] font-black uppercase tracking-wide text-slate-500">
+          Piazzamento
+        </p>
+        <p className={tournament.winner ? "text-xs font-black text-amber-300" : "text-xs font-black text-slate-200"}>
+          {tournament.winner ? "🏆 " : ""}{tournament.placement}
+        </p>
+      </div>
+
+      <div className="sm:text-right">
+        <p className="text-[9px] font-black uppercase tracking-wide text-slate-500">
+          OVR sorteggio
+        </p>
+        <p className="text-xs font-black text-emerald-300">
+          {formatDecimal(tournament.overallAtDraw)}
+        </p>
       </div>
     </article>
   );
