@@ -203,3 +203,22 @@ attivi sotto contratto.
 
 Questa specifica è allineata al game clock, al calendario stagionale e ai test
 di audit presenti nel branch `cleanup/stabilizzazione`.
+
+
+## Transizione tra stagioni
+
+Quando tutte le competizioni della stagione sono concluse e il settlement
+economico è terminato, la transizione crea in un'unica transazione la stagione
+successiva con:
+
+- 15 campionati e 120 iscrizioni club;
+- 14 giornate per ogni girone, con calendario completo;
+- 13 competizioni individuali (12 tornei di specialità + Mondiale);
+- 1 Coppa delle Nazioni;
+- 1 Coppa Specialità.
+
+La transizione verifica i conteggi prima di concludersi. Se la struttura della
+nuova stagione è incompleta, l'intera operazione viene annullata invece di
+lasciare una stagione parzialmente inizializzata. Le routine del game clock
+restano idempotenti e possono quindi rieseguire in sicurezza i controlli di
+inizializzazione.
