@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import Link from "next/link";
 import { Crown, Flag, Medal, Trophy } from "lucide-react";
 
@@ -117,9 +118,9 @@ function HonourBlock({
   title,
   children,
 }: {
-  icon: React.ReactNode;
+  icon: ReactNode;
   title: string;
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
   return (
     <div className="rounded-xl border border-emerald-900/45 bg-black/10 p-3">
