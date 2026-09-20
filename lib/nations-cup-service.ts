@@ -264,6 +264,11 @@ async function applyNationsCupStageGrowth(
         : "FINALIST";
 
   if (loserEntryIds.length > 0) {
+    await tx.nationsCupEntry.updateMany({
+      where: { id: { in: loserEntryIds } },
+      data: { eliminatedStage: loserPlacement },
+    });
+
     const loserPlayerIds = await getEntryPlayerIds(tx, loserEntryIds);
     await applyTournamentGrowth(
       tx,
@@ -315,6 +320,7 @@ async function createNextStage(
   const calendar = await getCupCalendar(tx, seasonId);
   if (stageOrder === 3) {
     const entries = await tx.nationsCupEntry.findMany({ where: { tournamentId } });
+    const eliminatedEntryIds: number[] = [];
     const qualified = Object.fromEntries(NATIONS_CUP_GROUPS.map((group) => {
       const groupEntries = entries.filter((entry) => entry.groupCode === group);
       const actual = [...groupEntries].sort((a, b) =>
@@ -322,8 +328,16 @@ async function createNextStage(
         (b.pointsFor - b.pointsAgainst) - (a.pointsFor - a.pointsAgainst) ||
         b.pointsFor - a.pointsFor || a.seed - b.seed
       );
+      eliminatedEntryIds.push(...actual.slice(2).map((entry) => entry.id));
       return [group, [actual[0].seed, actual[1].seed] as const];
     })) as Record<NationsCupGroup, readonly [number, number]>;
+
+    if (eliminatedEntryIds.length > 0) {
+      await tx.nationsCupEntry.updateMany({
+        where: { id: { in: eliminatedEntryIds } },
+        data: { eliminatedStage: "GROUP_STAGE" },
+      });
+    }
     const quarters = buildNationsCupQuarterFinals(qualified);
     const bySeed = new Map(entries.map((entry) => [entry.seed, entry.id]));
     await tx.nationsCupMatch.createMany({ data: quarters.map((match) => ({
