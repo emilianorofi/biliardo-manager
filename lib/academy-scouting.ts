@@ -2,7 +2,9 @@ import type { Prisma } from "@/generated/prisma/client";
 import {
   TRAINING_SKILLS,
   type TrainingFocus,
+  type TrainingPlayerValues,
 } from "@/lib/training-engine";
+import { calculateAcademyWeeklyDevelopment } from "@/lib/academy-development";
 import {
   ACADEMY_EVENT,
   getNextRomeWeeklyDate,
@@ -94,6 +96,13 @@ export async function advanceAcademyScouting(
         in: duePlayers.map((player) => player.id),
       },
     },
+    include: {
+      club: {
+        select: {
+          academyLevel: true,
+        },
+      },
+    },
   });
 
   for (const player of players) {
@@ -104,12 +113,33 @@ export async function advanceAcademyScouting(
       player.revealedAttributeKeys
     );
     let nextScoutingAt = player.nextScoutingAt;
+    let developmentWeeks = 0;
+    let currentValues: TrainingPlayerValues = {
+      precisione: player.precisione,
+      diretto: player.diretto,
+      sponde: player.sponde,
+      tattica: player.tattica,
+      mentalita: player.mentalita,
+      difesa: player.difesa,
+      realizzazione: player.realizzazione,
+      creativita: player.creativita,
+      misura: player.misura,
+    };
 
     while (
       nextScoutingAt &&
       nextScoutingAt.getTime() <= now.getTime() &&
       revealedAttributeKeys.length < TRAINING_SKILLS.length
     ) {
+      const development = calculateAcademyWeeklyDevelopment({
+        age: player.age,
+        talent: player.talent,
+        academyLevel: player.club.academyLevel,
+        currentValues,
+      });
+      currentValues = development.values;
+      developmentWeeks += 1;
+
       if (estimatedAttributeKeys.length < TRAINING_SKILLS.length) {
         const unknownAttributes = TRAINING_SKILLS.filter(
           (attribute) => !estimatedAttributeKeys.includes(attribute)
@@ -145,6 +175,7 @@ export async function advanceAcademyScouting(
         id: player.id,
       },
       data: {
+        ...currentValues,
         estimatedAttributeKeys,
         revealedAttributeKeys,
         revealedAttributes: revealedAttributeKeys.length,
