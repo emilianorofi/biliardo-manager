@@ -389,7 +389,8 @@ export async function playIndividualTournamentStage(
           await applyTournamentGrowth(
             transaction,
             loserPlayerIds,
-            tournamentGrowthValue(growthTier, placement)
+            tournamentGrowthValue(growthTier, placement),
+            tournamentType === "MONDIALE" ? null : tournamentType
           );
         }
       }
@@ -452,7 +453,8 @@ export async function playIndividualTournamentStage(
           await applyTournamentGrowth(
             transaction,
             [championPlayerId],
-            tournamentGrowthValue(growthTier, "WINNER")
+            tournamentGrowthValue(growthTier, "WINNER"),
+            tournamentType === "MONDIALE" ? null : tournamentType
           );
         }
         await transaction.individualTournament.update({
