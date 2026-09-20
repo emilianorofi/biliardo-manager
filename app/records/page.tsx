@@ -140,7 +140,7 @@ function RecordCard({
                     {row.firstName} {row.lastName}
                   </Link>
                   <div className="mt-0.5 flex items-center gap-1.5 text-[9px] text-slate-500">
-                    <CountryFlag code={nationality.code} className="h-3 w-4" />
+                    <CountryFlag code={nationality.code} label={nationality.label} className="h-3 w-4" />
                     <span>{nationality.label}</span>
                     {row.detail ? <span>· {row.detail}</span> : null}
                   </div>
