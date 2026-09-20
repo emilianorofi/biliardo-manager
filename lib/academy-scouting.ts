@@ -113,17 +113,16 @@ export async function advanceAcademyScouting(
       player.revealedAttributeKeys
     );
     let nextScoutingAt = player.nextScoutingAt;
-    let developmentWeeks = 0;
     let currentValues: TrainingPlayerValues = {
-      precisione: player.precisione,
-      diretto: player.diretto,
-      sponde: player.sponde,
-      tattica: player.tattica,
-      mentalita: player.mentalita,
-      difesa: player.difesa,
-      realizzazione: player.realizzazione,
-      creativita: player.creativita,
-      misura: player.misura,
+      precisione: player.precisione ?? 0,
+      diretto: player.diretto ?? 0,
+      sponde: player.sponde ?? 0,
+      tattica: player.tattica ?? 0,
+      mentalita: player.mentalita ?? 0,
+      difesa: player.difesa ?? 0,
+      realizzazione: player.realizzazione ?? 0,
+      creativita: player.creativita ?? 0,
+      misura: player.misura ?? 0,
     };
 
     while (
@@ -138,7 +137,6 @@ export async function advanceAcademyScouting(
         currentValues,
       });
       currentValues = development.values;
-      developmentWeeks += 1;
 
       if (estimatedAttributeKeys.length < TRAINING_SKILLS.length) {
         const unknownAttributes = TRAINING_SKILLS.filter(
