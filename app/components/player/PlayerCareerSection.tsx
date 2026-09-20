@@ -33,7 +33,9 @@ export default function PlayerCareerSection({
     <section className="rounded-2xl border border-emerald-900/60 bg-[#15261f] p-3">
       <SectionHeading />
 
-      <div className="mt-2 grid gap-3 xl:grid-cols-[0.65fr_1fr_1.35fr]">
+      <HonoursCard career={career} />
+
+      <div className="mt-3 grid gap-3 xl:grid-cols-[0.65fr_1fr_1.35fr]">
         <div className="grid grid-cols-2 content-start gap-1.5">
           <CareerMetric
             label="Presenze"
@@ -152,6 +154,70 @@ export default function PlayerCareerSection({
       />
       <TransferHistoryCard transfers={career.transfers} />
     </section>
+  );
+}
+
+function HonoursCard({ career }: { career: PlayerCareerView }) {
+  const honours = career.honours;
+
+  return (
+    <div className="mt-2 rounded-xl border border-amber-400/25 bg-gradient-to-r from-amber-400/[0.08] to-transparent p-2.5">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <div className="flex items-center gap-2">
+            <Trophy className="text-amber-300" size={16} />
+            <h3 className="text-sm font-black text-white">Palmarès</h3>
+          </div>
+          <p className="mt-0.5 text-[10px] text-slate-500">
+            Miglior risultato: {honours.bestPlacement}
+          </p>
+        </div>
+
+        <div className="grid grid-cols-3 gap-1.5 sm:grid-cols-6">
+          <HonourMetric label="Titoli" value={honours.totalTitles} />
+          <HonourMetric label="Mondiali" value={honours.worldTitles} />
+          <HonourMetric label="Tornei" value={honours.individualTitles} />
+          <HonourMetric label="Coppe spec." value={honours.specialtyCupTitles} />
+          <HonourMetric label="Nazioni" value={honours.nationsCupTitles} />
+          <HonourMetric label="Finali" value={honours.finals} />
+        </div>
+      </div>
+
+      {career.honoursBySeason.length > 0 && (
+        <div className="mt-2 border-t border-amber-400/10 pt-2">
+          <div className="flex flex-wrap gap-1.5">
+            {career.honoursBySeason.slice(0, 8).map((season) => (
+              <span
+                key={season.key}
+                className="rounded-md border border-amber-400/15 bg-black/15 px-2 py-1 text-[10px] font-bold text-slate-300"
+                title={season.achievements.join(" · ")}
+              >
+                <span className="text-amber-300">{season.label}</span>
+                {" · "}
+                {season.titles} titoli · {season.finals} finali
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function HonourMetric({
+  label,
+  value,
+}: {
+  label: string;
+  value: number;
+}) {
+  return (
+    <div className="min-w-[58px] rounded-md border border-amber-400/15 bg-black/20 px-2 py-1.5 text-center">
+      <p className="text-base font-black text-amber-300">{value}</p>
+      <p className="text-[8px] font-black uppercase tracking-wide text-slate-500">
+        {label}
+      </p>
+    </div>
   );
 }
 
