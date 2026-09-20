@@ -12,7 +12,7 @@ in ogni girone. Il motore temporale elabora l'intera giornata mondiale come un
 unico evento, così nessuna classifica può rimanere con squadre aventi un numero
 diverso di incontri giocati.
 
-| Categoria | Gironi | Squadre | Squadre totali |
+| Categoria | Gironi | Squadre per girone | Squadre totali |
 | --- | ---: | ---: | ---: |
 | Prima Serie | 1 | 8 | 8 |
 | Seconda Serie | 2 | 8 | 16 |
@@ -20,27 +20,20 @@ diverso di incontri giocati.
 | Quarta Serie | 8 | 8 | 64 |
 | Totale | 15 |  | 120 |
 
-Ogni squadra inizia con cinque giocatori. La popolazione iniziale contiene
-quindi 600 giocatori appartenenti alle squadre.
+Ogni squadra IA iniziale contiene **6 giocatori**. La popolazione iniziale del
+mondo è quindi di **720 giocatori** appartenenti alle squadre.
 
 ## Ingresso dei manager
 
-Un nuovo manager sostituisce immediatamente un club controllato dal computer.
-I posti vengono occupati partendo dalla categoria più alta ancora dotata di
-club IA:
+Un nuovo manager sostituisce un club controllato dal computer. I posti vengono
+assegnati partendo dalla categoria più alta che contiene ancora club IA. Nei
+livelli con più gironi viene preferito il girone con meno manager umani e poi,
+a parità, l'ordine del girone e la posizione del club prevista dalla query di
+subentro.
 
-1. utenti 1-8 in Prima Serie;
-2. utenti 9-24 in Seconda Serie;
-3. utenti 25-56 in Terza Serie;
-4. utenti 57-120 in Quarta Serie.
-
-Quando una categoria contiene più gironi, i nuovi manager vengono distribuiti
-nel girone con meno club umani. A parità viene usato l'ordine alfabetico dei
-gironi.
-
-Il subentro può avvenire a stagione iniziata. Il manager eredita punti,
-risultati e calendario già disputato dal club IA e gioca con la propria squadra
-dalla giornata successiva.
+Il subentro può avvenire a stagione iniziata. Il club mantiene punti, risultati
+e calendario già registrati; identità, rosa e gestione operativa vengono invece
+sostituiti dal nuovo manager.
 
 ## Promozioni e retrocessioni
 
@@ -55,25 +48,40 @@ Non sono previsti playoff nella prima versione.
 
 ## Nazionalità iniziali
 
+La distribuzione corrente dei 720 giocatori iniziali è:
+
 | Nazione | Giocatori |
 | --- | ---: |
-| Italia | 390 |
-| Argentina | 75 |
-| Germania | 39 |
-| Uruguay | 24 |
-| Francia | 24 |
-| Danimarca | 18 |
-| Belgio | 12 |
-| Altre 18 nazioni | 18 |
-| Totale | 600 |
+| Italia | 350 |
+| Argentina | 80 |
+| Germania | 50 |
+| Uruguay | 30 |
+| Francia | 30 |
+| Danimarca | 24 |
+| Belgio | 20 |
+| Brasile | 15 |
+| Spagna | 15 |
+| Paesi Bassi | 10 |
+| Svizzera | 9 |
+| Repubblica Ceca | 8 |
+| Egitto | 7 |
+| Austria | 6 |
+| Turchia | 6 |
+| Colombia | 6 |
+| Giappone | 6 |
+| Lussemburgo | 6 |
+| San Marino | 6 |
+| Norvegia | 6 |
+| Portogallo | 6 |
+| Svezia | 6 |
+| Albania | 6 |
+| Liechtenstein | 6 |
+| Corea del Sud | 6 |
+| **Totale** | **720** |
 
-Le altre nazioni iniziali sono Lussemburgo, Svizzera, Repubblica Ceca,
-Austria, San Marino, Brasile, Paesi Bassi, Spagna, Norvegia, Portogallo,
-Svezia, Albania, Liechtenstein, Turchia, Colombia, Corea del Sud, Giappone ed
-Egitto. Ognuna è rappresentata da almeno un giocatore.
-
-Nuove nazionalità potranno entrare gradualmente attraverso il ricambio dei
-giocatori e l'Accademia.
+La Coppa delle Nazioni richiede 16 nazioni e 3 giocatori per nazionale; la
+distribuzione iniziale garantisce un numero sufficiente di nazioni eleggibili.
+Nuove nazionalità potranno entrare attraverso il ricambio dei giocatori.
 
 ## Inizializzazione tecnica
 
