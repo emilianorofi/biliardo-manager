@@ -106,11 +106,32 @@ export type PlayerCareerSpecialtyCup = {
   champion: boolean;
 };
 
+export type PlayerCareerHonours = {
+  totalTitles: number;
+  worldTitles: number;
+  individualTitles: number;
+  specialtyCupTitles: number;
+  nationsCupTitles: number;
+  finals: number;
+  bestPlacement: string;
+  seasonsWithTitle: number;
+};
+
+export type PlayerCareerHonoursSeason = {
+  key: string;
+  label: string;
+  titles: number;
+  finals: number;
+  achievements: string[];
+};
+
 export type PlayerCareerView = {
   summary: PlayerCareerAggregate & {
     appearances: number;
     clubs: number;
   };
+  honours: PlayerCareerHonours;
+  honoursBySeason: PlayerCareerHonoursSeason[];
   specialties: PlayerCareerBreakdown[];
   gameTypes: PlayerCareerBreakdown[];
   seasons: PlayerCareerBreakdown[];
