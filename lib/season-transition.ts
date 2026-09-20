@@ -7,7 +7,13 @@ import {
   getNextLeagueDate,
 } from "@/lib/league-calendar";
 import { generateDoubleRoundRobin } from "@/lib/league-scheduler";
-import { getSeasonWeekDate } from "@/lib/individual-tournament-calendar";
+import {
+  buildIndividualTournamentCalendar,
+  getSeasonWeekDate,
+  INDIVIDUAL_TOURNAMENT_DEFINITIONS,
+} from "@/lib/individual-tournament-calendar";
+import { buildNationsCupCalendar } from "@/lib/nations-cup-calendar";
+import { buildSpecialtyCupCalendar } from "@/lib/specialty-cup-calendar";
 import { createLeagueTable } from "@/lib/league-table";
 import { calculateOverall } from "@/lib/training-engine";
 import { addRomeDaysAtTime } from "@/lib/rome-calendar";
@@ -249,6 +255,60 @@ export async function createNextSeasonFromCompletedSeason(
     });
   }
 
+  const seasonRoundDates = new Map(
+    roundDates.map((date, index) => [index + 1, date])
+  );
+  const individualCalendar =
+    buildIndividualTournamentCalendar(seasonRoundDates);
+  const nationsCupCalendar =
+    buildNationsCupCalendar(seasonRoundDates);
+  const specialtyCupCalendar =
+    buildSpecialtyCupCalendar(seasonRoundDates);
+
+  await transaction.individualTournament.createMany({
+    data: individualCalendar.map((tournament) => ({
+      seasonId: nextSeason.id,
+      leagueRound: tournament.leagueRound,
+      type: tournament.type,
+      name: tournament.name,
+      specialty: tournament.specialty,
+      status: "SCHEDULED",
+      drawAt: tournament.drawAt,
+      finalAt: tournament.finalAt,
+    })),
+    skipDuplicates: true,
+  });
+
+  await transaction.nationsCupTournament.upsert({
+    where: { seasonId: nextSeason.id },
+    create: {
+      seasonId: nextSeason.id,
+      leagueRound: nationsCupCalendar.leagueRound,
+      name: nationsCupCalendar.name,
+      status: "SCHEDULED",
+      drawAt: nationsCupCalendar.drawAt,
+      finalAt: nationsCupCalendar.finalAt,
+    },
+    update: {},
+  });
+
+  await transaction.$executeRaw`
+    INSERT INTO "SpecialtyCupTournament"
+      ("seasonId", "leagueRound", "status", "drawAt", "createdAt", "updatedAt")
+    VALUES
+      (
+        ${nextSeason.id},
+        ${specialtyCupCalendar.seasonWeek},
+        'SCHEDULED',
+        ${specialtyCupCalendar.drawAt},
+        NOW(),
+        NOW()
+      )
+    ON CONFLICT ("seasonId") DO NOTHING
+  `;
+
+  await verifyNewSeasonStructure(transaction, nextSeason.id);
+
   const players = await transaction.player.findMany({
     where: {
       careerStatus: "ACTIVE",
@@ -344,4 +404,53 @@ function getGroups(level: number) {
   const tier = WORLD_LEAGUE_STRUCTURE.find((item) => item.level === level);
   if (!tier) throw new Error("SEASON_TRANSITION_LEVEL_INVALID");
   return [...tier.groupCodes];
+}
+
+
+async function verifyNewSeasonStructure(
+  transaction: Prisma.TransactionClient,
+  seasonId: number
+) {
+  const [
+    leagueCount,
+    entryCount,
+    fixtureCount,
+    tournamentCount,
+    nationsCupCount,
+    specialtyCupRows,
+  ] = await Promise.all([
+    transaction.league.count({ where: { seasonId } }),
+    transaction.leagueEntry.count({
+      where: { league: { seasonId } },
+    }),
+    transaction.leagueFixture.count({
+      where: { league: { seasonId } },
+    }),
+    transaction.individualTournament.count({
+      where: { seasonId },
+    }),
+    transaction.nationsCupTournament.count({
+      where: { seasonId },
+    }),
+    transaction.$queryRaw<Array<{ count: bigint }>>`
+      SELECT COUNT(*)::bigint AS "count"
+      FROM "SpecialtyCupTournament"
+      WHERE "seasonId" = ${seasonId}
+    `,
+  ]);
+
+  const expectedFixtures =
+    TOTAL_WORLD_LEAGUES * CLUBS_PER_LEAGUE * (CLUBS_PER_LEAGUE - 1);
+  const specialtyCupCount = Number(specialtyCupRows[0]?.count ?? 0);
+
+  if (
+    leagueCount !== TOTAL_WORLD_LEAGUES ||
+    entryCount !== TOTAL_WORLD_CLUBS ||
+    fixtureCount !== expectedFixtures ||
+    tournamentCount !== INDIVIDUAL_TOURNAMENT_DEFINITIONS.length ||
+    nationsCupCount !== 1 ||
+    specialtyCupCount !== 1
+  ) {
+    throw new Error("SEASON_TRANSITION_NEW_SEASON_INCOMPLETE");
+  }
 }
