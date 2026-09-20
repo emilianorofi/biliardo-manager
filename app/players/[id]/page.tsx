@@ -101,6 +101,34 @@ export default async function PlayerPage({
               },
             },
           },
+          individualTournamentEntries: {
+            orderBy: {
+              createdAt: "desc",
+            },
+            select: {
+              id: true,
+              status: true,
+              eliminatedStage: true,
+              rankingAtDraw: true,
+              overallAtDraw: true,
+              tournament: {
+                select: {
+                  id: true,
+                  leagueRound: true,
+                  type: true,
+                  name: true,
+                  specialty: true,
+                  finalAt: true,
+                  season: {
+                    select: {
+                      number: true,
+                      name: true,
+                    },
+                  },
+                },
+              },
+            },
+          },
           fixtureAppearances: {
             orderBy: {
               playedAt: "desc",
@@ -290,7 +318,8 @@ const player: Player = {
     MIN_FIRST_TEAM_PLAYERS;
   const career = buildPlayerCareerView(
     databasePlayer.fixtureAppearances,
-    databasePlayer.transferListings
+    databasePlayer.transferListings,
+    databasePlayer.individualTournamentEntries
   );
   const isOwnPlayer = canViewPlayerTechnicalValues(
     technicalViewerClubId,
