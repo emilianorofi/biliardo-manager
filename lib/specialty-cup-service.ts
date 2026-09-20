@@ -456,7 +456,8 @@ export async function playSpecialtyCupStage(
             await applyTournamentGrowth(
               transaction,
               losers,
-              tournamentGrowthValue("SPECIALTY_CUP", placement)
+              tournamentGrowthValue("SPECIALTY_CUP", placement),
+              cupType
             );
           }
         }
@@ -472,7 +473,8 @@ export async function playSpecialtyCupStage(
             await applyTournamentGrowth(
               transaction,
               [championPlayerId],
-              tournamentGrowthValue("SPECIALTY_CUP", "WINNER")
+              tournamentGrowthValue("SPECIALTY_CUP", "WINNER"),
+              cupType
             );
           }
 
