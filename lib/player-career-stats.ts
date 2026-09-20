@@ -2,6 +2,8 @@ import type {
   PlayerCareerAggregate,
   PlayerCareerAppearance,
   PlayerCareerGameType,
+  PlayerCareerHonours,
+  PlayerCareerHonoursSeason,
   PlayerCareerResult,
   PlayerCareerSpecialty,
   PlayerCareerNationsCup,
@@ -168,6 +170,12 @@ export function buildPlayerCareerView(
       : specialtyCupRows.flatMap((row) =>
           normalizeSpecialtyCups(row, playerId)
         );
+  const honours = buildHonours(tournaments, nationsCups, specialtyCups);
+  const honoursBySeason = buildHonoursBySeason(
+    tournaments,
+    nationsCups,
+    specialtyCups
+  );
   const performances = normalizedAppearances.flatMap(
     (appearance) => appearance.games
   );
@@ -188,6 +196,8 @@ export function buildPlayerCareerView(
       ),
       ...buildAggregate(normalizedPerformances),
     },
+    honours,
+    honoursBySeason,
     specialties: SPECIALTIES.map(({ key, label }) => ({
       key,
       label,
@@ -219,6 +229,171 @@ export function buildPlayerCareerView(
     specialtyCups,
     transfers,
   };
+}
+
+function buildHonours(
+  tournaments: PlayerCareerTournament[],
+  nationsCups: PlayerCareerNationsCup[],
+  specialtyCups: PlayerCareerSpecialtyCup[]
+): PlayerCareerHonours {
+  const worldTitles = tournaments.filter(
+    (item) => item.type === "MONDIALE" && item.winner
+  ).length;
+  const individualTitles = tournaments.filter(
+    (item) => item.type !== "MONDIALE" && item.winner
+  ).length;
+  const specialtyCupTitles = specialtyCups.filter(
+    (item) => item.champion
+  ).length;
+  const nationsCupTitles = nationsCups.filter(
+    (item) => item.champion
+  ).length;
+
+  const totalTitles =
+    worldTitles +
+    individualTitles +
+    specialtyCupTitles +
+    nationsCupTitles;
+
+  const finals =
+    tournaments.filter(
+      (item) => item.winner || item.placement === "Finalista"
+    ).length +
+    specialtyCups.filter(
+      (item) => item.champion || item.placement === "Finalista"
+    ).length +
+    nationsCups.filter(
+      (item) => item.champion || item.placement === "Finalista"
+    ).length;
+
+  const titleSeasons = new Set<string>();
+  for (const item of tournaments) {
+    if (item.winner) titleSeasons.add(item.seasonName);
+  }
+  for (const item of specialtyCups) {
+    if (item.champion) titleSeasons.add(item.seasonName);
+  }
+  for (const item of nationsCups) {
+    if (item.champion) titleSeasons.add(item.seasonName);
+  }
+
+  return {
+    totalTitles,
+    worldTitles,
+    individualTitles,
+    specialtyCupTitles,
+    nationsCupTitles,
+    finals,
+    bestPlacement: getBestCareerPlacement(
+      tournaments,
+      nationsCups,
+      specialtyCups
+    ),
+    seasonsWithTitle: titleSeasons.size,
+  };
+}
+
+function buildHonoursBySeason(
+  tournaments: PlayerCareerTournament[],
+  nationsCups: PlayerCareerNationsCup[],
+  specialtyCups: PlayerCareerSpecialtyCup[]
+): PlayerCareerHonoursSeason[] {
+  const seasons = new Map<
+    string,
+    { titles: number; finals: number; achievements: string[] }
+  >();
+
+  const getSeason = (label: string) => {
+    const current = seasons.get(label) ?? {
+      titles: 0,
+      finals: 0,
+      achievements: [],
+    };
+    seasons.set(label, current);
+    return current;
+  };
+
+  for (const item of tournaments) {
+    const season = getSeason(item.seasonName);
+    if (item.winner) {
+      season.titles += 1;
+      season.finals += 1;
+      season.achievements.push(
+        item.type === "MONDIALE"
+          ? "Campione del Mondo"
+          : `Vincitore ${item.name}`
+      );
+    } else if (item.placement === "Finalista") {
+      season.finals += 1;
+      season.achievements.push(`Finalista ${item.name}`);
+    }
+  }
+
+  for (const item of specialtyCups) {
+    const season = getSeason(item.seasonName);
+    if (item.champion) {
+      season.titles += 1;
+      season.finals += 1;
+      season.achievements.push(`Vincitore ${item.cupName}`);
+    } else if (item.placement === "Finalista") {
+      season.finals += 1;
+      season.achievements.push(`Finalista ${item.cupName}`);
+    }
+  }
+
+  for (const item of nationsCups) {
+    const season = getSeason(item.seasonName);
+    if (item.champion) {
+      season.titles += 1;
+      season.finals += 1;
+      season.achievements.push("Vincitore Coppa delle Nazioni");
+    } else if (item.placement === "Finalista") {
+      season.finals += 1;
+      season.achievements.push("Finalista Coppa delle Nazioni");
+    }
+  }
+
+  return Array.from(seasons.entries())
+    .filter(([, season]) => season.achievements.length > 0)
+    .sort(([a], [b]) => seasonNumberFromLabel(b) - seasonNumberFromLabel(a))
+    .map(([label, season]) => ({
+      key: label,
+      label,
+      ...season,
+    }));
+}
+
+function getBestCareerPlacement(
+  tournaments: PlayerCareerTournament[],
+  nationsCups: PlayerCareerNationsCup[],
+  specialtyCups: PlayerCareerSpecialtyCup[]
+) {
+  const placements = [
+    ...tournaments.map((item) => item.placement),
+    ...nationsCups.map((item) => item.placement),
+    ...specialtyCups.map((item) => item.placement),
+  ];
+
+  const order = [
+    "Vincitore",
+    "Finalista",
+    "Semifinale",
+    "Quarti",
+    "Ottavi",
+    "16esimi",
+    "32esimi",
+    "64esimi",
+    "128esimi",
+    "Gironi",
+    "Partecipazione",
+  ];
+
+  return order.find((placement) => placements.includes(placement)) ?? "Nessuno";
+}
+
+function seasonNumberFromLabel(label: string) {
+  const match = label.match(/(\d+)/);
+  return match ? Number(match[1]) : 0;
 }
 
 function normalizeNationsCup(
