@@ -81,6 +81,48 @@ export async function advancePlayerAges(
       "updatedAt" = ${now}
   `;
 
+  // Sviluppo tecnico giovanile continuo.
+  // A 14 anni la crescita e maggiore; talento e livello Accademia
+  // amplificano il guadagno. Il calcolo e proporzionale ai giorni
+  // realmente trascorsi, quindi resta coerente anche dopo periodi offline.
+  await transaction.$executeRawUnsafe(
+    `UPDATE "AcademyPlayer" ap
+     SET
+       "precisione" = COALESCE(ap."precisione", 0) + dev.gain,
+       "diretto" = COALESCE(ap."diretto", 0) + dev.gain,
+       "sponde" = COALESCE(ap."sponde", 0) + dev.gain,
+       "tattica" = COALESCE(ap."tattica", 0) + dev.gain,
+       "mentalita" = COALESCE(ap."mentalita", 0) + dev.gain,
+       "difesa" = COALESCE(ap."difesa", 0) + dev.gain,
+       "realizzazione" = COALESCE(ap."realizzazione", 0) + dev.gain,
+       "creativita" = COALESCE(ap."creativita", 0) + dev.gain,
+       "misura" = COALESCE(ap."misura", 0) + dev.gain
+     FROM (
+       SELECT
+         a."id",
+         (
+           0.16 * (${advancedDays}::double precision / 7.0) *
+           (0.8 + ((LEAST(95.0, GREATEST(45.0, a."talent")) - 45.0) / 50.0) * 0.7) *
+           CASE
+             WHEN a."age" <= 14 THEN 1.35
+             WHEN a."age" = 15 THEN 1.15
+             WHEN a."age" = 16 THEN 1.00
+             ELSE 0.85
+           END *
+           CASE LEAST(5, GREATEST(1, c."academyLevel"))
+             WHEN 1 THEN 0.85
+             WHEN 2 THEN 0.925
+             WHEN 3 THEN 1.00
+             WHEN 4 THEN 1.075
+             ELSE 1.15
+           END
+         ) AS gain
+       FROM "AcademyPlayer" a
+       JOIN "Club" c ON c."id" = a."clubId"
+     ) dev
+     WHERE ap."id" = dev."id"`
+  );
+
   const expiredAcademyPlayers = await transaction.academyPlayer.findMany({
     where: {
       age: { gte: 18 },
