@@ -228,10 +228,16 @@ export function calculateIndividualGameScore({
       ? playerTwoPerformanceRating
       : playerOnePerformanceRating;
   const ratingRatio = clamp(loserRating / Math.max(1, winnerRating), 0.4, 1.2);
+  const scoreRoll = getLoserScoreRoll({
+    specialty,
+    winnerRating,
+    loserRating,
+    randomValue,
+  });
   const losingShare = clamp(
-    0.48 + ratingRatio * 0.3 + clamp(randomValue, 0, 1) * 0.16,
-    0.42,
-    0.96
+    0.4 + ratingRatio * 0.28 + scoreRoll * 0.16,
+    0.4,
+    0.9
   );
   const rawLoserScore = clamp(
     Math.round(targetPoints * losingShare),
@@ -261,6 +267,35 @@ export function calculateIndividualGameScore({
         playerOneScore: loserScore,
         playerTwoScore: winnerScore,
       };
+}
+
+function getLoserScoreRoll({
+  specialty,
+  winnerRating,
+  loserRating,
+  randomValue,
+}: {
+  specialty: MatchSpecialty;
+  winnerRating: number;
+  loserRating: number;
+  randomValue: number;
+}) {
+  const specialtySalt: Record<MatchSpecialty, number> = {
+    ITALIANA: 0x6d2b79f5,
+    GORIZIANA: 0x9e3779b9,
+    TUTTI_DOPPI: 0x85ebca6b,
+  };
+  let state =
+    Math.floor(clamp(randomValue, 0, 1) * 0xffffffff) ^
+    specialtySalt[specialty] ^
+    Math.round(winnerRating * 1223) ^
+    Math.round(loserRating * 7919);
+
+  state = Math.imul(state ^ (state >>> 16), 0x7feb352d);
+  state = Math.imul(state ^ (state >>> 15), 0x846ca68b);
+  state ^= state >>> 16;
+
+  return (state >>> 0) / 0x100000000;
 }
 
 const EXACT_FINISH_PROBABILITY = 0.05;
