@@ -101,7 +101,7 @@ export async function advancePlayerAges(
        SELECT
          a."id",
          (
-           0.16 * (${advancedDays}::double precision / 7.0) *
+           0.26 * (${advancedDays}::double precision / 7.0) *
            (0.8 + ((LEAST(95.0, GREATEST(45.0, a."talent")) - 45.0) / 50.0) * 0.7) *
            CASE
              WHEN a."age" <= 14 THEN 1.35
