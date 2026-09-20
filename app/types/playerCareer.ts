@@ -81,6 +81,31 @@ export type PlayerCareerTournament = {
   overallAtDraw: number;
 };
 
+export type PlayerCareerNationsCup = {
+  id: number;
+  tournamentId: number;
+  seasonName: string;
+  nationCode: string;
+  nationName: string;
+  groupCode: string;
+  placement: string;
+  champion: boolean;
+  played: number;
+  won: number;
+  drawn: number;
+  lost: number;
+};
+
+export type PlayerCareerSpecialtyCup = {
+  id: string;
+  tournamentId: number;
+  seasonName: string;
+  cupName: string;
+  specialty: string;
+  placement: string;
+  champion: boolean;
+};
+
 export type PlayerCareerView = {
   summary: PlayerCareerAggregate & {
     appearances: number;
@@ -91,5 +116,7 @@ export type PlayerCareerView = {
   seasons: PlayerCareerBreakdown[];
   recentAppearances: PlayerCareerAppearance[];
   tournaments: PlayerCareerTournament[];
+  nationsCups: PlayerCareerNationsCup[];
+  specialtyCups: PlayerCareerSpecialtyCup[];
   transfers: PlayerCareerTransfer[];
 };
