@@ -155,6 +155,40 @@ test("un incontro individuale termina appena un giocatore vince due prove", () =
   assert.equal(randomIndex, 3);
 });
 
+test("il margine del punteggio non dipende dal lato che vince", () => {
+  const samples = Array.from({ length: 1000 }, (_, index) => (index + 0.5) / 1000);
+
+  for (const specialty of ["ITALIANA", "GORIZIANA", "TUTTI_DOPPI"] as const) {
+    const target = MATCH_TARGET_POINTS[specialty];
+    let playerOneWinnerLoserTotal = 0;
+    let playerTwoWinnerLoserTotal = 0;
+
+    for (const randomValue of samples) {
+      playerOneWinnerLoserTotal += calculateIndividualGameScore({
+        specialty,
+        winnerSide: "PLAYER_ONE",
+        playerOnePerformanceRating: 80,
+        playerTwoPerformanceRating: 70,
+        randomValue,
+      }).playerTwoScore;
+      playerTwoWinnerLoserTotal += calculateIndividualGameScore({
+        specialty,
+        winnerSide: "PLAYER_TWO",
+        playerOnePerformanceRating: 70,
+        playerTwoPerformanceRating: 80,
+        randomValue,
+      }).playerOneScore;
+    }
+
+    const firstAverage = playerOneWinnerLoserTotal / samples.length;
+    const secondAverage = playerTwoWinnerLoserTotal / samples.length;
+
+    assert.ok(firstAverage < target * 0.82);
+    assert.ok(secondAverage < target * 0.82);
+    assert.ok(Math.abs(firstAverage - secondAverage) <= MATCH_TOTAL_SCORE_STEP[specialty]);
+  }
+});
+
 test("raggiunge il traguardo previsto e conserva l'intero tiro finale", () => {
   assert.deepEqual(
     calculateIndividualGameScore({
