@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import Link from "next/link";
 import { Crown, Medal, Percent, Trophy, Users } from "lucide-react";
 
@@ -106,7 +107,7 @@ function RecordCard({
 }: {
   title: string;
   subtitle: string;
-  icon: React.ReactNode;
+  icon: ReactNode;
   rows: WorldRecordPlayer[];
   suffix: string;
 }) {
