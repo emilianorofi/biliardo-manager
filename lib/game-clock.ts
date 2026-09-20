@@ -6,7 +6,6 @@ import {
 import {
   advanceAcademyScouting,
 } from "@/lib/academy-scouting";
-import { advanceAcademyDevelopment } from "@/lib/academy-weekly-development";
 import {
   drawIndividualTournament,
   initializeIndividualTournaments,
@@ -676,11 +675,6 @@ async function processAcademyEvent(
           candidate.id,
           candidate.scheduledAt
         );
-      const development =
-        await advanceAcademyDevelopment(
-          transaction,
-          candidate.id
-        );
 
       if (
         intake.createdPlayers > 0 ||
@@ -716,7 +710,6 @@ async function processAcademyEvent(
         processedAt,
         intake,
         scouting,
-        development,
       };
     }
   );
