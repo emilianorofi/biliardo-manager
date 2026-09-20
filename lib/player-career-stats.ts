@@ -4,6 +4,7 @@ import type {
   PlayerCareerGameType,
   PlayerCareerResult,
   PlayerCareerSpecialty,
+  PlayerCareerTournament,
   PlayerCareerTransfer,
   PlayerCareerTransferType,
   PlayerCareerView,
@@ -62,6 +63,26 @@ export type CareerAppearanceInput = {
   gamePerformances: CareerPerformanceInput[];
 };
 
+export type CareerTournamentInput = {
+  id: number;
+  status: string;
+  eliminatedStage: string | null;
+  rankingAtDraw: number;
+  overallAtDraw: number;
+  tournament: {
+    id: number;
+    leagueRound: number;
+    type: string;
+    name: string;
+    specialty: string;
+    finalAt: Date;
+    season: {
+      number: number;
+      name: string;
+    };
+  };
+};
+
 export type CareerTransferInput = {
   id: number;
   status: string;
@@ -87,7 +108,8 @@ type NormalizedPerformance = {
 
 export function buildPlayerCareerView(
   appearances: CareerAppearanceInput[],
-  transferListings: CareerTransferInput[] = []
+  transferListings: CareerTransferInput[] = [],
+  tournamentEntries: CareerTournamentInput[] = []
 ): PlayerCareerView {
   const normalizedAppearances = appearances.map(
     normalizeAppearance
@@ -99,6 +121,13 @@ export function buildPlayerCareerView(
         listing.completedAt !== null
     )
     .map(normalizeTransfer)
+    .sort(
+      (first, second) =>
+        new Date(second.completedAt).getTime() -
+        new Date(first.completedAt).getTime()
+    );
+  const tournaments = tournamentEntries
+    .map(normalizeTournament)
     .sort(
       (first, second) =>
         new Date(second.completedAt).getTime() -
@@ -150,8 +179,58 @@ export function buildPlayerCareerView(
           new Date(first.playedAt).getTime()
       )
       .slice(0, 6),
+    tournaments,
     transfers,
   };
+}
+
+function normalizeTournament(
+  entry: CareerTournamentInput
+): PlayerCareerTournament {
+  const winner = entry.status === "WINNER";
+
+  return {
+    id: entry.id,
+    tournamentId: entry.tournament.id,
+    seasonNumber: entry.tournament.season.number,
+    seasonName: entry.tournament.season.name,
+    leagueRound: entry.tournament.leagueRound,
+    name: entry.tournament.name,
+    type: entry.tournament.type,
+    specialty: entry.tournament.specialty,
+    completedAt: entry.tournament.finalAt.toISOString(),
+    placement: getTournamentPlacement(entry.status, entry.eliminatedStage),
+    winner,
+    rankingAtDraw: entry.rankingAtDraw,
+    overallAtDraw: roundValue(entry.overallAtDraw),
+  };
+}
+
+function getTournamentPlacement(status: string, eliminatedStage: string | null) {
+  if (status === "WINNER") return "Vincitore";
+  if (status === "ACTIVE") return "In corso";
+  if (status === "WITHDRAWN") return "Ritirato";
+
+  switch (eliminatedStage) {
+    case "ROUND_OF_256":
+      return "128esimi";
+    case "ROUND_OF_128":
+      return "64esimi";
+    case "ROUND_OF_64":
+      return "32esimi";
+    case "ROUND_OF_32":
+      return "16esimi";
+    case "ROUND_OF_16":
+      return "Ottavi";
+    case "QUARTER_FINAL":
+      return "Quarti";
+    case "SEMI_FINAL":
+      return "Semifinale";
+    case "FINAL":
+      return "Finalista";
+    default:
+      return status === "ELIMINATED" ? "Eliminato" : status;
+  }
 }
 
 function normalizeTransfer(
