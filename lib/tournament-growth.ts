@@ -17,14 +17,14 @@ const TOURNAMENT_GROWTH: Record<
   Record<TournamentPlacement, number>
 > = {
   INDIVIDUAL: {
-    WINNER: 0.23,
-    FINALIST: 0.20,
-    SEMI_FINAL: 0.17,
-    QUARTER_FINAL: 0.14,
-    ROUND_OF_16: 0.11,
+    WINNER: 0.30,
+    FINALIST: 0.24,
+    SEMI_FINAL: 0.20,
+    QUARTER_FINAL: 0.17,
+    ROUND_OF_16: 0.12,
     ROUND_OF_32: 0.08,
     ROUND_OF_64: 0.05,
-    ROUND_OF_128: 0.02,
+    ROUND_OF_128: 0.03,
   },
   SPECIALTY_CUP: {
     WINNER: 0.40,
@@ -37,14 +37,14 @@ const TOURNAMENT_GROWTH: Record<
     ROUND_OF_128: 0.04,
   },
   WORLD: {
-    WINNER: 0.23,
-    FINALIST: 0.20,
-    SEMI_FINAL: 0.17,
-    QUARTER_FINAL: 0.14,
-    ROUND_OF_16: 0.11,
-    ROUND_OF_32: 0.08,
-    ROUND_OF_64: 0.05,
-    ROUND_OF_128: 0.02,
+    WINNER: 0.50,
+    FINALIST: 0.40,
+    SEMI_FINAL: 0.35,
+    QUARTER_FINAL: 0.30,
+    ROUND_OF_16: 0.20,
+    ROUND_OF_32: 0.15,
+    ROUND_OF_64: 0.10,
+    ROUND_OF_128: 0.05,
   },
 };
 
