@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
@@ -6,11 +7,14 @@ import {
   MapPin,
   ShieldCheck,
   Star,
+  Trophy,
+  TrendingUp,
   Users,
 } from "lucide-react";
 
 import PlayerListCard from "@/app/components/player/PlayerListCard";
 import type { Player } from "@/app/types/player";
+import { getClubHonours } from "@/lib/club-honours";
 import { getTechnicalViewerClubId } from "@/lib/current-club";
 import { buildGlobalPlayerRanking } from "@/lib/player-ranking";
 import { canViewPlayerTechnicalValues } from "@/lib/player-visibility";
@@ -34,7 +38,7 @@ export default async function ClubPage({
   }
 
   const viewerClubId = await getTechnicalViewerClubId();
-  const [club, rankablePlayers] = await Promise.all([
+  const [club, rankablePlayers, honours] = await Promise.all([
     prisma.club.findUnique({
       where: {
         id: clubId,
@@ -85,6 +89,7 @@ export default async function ClubPage({
         misura: true,
       },
     }),
+    getClubHonours(clubId),
   ]);
 
   if (!club) {
@@ -235,6 +240,55 @@ export default async function ClubPage({
         </div>
       </header>
 
+      <section className="rounded-2xl border border-amber-400/20 bg-[#15261f] px-4 py-3.5 sm:px-5">
+        <div className="flex items-center gap-2">
+          <Trophy size={17} className="text-amber-300" />
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-amber-300">
+              Palmarès
+            </p>
+            <h2 className="text-lg font-black text-white">Storia del club</h2>
+          </div>
+        </div>
+
+        <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
+          <ClubMetric icon={<Trophy size={18} />} label="Titoli lega" value={honours.leagueTitles} highlight />
+          <ClubMetric icon={<Star size={18} />} label="Prima Serie" value={honours.topFlightTitles} />
+          <ClubMetric icon={<TrendingUp size={18} />} label="Promozioni" value={honours.promotions} />
+          <ClubMetric
+            icon={<ShieldCheck size={18} />}
+            label="Miglior Prima Serie"
+            value={honours.bestTopFlightFinish ? `#${honours.bestTopFlightFinish}` : "—"}
+          />
+        </div>
+
+        {honours.seasons.length > 0 ? (
+          <details className="mt-3 rounded-xl border border-emerald-900/50 bg-emerald-950/20 px-3 py-2">
+            <summary className="cursor-pointer text-xs font-black text-slate-300">
+              Storico stagioni ({honours.seasons.length})
+            </summary>
+            <div className="mt-2 space-y-1.5">
+              {honours.seasons.map((season) => (
+                <div
+                  key={`${season.seasonNumber}-${season.level}-${season.groupCode}`}
+                  className="grid gap-1 rounded-lg border border-emerald-900/40 bg-black/10 px-2.5 py-2 text-xs sm:grid-cols-[1fr_auto_auto]"
+                >
+                  <span className="font-bold text-white">
+                    {season.seasonName} · {season.leagueName}
+                  </span>
+                  <span className="text-slate-400">
+                    #{season.position} · {season.points} pt · {season.pointsFor}-{season.pointsAgainst}
+                  </span>
+                  <span className="font-black text-amber-300">
+                    {season.champion ? (season.level === 1 ? "🏆 Campione" : "🏆 Promosso") : ""}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </details>
+        ) : null}
+      </section>
+
       <section className="rounded-2xl border border-emerald-900/60 bg-[#15261f] px-4 py-3.5 sm:px-5">
         <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
           <div>
@@ -301,7 +355,7 @@ function ClubMetric({
   value,
   highlight = false,
 }: {
-  icon: React.ReactNode;
+  icon: ReactNode;
   label: string;
   value: string | number;
   highlight?: boolean;
