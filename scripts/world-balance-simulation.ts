@@ -54,8 +54,7 @@ type SimPlayer = {
 type ClubInput = {
   id: number;
   trainerLevel: number;
-  trainingCenterLevel: number;
-  academyLevel: number;
+  youthCoachLevel: number;
   trainingPlan: {
     primaryFocus: string;
     secondaryFocus: string;
@@ -121,8 +120,7 @@ async function main() {
       select: {
         id: true,
         trainerLevel: true,
-        trainingCenterLevel: true,
-        academyLevel: true,
+        youthCoachLevel: true,
         trainingPlan: {
           select: {
             primaryFocus: true,
@@ -190,7 +188,7 @@ async function main() {
           createAcademyGraduate({
             id: nextSyntheticId--,
             clubId,
-            academyLevel: club?.academyLevel ?? 1,
+            academyLevel: club?.youthCoachLevel ?? 1,
             random,
           })
         );
@@ -275,9 +273,9 @@ function simulateTrainingSeason(
         player.clubId === null ? null : clubRanks.get(player.id) ?? 99
       );
       const trainerEfficiency = getTrainerEfficiency(club?.trainerLevel ?? 1);
-      const centerMultiplier = getTrainingCenterGrowthMultiplier(
-        club?.trainingCenterLevel ?? 1
-      );
+      // Il modello Club corrente non persiste ancora un livello del centro allenamento.
+      // Manteniamo il moltiplicatore neutro finche la struttura non verra introdotta nel DB.
+      const centerMultiplier = getTrainingCenterGrowthMultiplier(1);
       const currentValues = skillValues(player);
       const primaryGain =
         calculateTrainingGain({
