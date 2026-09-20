@@ -65,6 +65,22 @@ export type PlayerCareerTransfer = {
   amount: number | null;
 };
 
+export type PlayerCareerTournament = {
+  id: number;
+  tournamentId: number;
+  seasonNumber: number;
+  seasonName: string;
+  leagueRound: number;
+  name: string;
+  type: string;
+  specialty: string;
+  completedAt: string;
+  placement: string;
+  winner: boolean;
+  rankingAtDraw: number;
+  overallAtDraw: number;
+};
+
 export type PlayerCareerView = {
   summary: PlayerCareerAggregate & {
     appearances: number;
@@ -74,5 +90,6 @@ export type PlayerCareerView = {
   gameTypes: PlayerCareerBreakdown[];
   seasons: PlayerCareerBreakdown[];
   recentAppearances: PlayerCareerAppearance[];
+  tournaments: PlayerCareerTournament[];
   transfers: PlayerCareerTransfer[];
 };
