@@ -1,26 +1,48 @@
 # Invecchiamento e ritiro
 
-La chiusura della stagione è collegata alla registrazione dell'ultima partita.
-Una stagione viene conclusa soltanto quando tutti i suoi campionati risultano
-`COMPLETED`.
+L'età dei giocatori avanza **ogni giorno di calendario di gioco** tramite il
+game clock. Un anno di età corrisponde a 105 giorni ed è rappresentato come
+`anni + giorni`, con `ageDays` compreso tra 0 e 104.
 
-L'operazione è protetta dallo stato della stagione e dal lock della sua riga:
-anche in presenza di richieste concorrenti, età e ritiri vengono elaborati una
-sola volta.
+Il controllo di fine stagione non aggiunge più un anno ai giocatori: serve
+soltanto a valutare gli eventuali ritiri usando l'età già raggiunta in quel
+momento.
 
-## Ordine delle operazioni
+## Avanzamento quotidiano
 
-1. Ogni giocatore di prima squadra con carriera `ACTIVE`, compresi gli
-   svincolati, compie un anno.
-2. La probabilità di ritiro viene calcolata sulla nuova età.
-3. I giocatori estratti vengono marcati `RETIRED`, rimossi dalla rosa e dalla
-   formazione, e le loro inserzioni di mercato ancora aperte vengono annullate.
-4. Lo storico di partite e trasferimenti rimane collegato al giocatore.
-5. La stagione passa a `COMPLETED`.
+Il game clock conserva l'ultima data elaborata nel fuso `Europe/Rome`.
+Quando viene eseguito:
+
+1. calcola quanti giorni di calendario sono trascorsi;
+2. incrementa `ageDays` per tutti i giocatori attivi e per i giovani
+   dell'Accademia;
+3. ogni 105 giorni converte automaticamente i giorni accumulati in un anno;
+4. rimuove dall'Accademia i giovani che raggiungono 18e0 senza essere stati
+   promossi, registrando l'evento per il club.
+
+L'operazione usa un lock dedicato ed è idempotente: più esecuzioni nella stessa
+giornata non fanno invecchiare due volte i giocatori.
+
+## Ritiro a fine stagione
+
+La stagione viene chiusa soltanto dopo il termine della settimana 15 e dopo la
+conclusione di tutte le competizioni obbligatorie.
+
+Alla chiusura:
+
+1. vengono considerati tutti i giocatori con carriera `ACTIVE`, compresi gli
+   svincolati;
+2. la probabilità di ritiro viene calcolata sull'età corrente, senza modificarla;
+3. i ritiri estratti vengono limitati, quando necessario, per non lasciare un
+   club con meno di tre giocatori attivi;
+4. i giocatori che si ritirano vengono marcati `RETIRED`, rimossi da rosa e
+   formazione e le loro inserzioni di mercato ancora aperte vengono annullate;
+5. storico di partite e trasferimenti rimane collegato al giocatore;
+6. la stagione passa a `COMPLETED`.
 
 ## Probabilità
 
-| Età dopo il compleanno | Probabilità di ritiro |
+| Età corrente | Probabilità di ritiro |
 | --- | ---: |
 | Fino a 49 | 0% |
 | 50–55 | 2% |
@@ -33,5 +55,5 @@ sola volta.
 | 86–90 | 90% |
 | Da 91 in poi | 95% |
 
-Il ciclo anagrafico dell'accademia e la crescita o il calo delle caratteristiche
-sono interventi separati.
+Crescita e decadimento delle caratteristiche tecniche restano processi distinti
+dall'avanzamento anagrafico.
