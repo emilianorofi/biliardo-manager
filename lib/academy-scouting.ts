@@ -90,20 +90,20 @@ export async function advanceAcademyScouting(
     };
   }
 
-  const players = await transaction.academyPlayer.findMany({
-    where: {
-      id: {
-        in: duePlayers.map((player) => player.id),
-      },
-    },
-    include: {
-      club: {
-        select: {
-          academyLevel: true,
+  const [players, club] = await Promise.all([
+    transaction.academyPlayer.findMany({
+      where: {
+        id: {
+          in: duePlayers.map((player) => player.id),
         },
       },
-    },
-  });
+    }),
+    transaction.club.findUnique({
+      where: { id: clubId },
+      select: { academyLevel: true },
+    }),
+  ]);
+  const academyLevel = club?.academyLevel ?? 1;
 
   for (const player of players) {
     const estimatedAttributeKeys = normalizeKeys(
@@ -133,7 +133,7 @@ export async function advanceAcademyScouting(
       const development = calculateAcademyWeeklyDevelopment({
         age: player.age,
         talent: player.talent,
-        academyLevel: player.club.academyLevel,
+        academyLevel,
         currentValues,
       });
       currentValues = development.values;
