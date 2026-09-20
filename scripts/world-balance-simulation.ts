@@ -449,7 +449,10 @@ function createAcademyGraduate({
   academyLevel: number;
   random: () => number;
 }): SimPlayer {
-  const overall = 50 + Math.floor(random() * 5) + Math.max(0, academyLevel - 1);
+  const levelBonusMinimum = academyLevel >= 4 ? 1 : 0;
+  const levelBonusMaximum = academyLevel === 1 ? 0 : academyLevel === 2 ? 1 : academyLevel === 3 ? 2 : academyLevel === 4 ? 3 : 4;
+  const levelBonus = levelBonusMinimum + Math.floor(random() * (levelBonusMaximum - levelBonusMinimum + 1));
+  const overall = 50 + Math.floor(random() * 5) + levelBonus;
   const deviations = shuffle([-4, -3, -2, -1, 0, 1, 2, 3, 4], random);
   const bands = getAcademyTalentBands(academyLevel);
   const roll = random();
