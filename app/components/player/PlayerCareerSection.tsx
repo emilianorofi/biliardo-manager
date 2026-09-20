@@ -14,6 +14,8 @@ import type {
   PlayerCareerAppearance,
   PlayerCareerBreakdown,
   PlayerCareerGame,
+  PlayerCareerNationsCup,
+  PlayerCareerSpecialtyCup,
   PlayerCareerTournament,
   PlayerCareerTransfer,
   PlayerCareerView,
@@ -144,6 +146,10 @@ export default function PlayerCareerSection({
       </div>
 
       <TournamentHistoryCard tournaments={career.tournaments} />
+      <SeasonCupHistoryCard
+        nationsCups={career.nationsCups}
+        specialtyCups={career.specialtyCups}
+      />
       <TransferHistoryCard transfers={career.transfers} />
     </section>
   );
@@ -404,6 +410,74 @@ function TournamentRow({
         </p>
       </div>
     </article>
+  );
+}
+
+function SeasonCupHistoryCard({
+  nationsCups,
+  specialtyCups,
+}: {
+  nationsCups: PlayerCareerNationsCup[];
+  specialtyCups: PlayerCareerSpecialtyCup[];
+}) {
+  const total = nationsCups.length + specialtyCups.length;
+  if (total === 0) return null;
+
+  return (
+    <div className="mt-3 rounded-xl border border-sky-400/20 bg-sky-400/[0.04] p-2.5">
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-2">
+          <Trophy className="text-sky-300" size={14} />
+          <h3 className="text-sm font-black text-white">
+            Coppe stagionali
+          </h3>
+        </div>
+        <span className="text-[10px] font-semibold text-slate-500">
+          {total} partecipazioni
+        </span>
+      </div>
+
+      <div className="mt-2 space-y-1.5">
+        {nationsCups.map((cup) => (
+          <article
+            key={`nation-${cup.id}`}
+            className="grid gap-2 rounded-lg border border-sky-400/15 bg-black/15 px-2.5 py-2 sm:grid-cols-[minmax(0,1fr)_120px_auto] sm:items-center"
+          >
+            <div>
+              <p className="text-xs font-black text-white">
+                Coppa delle Nazioni · {cup.nationName}
+              </p>
+              <p className="mt-0.5 text-[9px] uppercase tracking-wide text-slate-500">
+                {cup.seasonName} · Gruppo {cup.groupCode}
+              </p>
+            </div>
+            <p className={cup.champion ? "text-xs font-black text-amber-300" : "text-xs font-black text-slate-200"}>
+              {cup.champion ? "🏆 " : ""}{cup.placement}
+            </p>
+            <p className="text-[10px] font-bold text-slate-400 sm:text-right">
+              {cup.won}V · {cup.drawn}N · {cup.lost}P
+            </p>
+          </article>
+        ))}
+
+        {specialtyCups.map((cup) => (
+          <article
+            key={`specialty-${cup.id}`}
+            className="grid gap-2 rounded-lg border border-sky-400/15 bg-black/15 px-2.5 py-2 sm:grid-cols-[minmax(0,1fr)_120px] sm:items-center"
+          >
+            <div>
+              <p className="text-xs font-black text-white">{cup.cupName}</p>
+              <p className="mt-0.5 text-[9px] uppercase tracking-wide text-slate-500">
+                {cup.seasonName}
+              </p>
+            </div>
+            <p className={cup.champion ? "text-xs font-black text-amber-300 sm:text-right" : "text-xs font-black text-slate-200 sm:text-right"}>
+              {cup.champion ? "🏆 " : ""}{cup.placement}
+            </p>
+          </article>
+        ))}
+      </div>
+    </div>
   );
 }
 
