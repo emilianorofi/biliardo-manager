@@ -58,7 +58,9 @@ Questa struttura permette di ottenere senza duplicare dati:
 
 La scheda carriera collega inoltre i trasferimenti completati e le partecipazioni ai tornei individuali già presenti nel database. Per ogni torneo mostra competizione, stagione, settimana, ranking e overall al sorteggio, piazzamento finale ed eventuale vittoria. Il Mondiale usa la stessa struttura dei tornei individuali ed entra quindi automaticamente nello storico.
 
-Coppa delle Nazioni, Coppa Specialità, crescita delle caratteristiche, premi e ritiro potranno essere aggiunti allo stesso percorso quando verrà definito il relativo livello di dettaglio storico.
+La scheda collega anche le coppe stagionali. Per la Coppa delle Nazioni conserva nazionale rappresentata, gruppo, bilancio vittorie-pareggi-sconfitte, piazzamento ed eventuale titolo. Per la Coppa Specialità legge il tabellone persistito della stagione e mostra coppa disputata, piazzamento ed eventuale vittoria.
+
+Crescita delle caratteristiche, premi economici e ritiro potranno essere aggiunti allo stesso percorso nelle fasi successive.
 
 ## Registrazione automatica della partita
 
