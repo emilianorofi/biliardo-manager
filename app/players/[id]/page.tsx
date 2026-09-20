@@ -62,7 +62,7 @@ export default async function PlayerPage({
     notFound();
   }
 
-  const [databasePlayer, rosterCount, activeSales, rankablePlayers] =
+  const [databasePlayer, rosterCount, activeSales, rankablePlayers, nationsCupEntries, specialtyCupRows] =
     await Promise.all([
       prisma.player.findUnique({
         where: {
@@ -200,6 +200,45 @@ export default async function PlayerPage({
           misura: true,
         },
       }),
+      prisma.nationsCupEntry.findMany({
+        where: {
+          OR: [
+            { firstPlayerId: playerId },
+            { secondPlayerId: playerId },
+            { thirdPlayerId: playerId },
+          ],
+        },
+        orderBy: { createdAt: "desc" },
+        select: {
+          id: true,
+          nationCode: true,
+          nationName: true,
+          groupCode: true,
+          played: true,
+          won: true,
+          drawn: true,
+          lost: true,
+          eliminatedStage: true,
+          tournament: {
+            select: {
+              id: true,
+              championCode: true,
+              season: { select: { name: true } },
+            },
+          },
+        },
+      }),
+      prisma.$queryRaw<Array<{
+        id: number;
+        seasonName: string;
+        payload: unknown;
+      }>>`
+        SELECT sct."id", s."name" AS "seasonName", sct."payload"
+        FROM "SpecialtyCupTournament" sct
+        JOIN "Season" s ON s."id" = sct."seasonId"
+        WHERE sct."payload" IS NOT NULL
+        ORDER BY s."number" DESC
+      `,
     ]);
 
   const currentListing =
@@ -319,7 +358,10 @@ const player: Player = {
   const career = buildPlayerCareerView(
     databasePlayer.fixtureAppearances,
     databasePlayer.transferListings,
-    databasePlayer.individualTournamentEntries
+    databasePlayer.individualTournamentEntries,
+    nationsCupEntries,
+    specialtyCupRows,
+    playerId
   );
   const isOwnPlayer = canViewPlayerTechnicalValues(
     technicalViewerClubId,
