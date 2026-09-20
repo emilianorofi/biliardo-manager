@@ -1,7 +1,7 @@
 import type { TrainingPlayerValues } from "@/lib/training-engine";
 import { TRAINING_SKILLS } from "@/lib/training-engine";
 
-const ACADEMY_BASE_WEEKLY_GAIN = 0.16;
+const ACADEMY_BASE_WEEKLY_GAIN = 0.26;
 
 export function getTalentDevelopmentMultiplier(talent: number) {
   const normalized = Math.min(95, Math.max(45, talent));
