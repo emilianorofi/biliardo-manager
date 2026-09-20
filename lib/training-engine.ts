@@ -280,13 +280,17 @@ export function getAgeMultiplier(
   return 0.005;
 }
 
-function getTalentMultiplier(
+export function getTalentMultiplier(
   talent: number
 ) {
   const normalizedTalent =
-    clamp(talent, 0, 100);
+    clamp(talent, 45, 95);
 
-  return 0.9 + (normalizedTalent / 100) * 0.2;
+  return (
+    0.8 +
+    ((normalizedTalent - 45) / 50) *
+      0.7
+  );
 }
 
 function getSkillLevelMultiplier(currentValue: number) {
