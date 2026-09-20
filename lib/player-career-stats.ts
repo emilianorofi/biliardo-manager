@@ -4,6 +4,8 @@ import type {
   PlayerCareerGameType,
   PlayerCareerResult,
   PlayerCareerSpecialty,
+  PlayerCareerNationsCup,
+  PlayerCareerSpecialtyCup,
   PlayerCareerTournament,
   PlayerCareerTransfer,
   PlayerCareerTransferType,
@@ -83,6 +85,29 @@ export type CareerTournamentInput = {
   };
 };
 
+export type CareerNationsCupInput = {
+  id: number;
+  nationCode: string;
+  nationName: string;
+  groupCode: string;
+  played: number;
+  won: number;
+  drawn: number;
+  lost: number;
+  eliminatedStage: string | null;
+  tournament: {
+    id: number;
+    championCode: string | null;
+    season: { name: string };
+  };
+};
+
+export type CareerSpecialtyCupInput = {
+  id: number;
+  seasonName: string;
+  payload: unknown;
+};
+
 export type CareerTransferInput = {
   id: number;
   status: string;
@@ -109,7 +134,10 @@ type NormalizedPerformance = {
 export function buildPlayerCareerView(
   appearances: CareerAppearanceInput[],
   transferListings: CareerTransferInput[] = [],
-  tournamentEntries: CareerTournamentInput[] = []
+  tournamentEntries: CareerTournamentInput[] = [],
+  nationsCupEntries: CareerNationsCupInput[] = [],
+  specialtyCupRows: CareerSpecialtyCupInput[] = [],
+  playerId?: number
 ): PlayerCareerView {
   const normalizedAppearances = appearances.map(
     normalizeAppearance
@@ -133,6 +161,13 @@ export function buildPlayerCareerView(
         new Date(second.completedAt).getTime() -
         new Date(first.completedAt).getTime()
     );
+  const nationsCups = nationsCupEntries.map(normalizeNationsCup);
+  const specialtyCups =
+    playerId === undefined
+      ? []
+      : specialtyCupRows.flatMap((row) =>
+          normalizeSpecialtyCups(row, playerId)
+        );
   const performances = normalizedAppearances.flatMap(
     (appearance) => appearance.games
   );
@@ -180,8 +215,111 @@ export function buildPlayerCareerView(
       )
       .slice(0, 6),
     tournaments,
+    nationsCups,
+    specialtyCups,
     transfers,
   };
+}
+
+function normalizeNationsCup(
+  entry: CareerNationsCupInput
+): PlayerCareerNationsCup {
+  const champion =
+    entry.tournament.championCode === entry.nationCode;
+
+  return {
+    id: entry.id,
+    tournamentId: entry.tournament.id,
+    seasonName: entry.tournament.season.name,
+    nationCode: entry.nationCode,
+    nationName: entry.nationName,
+    groupCode: entry.groupCode,
+    placement: champion
+      ? "Vincitore"
+      : nationsCupPlacement(entry.eliminatedStage),
+    champion,
+    played: entry.played,
+    won: entry.won,
+    drawn: entry.drawn,
+    lost: entry.lost,
+  };
+}
+
+function nationsCupPlacement(stage: string | null) {
+  if (stage === "FINALIST") return "Finalista";
+  if (stage === "SEMI_FINAL") return "Semifinale";
+  if (stage === "QUARTER_FINAL") return "Quarti";
+  if (stage === "GROUP_STAGE") return "Gironi";
+  return "Partecipazione";
+}
+
+function normalizeSpecialtyCups(
+  row: CareerSpecialtyCupInput,
+  playerId: number
+): PlayerCareerSpecialtyCup[] {
+  if (!row.payload || typeof row.payload !== "object") return [];
+  const payload = row.payload as {
+    cups?: Record<string, {
+      name?: string;
+      type?: string;
+      slots?: Array<{ playerId?: number }>;
+      rounds?: Array<{
+        stageLabel?: string;
+        matches?: Array<{
+          playerOneId?: number | null;
+          playerTwoId?: number | null;
+          winnerPlayerId?: number | null;
+        }>;
+      }>;
+      championPlayerId?: number | null;
+    }>;
+  };
+
+  return Object.entries(payload.cups ?? {}).flatMap(([key, cup]) => {
+    if (!cup.slots?.some((slot) => slot.playerId === playerId)) return [];
+
+    const champion = cup.championPlayerId === playerId;
+    let placement = champion ? "Vincitore" : "Partecipazione";
+
+    if (!champion) {
+      for (const round of cup.rounds ?? []) {
+        const lost = round.matches?.some(
+          (match) =>
+            (match.playerOneId === playerId ||
+              match.playerTwoId === playerId) &&
+            match.winnerPlayerId !== playerId
+        );
+        if (lost) {
+          placement = specialtyCupPlacement(round.stageLabel);
+          break;
+        }
+      }
+    }
+
+    return [{
+      id: `${row.id}-${key}-${playerId}`,
+      tournamentId: row.id,
+      seasonName: row.seasonName,
+      cupName: cup.name ?? key,
+      specialty: cup.type ?? key,
+      placement,
+      champion,
+    }];
+  });
+}
+
+function specialtyCupPlacement(stageLabel?: string) {
+  if (!stageLabel) return "Partecipazione";
+  const label = stageLabel.toLowerCase();
+  if (label.includes("finale") && !label.includes("semi")) return "Finalista";
+  if (label.includes("semifinale")) return "Semifinale";
+  if (label.includes("quarti")) return "Quarti";
+  if (label.includes("ottavi")) return "Ottavi";
+  if (label.includes("sedicesimi") || label.includes("16esimi")) return "16esimi";
+  if (label.includes("trentaduesimi") || label.includes("32esimi")) return "32esimi";
+  if (label.includes("sessantaquattresimi") || label.includes("64esimi")) return "64esimi";
+  if (label.includes("centoventottesimi") || label.includes("128esimi")) return "128esimi";
+  return stageLabel;
 }
 
 function normalizeTournament(
