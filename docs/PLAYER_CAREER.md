@@ -76,3 +76,24 @@ La partita reale viene giocata tramite `playLeagueFixture`. Il servizio:
 Tutte le operazioni avvengono nella stessa transazione. Se anche una sola registrazione fallisce, vengono annullati anche risultato e aggiornamento della classifica: non può quindi esistere una partita salvata soltanto in parte.
 
 L'endpoint `POST /api/league/play-fixture` è utilizzabile soltanto da un manager coinvolto nell'incontro e non permette di giocare prima dell'orario programmato. Il servizio interno rimane riutilizzabile dalla futura automazione delle giornate.
+
+
+## Palmarès
+
+La scheda giocatore calcola il palmarès direttamente dai risultati storici già
+persistiti, senza duplicare i dati in una seconda tabella.
+
+Il riepilogo comprende:
+
+- titoli complessivi;
+- Campionati Mondiali vinti;
+- tornei individuali di specialità vinti;
+- Coppe Specialità vinte;
+- Coppe delle Nazioni vinte;
+- finali complessivamente raggiunte;
+- miglior piazzamento in carriera;
+- numero di stagioni nelle quali è stato conquistato almeno un titolo.
+
+Per le stagioni con finali o vittorie viene inoltre costruito un riepilogo
+cronologico degli obiettivi raggiunti. In questo modo il palmarès rimane
+automaticamente coerente con lo storico delle competizioni.
