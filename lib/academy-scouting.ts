@@ -2,9 +2,7 @@ import type { Prisma } from "@/generated/prisma/client";
 import {
   TRAINING_SKILLS,
   type TrainingFocus,
-  type TrainingPlayerValues,
 } from "@/lib/training-engine";
-import { calculateAcademyWeeklyDevelopment } from "@/lib/academy-development";
 import {
   ACADEMY_EVENT,
   getNextRomeWeeklyDate,
@@ -90,20 +88,13 @@ export async function advanceAcademyScouting(
     };
   }
 
-  const [players, club] = await Promise.all([
-    transaction.academyPlayer.findMany({
-      where: {
-        id: {
-          in: duePlayers.map((player) => player.id),
-        },
+  const players = await transaction.academyPlayer.findMany({
+    where: {
+      id: {
+        in: duePlayers.map((player) => player.id),
       },
-    }),
-    transaction.club.findUnique({
-      where: { id: clubId },
-      select: { academyLevel: true },
-    }),
-  ]);
-  const academyLevel = club?.academyLevel ?? 1;
+    },
+  });
 
   for (const player of players) {
     const estimatedAttributeKeys = normalizeKeys(
@@ -113,31 +104,12 @@ export async function advanceAcademyScouting(
       player.revealedAttributeKeys
     );
     let nextScoutingAt = player.nextScoutingAt;
-    let currentValues: TrainingPlayerValues = {
-      precisione: player.precisione ?? 0,
-      diretto: player.diretto ?? 0,
-      sponde: player.sponde ?? 0,
-      tattica: player.tattica ?? 0,
-      mentalita: player.mentalita ?? 0,
-      difesa: player.difesa ?? 0,
-      realizzazione: player.realizzazione ?? 0,
-      creativita: player.creativita ?? 0,
-      misura: player.misura ?? 0,
-    };
 
     while (
       nextScoutingAt &&
       nextScoutingAt.getTime() <= now.getTime() &&
       revealedAttributeKeys.length < TRAINING_SKILLS.length
     ) {
-      const development = calculateAcademyWeeklyDevelopment({
-        age: player.age,
-        talent: player.talent,
-        academyLevel,
-        currentValues,
-      });
-      currentValues = development.values;
-
       if (estimatedAttributeKeys.length < TRAINING_SKILLS.length) {
         const unknownAttributes = TRAINING_SKILLS.filter(
           (attribute) => !estimatedAttributeKeys.includes(attribute)
@@ -173,7 +145,6 @@ export async function advanceAcademyScouting(
         id: player.id,
       },
       data: {
-        ...currentValues,
         estimatedAttributeKeys,
         revealedAttributeKeys,
         revealedAttributes: revealedAttributeKeys.length,
